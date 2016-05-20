@@ -14,6 +14,7 @@ from sklearn.lda import LDA
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import MaxAbsScaler
+import pdb
 
 #-----------Pull neural data in Extracted_ Form----------------
 
@@ -21,29 +22,55 @@ from sklearn.preprocessing import MaxAbsScaler
 #root.withdraw()
 #filename = tkFileDialog.askopenfilename();
 
-filename = '/Volumes/ADATA_SH93/nhp_data/20151026_504/sorted_files/matfiles/Extracted_504_2015-10-26-14-03-03.mat'
+filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-25-20.mat'
+#filename = '/Users/johnhessburg/documents/lab/workspace/Classification_scripts/test/Extracted_0059_2015-10-27-15-05-19.mat'
 print filename
+
 a = sio.loadmat(filename);
 
 #Pull reward timestamps. Separate timespamp file must exist in folder containing neural data, with same name+_timestamps
 print filename[:-4]+"_timestamps"+filename[-4:]
 Timestamps = sio.loadmat(filename[:-4]+"_timestamps"+filename[-4:]);
 #Timestamp generation: generates arrays of timestamps depending on reward level, including offset for cue presentation and reward delivery
-zero_reward_delivery = Timestamps['zero_reward_Reward'][0];
-zero_reward_cue = Timestamps['zero_reward_cue'][0];
-one_reward_delivery = Timestamps['one_reward_Reward'][0]+.50;
-one_reward_cue = Timestamps['one_reward_cue'][0]+1.0;
-two_reward_delivery = Timestamps['two_reward_Reward'][0]+1.0;
-two_reward_cue = Timestamps['two_reward_cue'][0]+2.0;
-three_reward_delivery = Timestamps['three_reward_Reward'][0]+1.5;
-three_reward_cue = Timestamps['three_reward_cue'][0]+3.0;
+
+#print Timestamps['r_f_nextreset'][0]
+#print np.transpose(Timestamps['r_f_nextreset'][0][0])
+
+#for now use existing names
+#zero_reward_delivery = Timestamps['zero_reward_Reward'][0];
+#one reward cue, completed unsuccessfully
+zero_reward_delivery = Timestamps['r_f_nextreset'][0];
+#zero_reward_cue = Timestamps['zero_reward_cue'][0];
+zero_reward_cue = Timestamps['r_f_cue_ts'][0];
+
+#one reward, completed successfully (rewarding)
+#one_reward_delivery = Timestamps['one_reward_Reward'][0]+.50;
+one_reward_delivery = Timestamps['r_s_rdelivery_ts'][0];
+#one_reward_cue = Timestamps['one_reward_cue'][0]+1.0;
+one_reward_cue = Timestamps['r_s_cue_ts'][0];
+
+#one punishment, completed unsuccessfully (punishing)
+#two_reward_delivery = Timestamps['two_reward_Reward'][0]+1.0;
+two_reward_delivery = Timestamps['p_f_pdelivery_ts'][0];
+#two_reward_cue = Timestamps['two_reward_cue'][0]+2.0;
+two_reward_cue = Timestamps['p_f_cue_ts'][0];
+
+#one punishment, completed successcfully (non-punishing)
+#three_reward_delivery = Timestamps['three_reward_Reward'][0]+1.5;
+three_reward_delivery = Timestamps['p_s_nextreset'][0];
+#three_reward_cue = Timestamps['three_reward_cue'][0]+3.0;
+three_reward_cue = Timestamps['p_s_cue_ts'][0];
+
+#print three_reward_delivery
+#print three_reward_cue
 
 #Pull neural spikes
 
 Spikes = a['neural_data']['spikeTimes'];
 #Break spikes into M1 S1 pmd 
-M1_spikes = Spikes[0,0][0,0];
-PmD_spikes = Spikes[0,0][0,1];
+#Different for jack/dave- jack has MAP1=PMd, MAP2=M1, MAP3=S1, ALL=PMv
+M1_spikes = Spikes[0,0][0,1];
+PmD_spikes = Spikes[0,0][0,0];
 S1_spikes = Spikes[0,0][0,2];
 #Find first channel count for pmv on map1
 #PmV is requires extra processing to generate as the data is the last 32 channels of each MAP system
@@ -169,7 +196,7 @@ for name_of_bin,time_of_bin in time_boundry.iteritems():
  S1_one_reward_cue_hists = Build_hist(S1_spikes,one_reward_cue,no_bins,before_time,after_time)
  PmD_one_reward_cue_hists = Build_hist(PmD_spikes,one_reward_cue,no_bins,before_time,after_time)
  PmV_one_reward_cue_hists = Build_hist_PmV(PmV_spikes,one_reward_cue,no_bins,before_time,after_time)
-
+ 
  #Two Reward 
  M1_two_reward_hists = Build_hist(M1_spikes,two_reward_delivery,no_bins,before_time,after_time)
  S1_two_reward_hists = Build_hist(S1_spikes,two_reward_delivery,no_bins,before_time,after_time)
@@ -215,6 +242,8 @@ for name_of_bin,time_of_bin in time_boundry.iteritems():
  #Perform PCA on PSTH followed By LDA on PCA transform of PSTH data and save figure showing results for each bin
  for key,value in final_data_no_targets.iteritems():
      print key
+     #print targets
+     #pdb.set_trace()
      lda = LDA(n_components=2)
      pca = RandomizedPCA(n_components=20)
      proj = pca.fit_transform(value)

@@ -28,10 +28,10 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 
-mypath = '/Users/johnhessburg/documents/lab/workspace/Classification_scripts/test_jordan'
+mypath = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20150928_504/figs/block1/200_pca/test_random'
 onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
 for file in onlyfiles:
- if file[-3:]!='npy':
+if file[-3:]!='npy':
      continue
  #if file[4:8]!='4_18':
      #continue
@@ -55,10 +55,10 @@ for file in onlyfiles:
  second_half = np.vstack(second_half)
  Data = np.vstack([first_half,second_half])
  # for true targets uncomment next line
- #targets = np.hstack([targets,targets])
+ targets = np.hstack([targets,targets])
 
  #for random targets uncomment next line
- targets = np.random.randint(1,no_locations+1,no_mappings*no_locations*no_thwacks)
+ #targets = np.random.randint(1,no_locations+1,no_mappings*no_locations*no_thwacks)
 
 
  lda = LDA(n_components=14)
@@ -154,5 +154,7 @@ for file in onlyfiles:
      myfile.write("Classification report for post injection classifier\ntrained on pre injection data\n"+file.rsplit('_')[0]+'_'+file.rsplit('_')[1]+" "+file.rsplit('_')[2]+" injection %s:\n%s\n"
        % (classifier, classification_report(expected, predicted)))
      myfile.write(file+"\n")
+
+
 
 
