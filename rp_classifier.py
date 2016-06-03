@@ -32,13 +32,13 @@ no_bins = 10
 plot_bool = False
 
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20160118_0059/Extracted_0059_2016-01-18-12-48-52.mat'
-#filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20160118_0059/Extracted_0059_2016-01-18-13-02-45.mat'
+filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20160118_0059/Extracted_0059_2016-01-18-13-02-45.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20150929_504/Extracted_504_2015-09-29-12-48-19.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20150929_504/Extracted_504_2015-09-29-13-10-44.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-14-23.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-33-52.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-25-20.mat'
-filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-46-25.mat'
+#filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-46-25.mat'
 
 ######################
 print filename
@@ -668,12 +668,13 @@ for name_of_bin,time_of_bin in time_boundry.iteritems():
             #    print 'error plotting'
 
             #accuracy_dict[key]={'accuracy_sammer':accuracy_sammer,'accuracy_samme':accuracy_samme}
-        #accuracy_total[i] = accuracy_dict
-        #or is it:
+			#accuracy_total[i] = accuracy_dict
+			#or is it:
             accuracy_dict[i] ={'accuracy_sammer':accuracy_sammer,'accuracy_samme':accuracy_samme}
             #print 'accuracy dict is:'
             #print i
         accuracy_total[key] = accuracy_dict
+        accuracy_dict = {}
         #print 'accuracy total is:'
         #print key
 		
