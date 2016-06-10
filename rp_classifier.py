@@ -30,6 +30,8 @@ from sklearn.tree import DecisionTreeClassifier
 pca_num = 150
 no_bins = 10
 plot_bool = False
+num_classifier_repeats = 10
+
 
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20160118_0059/Extracted_0059_2016-01-18-12-48-52.mat'
 filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20160118_0059/Extracted_0059_2016-01-18-13-02-45.mat'
@@ -500,7 +502,7 @@ for name_of_bin,time_of_bin in time_boundry.iteritems():
         succr_succnr_unsuccp_unsuccnp = False
         lda_pre_all = False
         lda_pre_succr_succnr_other = False
-        
+
         #accuracy_total = {}
         #TODO must be better way to do this
         for i in range(7):
@@ -593,92 +595,98 @@ for name_of_bin,time_of_bin in time_boundry.iteritems():
             else:
                 print 'classifying all targets'
                 targs_to_classify = np.copy(targets)
-            
-            #split into training and testing samples. test_size = proportion of data used for test
-            x_train, x_test, y_train, y_test = train_test_split(value_to_classify, targs_to_classify, test_size = .4) 
 
-            #########################
-            #ADABoost Classifier
-            #########################
-            bdt_real = AdaBoostClassifier(DecisionTreeClassifier(max_depth=2),n_estimators=600,learning_rate=1)
-
-            bdt_discrete = AdaBoostClassifier(DecisionTreeClassifier(max_depth=2),n_estimators=600,learning_rate=1.5,algorithm="SAMME")
-            bdt_real.fit(x_train, y_train)
-            bdt_discrete.fit(x_train, y_train)
-            
-            real_test_errors = []
-            discrete_test_errors = []
-
-            for real_test_predict, discrete_train_predict in zip(bdt_real.staged_predict(x_test), bdt_discrete.staged_predict(x_test)):
-                real_test_errors.append(1. - accuracy_score(real_test_predict, y_test))
-                discrete_test_errors.append(1. - accuracy_score(discrete_train_predict, y_test))
-
-            n_trees_discrete = len(bdt_discrete)
-            n_trees_real = len(bdt_real)
-
-            # Boosting might terminate early, but the following arrays are always
-            # n_estimators long. We crop them to the actual number of trees here:
-            discrete_estimator_errors = bdt_discrete.estimator_errors_[:n_trees_discrete]
-            real_estimator_errors = bdt_real.estimator_errors_[:n_trees_real]
-            discrete_estimator_weights = bdt_discrete.estimator_weights_[:n_trees_discrete]
-            
-            # Test on the testing data set and display the accuracies
-            ypred_r = bdt_real.predict(x_test)
-            ypred_e = bdt_discrete.predict(x_test)
-            accuracy_sammer = accuracy_score(ypred_r,y_test)
-            accuracy_samme = accuracy_score(ypred_e,y_test)
-        
-            print 'Accuracy of SAMME.R = ', accuracy_sammer
-            print 'Accuracy of SAMME = ', accuracy_samme
-
-            #try:
-            #    plt.figure(figsize=(15, 5))
-
-            #    plt.subplot(131)
-            #    plt.plot(range(1, n_trees_discrete + 1),discrete_test_errors, c='black', label='SAMME')
-			#   plt.plot(range(1, n_trees_real + 1),real_test_errors, c='black',linestyle='dashed', label='SAMME.R')
-            #    plt.legend()
-            #    plt.ylim(0.18, 0.62)
-            #    plt.ylabel('Test Error')
-            #    plt.xlabel('Number of Trees')
+            samme_accuracies = np.zeros(num_classifier_repeats)
+            sammer_accuracies = np.zeros(num_classifier_repeats)
                 
-            #    plt.subplot(132)
-            #    plt.plot(range(1, n_trees_discrete + 1), discrete_estimator_errors,"b", label='SAMME', alpha=.5)
-            #    plt.plot(range(1, n_trees_real + 1), real_estimator_errors,"r", label='SAMME.R', alpha=.5)
-            #    plt.legend()
-            #    plt.ylabel('Error')
-            #    plt.xlabel('Number of Trees')
-            #    plt.ylim((.2,max(real_estimator_errors.max(),discrete_estimator_errors.max()) * 1.2))
-            #    plt.xlim((-20, len(bdt_discrete) + 20))
+            for N in range(num_classifier_repeats):
+
+                #split into training and testing samples. test_size = proportion of data used for test
+                x_train, x_test, y_train, y_test = train_test_split(value_to_classify, targs_to_classify, test_size = .4) 
+
+                #########################
+                #ADABoost Classifier
+                #########################
+                bdt_real = AdaBoostClassifier(DecisionTreeClassifier(max_depth=2),n_estimators=600,learning_rate=1)
+
+                bdt_discrete = AdaBoostClassifier(DecisionTreeClassifier(max_depth=2),n_estimators=600,learning_rate=1.5,algorithm="SAMME")
+                bdt_real.fit(x_train, y_train)
+                bdt_discrete.fit(x_train, y_train)
             
-            #    plt.subplot(133)
-            #    plt.plot(range(1, n_trees_discrete + 1), discrete_estimator_weights,"b", label='SAMME')
-            #    plt.legend()
-            #    plt.ylabel('Weight')
-            #    plt.xlabel('Number of Trees')
-            #    plt.ylim((0, discrete_estimator_weights.max() * 1.2))
-            #    plt.xlim((-20, n_trees_discrete + 20))
+                real_test_errors = []
+                discrete_test_errors = []
 
-            #    # prevent overlapping y-axis labels
-            #    plt.subplots_adjust(wspace=0.25)
-            #    #plt.show()
-            #    plt.savefig(key+"_from_"+name_of_bin+"_"+i+"_SAMME.png")
-            #    plt.clf()
-            #except:
-            #    print 'error plotting'
+                for real_test_predict, discrete_train_predict in zip(bdt_real.staged_predict(x_test), bdt_discrete.staged_predict(x_test)):
+                    real_test_errors.append(1. - accuracy_score(real_test_predict, y_test))
+                    discrete_test_errors.append(1. - accuracy_score(discrete_train_predict, y_test))
 
-            #accuracy_dict[key]={'accuracy_sammer':accuracy_sammer,'accuracy_samme':accuracy_samme}
-			#accuracy_total[i] = accuracy_dict
-			#or is it:
-            accuracy_dict[i] ={'accuracy_sammer':accuracy_sammer,'accuracy_samme':accuracy_samme}
-            #print 'accuracy dict is:'
-            #print i
+                n_trees_discrete = len(bdt_discrete)
+                n_trees_real = len(bdt_real)
+
+                # Boosting might terminate early, but the following arrays are always
+                # n_estimators long. We crop them to the actual number of trees here:
+                discrete_estimator_errors = bdt_discrete.estimator_errors_[:n_trees_discrete]
+                real_estimator_errors = bdt_real.estimator_errors_[:n_trees_real]
+                discrete_estimator_weights = bdt_discrete.estimator_weights_[:n_trees_discrete]
+            
+                # Test on the testing data set and display the accuracies
+                ypred_r = bdt_real.predict(x_test)
+                ypred_e = bdt_discrete.predict(x_test)
+                accuracy_sammer = accuracy_score(ypred_r,y_test)
+                accuracy_samme = accuracy_score(ypred_e,y_test)
+        
+                print 'Accuracy of SAMME.R = ', accuracy_sammer
+                print 'Accuracy of SAMME = ', accuracy_samme
+
+                samme_accuracies[N] = accuracy_samme
+                sammer_accuracies[N] = accuracy_sammer
+                
+                #try:
+                #    plt.figure(figsize=(15, 5))
+                
+                #    plt.subplot(131)
+                #    plt.plot(range(1, n_trees_discrete + 1),discrete_test_errors, c='black', label='SAMME')
+                #   plt.plot(range(1, n_trees_real + 1),real_test_errors, c='black',linestyle='dashed', label='SAMME.R')
+                #    plt.legend()
+                #    plt.ylim(0.18, 0.62)
+                #    plt.ylabel('Test Error')
+                #    plt.xlabel('Number of Trees')
+                
+                #    plt.subplot(132)
+                #    plt.plot(range(1, n_trees_discrete + 1), discrete_estimator_errors,"b", label='SAMME', alpha=.5)
+                #    plt.plot(range(1, n_trees_real + 1), real_estimator_errors,"r", label='SAMME.R', alpha=.5)
+                #    plt.legend()
+                #    plt.ylabel('Error')
+                #    plt.xlabel('Number of Trees')
+                #    plt.ylim((.2,max(real_estimator_errors.max(),discrete_estimator_errors.max()) * 1.2))
+                #    plt.xlim((-20, len(bdt_discrete) + 20))
+                
+                #    plt.subplot(133)
+                #    plt.plot(range(1, n_trees_discrete + 1), discrete_estimator_weights,"b", label='SAMME')
+                #    plt.legend()
+                #    plt.ylabel('Weight')
+                #    plt.xlabel('Number of Trees')
+                #    plt.ylim((0, discrete_estimator_weights.max() * 1.2))
+                #    plt.xlim((-20, n_trees_discrete + 20))
+
+                #    # prevent overlapping y-axis labels
+                #    plt.subplots_adjust(wspace=0.25)
+                #    #plt.show()
+                #    plt.savefig(key+"_from_"+name_of_bin+"_"+i+"_SAMME.png")
+                #    plt.clf()
+                #except:
+                #    print 'error plotting'
+
+            accuracy_samme_avg = np.mean(samme_accuracies)
+            accuracy_sammer_avg = np.mean(sammer_accuracies)
+            accuracy_samme_std = np.std(samme_accuracies)
+            accuracy_sammer_std = np.std(sammer_accuracies)
+                
+            #accuracy_dict[i] ={'accuracy_sammer':accuracy_sammer,'accuracy_samme':accuracy_samme}
+            accuracy_dict[i] = {'accuracy_sammer_avg':accuracy_sammer_avg,'accuracy_samme_avg':accuracy_samme_avg,'accuracy_samme_std':accuracy_samme_std,'accuracy_sammer_std':accuracy_sammer_std}
         accuracy_total[key] = accuracy_dict
         accuracy_dict = {}
-        #print 'accuracy total is:'
-        #print key
 		
-		#print accuracy_total.keys()
 		###########################
     all_accuracy_total[name_of_bin] = accuracy_total
     print all_accuracy_total.keys()
