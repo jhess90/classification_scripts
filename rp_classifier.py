@@ -30,7 +30,7 @@ from sklearn.tree import DecisionTreeClassifier
 pca_num = 150
 no_bins = 10
 plot_bool = False
-num_classifier_repeats = 10
+num_classifier_repeats = 1
 
 
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20160118_0059/Extracted_0059_2016-01-18-12-48-52.mat'
