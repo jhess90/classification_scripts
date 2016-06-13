@@ -30,7 +30,7 @@ from sklearn.tree import DecisionTreeClassifier
 pca_num = 150
 no_bins = 10
 plot_bool = False
-num_classifier_repeats = 10
+num_classifier_repeats = 1
 
 #### laptop ##############
 
