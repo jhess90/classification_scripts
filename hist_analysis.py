@@ -36,6 +36,15 @@ from sklearn.cross_validation import train_test_split
 #date_str = '19-16-25-20'
 #date_str = '19-16-46-25'
 
+#date_str = '25-15-41-44'
+#date_str = '25-15-58-17'
+#date_str = '25-14-46-46'
+#date_str = '25-15-02-58'
+#date_str = '26-11-25-03'
+#date_str = '26-11-45-52' 
+date_str = '26-12-17-53'
+#date_str = '26-12-38-56'
+
 bin_size=10
 condensed_targs = False
 ##########################################################
@@ -156,88 +165,10 @@ def make_avg_hist(Data):
         condensed_targ[condensed_targ == 6] = 2 #set all rest to 2
 
         #split into training and testing samples. test_size = proportion of data used for test
-        x_train, x_test, y_train, y_test = train_test_split(x, condensed_targ, test_size = .4) 
+        #x_train, x_test, y_train, y_test = train_test_split(x, condensed_targ, test_size = .4) 
 
-
-        #########################
-        #ADABoost Classifier
-        #########################
-        #bdt_real = AdaBoostClassifier(DecisionTreeClassifier(max_depth=2),n_estimators=600,learning_rate=1)
-
-        #bdt_discrete = AdaBoostClassifier(DecisionTreeClassifier(max_depth=2),n_estimators=600,learning_rate=1.5,algorithm="SAMME")
-        #bdt_real.fit(x_train, y_train)
-        #bdt_discrete.fit(x_train, y_train)
-
-        #real_test_errors = []
-        #discrete_test_errors = []
-
-        #for real_test_predict, discrete_train_predict in zip(bdt_real.staged_predict(X_test), bdt_discrete.staged_predict(X_test)):
-            #real_test_errors.append(1. - accuracy_score(real_test_predict, y_test))
-            #discrete_test_errors.append(1. - accuracy_score(discrete_train_predict, y_test))
-
-        #n_trees_discrete = len(bdt_discrete)
-        #n_trees_real = len(bdt_real)
-
-        # Boosting might terminate early, but the following arrays are always
-        # n_estimators long. We crop them to the actual number of trees here:
-        #discrete_estimator_errors = bdt_discrete.estimator_errors_[:n_trees_discrete]
-        #real_estimator_errors = bdt_real.estimator_errors_[:n_trees_real]
-        #discrete_estimator_weights = bdt_discrete.estimator_weights_[:n_trees_discrete]
-
-        #plt.figure(figsize=(15, 5))
-
-        #plt.subplot(131)
-        #plt.plot(range(1, n_trees_discrete + 1),discrete_test_errors, c='black', label='SAMME')
-        #plt.plot(range(1, n_trees_real + 1),real_test_errors, c='black',linestyle='dashed', label='SAMME.R')
-        #plt.legend()
-        #plt.ylim(0.18, 0.62)
-        #plt.ylabel('Test Error')
-        #plt.xlabel('Number of Trees')
-
-        #plt.subplot(132)
-        #plt.plot(range(1, n_trees_discrete + 1), discrete_estimator_errors,"b", label='SAMME', alpha=.5)
-        #plt.plot(range(1, n_trees_real + 1), real_estimator_errors,"r", label='SAMME.R', alpha=.5)
-        #plt.legend()
-        #plt.ylabel('Error')
-        #plt.xlabel('Number of Trees')
-        #plt.ylim((.2,max(real_estimator_errors.max(),discrete_estimator_errors.max()) * 1.2))
-        #plt.xlim((-20, len(bdt_discrete) + 20))
-
-        #plt.subplot(133)
-        #plt.plot(range(1, n_trees_discrete + 1), discrete_estimator_weights,"b", label='SAMME')
-        #plt.legend()
-        #plt.ylabel('Weight')
-        #plt.xlabel('Number of Trees')
-        #plt.ylim((0, discrete_estimator_weights.max() * 1.2))
-        #plt.xlim((-20, n_trees_discrete + 20))
-
-        ## prevent overlapping y-axis labels
-        #plt.subplots_adjust(wspace=0.25)
-        #plt.show()
-
-        ###########################
-        
-        ##other_targ_odd = other_targ[::2]
-        ##other_targ_even = other_targ[1::2]
-                
-        #pca first?
-        #pca = RandomizedPCA(n_components = 100)
-        #lda = LDA(n_components = 2)
-        #proj = pca.fit_transform(odds)
-        #even_proj = pca.fit_transform(evens)
-        #z  = lda.fit(proj, odd_targ)
-        ##z=lda.transform(evens)
-        #z_labels = lda.predict(even_proj)
-        #z_prob = lda.predict_proba(even_proj)
-         
-        #lda2 = LDA(n_components = 2)
-        #z2 = lda2.fit(odds, other_targ_odd)
-        #z2_labels = lda2.predict(evens)
-        #z_prob2 = lda2.predict_proba(evens)
-
-        #temp_dict = {'z_labels':z_labels,'z_prob':z_prob,'odds':odds,'evens':evens,'odd_targ':odd_targ,'even_targ':even_targ,'other_targ_odd':other_targ_odd,'other_targ_even':other_targ_even,'z2_labels':z2_labels,'z_prob2':z_prob2}
-
-        temp_dict = {'x_train':x_train,'x_test':x_test,'y_train':y_train,'y_test':y_test, 'x':x}
+        #temp_dict = {'x_train':x_train,'x_test':x_test,'y_train':y_train,'y_test':y_test, 'x':x}
+        temp_dict = {}
         classifier_dict[key] = temp_dict
 
         ##############################
@@ -617,38 +548,55 @@ for file_key,file_value in file_dict.iteritems():
         plt.imshow(tb_dict['btm_p_hists'],interpolation='nearest')
         plt.title("bottom 10 punishing")
         
-        plt.subplot(4,2,5)
-        plt.plot(collapsed_dict['top_r_hists'])
-        plt.plot(collapsed_dict['btm_r_hists'])
-        plt.title("top and bottom r hists")
+        #plt.subplot(4,2,5)
+        #plt.plot(collapsed_dict['top_r_hists'])
+        #plt.plot(collapsed_dict['btm_r_hists'])
+        #plt.title("top and bottom r hists")
 
-        plt.subplot(4,2,6)
-        plt.plot(collapsed_dict['top_p_hists'])
-        plt.plot(collapsed_dict['btm_p_hists'])
-        plt.title("top and bottom p hists")
+        #plt.subplot(4,2,6)
+        #plt.plot(collapsed_dict['top_p_hists'])
+        #plt.plot(collapsed_dict['btm_p_hists'])
+        #plt.title("top and bottom p hists")
 
         try:
-            plt.subplot(4,2,7)
-            #plt.hist(unit_rank_dict[key]['reward_index'])
-            #plt.title('reward index histogram')
-            plt.hist(unit_rank_dict[key]['alt_reward_index'])
-            plt.title('alt reward index histogram')
+            plt.subplot(4,2,5)
+            plt.hist(unit_rank_dict[key]['reward_index'])
+            plt.title('reward index histogram')
+            plt.xlim(-1.1,1.1)
         except:
             print 'unable to plot reward index, likely zero'
 
         try:
-            plt.subplot(4,2,8)
-            #plt.hist(unit_rank_dict[key]['punishment_index'])
-            #plt.title('punishment index histogram')
-            plt.hist(unit_rank_dict[key]['alt_punishment_index'])
-            plt.title('alt punishment index histogram')
+            plt.subplot(4,2,6)
+            plt.hist(unit_rank_dict[key]['punishment_index'])
+            plt.title('punishment index histogram')
+            plt.xlim(-1.1,1.1)
         except:
             print 'unable to plot punishment index, likely zero'
+		
+        try:
+            plt.subplot(4,2,7)
+            plt.hist(unit_rank_dict[key]['alt_reward_index'])
+            plt.title('alt reward index histogram')
+            plt.xlim(-1.1,1.1)
+        except:
+            print 'unable to plot alt reward index, likely zero'
+
+        try:
+            plt.subplot(4,2,8)
+            plt.hist(unit_rank_dict[key]['alt_punishment_index'])
+            plt.title('alt punishment index histogram')
+            plt.xlim(-1.1,1.1)
+        except:
+            print 'unable to plot alt punishment index, likely zero'
             
         if condensed_targs:
             plt.savefig(file_key[0:-4]+"_condensed_"+key+"_mixed.png")
         else:
             plt.savefig(file_key[0:-4]+"_not_condensed_"+key+"_mixed.png")
+
+
+        #plt.subplots_adjust(wspace=0.6)
         plt.clf()
 
     if condensed_targs:
