@@ -57,8 +57,8 @@ num_classifier_repeats = 10
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20160525_0059/Extracted_0059_2016-05-25-15-58-17.mat'
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20160525_504/Extracted_504_2016-05-25-14-46-46.mat'
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20160525_504/Extracted_504_2016-05-25-15-02-58.mat'
-filename = '/home/jack/Dropbox/single_rp_files/extracted/20160526_0059/Extracted_0059_2016-05-26-12-17-53.mat'
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20160526_0059/Extracted_0059_2016-05-26-12-38-56.mat'
+#filename = '/home/jack/Dropbox/single_rp_files/extracted/20160526_0059/Extracted_0059_2016-05-26-12-17-53.mat'
+filename = '/home/jack/Dropbox/single_rp_files/extracted/20160526_0059/Extracted_0059_2016-05-26-12-38-56.mat'
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20160526_504/Extracted_504_2016-05-26-11-25-03.mat'
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20160526_504/Extracted_504_2016-05-26-11-45-52.mat'
 
