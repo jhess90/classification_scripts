@@ -28,7 +28,7 @@ from sklearn.tree import DecisionTreeClassifier
 #######################
 
 pca_num = 150
-no_bins = 1
+no_bins = 10
 plot_bool = False
 num_classifier_repeats = 10
 
@@ -41,14 +41,7 @@ num_classifier_repeats = 10
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-14-23.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-33-52.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-25-20.mat'
-filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-46-25.mat'
-
-###################
-#filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20160226_0059/block3/Extracted_0059_2016-02-26-16-28-27.mat'
-
-
-
-
+#filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-46-25.mat'
 
 ### beaver ##############
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20160118_0059/Extracted_0059_2016-01-18-12-48-52.mat'
@@ -64,30 +57,13 @@ filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151019_0059/
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20160525_0059/Extracted_0059_2016-05-25-15-58-17.mat'
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20160525_504/Extracted_504_2016-05-25-14-46-46.mat'
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20160525_504/Extracted_504_2016-05-25-15-02-58.mat'
-filename = '/home/jack/Dropbox/single_rp_files/extracted/20160526_0059/Extracted_0059_2016-05-26-12-17-53.mat'
+#filename = '/home/jack/Dropbox/single_rp_files/extracted/20160526_0059/Extracted_0059_2016-05-26-12-17-53.mat'
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20160526_0059/Extracted_0059_2016-05-26-12-38-56.mat'
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20160526_504/Extracted_504_2016-05-26-11-25-03.mat'
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20160526_504/Extracted_504_2016-05-26-11-45-52.mat'
 
 
-### beaver ##############
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20160118_0059/Extracted_0059_2016-01-18-12-48-52.mat'
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20160118_0059/Extracted_0059_2016-01-18-13-02-45.mat'
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20150929_504/Extracted_504_2015-09-29-12-48-19.mat'
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20150929_504/Extracted_504_2015-09-29-13-10-44.mat'
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-14-23.mat'
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-33-52.mat'
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-25-20.mat'
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-46-25.mat'
-
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20160525_0059/Extracted_0059_2016-05-25-15-41-44.mat'
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20160525_0059/Extracted_0059_2016-05-25-15-58-17.mat'
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20160525_504/Extracted_504_2016-05-25-14-46-46.mat'
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20160525_504/Extracted_504_2016-05-25-15-02-58.mat'
-filename = '/home/jack/Dropbox/single_rp_files/extracted/20160526_0059/Extracted_0059_2016-05-26-12-17-53.mat'
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20160526_0059/Extracted_0059_2016-05-26-12-38-56.mat'
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20160526_504/Extracted_504_2016-05-26-11-25-03.mat'
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20160526_504/Extracted_504_2016-05-26-11-45-52.mat'
+filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20160226_0059/block3/Extracted_0059_2016-02-26-16-28-27.mat'
 
 
 ######################
@@ -166,27 +142,24 @@ if not  p_only_f_pdelivery.size:
 
 #catch trials- sometimes empty, so that's why there's the rcatch/pcatch bools
 #reward cue, successfully completed, but no reward delivered
-#r_s_catch_cue = Timestamps['r_s_catch_cue_ts'][0];
-#r_s_catch_nextreset = Timestamps['r_s_catch_nextreset'][0];
-#if not r_s_catch_cue.size:
-#	print ('No r_s catch trials')
-#	rcatch_bool = False
-#else:
-#	print ('r_s catch trials: %s' %(len(r_s_catch_cue)))
-#	rcatch_bool = True
+r_s_catch_cue = Timestamps['r_s_catch_cue_ts'][0];
+r_s_catch_nextreset = Timestamps['r_s_catch_nextreset'][0];
+if not r_s_catch_cue.size:
+	print ('No r_s catch trials')
+	rcatch_bool = False
+else:
+	print ('r_s catch trials: %s' %(len(r_s_catch_cue)))
+	rcatch_bool = True
 
 #punishment cue, successfully completed, but no reward delivered
-#p_f_catch_cue = Timestamps['p_f_catch_cue_ts'][0];
-#p_f_catch_nextreset = Timestamps['p_f_catch_nextreset'][0];
-#if not p_f_catch_cue.size:
-#	print ('No p_f catch trials')
-#	pcatch_bool = False
-#else:
-#	print ('p_f catch trials: %s' %(len(p_f_catch_cue)))
-#	pcatch_bool = True
-
-rcatch_bool = False
-pcatch_bool = False
+p_f_catch_cue = Timestamps['p_f_catch_cue_ts'][0];
+p_f_catch_nextreset = Timestamps['p_f_catch_nextreset'][0];
+if not p_f_catch_cue.size:
+	print ('No p_f catch trials')
+	pcatch_bool = False
+else:
+	print ('p_f catch trials: %s' %(len(p_f_catch_cue)))
+	pcatch_bool = True
 
 #Pull neural spikes
 
@@ -278,46 +251,33 @@ for name_of_bin,time_of_bin in time_boundry.iteritems():
         
     #Function that builds histograms of M1,S1,PmD spikes based on parameters entered above
     def Build_hist(data,timestamps,no_bins,time_before,time_after):
-        dummy = []
-        dummy_new_norm = []
-        for i in range(0,timestamps.shape[0]):
-            dummy1=[]
-            dummy1_new_norm = []
-            b = timestamps[i]
-            for ii in range(data.shape[0]):
-                a = data[ii]['ts'][0,0][0]
-                c = (np.histogram(a[np.where(np.logical_and(a>=b-time_before,a<=b+time_after))],bins=no_bins,normed=False,density=False))
-                dummy1.append(np.nan_to_num(c[0]))
-                dummy1_new_norm.append(np.nan_to_num(c[0]))
-            dummy.append(MaxAbsScaler().fit_transform(dummy1))
-            #TODO make new normalization, for now just see if works
-            dummy_new_norm.append(dummy1_new_norm)
-        #print np.array(dummy).shape
-        hist_return_dict={'normalized':dummy,'new_normalized':dummy_new_norm}
-        return np.array(hist_return_dict)
+		dummy = []
+		for i in range(0,timestamps.shape[0]):
+			dummy1=[]
+			b = timestamps[i]
+			for ii in range(data.shape[0]):
+				a = data[ii]['ts'][0,0][0]
+				c = (np.histogram(a[np.where(np.logical_and(a>=b-time_before,a<=b+time_after))],bins=no_bins,normed=False,density=False))
+				dummy1.append(np.nan_to_num(c[0]))
+			dummy.append(MaxAbsScaler().fit_transform(dummy1))
+		#print np.array(dummy).shape
+		return np.array(dummy)
     
     #Build PmV histograms
     def Build_hist_PmV(data,timestamps,no_bins,time_before,time_after):
         dummy = []
-        dummy_new_norm = []
         for i in range(0,timestamps.shape[0]):
             dummy1=[]
-            dummy1_new_norm = []
             b = timestamps[i]
             for ii in range(data.shape[0]):
                 a = data[ii]
                 c = (np.histogram(a[np.where(np.logical_and(a>=b-time_before,a<=b+time_after))],bins=no_bins,normed=False,density=False))
                 dummy1.append(np.nan_to_num(c[0]))
-                dummy1_new_norm.append(np.nan_to_num(c[0]))
             dummy.append(MaxAbsScaler().fit_transform(dummy1))
-            #TODO make new normalization, for now just see if works
-            dummy_new_norm.append(dummy1_new_norm)
-        #plt.hist(dummy)
-        #plt.show()
-        #hist_return_dict={'normalized':dummy,'new_normalized':dummy_new_norm}
-        #return np.array(hist_return_dict)
+            #plt.hist(dummy)
+            #plt.show()
         return np.array(dummy)
-		
+    
     #Assemble a final dictionary of the final dataset for saving
     def Make_final_data(data,start_position):
         dummy = []
@@ -360,13 +320,13 @@ for name_of_bin,time_of_bin in time_boundry.iteritems():
             dummy.append(np.hstack(data[start_position+56][i]))
         p_only_f_data = np.array(dummy)
         p_only_f_targets = np.ones(p_only_f_data.shape[0])*7
-        
+
+
+		
 #        return (np.vstack([rp_s_data,rp_f_data,nrnp_s_data,nrnp_f_data,r_only_s_data,r_only_f_data,p_only_s_data,p_only_f_data]),np.hstack([rp_s_targets,rp_f_targets,nrnp_s_targets,nrnp_f_targets,r_only_s_targets,r_only_f_targets,p_only_s_targets,p_only_f_targets]))
         return(np.vstack([rp_s_data,rp_f_data,nrnp_s_data,nrnp_f_data,r_only_s_data,r_only_f_data,p_only_s_data,p_only_f_data]),np.hstack([rp_s_targets,rp_f_targets,nrnp_s_targets,nrnp_f_targets,r_only_s_targets,r_only_f_targets,p_only_s_targets,p_only_f_targets]))
 
     #one reward cue, one punishment cue, successful (rewarding)
-    #M1_rp_s_rdelivery_hists_dict = Build_hist(M1_spikes,rp_s_rdelivery,no_bins,before_time,after_time)
-    #M1_rp_s_rdelivery_hists= M1_rp_s_rdelivery_hists_dict[()]['normalized'][0]
     M1_rp_s_rdelivery_hists = Build_hist(M1_spikes,rp_s_rdelivery,no_bins,before_time,after_time)
     S1_rp_s_rdelivery_hists = Build_hist(S1_spikes,rp_s_rdelivery,no_bins,before_time,after_time)
     PmD_rp_s_rdelivery_hists = Build_hist(PmD_spikes,rp_s_rdelivery,no_bins,before_time,after_time)
