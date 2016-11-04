@@ -42,8 +42,15 @@ from sklearn.cross_validation import train_test_split
 #date_str = '25-15-02-58'
 #date_str = '26-11-25-03'
 #date_str = '26-11-45-52' 
-date_str = '26-12-17-53'
+#date_str = '26-12-17-53'
 #date_str = '26-12-38-56'
+
+###########
+
+date_str = '26-16-28-27'
+
+
+
 
 bin_size=10
 condensed_targs = False
