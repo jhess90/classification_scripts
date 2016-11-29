@@ -48,8 +48,6 @@ from sklearn.cross_validation import train_test_split
 ###########
 
 #date_str = '26-16-28-27'
-#date_str = '11-13-56-44'
-date_str = '11-14-10-01'
 
 
 bin_size=10
