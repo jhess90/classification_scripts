@@ -27,10 +27,12 @@ from sklearn.tree import DecisionTreeClassifier
 #params to set ########
 #######################
 
-pca_num = 150
+pca_num = 250
 no_bins = 10
 plot_bool = True
-num_classifier_repeats = 10
+num_classifier_repeats = 1
+time_boundry={'-0.5-0.0':[-0.5,0.0],'0-0.5':[0.0,0.5]} #,'0.5-1.0':[0.5,1.0],'all':[0.0,2.0]}
+
 
 #### laptop ##############
 
@@ -231,7 +233,7 @@ PmD_spikes = PmD_spikes[0,0:PmD_limit];
 
 #time_boundry={'-0.5-0.0':[-0.5,0.0],'0-0.5':[0.0,0.5], '0.5-1.0':[0.5,1.0], '1.0-1.5':[1.0,1.5], '1.5-2.0':[1.5,2.0],'all':[-0.5,2.0]}
 #time_boundry={'-0.5-0.0':[-0.5,0.0],'0-0.5':[0.0,0.5],'0.5-1.0':[0.5,1.0],'all_incpre':[-0.5,2.0]}
-time_boundry={'-0.5-0.0':[-0.5,0.0],'0-0.5':[0.0,0.5],'0.5-1.0':[0.5,1.0],'all':[0.0,2.0]}
+#time_boundry={'-0.5-0.0':[-0.5,0.0],'0-0.5':[0.0,0.5],'0.5-1.0':[0.5,1.0],'all':[0.0,2.0]}
 
 
 #accuracy_total = {}
@@ -476,7 +478,7 @@ for name_of_bin,time_of_bin in time_boundry.iteritems():
         #randomize targets (uncomment to randomize)
         #targets=np.random.randint(0,7,len_targets)
         
-        lda = LDA(n_components=2)
+        lda = LDA(n_components=8)
         pca = RandomizedPCA(n_components=pca_num)
         proj = pca.fit_transform(value)
         proj = lda.fit_transform(proj,targets)
