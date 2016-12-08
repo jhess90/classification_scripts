@@ -444,26 +444,26 @@ for name_of_bin,time_of_bin in time_boundry.iteritems():
 
     if rcatch_bool or pcatch_bool:
         M1_r_s_catch_nextreset_hists = Build_hist(M1_spikes,r_s_catch_nextreset,no_bins,before_time,after_time)
-        S1_r_s_catch_nextreset_hists = Build_hist(M1_spikes,r_s_catch_nextreset,no_bins,before_time,after_time)
-        PmD_r_s_catch_nextreset_hists = Build_hist(M1_spikes,r_s_catch_nextreset,no_bins,before_time,after_time)
-        PmV_r_s_catch_nextreset_hists = Build_hist(M1_spikes,r_s_catch_nextreset,no_bins,before_time,after_time)
+        S1_r_s_catch_nextreset_hists = Build_hist(S1_spikes,r_s_catch_nextreset,no_bins,before_time,after_time)
+        PmD_r_s_catch_nextreset_hists = Build_hist(PmD_spikes,r_s_catch_nextreset,no_bins,before_time,after_time)
+        PmV_r_s_catch_nextreset_hists = Build_hist(PmV_spikes,r_s_catch_nextreset,no_bins,before_time,after_time)
 
         M1_r_s_catch_cue_hists = Build_hist(M1_spikes,r_s_catch_cue,no_bins,before_time,after_time)
-        S1_r_s_catch_cue_hists = Build_hist(M1_spikes,r_s_catch_cue,no_bins,before_time,after_time)
-        PmD_r_s_catch_cue_hists = Build_hist(M1_spikes,r_s_catch_cue,no_bins,before_time,after_time)
-        PmV_r_s_catch_cue_hists = Build_hist(M1_spikes,r_s_catch_cue,no_bins,before_time,after_time)
+        S1_r_s_catch_cue_hists = Build_hist(S1_spikes,r_s_catch_cue,no_bins,before_time,after_time)
+        PmD_r_s_catch_cue_hists = Build_hist(PmD_spikes,r_s_catch_cue,no_bins,before_time,after_time)
+        PmV_r_s_catch_cue_hists = Build_hist(PmV_spikes,r_s_catch_cue,no_bins,before_time,after_time)
 
         #punishment cue, unsuccessful, NO punishment delivery (catch trial)
         #if pcatch_bool:
         M1_p_f_catch_nextreset_hists = Build_hist(M1_spikes,p_f_catch_nextreset,no_bins,before_time,after_time)
-        S1_p_f_catch_nextreset_hists = Build_hist(M1_spikes,p_f_catch_nextreset,no_bins,before_time,after_time)
-        PmD_p_f_catch_nextreset_hists = Build_hist(M1_spikes,p_f_catch_nextreset,no_bins,before_time,after_time)
-        PmV_p_f_catch_nextreset_hists = Build_hist(M1_spikes,p_f_catch_nextreset,no_bins,before_time,after_time)
+        S1_p_f_catch_nextreset_hists = Build_hist(S1_spikes,p_f_catch_nextreset,no_bins,before_time,after_time)
+        PmD_p_f_catch_nextreset_hists = Build_hist(PmD_spikes,p_f_catch_nextreset,no_bins,before_time,after_time)
+        PmV_p_f_catch_nextreset_hists = Build_hist(PmV_spikes,p_f_catch_nextreset,no_bins,before_time,after_time)
 
         M1_p_f_catch_cue_hists = Build_hist(M1_spikes,p_f_catch_cue,no_bins,before_time,after_time)
-        S1_p_f_catch_cue_hists = Build_hist(M1_spikes,p_f_catch_cue,no_bins,before_time,after_time)
-        PmD_p_f_catch_cue_hists = Build_hist(M1_spikes,p_f_catch_cue,no_bins,before_time,after_time)
-        PmV_p_f_catch_cue_hists = Build_hist(M1_spikes,p_f_catch_cue,no_bins,before_time,after_time)
+        S1_p_f_catch_cue_hists = Build_hist(S1_spikes,p_f_catch_cue,no_bins,before_time,after_time)
+        PmD_p_f_catch_cue_hists = Build_hist(PmD_spikes,p_f_catch_cue,no_bins,before_time,after_time)
+        PmV_p_f_catch_cue_hists = Build_hist(PmV_spikes,p_f_catch_cue,no_bins,before_time,after_time)
     
     #This list is a consortium of all of the reward histograms, both cue and reward for each region at each level of reward
     #no overlapping data points
