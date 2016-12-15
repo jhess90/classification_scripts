@@ -27,16 +27,14 @@ from sklearn.tree import DecisionTreeClassifier
 #params to set ########
 #######################
 
-no_bins = 10
 plot_bool = True
 time_boundry={'-0.5-1.0':[-0.5,1.0]}
 
-
-bin_size = 50 #in ms
+bin_size = 500 #in ms
 
 #### laptop ##############
 
-#filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20160118_0059/Extracted_0059_2016-01-18-12-48-52.mat'
+filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20160118_0059/Extracted_0059_2016-01-18-12-48-52.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20160118_0059/Extracted_0059_2016-01-18-13-02-45.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20150929_504/Extracted_504_2015-09-29-12-48-19.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20150929_504/Extracted_504_2015-09-29-13-10-44.mat'
@@ -89,7 +87,9 @@ bin_size = 50 #in ms
 #filename = '/home/jack/Dropbox/mult_rp_files/workspace/20160111_504/block1/Extracted_504_2016-01-11-13-56-44.mat'
 #filename = '/home/jack/Dropbox/mult_rp_files/workspace/20160111_504/block2/Extracted_504_2016-01-11-14-10-01.mat'
 
-filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20160226_0059/block3/Extracted_0059_2016-02-26-16-28-27.mat'
+
+
+#filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20160226_0059/block3/Extracted_0059_2016-02-26-16-28-27.mat'
 
 
 ######################
@@ -264,43 +264,7 @@ all_accuracy_total = {}
 for name_of_bin,time_of_bin in time_boundry.iteritems():
     before_time = -time_of_bin[0]
     after_time = time_of_bin[1]
-    print( 'bin %s' %(name_of_bin))
-    #Build and save M1 PSTH
-
-    if name_of_bin == 'all':
-        #to keep 50 ms bins
-        no_bins = 50
-    else:
-        no_bins = 10
-        
-    #Function that builds histograms of M1,S1,PmD spikes based on parameters entered above
-    def Build_hist(data,timestamps,no_bins,time_before,time_after):
-		dummy = []
-		for i in range(0,timestamps.shape[0]):
-			dummy1=[]
-			b = timestamps[i]
-			for ii in range(data.shape[0]):
-				a = data[ii]['ts'][0,0][0]
-				c = (np.histogram(a[np.where(np.logical_and(a>=b-time_before,a<=b+time_after))],bins=no_bins,normed=False,density=False))
-				dummy1.append(np.nan_to_num(c[0]))
-			dummy.append(MaxAbsScaler().fit_transform(dummy1))
-		#print np.array(dummy).shape
-		return np.array(dummy)
-    
-    #Build PmV histograms
-    def Build_hist_PmV(data,timestamps,no_bins,time_before,time_after):
-        dummy = []
-        for i in range(0,timestamps.shape[0]):
-            dummy1=[]
-            b = timestamps[i]
-            for ii in range(data.shape[0]):
-                a = data[ii]
-                c = (np.histogram(a[np.where(np.logical_and(a>=b-time_before,a<=b+time_after))],bins=no_bins,normed=False,density=False))
-                dummy1.append(np.nan_to_num(c[0]))
-            dummy.append(MaxAbsScaler().fit_transform(dummy1))
-            #plt.hist(dummy)
-            #plt.show()
-        return np.array(dummy)
+    print( 'bin %s' %(name_of_bin))        
     
     #Assemble a final dictionary of the final dataset for saving
     def Make_final_data(data,start_position):
@@ -350,147 +314,6 @@ for name_of_bin,time_of_bin in time_boundry.iteritems():
 #        return (np.vstack([rp_s_data,rp_f_data,nrnp_s_data,nrnp_f_data,r_only_s_data,r_only_f_data,p_only_s_data,p_only_f_data]),np.hstack([rp_s_targets,rp_f_targets,nrnp_s_targets,nrnp_f_targets,r_only_s_targets,r_only_f_targets,p_only_s_targets,p_only_f_targets]))
         return(np.vstack([rp_s_data,rp_f_data,nrnp_s_data,nrnp_f_data,r_only_s_data,r_only_f_data,p_only_s_data,p_only_f_data]),np.hstack([rp_s_targets,rp_f_targets,nrnp_s_targets,nrnp_f_targets,r_only_s_targets,r_only_f_targets,p_only_s_targets,p_only_f_targets]))
 
-    ##one reward cue, one punishment cue, successful (rewarding)
-    #M1_rp_s_rdelivery_hists = Build_hist(M1_spikes,rp_s_rdelivery,no_bins,before_time,after_time)
-    #S1_rp_s_rdelivery_hists = Build_hist(S1_spikes,rp_s_rdelivery,no_bins,before_time,after_time)
-    #PmD_rp_s_rdelivery_hists = Build_hist(PmD_spikes,rp_s_rdelivery,no_bins,before_time,after_time)
-    #PmV_rp_s_rdelivery_hists = Build_hist_PmV(PmV_spikes,rp_s_rdelivery,no_bins,before_time,after_time)
-
-    #M1_rp_s_cue_hists = Build_hist(M1_spikes,rp_s_cue,no_bins,before_time,after_time)
-    #S1_rp_s_cue_hists = Build_hist(S1_spikes,rp_s_cue,no_bins,before_time,after_time)
-    #PmD_rp_s_cue_hists = Build_hist(PmD_spikes,rp_s_cue,no_bins,before_time,after_time)
-    #PmV_rp_s_cue_hists = Build_hist_PmV(PmV_spikes,rp_s_cue,no_bins,before_time,after_time)
-
-    #one reward cue, one punishment cue, unsuccessful (punishing)
-    #M1_rp_f_pdelivery_hists = Build_hist(M1_spikes,rp_f_pdelivery,no_bins,before_time,after_time)
-    #S1_rp_f_pdelivery_hists = Build_hist(S1_spikes,rp_f_pdelivery,no_bins,before_time,after_time)
-    #PmD_rp_f_pdelivery_hists = Build_hist(PmD_spikes,rp_f_pdelivery,no_bins,before_time,after_time)
-    #PmV_rp_f_pdelivery_hists = Build_hist_PmV(PmV_spikes,rp_f_pdelivery,no_bins,before_time,after_time)
-
-    #M1_rp_f_cue_hists = Build_hist(M1_spikes,rp_f_cue,no_bins,before_time,after_time)
-    #S1_rp_f_cue_hists = Build_hist(S1_spikes,rp_f_cue,no_bins,before_time,after_time)
-    #PmD_rp_f_cue_hists = Build_hist(PmD_spikes,rp_f_cue,no_bins,before_time,after_time)
-    #PmV_rp_f_cue_hists = Build_hist_PmV(PmV_spikes,rp_f_cue,no_bins,before_time,after_time)
-
-    #no reward cue, no punishment cue, successful (non-rewarding)
-    #M1_nrnp_s_nextreset_hists = Build_hist(M1_spikes,nrnp_s_nextreset,no_bins,before_time,after_time)
-    #S1_nrnp_s_nextreset_hists = Build_hist(S1_spikes,nrnp_s_nextreset,no_bins,before_time,after_time)
-    #PmD_nrnp_s_nextreset_hists = Build_hist(PmD_spikes,nrnp_s_nextreset,no_bins,before_time,after_time)
-    #PmV_nrnp_s_nextreset_hists = Build_hist_PmV(PmV_spikes,nrnp_s_nextreset,no_bins,before_time,after_time)
-
-    #M1_nrnp_s_cue_hists = Build_hist(M1_spikes,nrnp_s_cue,no_bins,before_time,after_time)
-    #S1_nrnp_s_cue_hists = Build_hist(S1_spikes,nrnp_s_cue,no_bins,before_time,after_time)
-    #PmD_nrnp_s_cue_hists = Build_hist(PmD_spikes,nrnp_s_cue,no_bins,before_time,after_time)
-    #PmV_nrnp_s_cue_hists = Build_hist_PmV(PmV_spikes,nrnp_s_cue,no_bins,before_time,after_time)
-
-    #no reward cue, no punishment cue, fail (non-punishing)
-    #M1_nrnp_f_nextreset_hists = Build_hist(M1_spikes,nrnp_f_nextreset,no_bins,before_time,after_time)
-    #S1_nrnp_f_nextreset_hists = Build_hist(S1_spikes,nrnp_f_nextreset,no_bins,before_time,after_time)
-    #PmD_nrnp_f_nextreset_hists = Build_hist(PmD_spikes,nrnp_f_nextreset,no_bins,before_time,after_time)
-    #PmV_nrnp_f_nextreset_hists = Build_hist_PmV(PmV_spikes,nrnp_f_nextreset,no_bins,before_time,after_time)
-
-    #M1_nrnp_f_cue_hists = Build_hist(M1_spikes,nrnp_f_cue,no_bins,before_time,after_time)
-    #S1_nrnp_f_cue_hists = Build_hist(S1_spikes,nrnp_f_cue,no_bins,before_time,after_time)
-    #PmD_nrnp_f_cue_hists = Build_hist(PmD_spikes,nrnp_f_cue,no_bins,before_time,after_time)
-    #PmV_nrnp_f_cue_hists = Build_hist_PmV(PmV_spikes,nrnp_f_cue,no_bins,before_time,after_time)
-
-    #reward cue only, successful (rewarding)
-    #M1_r_only_s_rdelivery_hists = Build_hist(M1_spikes,r_only_s_rdelivery,no_bins,before_time,after_time)
-    #S1_r_only_s_rdelivery_hists = Build_hist(S1_spikes,r_only_s_rdelivery,no_bins,before_time,after_time)
-    #PmD_r_only_s_rdelivery_hists = Build_hist(PmD_spikes,r_only_s_rdelivery,no_bins,before_time,after_time)
-    #PmV_r_only_s_rdelivery_hists = Build_hist_PmV(PmV_spikes,r_only_s_rdelivery,no_bins,before_time,after_time)
-
-    #M1_r_only_s_cue_hists = Build_hist(M1_spikes,r_only_s_cue,no_bins,before_time,after_time)
-    #S1_r_only_s_cue_hists = Build_hist(S1_spikes,r_only_s_cue,no_bins,before_time,after_time)
-    #PmD_r_only_s_cue_hists = Build_hist(PmD_spikes,r_only_s_cue,no_bins,before_time,after_time)
-    #PmV_r_only_s_cue_hists = Build_hist_PmV(PmV_spikes,r_only_s_cue,no_bins,before_time,after_time)
-
-    #reward cue only, unsuccesssul (non-rewarding)
-    #M1_r_only_f_nextreset_hists = Build_hist(M1_spikes,r_only_f_nextreset,no_bins,before_time,after_time)
-    #S1_r_only_f_nextreset_hists = Build_hist(S1_spikes,r_only_f_nextreset,no_bins,before_time,after_time)
-    #PmD_r_only_f_nextreset_hists = Build_hist(PmD_spikes,r_only_f_nextreset,no_bins,before_time,after_time)
-    #PmV_r_only_f_nextreset_hists = Build_hist_PmV(PmV_spikes,r_only_f_nextreset,no_bins,before_time,after_time)
-
-    #M1_r_only_f_cue_hists = Build_hist(M1_spikes,r_only_f_cue,no_bins,before_time,after_time)
-    #S1_r_only_f_cue_hists = Build_hist(S1_spikes,r_only_f_cue,no_bins,before_time,after_time)
-    #PmD_r_only_f_cue_hists = Build_hist(PmD_spikes,r_only_f_cue,no_bins,before_time,after_time)
-    #PmV_r_only_f_cue_hists = Build_hist_PmV(PmV_spikes,r_only_f_cue,no_bins,before_time,after_time)
-
-    #punishment cue only, successful (non-punishing)
-    #M1_p_only_s_nextreset_hists = Build_hist(M1_spikes,p_only_s_nextreset,no_bins,before_time,after_tim#e)
-    #S1_p_only_s_nextreset_hists = Build_hist(S1_spikes,p_only_s_nextreset,no_bins,before_time,after_tim#e)
-    #PmD_p_only_s_nextreset_hists = Build_hist(PmD_spikes,p_only_s_nextreset,no_bins,before_time,after_time)
-    #PmV_p_only_s_nextreset_hists = Build_hist_PmV(PmV_spikes,p_only_s_nextreset,no_bins,before_time,after_time)
-
-    #M1_p_only_s_cue_hists = Build_hist(M1_spikes,p_only_s_cue,no_bins,before_time,after_time)
-    #S1_p_only_s_cue_hists = Build_hist(S1_spikes,p_only_s_cue,no_bins,before_time,after_time)
-    #PmD_p_only_s_cue_hists = Build_hist(PmD_spikes,p_only_s_cue,no_bins,before_time,after_time)
-    #PmV_p_only_s_cue_hists = Build_hist_PmV(PmV_spikes,p_only_s_cue,no_bins,before_time,after_time)
-
-    #punishment cue only, unsuccessful (punishing)
-    #M1_p_only_f_pdelivery_hists = Build_hist(M1_spikes,p_only_f_pdelivery,no_bins,before_time,after_time)
-    #S1_p_only_f_pdelivery_hists = Build_hist(S1_spikes,p_only_f_pdelivery,no_bins,before_time,after_time)
-    #PmD_p_only_f_pdelivery_hists = Build_hist(PmD_spikes,p_only_f_pdelivery,no_bins,before_time,after_time)
-    #PmV_p_only_f_pdelivery_hists = Build_hist_PmV(PmV_spikes,p_only_f_pdelivery,no_bins,before_time,after_time)
-
-    #M1_p_only_f_cue_hists = Build_hist(M1_spikes,p_only_f_cue,no_bins,before_time,after_time)
-    #S1_p_only_f_cue_hists = Build_hist(S1_spikes,p_only_f_cue,no_bins,before_time,after_time)
-    #PmD_p_only_f_cue_hists = Build_hist(PmD_spikes,p_only_f_cue,no_bins,before_time,after_time)
-    #PmV_p_only_f_cue_hists = Build_hist_PmV(PmV_spikes,p_only_f_cue,no_bins,before_time,after_time)#reward cue, successful, NO reward delivery (catch trial)
-
-    #if rcatch_bool or pcatch_bool:
-        #M1_r_s_catch_nextreset_hists = Build_hist(M1_spikes,r_s_catch_nextreset,no_bins,before_time,after_time)
-        #S1_r_s_catch_nextreset_hists = Build_hist(M1_spikes,r_s_catch_nextreset,no_bins,before_time,after_time)
-        #PmD_r_s_catch_nextreset_hists = Build_hist(M1_spikes,r_s_catch_nextreset,no_bins,before_time,after_time)
-        #PmV_r_s_catch_nextreset_hists = Build_hist(M1_spikes,r_s_catch_nextreset,no_bins,before_time,after_time)
-
-        #M1_r_s_catch_cue_hists = Build_hist(M1_spikes,r_s_catch_cue,no_bins,before_time,after_time)
-        #S1_r_s_catch_cue_hists = Build_hist(M1_spikes,r_s_catch_cue,no_bins,before_time,after_time)
-        #PmD_r_s_catch_cue_hists = Build_hist(M1_spikes,r_s_catch_cue,no_bins,before_time,after_time)#
-        #PmV_r_s_catch_cue_hists = Build_hist(M1_spikes,r_s_catch_cue,no_bins,before_time,after_time)
-
-        #punishment cue, unsuccessful, NO punishment delivery (catch trial)
-        #if pcatch_bool:
-        #M1_p_f_catch_nextreset_hists = Build_hist(M1_spikes,p_f_catch_nextreset,no_bins,before_time,after_time)
-        #S1_p_f_catch_nextreset_hists = Build_hist(M1_spikes,p_f_catch_nextreset,no_bins,before_time,after_time)
-        #PmD_p_f_catch_nextreset_hists = Build_hist(M1_spikes,p_f_catch_nextreset,no_bins,before_time,after_time)
-        #PmV_p_f_catch_nextreset_hists = Build_hist(M1_spikes,p_f_catch_nextreset,no_bins,before_time,after_time)
-
-        #M1_p_f_catch_cue_hists = Build_hist(M1_spikes,p_f_catch_cue,no_bins,before_time,after_time)
-        #S1_p_f_catch_cue_hists = Build_hist(M1_spikes,p_f_catch_cue,no_bins,before_time,after_time)
-        #PmD_p_f_catch_cue_hists = Build_hist(M1_spikes,p_f_catch_cue,no_bins,before_time,after_time)#
-        #PmV_p_f_catch_cue_hists = Build_hist(M1_spikes,p_f_catch_cue,no_bins,before_time,after_time)
-    
-    #This list is a consortium of all of the reward histograms, both cue and reward for each region at each level of reward
-    #no overlapping data points
-    #pnt_data_2 = [M1_rp_s_rdelivery_hists, S1_rp_s_rdelivery_hists, PmD_rp_s_rdelivery_hists, PmV_rp_s_rdelivery_hists, M1_rp_s_cue_hists, S1_rp_s_cue_hists, PmD_rp_s_cue_hists, PmV_rp_s_cue_hists, M1_rp_f_pdelivery_hists, S1_rp_f_pdelivery_hists, PmD_rp_f_pdelivery_hists, PmV_rp_f_pdelivery_hists, M1_rp_f_cue_hists, S1_rp_f_cue_hists, PmD_rp_f_cue_hists, PmV_rp_f_cue_hists, M1_nrnp_s_nextreset_hists, S1_nrnp_s_nextreset_hists, PmD_nrnp_s_nextreset_hists, PmV_nrnp_s_nextreset_hists, M1_nrnp_s_cue_hists, S1_nrnp_s_cue_hists, PmD_nrnp_s_cue_hists, PmV_nrnp_s_cue_hists, M1_nrnp_f_nextreset_hists, S1_nrnp_f_nextreset_hists, PmD_nrnp_f_nextreset_hists, PmV_nrnp_f_nextreset_hists, M1_nrnp_f_cue_hists, S1_nrnp_f_cue_hists, PmD_nrnp_f_cue_hists, PmV_nrnp_f_cue_hists, M1_r_only_s_rdelivery_hists, S1_r_only_s_rdelivery_hists, PmD_r_only_s_rdelivery_hists, PmV_r_only_s_rdelivery_hists, M1_r_only_s_cue_hists, S1_r_only_s_cue_hists, PmD_r_only_s_cue_hists, PmV_r_only_s_cue_hists, M1_r_only_f_nextreset_hists, S1_r_only_f_nextreset_hists, PmD_r_only_f_nextreset_hists, PmV_r_only_f_nextreset_hists, M1_r_only_f_cue_hists, S1_r_only_f_cue_hists, PmD_r_only_f_cue_hists, PmV_r_only_f_cue_hists, M1_p_only_s_nextreset_hists, S1_p_only_s_nextreset_hists, PmD_p_only_s_nextreset_hists, PmV_p_only_s_nextreset_hists, M1_p_only_s_cue_hists, S1_p_only_s_cue_hists, PmD_p_only_s_cue_hists, PmV_p_only_s_cue_hists, M1_p_only_f_pdelivery_hists, S1_p_only_f_pdelivery_hists, PmD_p_only_f_pdelivery_hists, PmV_p_only_f_pdelivery_hists, M1_p_only_f_cue_hists, S1_p_only_f_cue_hists, PmD_p_only_f_cue_hists, PmV_p_only_f_cue_hists]
-    #if pcatch_bool or rcatch_bool:
-        #pnt_data_2 = [M1_rp_s_rdelivery_hists, S1_rp_s_rdelivery_hists, PmD_rp_s_rdelivery_hists, PmV_rp_s_rdelivery_hists, M1_rp_s_cue_hists, S1_rp_s_cue_hists, PmD_rp_s_cue_hists, PmV_rp_s_cue_hists, M1_rp_f_pdelivery_hists, S1_rp_f_pdelivery_hists, PmD_rp_f_pdelivery_hists, PmV_rp_f_pdelivery_hists, M1_rp_f_cue_hists, S1_rp_f_cue_hists, PmD_rp_f_cue_hists, PmV_rp_f_cue_hists, M1_nrnp_s_nextreset_hists, S1_nrnp_s_nextreset_hists, PmD_nrnp_s_nextreset_hists, PmV_nrnp_s_nextreset_hists, M1_nrnp_s_cue_hists, S1_nrnp_s_cue_hists, PmD_nrnp_s_cue_hists, PmV_nrnp_s_cue_hists, M1_nrnp_f_nextreset_hists, S1_nrnp_f_nextreset_hists, PmD_nrnp_f_nextreset_hists, PmV_nrnp_f_nextreset_hists, M1_nrnp_f_cue_hists, S1_nrnp_f_cue_hists, PmD_nrnp_f_cue_hists, PmV_nrnp_f_cue_hists, M1_r_only_s_rdelivery_hists, S1_r_only_s_rdelivery_hists, PmD_r_only_s_rdelivery_hists, PmV_r_only_s_rdelivery_hists, M1_r_only_s_cue_hists, S1_r_only_s_cue_hists, PmD_r_only_s_cue_hists, PmV_r_only_s_cue_hists, M1_r_only_f_nextreset_hists, S1_r_only_f_nextreset_hists, PmD_r_only_f_nextreset_hists, PmV_r_only_f_nextreset_hists, M1_r_only_f_cue_hists, S1_r_only_f_cue_hists, PmD_r_only_f_cue_hists, PmV_r_only_f_cue_hists, M1_p_only_s_nextreset_hists, S1_p_only_s_nextreset_hists, PmD_p_only_s_nextreset_hists, PmV_p_only_s_nextreset_hists, M1_p_only_s_cue_hists, S1_p_only_s_cue_hists, PmD_p_only_s_cue_hists, PmV_p_only_s_cue_hists, M1_p_only_f_pdelivery_hists, S1_p_only_f_pdelivery_hists, PmD_p_only_f_pdelivery_hists, PmV_p_only_f_pdelivery_hists, M1_p_only_f_cue_hists, S1_p_only_f_cue_hists, PmD_p_only_f_cue_hists, PmV_p_only_f_cue_hists, M1_r_s_catch_nextreset_hists, S1_r_s_catch_nextreset_hists, PmD_r_s_catch_nextreset_hists, PmV_r_s_catch_nextreset_hists, M1_r_s_catch_cue_hists, S1_r_s_catch_cue_hists, PmD_r_s_catch_cue_hists, PmV_r_s_catch_cue_hists, M1_p_f_catch_nextreset_hists, S1_p_f_catch_nextreset_hists, PmD_p_f_catch_nextreset_hists, PmV_p_f_catch_nextreset_hists, M1_p_f_catch_cue_hists, S1_p_f_catch_cue_hists, PmD_p_f_catch_cue_hists, PmV_p_f_catch_cue_hists]
-
-    #Generates final data dictionary for each region based on pnt_data; _d_ is following reward delivery and _c_ is following cue
-    #M1_d_data,targets=Make_final_data(pnt_data_2,0)
-    #S1_d_data,targets=Make_final_data(pnt_data_2,1)
-    #pmd_d_data,targets=Make_final_data(pnt_data_2,2)
-    #pmv_d_data,targets=Make_final_data(pnt_data_2,3)
-
-    #M1_c_data,targets=Make_final_data(pnt_data_2,4)
-    #S1_c_data,targets=Make_final_data(pnt_data_2,5)
-    #pmd_c_data,targets=Make_final_data(pnt_data_2,6)
-    #pmv_c_data,targets=Make_final_data(pnt_data_2,7) 
-
-    #Construct dictionary for saving array
-    #final_data = {'M1_d_data':M1_d_data,'S1_d_data':S1_d_data,'pmd_d_data':pmd_d_data,'pmv_d_data':pmv_d_data,'M1_c_data':M1_c_data,'S1_c_data':S1_c_data,'pmd_c_data':pmd_c_data,'pmv_c_data':pmv_c_data,'targets':targets}
-
-    #Construct temparary dictionary for figure generation
-    #final_data_no_targets = {'M1_at_delivery':M1_d_data,'S1_at_delivery':S1_d_data,'PmD_at_delivery':pmd_d_data,'PmV_at_delivery':pmv_d_data,'M1_at_cue':M1_c_data,'S1_at_cue':S1_c_data,'PmD_at_cue':pmd_c_data,'PmV_at_cue':pmv_c_data}
-
-    #np.save("single_rp_"+filename[-15:-4]+"_hists_"+name_of_bin,(final_data,unit_names))
-
-
-
-#spikes=[]
-#for i in range(len(M1_spikes)):
-#	spikes.append(M1_spikes[i]['ts'][0,0][0])
 
 #rp_s_rdelivery
 time_before = -0.5 #make sure if change to pos time before it still works
@@ -519,6 +342,11 @@ def make_raster(data,spikes,key,key2,unit_no,time_before,time_after):
 	adjusted_times = []
 	binned = []
 	#firing_rate = []
+
+	#fig,axs = plt.subplots(nrows=1, ncols=2, sharex=True)
+	plt.subplot(2,1,1)
+	
+	#ax=axs[0,0]
 	
 	for i in range(dummy.shape[0]):
 		adjusted_times=dummy[i][unit_no]-value[i]
@@ -538,42 +366,57 @@ def make_raster(data,spikes,key,key2,unit_no,time_before,time_after):
 	avg_firing_rate = np.mean(firing_rate)
 	std_dev_firing_rate = np.std(firing_rate)
 	
-	#fig,axs = plt.subplots(nrows=1, ncols=2, sharex=True)
-
-	plt.subplot(2,1,1)
-	
-	#ax=axs[0,0]
 	
 	plt.axvline(0.0)
 	
 	#plt.title('Ex raster plot,%s, %s, unit: %s' %(key,key2,str(unit_no)))
-	#plt.set_title('Raster plot')
+	plt.title('Raster plot')
 	#ax.xlabel('Time')
 	#ax.ylabel('Trial')
 	#plt.show()
 
 	#ax=axs[0,1]
-	plt.subplot(2,2,1)
-	plt.errorbar(avg_firing_rate,std_dev_firing_rate) #,yerr=yerr,fmt=o)
-	#plt.set_title('average firing rate')
+	plt.subplot(2,1,2)
+	#plt.plot(avg_firing_rate)
+	#plt.plot((avg_firing_rate + std_dev_firing_rate))
+	#plt.plot(avg_firing_rate - std_dev_firing_rate)
+	#plt.plot(avg_firing_rate)
+	#plt.xlim(0,30)
 
+	#plt.errorbar(avg_firing_rate,std_dev_firing_rate) #,yerr=yerr,fmt=o)
+	plt.title('average firing rate')
+
+	#plt.fill_between(avg_firing_rate,std_dev_firing_rate,std_dev_firing_rate,alpha=1, edgecolor='#3F7F4C', facecolor='#7EFF99',linewidth=0)
+	#plt.fill_between(avg_firing_rate,avg_firing_rate-10,avg_firing_rate+10)   #,alpha=1, edgecolor='#3F7F4C', facecolor='#7EFF99',linewidth=0)
+
+	ymax = avg_firing_rate + std_dev_firing_rate
+	ymin = avg_firing_rate - std_dev_firing_rate
+
+	#plt.plot(avg_firing_rate)
+	#plt.fill_between(ymin,ymax,alpha=1,edgecolor='#3F7F4C',facecolor='#7EFF99',linewidth=0)
+	plt.errorbar(np.arange(no_bins),avg_firing_rate,yerr=std_dev_firing_rate)
+	plt.xlim(0,no_bins)
+	plt.ylim(ymin=0)
+	
 	#fig.suptitle('%s, %s, unit: %s' %(key,key2,str(unit_no)))
-	plt.title('%s, %s, unit: %s' %(key,key2,str(unit_no)))
+	plt.suptitle('%s, %s, unit: %s' %(key,key2,str(unit_no)))
 	
 	plt.savefig('raster_%s_%s_unit%s' %(key, key2, str(unit_no)))
 	plt.clf()
+
+	return_dict={'avg_firing_rate':avg_firing_rate,'std_dev_firing_rate':std_dev_firing_rate,'binned':binned,'firing_rate':firing_rate,'adjusted_times':adjusted_times}
 	
-	return(firing_rate)
+	return(return_dict)
 
 #unit_no for loop
 #unit_no = 20
 
-#ts_dict={'rp_s_cue':rp_s_cue, 'rp_s_rdelivery':rp_s_rdelivery, 'rp_f_cue':rp_f_cue, 'rp_f_pdelivery':rp_f_pdelivery, 'nrnp_s_cue':nrnp_s_cue, 'nrnp_s_nextreset':nrnp_s_nextreset, 'nrnp_f_cue':nrnp_f_cue, 'nrnp_f_nextreset':nrnp_f_nextreset, 'r_only_s_cue':r_only_s_cue, 'r_only_s_rdelivery':r_only_s_rdelivery, 'r_only_f_cue':r_only_f_cue, 'r_only_f_nextreset':r_only_f_nextreset, 'p_only_s_cue':p_only_s_cue, 'p_only_s_nextreset':p_only_s_nextreset, 'p_only_f_cue':p_only_f_cue, 'p_only_f_pdelivery':p_only_f_pdelivery}
+ts_dict={'rp_s_cue':rp_s_cue, 'rp_s_rdelivery':rp_s_rdelivery, 'rp_f_cue':rp_f_cue, 'rp_f_pdelivery':rp_f_pdelivery, 'nrnp_s_cue':nrnp_s_cue, 'nrnp_s_nextreset':nrnp_s_nextreset, 'nrnp_f_cue':nrnp_f_cue, 'nrnp_f_nextreset':nrnp_f_nextreset, 'r_only_s_cue':r_only_s_cue, 'r_only_s_rdelivery':r_only_s_rdelivery, 'r_only_f_cue':r_only_f_cue, 'r_only_f_nextreset':r_only_f_nextreset, 'p_only_s_cue':p_only_s_cue, 'p_only_s_nextreset':p_only_s_nextreset, 'p_only_f_cue':p_only_f_cue, 'p_only_f_pdelivery':p_only_f_pdelivery}
 
 #testing dict
 #ts_dict={'rp_s_cue':rp_s_cue, 'r_only_s':r_only_s_rdelivery,'nrnp_s_cue':nrnp_s_cue}
 #ts_dict={'r_only_f_nextreset':r_only_f_nextreset}
-ts_dict = {'rp_s_rdelivery':rp_s_rdelivery}
+#ts_dict = {'rp_s_rdelivery':rp_s_rdelivery}
 
 data_dict={'M1_spikes':M1_spikes,'S1_spikes':S1_spikes,'PmD_spikes':PmD_spikes,'PmV_spikes':PmV_spikes}
 
