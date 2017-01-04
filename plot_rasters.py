@@ -30,11 +30,11 @@ from sklearn.tree import DecisionTreeClassifier
 plot_bool = True
 time_boundry={'-0.5-1.0':[-0.5,1.0]}
 
-bin_size = 50 #in ms
+bin_size = 500 #in ms
 
 #### laptop ##############
 
-filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20160118_0059/Extracted_0059_2016-01-18-12-48-52.mat'
+#filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20160118_0059/Extracted_0059_2016-01-18-12-48-52.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20160118_0059/Extracted_0059_2016-01-18-13-02-45.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20150929_504/Extracted_504_2015-09-29-12-48-19.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20150929_504/Extracted_504_2015-09-29-13-10-44.mat'
@@ -50,7 +50,7 @@ filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20160118_0059/
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20150929_504/Extracted_504_2015-09-29-13-10-44.mat'
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-14-23.mat'
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-33-52.mat'
-#filename = '/home/jack/Dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-25-20.mat'
+filename = '/home/jack/Dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-25-20.mat'
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-46-25.mat'
 
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20160525_0059/Extracted_0059_2016-05-25-15-41-44.mat'
@@ -609,4 +609,4 @@ short_filename = filename[-27:-4]
 if short_filename.startswith('0'):
 	short_filename = '0%s' %(short_filename)
 
-np.save('avg_fr_and_nlized_data_%s' %(short_filename),save_dict)
+np.save('avg_fr_and_nlized_data_%s_bin%s' %(short_filename,bin_size),save_dict)
