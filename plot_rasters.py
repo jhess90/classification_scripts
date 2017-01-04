@@ -313,6 +313,11 @@ time_after = 1.0
 
 no_bins = (time_after - time_before) * 1000 / bin_size
 
+print 'bin size = %s' %(bin_size)
+
+param_dict = {'time_before':time_before,'time_after':time_after,'time_boundry':time_boundry,'bin_size':bin_size,'no_bins':no_bins}
+
+
 def normalize_data(spike_data):
 	hist = []
 	nl_spike_data = []
@@ -549,6 +554,7 @@ data_dict_all = {'M1_dicts':M1_dicts,'S1_dicts':S1_dicts,'PmD_dicts':PmD_dicts,'
 
 save_dict = {}
 save_dict['data_dict_all'] = data_dict_all
+save_dict['param_dict'] = param_dict
 
 #total_rasters = []
 #for key, value in ts_dict.iteritems():
@@ -595,6 +601,7 @@ for key, value in ts_dict.iteritems():
 
 				total_rasters.append(rasters)
 			save_dict['%s_%s' %(key, key2)] = total_rasters
+			total_rasters = []
 	else:
 		print 'no instances of event %s, no plot generation' %(key)
 
