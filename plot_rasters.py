@@ -30,7 +30,7 @@ from sklearn.tree import DecisionTreeClassifier
 plot_bool = True
 time_boundry={'-0.5-1.0':[-0.5,1.0]}
 
-bin_size = 500 #in ms
+bin_size = 50 #in ms
 
 #### laptop ##############
 
@@ -39,7 +39,7 @@ bin_size = 500 #in ms
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20150929_504/Extracted_504_2015-09-29-12-48-19.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20150929_504/Extracted_504_2015-09-29-13-10-44.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-14-23.mat'
-#filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-33-52.mat'
+filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-33-52.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-25-20.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-46-25.mat'
 
@@ -50,7 +50,7 @@ bin_size = 500 #in ms
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20150929_504/Extracted_504_2015-09-29-13-10-44.mat'
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-14-23.mat'
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-33-52.mat'
-filename = '/home/jack/Dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-25-20.mat'
+#filename = '/home/jack/Dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-25-20.mat'
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-46-25.mat'
 
 #filename = '/home/jack/Dropbox/single_rp_files/extracted/20160525_0059/Extracted_0059_2016-05-25-15-41-44.mat'
@@ -311,7 +311,7 @@ for name_of_bin,time_of_bin in time_boundry.iteritems():
 time_before = -0.5 #make sure if change to pos time before it still works
 time_after = 1.0
 
-no_bins = (time_after - time_before) * 1000 / bin_size
+no_bins = int((time_after - time_before) * 1000 / bin_size)
 
 print 'bin size = %s' %(bin_size)
 
@@ -454,6 +454,10 @@ def make_nl_raster(data,spikes,nl,key,key2,unit_no,time_before,time_after,min_bi
 
 		binned_temp = np.histogram(adjusted_times,bins=no_bins,normed=False,density=False)
 		binned.append(np.nan_to_num(binned_temp[0]))
+
+		if i >= len(min_bin):
+			print 'potential indexing error: breaking'
+			break
 
 		binned_nl_temp_num = binned_temp[0] - min_bin[i]
 		binned_nl_temp_denom = max_bin[i] - min_bin[i]
