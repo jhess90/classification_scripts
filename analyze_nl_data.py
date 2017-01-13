@@ -26,18 +26,18 @@ import glob
 import scipy as sp
 import statsmodels.api as sm
 import pandas
+import xlsxwriter
+import pyexcel
+import pyexcel_xlsx
 
-#TODO: on beaver install statsmodels
-
-#######################
-#params to set ########
-#######################
+#TODO: on beaver install statsmodels, pyexcel, pyexcel_xlsx
 
 filename = glob.glob('avg_fr_and_nlized_data*.npy')
+filename = filename[0]
 
-print 'loading %s' %(filename[0])
+print 'loading %s' %(filename)
 
-save_dict = np.load(filename[0])[()]
+save_dict = np.load(filename)[()]
 
 keys = save_dict.keys()
 
@@ -51,7 +51,6 @@ bin_size = params['bin_size']
 time_before = params['time_before']
 time_after = params['time_after']
 num_bins_before = np.int(time_before * 1000 / bin_size * -1) #because neg value
-
 
 print 'arranging data'
 
@@ -78,12 +77,6 @@ def do_stats(event_key,event_data):
 		mann_w.append(mann_w_temp)
 		mann_w_sig_bool.append(mann_w_sig_bool_temp)
 
-			
-		#stats['mann_w'] = mann_w
-		#stats['mann_w_sig_bool'] = mann_w_sig_bool
-		
-		#stats_all.append(stats)
-
 	#for i in range(len(event_key))
 	stats_all['mann_w'] = mann_w
 	stats_all['mann_w_sig_bool'] = mann_w_sig_bool
@@ -96,7 +89,7 @@ def do_stats(event_key,event_data):
 	return stats_all
 
 
-def do_comp_stats(all_dict):
+def do_comp_stats(all_dict,region_key,type_key):
 
 	nlized_comparison_data = {}
 	index = 0
@@ -120,55 +113,79 @@ def do_comp_stats(all_dict):
 	all_before = d3_nl_array[:,:,0:num_bins_before]
 	all_after = d3_nl_array[:,:,num_bins_before:2*num_bins_before]
 
-	#unit_stats = []
 	anovas = []
 	if d3_nl_array.shape[0] == 8:
 		for i in range(d3_nl_array.shape[1]):
-			anovas.append(sp.stats.f_oneway(d3_nl_array[0][i],d3_nl_array[1][i],d3_nl_array[2][i],d3_nl_array[3][i],d3_nl_array[4][i],d3_nl_array[5][i],d3_nl_array[6][i],d3_nl_array[7][i]))
+			anovas.append(sp.stats.f_oneway(all_after[0][i],all_after[1][i],all_after[2][i],all_after[3][i],all_after[4][i],all_after[5][i],all_after[6][i],all_after[7][i]))
 		anovas = np.asarray(anovas)
-	elif dl_nl_array.shape[0] == 7:
+
+	elif d3_nl_array.shape[0] == 7:
 		for i in range(d3_nl_array.shape[1]):
-			anovas.append(sp.stats.f_oneway(d3_nl_array[0][i],d3_nl_array[1][i],d3_nl_array[2][i],d3_nl_array[3][i],d3_nl_array[4][i],d3_nl_array[5][i],d3_nl_array[6][i]))
+			anovas.append(sp.stats.f_oneway(all_after[0][i],all_after[1][i],all_after[2][i],all_after[3][i],all_after[4][i],all_after[5][i],all_after[6][i]))
 		anovas = np.asarray(anovas)
-	elif dl_nl_array.shape[0] == 6:
+	elif d3_nl_array.shape[0] == 6:
 		for i in range(d3_nl_array.shape[1]):
-			anovas.append(sp.stats.f_oneway(d3_nl_array[0][i],d3_nl_array[1][i],d3_nl_array[2][i],d3_nl_array[3][i],d3_nl_array[4][i],d3_nl_array[5][i]))
+			anovas.append(sp.stats.f_oneway(all_after[0][i],all_after[1][i],all_after[2][i],all_after[3][i],all_after[4][i],all_after[5][i]))
 		anovas = np.asarray(anovas)
-	elif dl_nl_array.shape[0] == 5:
+	elif d3_nl_array.shape[0] == 5:
 		for i in range(d3_nl_array.shape[1]):
-			anovas.append(sp.stats.f_oneway(d3_nl_array[0][i],d3_nl_array[1][i],d3_nl_array[2][i],d3_nl_array[3][i],d3_nl_array[4][i]))
+			anovas.append(sp.stats.f_oneway(all_after[0][i],all_after[1][i],all_after[2][i],all_after[3][i],all_after[4][i]))
 		anovas = np.asarray(anovas)
-	elif dl_nl_array.shape[0] == 4:
+	elif d3_nl_array.shape[0] == 4:
 		for i in range(d3_nl_array.shape[1]):
-			anovas.append(sp.stats.f_oneway(d3_nl_array[0][i],d3_nl_array[1][i],d3_nl_array[2][i],d3_nl_array[3][i]))
+			anovas.append(sp.stats.f_oneway(all_after[0][i],all_after[1][i],all_after[2][i],all_after[3][i]))
 		anovas = np.asarray(anovas)
-	elif dl_nl_array.shape[0] == 3:
+	elif d3_nl_array.shape[0] == 3:
 		for i in range(d3_nl_array.shape[1]):
-			anovas.append(sp.stats.f_oneway(d3_nl_array[0][i],d3_nl_array[1][i],d3_nl_array[2][i]))
+			anovas.append(sp.stats.f_oneway(all_after[0][i],all_after[1][i],all_after[2][i]))
 		anovas = np.asarray(anovas)
-	elif dl_nl_array.shape[0] == 2:
+	elif d3_nl_array.shape[0] == 2:
 		for i in range(d3_nl_array.shape[1]):
-			anovas.append(sp.stats.f_oneway(d3_nl_array[0][i],d3_nl_array[1][i]))
+			anovas.append(sp.stats.f_oneway(all_after[0][i],all_after[1][i]))
 		anovas = np.asarray(anovas)
 	else:
 		print 'ANOVA error'
 
-	#for sig anovas, t-tests between each of the options (?)
-		
 	anova_pval = anovas[:,1]
 	anova_sig_pval = np.where(anova_pval <= 0.05)
 	anova_sig_pval_bool = anova_pval <= 0.05
 
 	anova_sig_perc = sum(anova_sig_pval_bool) / float(len(anova_sig_pval_bool))
-
 	anova_sig_perc_str= np.around(anova_sig_perc *100,decimals = 2)
 	print '%s%% units significantly different between events' %(anova_sig_perc_str)
 
+	for_post_hoc = []
+	for i in range(len(anova_sig_pval_bool)):
+		if anova_sig_pval_bool[i]:
+			list_all = np.zeros(num_bins_before * d3_nl_array.shape[0])
+			cat_all = np.zeros(num_bins_before * d3_nl_array.shape[0])
+			vals = {}
+			for j in range(d3_nl_array.shape[0]):
+				list_all[j*num_bins_before:(j+1)*num_bins_before] = all_after[j][i][0:num_bins_before]
+				cat_all[j*num_bins_before:(j+1)*num_bins_before] = np.ones(num_bins_before)*j
 
-	return_dict={'d3_nl_array':d3_nl_array,'d3_index':d3_index,'nlized_comparison_data':nlized_comparison_data,'anovas':anovas,'anova_sig_pval':anova_sig_pval,'anova_sig_pval_bool':anova_sig_pval_bool,'anova_sig_perc':anova_sig_perc}
+			list_all = np.asarray(list_all)
+			cat_all = np.asarray(cat_all)
+
+			mc = sm.stats.multicomp.MultiComparison(list_all,cat_all)
+			tukey = mc.tukeyhsd()
+
+			#print 'unit: %s' %(i)
+			#print tukey.summary()
+
+			pyexcel.save_as(array = tukey.summary(),dest_file_name='%s_%s_unit_%s.csv'%(type_key,region_key,i))
+			
+			vals['unit_no'] = i
+			vals['list_all'] = list_all
+			vals['cat_all'] = cat_all
+			vals['mc'] = mc
+			vals['tukey'] = tukey
+			
+			for_post_hoc.append(vals)
+
+	return_dict={'d3_nl_array':d3_nl_array,'d3_index':d3_index,'nlized_comparison_data':nlized_comparison_data,'anovas':anovas,'anova_sig_pval':anova_sig_pval,'anova_sig_pval_bool':anova_sig_pval_bool,'anova_sig_perc':anova_sig_perc,'for_post_hoc':for_post_hoc}
 								
 	return return_dict
-
 
 
 for i in range(len(keys)):
@@ -196,24 +213,52 @@ for region_key,region_dict in all_regions_dict.iteritems():
 			stats = do_stats(event_key,event_value)
 			delivery_dicts['stats_%s' %(event_key)] = stats
 
-		#for event_key,event_value in cue_dicts.iteritems():
-		#	if not 'stats' in event_key:
-		#		comp_stats = do_comp_stats(event_key,event_value)
-		#		#region_dict[event_key
-		#for event_key,event_value in delivery_dicts.iteritems():
-		#	if not 'stats' in event_key:
-		#		comp_stats = do_comp_stats(event_key,event_value)
-
 	print '%s cue:' %(region_key)
-	cue_comp_stats = do_comp_stats(cue_dicts)
+	cue_comp_stats = do_comp_stats(cue_dicts,region_key,'cue')
 	print '%s delivery:' %(region_key)
-	delivery_comp_stats = do_comp_stats(delivery_dicts)
+	delivery_comp_stats = do_comp_stats(delivery_dicts,region_key,'delivery')
 
 	all_regions_dict[region_key]['cue_dicts'] = cue_dicts
 	all_regions_dict[region_key]['delivery_dicts'] = delivery_dicts
 
 	all_regions_dict[region_key]['cue_comp_stats'] = cue_comp_stats
 	all_regions_dict[region_key]['delivery_comp_stats'] = delivery_comp_stats
-								
 
 	
+#save npy and xls files
+print 'saving data'
+np.save('data_%s' %(filename),all_regions_dict)
+
+workbook = xlsxwriter.Workbook('data_%s.xlsx' %(filename))
+worksheet = workbook.add_worksheet()
+
+row = 0
+for region_key,region_data in all_regions_dict.iteritems():
+	worksheet.write(row,0,region_key)
+	worksheet.write(row,1,'cue_dicts')
+	for event_key,event_data in all_regions_dict[region_key]['cue_dicts'].iteritems():
+		if 'stats' in event_key:
+			worksheet.write(row,2,event_key)
+			worksheet.write(row,3,all_regions_dict[region_key]['cue_dicts'][event_key]['perc_sig'])
+			row +=1
+	worksheet.write(row,1,'delivery_dicts')
+	for event_key,event_data in all_regions_dict[region_key]['delivery_dicts'].iteritems():
+		if 'stats' in event_key:
+			worksheet.write(row,2,event_key)
+			worksheet.write(row,3,all_regions_dict[region_key]['delivery_dicts'][event_key]['perc_sig'])
+			row +=1
+
+row = 0
+worksheet2 = workbook.add_worksheet()
+for region_key,region_data in all_regions_dict.iteritems():
+	worksheet2.write(row,0,region_key)
+	worksheet2.write(row,1,'cue_comp_stats')
+	worksheet2.write(row,2,all_regions_dict[region_key]['cue_comp_stats']['anova_sig_perc'])
+	worksheet2.write(row,3,'delivery_comp_stats')
+	worksheet2.write(row,4,all_regions_dict[region_key]['delivery_comp_stats']['anova_sig_perc'])
+	row +=1
+
+	
+pyexcel.merge_all_to_a_book(glob.glob('*.csv'),'post_hoc_results_%s.xlsx' %(filename))
+
+#TODO delete csv files?
