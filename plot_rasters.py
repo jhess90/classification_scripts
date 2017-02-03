@@ -29,7 +29,6 @@ from sklearn.tree import DecisionTreeClassifier
 
 plot_bool = True
 time_boundry={'-0.5-1.0':[-0.5,1.0]}
-
 bin_size = 50 #in ms
 
 #### laptop ##############
@@ -39,7 +38,7 @@ bin_size = 50 #in ms
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20150929_504/Extracted_504_2015-09-29-12-48-19.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20150929_504/Extracted_504_2015-09-29-13-10-44.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-14-23.mat'
-filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-33-52.mat'
+#filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151001_504/Extracted_504_2015-10-01-15-33-52.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-25-20.mat'
 #filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151019_0059/Extracted_0059_2015-10-19-16-46-25.mat'
 
@@ -87,9 +86,10 @@ filename = '/Users/johnhessburg/dropbox/single_rp_files/extracted/20151001_504/E
 #filename = '/home/jack/Dropbox/mult_rp_files/workspace/20160111_504/block1/Extracted_504_2016-01-11-13-56-44.mat'
 #filename = '/home/jack/Dropbox/mult_rp_files/workspace/20160111_504/block2/Extracted_504_2016-01-11-14-10-01.mat'
 
-
-
 #filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20160226_0059/block3/Extracted_0059_2016-02-26-16-28-27.mat'
+filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/test/Extracted_504_2016-01-11-13-56-44.mat'
+
+
 
 
 ######################
@@ -304,6 +304,10 @@ for name_of_bin,time_of_bin in time_boundry.iteritems():
             dummy.append(np.hstack(data[start_position+56][i]))
         p_only_f_data = np.array(dummy)
         p_only_f_targets = np.ones(p_only_f_data.shape[0])*7
+
+#		if pcatch_bool:
+#			dummy=[]
+#			for i in r
 		
         return(np.vstack([rp_s_data,rp_f_data,nrnp_s_data,nrnp_f_data,r_only_s_data,r_only_f_data,p_only_s_data,p_only_f_data]),np.hstack([rp_s_targets,rp_f_targets,nrnp_s_targets,nrnp_f_targets,r_only_s_targets,r_only_f_targets,p_only_s_targets,p_only_f_targets]))
 

@@ -61,8 +61,21 @@ def do_stats(event_key,event_data):
 	stats_all = {}
 	mann_w = []
 	mann_w_sig_bool = []
-	for i in range(len(event_key)):
+	#for i in range(len(event_key)):
+	for i in range(len(event_data)):
+		#TODO did this fix it? Or is something else up??
 		stats = {}
+		#print i
+		#print event_key
+		#if len(event_data) > i:
+		#	#TODO what's up here. 1015block10059
+		#	mann_w_temp = [99,99]
+		#	mann_w_sig_bool_temp = False
+		#	break
+		#print len(event_data)
+		#print i
+		#print len(event_key)
+		#print event_data[i]['avg_nl']
 		before_bins = event_data[i]['avg_nl'][0:num_bins_before]
 		after_bins = event_data[i]['avg_nl'][num_bins_before:2*num_bins_before]
 
@@ -77,7 +90,6 @@ def do_stats(event_key,event_data):
 		mann_w.append(mann_w_temp)
 		mann_w_sig_bool.append(mann_w_sig_bool_temp)
 
-	#for i in range(len(event_key))
 	stats_all['mann_w'] = mann_w
 	stats_all['mann_w_sig_bool'] = mann_w_sig_bool
 
@@ -85,7 +97,7 @@ def do_stats(event_key,event_data):
 	stats_all['perc_sig'] = perc_sig
 	perc_sig_str = np.around(perc_sig *100,decimals = 2)
 	print '%s%% units in %s significantly different' %(perc_sig_str,event_key)
-	
+
 	return stats_all
 
 
@@ -225,9 +237,157 @@ for region_key,region_dict in all_regions_dict.iteritems():
 	all_regions_dict[region_key]['delivery_comp_stats'] = delivery_comp_stats
 
 	
+print '\n################################################\n###Time to interpret this shit #################\n################################################\n'
+
+#anova.reject = bool of comparisons
+
+sig_compare = {}
+for region_key,region_val in all_regions_dict.iteritems():
+	#for event_key,event_val in all_regions_dict[region_key]['cue_dicts'].iteritems():
+	#	if 'stats' in event_key:
+	cue_temp = all_regions_dict[region_key]['cue_dicts']
+	key_temp = region_key[0:-6]
+	key_temp = key_temp + 's'
+	sig_cued_rewarding = []
+	sig_cued_punishing = []
+	sig_reward_delivery = []
+	sig_succ_noreward = []
+	sig_punishment_delivery = []
+	sig_unsucc_nopunishment = []
+
+	
+	print key_temp
+	for i in range(len(cue_temp['stats_r_only_s_cue_%s' %(key_temp)]['mann_w_sig_bool'])):
+		if cue_temp['stats_r_only_s_cue_%s' %(key_temp)]['mann_w_sig_bool'][i] and cue_temp['stats_r_only_f_cue_%s' %(key_temp)]['mann_w_sig_bool'][i] and cue_temp['stats_rp_s_cue_%s' %(key_temp)]['mann_w_sig_bool'][i] and cue_temp['stats_rp_f_cue_%s' %(key_temp)]['mann_w_sig_bool'][i]:
+			sig_cued_rewarding.append(i)
+			print 'unit %s sig for all cued rewarding' %(i)
+		elif cue_temp['stats_rp_s_cue_%s' %(key_temp)]['mann_w_sig_bool'][i] and cue_temp['stats_rp_f_cue_%s' %(key_temp)]['mann_w_sig_bool'][i] and cue_temp['stats_p_only_s_cue_%s' %(key_temp)]['mann_w_sig_bool'][i] and cue_temp['stats_p_only_f_cue_%s' %(key_temp)]['mann_w_sig_bool'][i]:
+			sig_cued_punishing.append(i)
+			print 'unit %s sig for all cued punishing' %(i)
+
+			####TODO WHAT COMBINATIONS DO I NEED HERE?!?!
+	delivery_temp = all_regions_dict[region_key]['delivery_dicts']
+	for i in range(len(delivery_temp['stats_r_only_s_rdelivery_%s' %(key_temp)]['mann_w_sig_bool'])):
+		if delivery_temp['stats_r_only_s_rdelivery_%s' %(key_temp)]['mann_w_sig_bool'][i] and delivery_temp['stats_rp_s_rdelivery_%s' %(key_temp)]['mann_w_sig_bool'][i]:
+			sig_reward_delivery.append(i)
+			print 'unit %s sig for all reward delivery' %(i)
+		elif delivery_temp['stats_nrnp_s_nextreset_%s' %(key_temp)]['mann_w_sig_bool'][i] and delivery_temp['stats_p_only_s_nextreset_%s' %(key_temp)]['mann_w_sig_bool'][i]:
+			sig_succ_noreward.append(i)
+			print 'unit %s sig for all successful without reward delivery' %(i)
+		elif delivery_temp['stats_r_only_f_nextreset_%s' %(key_temp)]['mann_w_sig_bool'][i] and delivery_temp['stats_nrnp_f_nextreset_%s' %(key_temp)]['mann_w_sig_bool'][i]:
+			sig_unsucc_nopunishment.append(i)
+			print 'unit %s sig for all unsuccessful without punishment delivery' %(i)
+		elif delivery_temp['stats_rp_f_pdelivery_%s' %(key_temp)]['mann_w_sig_bool'][i] and delivery_temp['stats_p_only_f_pdelivery_%s' %(key_temp)]['mann_w_sig_bool'][i]:
+			sig_punishment_delivery.append(i)
+			print 'unit %s sig for all punishment delivery' %(i)
+
+	#because indexes in anova not the same
+	for ind,region in all_regions_dict[region_key]['cue_comp_stats']['d3_index'].items():
+		if 'r_only_s' in region:
+			r_only_s_cue_ind = ind
+		elif 'r_only_f' in region:
+			r_only_f_cue_ind = ind
+		elif 'rp_s' in region:
+			rp_s_cue_ind = ind
+		elif 'rp_f' in region:
+			rp_f_cue_ind = ind
+		elif 'p_only_s' in region:
+			p_only_s_cue_ind = ind
+		elif 'p_only_f' in region:
+			p_only_f_cue_ind = ind
+		elif 'nrnp_s' in region:
+			nrnp_s_cue_ind = ind
+		elif 'nrnp_f' in region:
+			nrnp_f_cue_ind = ind
+
+			
+	for ind,region in all_regions_dict[region_key]['delivery_comp_stats']['d3_index'].items():
+		if 'r_only_s' in region:
+			r_only_s_delivery_ind = ind
+		elif 'r_only_f' in region:
+			r_only_f_delivery_ind = ind
+		elif 'rp_s' in region:
+			rp_s_delivery_ind = ind
+		elif 'rp_f' in region:
+			rp_f_delivery_ind = ind
+		elif 'p_only_s' in region:
+			p_only_s_delivery_ind = ind
+		elif 'p_only_f' in region:
+			p_only_f_delivery_ind = ind
+		elif 'nrnp_s' in region:
+			nrnp_s_delivery_ind = ind
+		elif 'nrnp_f' in region:
+			nrnp_f_delivery_ind = ind
+
+	# ind of tukey.reject bool array = val x vs val y in anova
+	#0 = 0 vs 1     #10 = 1 vs 5     #20 = 3 vs 6
+	#1 = 0 vs 2     #11 = 1 vs 6     #21 = 3 vs 7
+	#2 = 0 vs 3     #12 = 1 vs 7     #22 = 4 vs 5
+	#3 = 0 vs 4     #13 = 2 vs 3     #23 = 4 vs 6
+	#4 = 0 vs 5     #14 = 2 vs 4     #24 = 4 vs 7
+	#5 = 0 vs 6     #15 = 2 vs 5     #25 = 5 vs 6
+	#6 = 0 vs 7     #16 = 2 vs 6     #26 = 5 vs 7
+	#7 = 1 vs 2     #17 = 2 vs 7     #27 = 6 vs 7
+	#8 = 1 vs 3     #18 = 3 vs 4
+	#9 = 1 vs 4     #19 = 3 vs 5
+
+	all_inds = np.array(((0,1),(0,2),(0,3),(0,4),(0,5),(0,6),(0,7),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(2,3),(2,4),(2,5),(2,6),(2,7),(3,4),(3,5),(3,6),(3,7),(4,5),(4,6),(4,7),(5,6),(5,7),(6,7)))
+	
+	#what to compare? if rewarding trials sig diff from nonrewarding and/or punishing, and if punishing tirals sig diff from nonpunishing and/or rewarding
+	post_hoc_cue = all_regions_dict[region_key]['cue_comp_stats']['for_post_hoc']
+	post_hoc_delivery = all_regions_dict[region_key]['delivery_comp_stats']['for_post_hoc']
+	diffs_dict = {}
+	for i in range(len(post_hoc_cue)):
+		tukey_cue = post_hoc_cue[i]['tukey']
+		reject_cue = tukey_cue.reject
+		unit = post_hoc_cue[i]['unit_no']
+
+		#rp_s, rp_f, r_only_s, r_only_f
+		diffs = np.where(reject_cue)
+		if diffs:
+			for j in range(len(diffs)):
+				pair_temp = all_inds[diffs[0][j]]
+				temp_a = pair_temp[0] 
+				temp_b = pair_temp[1] 
+
+				print unit
+				if (temp_a or temp_b) == r_only_s_cue_ind:
+					print "r only s cue"
+				if (temp_a or temp_b) == r_only_f_cue_ind:
+					print 'r only f cue'
+				if (temp_a or temp_b) == rp_s_cue_ind:
+					print 'rp s cue'
+				if (temp_a or temp_b) == rp_f_cue_ind:
+					print 'rp f cue'
+				if (temp_a or temp_b) == p_only_s_cue_ind:
+					print 'p only s cue'
+				if (temp_a or temp_b) == p_only_f_cue_ind:
+					print 'p only f cue'
+				if (temp_a or temp_b) == nrnp_s_cue_ind:
+					print 'nrnp s cue'
+				if (temp_a or temp_b) == nrnp_f_cue_ind:
+					print 'nrnp f cue'
+
+			
+
+		diffs_dict['unit'] = unit
+
+	#TODO repeat for delivery, diff for loops b/ diff lengths
+	
+	
+			
+			
+
+	sig_compare[key_temp] = {'sig_cued_rewarding':sig_cued_rewarding,'sig_cued_punishing':sig_cued_punishing,'sig_reward_delivery':sig_reward_delivery,'sig_succ_noreward':sig_succ_noreward,'sig_unsucc_nopunishment':sig_unsucc_nopunishment,'sig_punishment_delivery':sig_punishment_delivery}
+
+
+
+
+
+
 #save npy and xls files
 print 'saving data'
-np.save('data_%s' %(filename),all_regions_dict)
+np.save('data_%s' %(filename),all_regions_dict, sig_compare)
 
 workbook = xlsxwriter.Workbook('data_%s.xlsx' %(filename))
 worksheet = workbook.add_worksheet()
@@ -261,4 +421,4 @@ for region_key,region_data in all_regions_dict.iteritems():
 	
 pyexcel.merge_all_to_a_book(glob.glob('*.csv'),'post_hoc_results_%s.xlsx' %(filename))
 
-#TODO delete csv files?
+#TODO delete csvs
