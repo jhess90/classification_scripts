@@ -87,9 +87,8 @@ bin_size = 50 #in ms
 #filename = '/home/jack/Dropbox/mult_rp_files/workspace/20160111_504/block2/Extracted_504_2016-01-11-14-10-01.mat'
 
 #filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20160226_0059/block3/Extracted_0059_2016-02-26-16-28-27.mat'
-filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/test/Extracted_504_2016-01-11-13-56-44.mat'
-
-
+#filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/test/Extracted_504_2016-01-11-13-56-44.mat'
+filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/test/Extracted_0059_2017-02-01-13-48-35.mat'
 
 
 ######################
@@ -220,9 +219,15 @@ unit_names['M1_unit_names']=M1_unit_names
 S1_unit_names = []  
 for i in range(0,S1_spikes.shape[1]):
     if int(S1_spikes[0,i]['signame'][0][0][0][3:-1]) > 96:
-        S1_limit =i;
+        #if int(S1_spikes[0,i]['signame'][0][0][0][5:-1]) > 96:
+        S1_limit = i;
+        #print S1_limit
         print ("The number of units in S1 is: %s"%(S1_limit))
         break
+    elif (int(S1_spikes[0,i]['signame'][0][0][0][3:-1]) == 96):
+        S1_limit = i;
+        #print S1_limit
+        print ('The number of units in S1 is: %s' %(S1_limit))
     S1_unit_names.append(S1_spikes[0,i]['signame'][0][0][0])
 for i in range(S1_limit,S1_spikes.shape[1]):
     dummy.append(S1_spikes[0,i]['ts'][0,0][0])
@@ -304,10 +309,6 @@ for name_of_bin,time_of_bin in time_boundry.iteritems():
             dummy.append(np.hstack(data[start_position+56][i]))
         p_only_f_data = np.array(dummy)
         p_only_f_targets = np.ones(p_only_f_data.shape[0])*7
-
-#		if pcatch_bool:
-#			dummy=[]
-#			for i in r
 		
         return(np.vstack([rp_s_data,rp_f_data,nrnp_s_data,nrnp_f_data,r_only_s_data,r_only_f_data,p_only_s_data,p_only_f_data]),np.hstack([rp_s_targets,rp_f_targets,nrnp_s_targets,nrnp_f_targets,r_only_s_targets,r_only_f_targets,p_only_s_targets,p_only_f_targets]))
 
@@ -530,6 +531,14 @@ def make_nl_raster(data,spikes,nl,key,key2,unit_no,time_before,time_after,min_bi
 
 
 ts_dict={'rp_s_cue':rp_s_cue, 'rp_s_rdelivery':rp_s_rdelivery, 'rp_f_cue':rp_f_cue, 'rp_f_pdelivery':rp_f_pdelivery, 'nrnp_s_cue':nrnp_s_cue, 'nrnp_s_nextreset':nrnp_s_nextreset, 'nrnp_f_cue':nrnp_f_cue, 'nrnp_f_nextreset':nrnp_f_nextreset, 'r_only_s_cue':r_only_s_cue, 'r_only_s_rdelivery':r_only_s_rdelivery, 'r_only_f_cue':r_only_f_cue, 'r_only_f_nextreset':r_only_f_nextreset, 'p_only_s_cue':p_only_s_cue, 'p_only_s_nextreset':p_only_s_nextreset, 'p_only_f_cue':p_only_f_cue, 'p_only_f_pdelivery':p_only_f_pdelivery}
+
+
+if pcatch_bool or rcatch_bool:
+	ts_dict['r_s_catch_cue'] = r_s_catch_cue
+	ts_dict['r_s_catch_nextreset'] = r_s_catch_nextreset
+	ts_dict['p_f_catch_cue'] = p_f_catch_cue
+	ts_dict['p_f_catch_nextreset'] = p_f_catch_nextreset
+
 
 #testing dict
 #ts_dict={'rp_s_cue':rp_s_cue, 'r_only_s':r_only_s_rdelivery,'nrnp_s_cue':nrnp_s_cue}

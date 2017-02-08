@@ -47,11 +47,12 @@ PmD_dict_total = {}
 PmV_dict_total = {}
 
 params = save_dict['param_dict']
+
 bin_size = params['bin_size']
 time_before = params['time_before']
 time_after = params['time_after']
 num_bins_before = np.int(time_before * 1000 / bin_size * -1) #because neg value
-
+		
 print 'arranging data'
 
 
@@ -126,7 +127,17 @@ def do_comp_stats(all_dict,region_key,type_key):
 	all_after = d3_nl_array[:,:,num_bins_before:2*num_bins_before]
 
 	anovas = []
-	if d3_nl_array.shape[0] == 8:
+	if d3_nl_array.shape[0] == 10:
+		for i in range(d3_nl_array.shape[1]):
+			anovas.append(sp.stats.f_oneway(all_after[0][i],all_after[1][i],all_after[2][i],all_after[3][i],all_after[4][i],all_after[5][i],all_after[6][i],all_after[7][i],all_after[8][i],all_after[9][i]))
+		anovas = np.asarray(anovas)
+		
+	elif d3_nl_array.shape[0] == 9:
+		for i in range(d3_nl_array.shape[1]):
+			anovas.append(sp.stats.f_oneway(all_after[0][i],all_after[1][i],all_after[2][i],all_after[3][i],all_after[4][i],all_after[5][i],all_after[6][i],all_after[7][i],all_after[8][i]))
+		anovas = np.asarray(anovas)
+		
+	elif d3_nl_array.shape[0] == 8:
 		for i in range(d3_nl_array.shape[1]):
 			anovas.append(sp.stats.f_oneway(all_after[0][i],all_after[1][i],all_after[2][i],all_after[3][i],all_after[4][i],all_after[5][i],all_after[6][i],all_after[7][i]))
 		anovas = np.asarray(anovas)
@@ -212,6 +223,13 @@ for i in range(len(keys)):
 		
 all_regions_dict = {'S1_dict_total':S1_dict_total,'M1_dict_total':M1_dict_total,'PmD_dict_total':PmD_dict_total,'PmV_dict_total':PmV_dict_total}
 
+catch_bool = False
+for key,val in all_regions_dict['M1_dict_total'].iteritems():
+	if 'catch' in key:
+		catch_bool = True
+
+print 'catch bool is %s' %(catch_bool)
+		
 for region_key,region_dict in all_regions_dict.iteritems():
 	cue_dicts = {}
 	delivery_dicts = {}
@@ -255,7 +273,8 @@ for region_key,region_val in all_regions_dict.iteritems():
 	sig_punishment_delivery = []
 	sig_unsucc_nopunishment = []
 
-	
+
+	#TODO adjust w/ catch trials?
 	print key_temp
 	for i in range(len(cue_temp['stats_r_only_s_cue_%s' %(key_temp)]['mann_w_sig_bool'])):
 		if cue_temp['stats_r_only_s_cue_%s' %(key_temp)]['mann_w_sig_bool'][i] and cue_temp['stats_r_only_f_cue_%s' %(key_temp)]['mann_w_sig_bool'][i] and cue_temp['stats_rp_s_cue_%s' %(key_temp)]['mann_w_sig_bool'][i] and cue_temp['stats_rp_f_cue_%s' %(key_temp)]['mann_w_sig_bool'][i]:
@@ -299,7 +318,10 @@ for region_key,region_val in all_regions_dict.iteritems():
 			nrnp_s_cue_ind = ind
 		elif 'nrnp_f' in region:
 			nrnp_f_cue_ind = ind
-
+		elif 'r_s_catch_cue' in region:
+			r_s_catch_cue_ind = ind
+		elif 'p_f_catch_cue' in region:
+			p_f_catch_cue_ind = ind
 			
 	for ind,region in all_regions_dict[region_key]['delivery_comp_stats']['d3_index'].items():
 		if 'r_only_s' in region:
@@ -318,21 +340,40 @@ for region_key,region_val in all_regions_dict.iteritems():
 			nrnp_s_delivery_ind = ind
 		elif 'nrnp_f' in region:
 			nrnp_f_delivery_ind = ind
+		elif 'r_s_catch_nextreset' in region:
+			r_s_catch_nextreset = ind
+		elif 'p_f_catch_nextreset' in region:
+			p_f_catch_nextreset = ind
 
-	# ind of tukey.reject bool array = val x vs val y in anova
-	#0 = 0 vs 1     #10 = 1 vs 5     #20 = 3 vs 6
-	#1 = 0 vs 2     #11 = 1 vs 6     #21 = 3 vs 7
-	#2 = 0 vs 3     #12 = 1 vs 7     #22 = 4 vs 5
-	#3 = 0 vs 4     #13 = 2 vs 3     #23 = 4 vs 6
-	#4 = 0 vs 5     #14 = 2 vs 4     #24 = 4 vs 7
-	#5 = 0 vs 6     #15 = 2 vs 5     #25 = 5 vs 6
-	#6 = 0 vs 7     #16 = 2 vs 6     #26 = 5 vs 7
-	#7 = 1 vs 2     #17 = 2 vs 7     #27 = 6 vs 7
-	#8 = 1 vs 3     #18 = 3 vs 4
-	#9 = 1 vs 4     #19 = 3 vs 5
+	if not catch_bool:
+		# ind of tukey.reject bool array = val x vs val y in anova
+		#0 = 0 vs 1     #10 = 1 vs 5     #20 = 3 vs 6
+		#1 = 0 vs 2     #11 = 1 vs 6     #21 = 3 vs 7
+		#2 = 0 vs 3     #12 = 1 vs 7     #22 = 4 vs 5
+		#3 = 0 vs 4     #13 = 2 vs 3     #23 = 4 vs 6
+		#4 = 0 vs 5     #14 = 2 vs 4     #24 = 4 vs 7
+		#5 = 0 vs 6     #15 = 2 vs 5     #25 = 5 vs 6
+		#6 = 0 vs 7     #16 = 2 vs 6     #26 = 5 vs 7
+		#7 = 1 vs 2     #17 = 2 vs 7     #27 = 6 vs 7
+		#8 = 1 vs 3     #18 = 3 vs 4
+		#9 = 1 vs 4     #19 = 3 vs 5
 
-	all_inds = np.array(((0,1),(0,2),(0,3),(0,4),(0,5),(0,6),(0,7),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(2,3),(2,4),(2,5),(2,6),(2,7),(3,4),(3,5),(3,6),(3,7),(4,5),(4,6),(4,7),(5,6),(5,7),(6,7)))
-	
+		all_inds = np.array(((0,1),(0,2),(0,3),(0,4),(0,5),(0,6),(0,7),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(2,3),(2,4),(2,5),(2,6),(2,7),(3,4),(3,5),(3,6),(3,7),(4,5),(4,6),(4,7),(5,6),(5,7),(6,7)))
+	else:
+		# ind of tukey.reject bool array = val x vs val y in anova
+		#0 = 0 vs 1     #10 = 1 vs 3     #20 = 2 vs 6    #30 = 4 vs 5    #40 = 6 vs 8
+		#1 = 0 vs 2     #11 = 1 vs 4     #21 = 2 vs 7    #31 = 4 vs 6    #41 = 6 vs 9
+		#2 = 0 vs 3     #12 = 1 vs 5     #22 = 2 vs 8    #32 = 4 vs 7    #42 = 7 vs 8
+		#3 = 0 vs 4     #13 = 1 vs 6     #23 = 2 vs 9    #33 = 4 vs 8    #43 = 7 vs 9
+		#4 = 0 vs 5     #14 = 1 vs 7     #24 = 3 vs 4    #34 = 4 vs 9    #44 = 8 vs 9
+		#5 = 0 vs 6     #15 = 1 vs 8     #25 = 3 vs 5    #35 = 5 vs 6    
+		#6 = 0 vs 7     #16 = 1 vs 9     #26 = 3 vs 6    #36 = 5 vs 7
+		#7 = 0 vs 8     #17 = 2 vs 3     #27 = 3 vs 7    #37 = 5 vs 8
+		#8 = 0 vs 9     #18 = 2 vs 4     #28 = 3 vs 8    #38 = 5 vs 9
+		#9 = 1 vs 2     #19 = 2 vs 5     #29 = 3 vs 9    #39 = 6 vs 7
+
+		all_inds = np.array(((0,1),(0,2),(0,3),(0,4),(0,5),(0,6),(0,7),(0,8),(0,9),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(2,3),(2,4),(2,5),(2,6),(2,7),(2,8),(2,9),(3,4),(3,5),(3,6),(3,7),(3,8),(3,9),(4,5),(4,6),(4,7),(4,8),(4,9),(5,6),(5,7),(5,8),(5,9),(6,7),(6,8),(6,9),(7,8),(7,9),(8,9)))
+		
 	#what to compare? if rewarding trials sig diff from nonrewarding and/or punishing, and if punishing tirals sig diff from nonpunishing and/or rewarding
 	post_hoc_cue = all_regions_dict[region_key]['cue_comp_stats']['for_post_hoc']
 	post_hoc_delivery = all_regions_dict[region_key]['delivery_comp_stats']['for_post_hoc']
@@ -344,39 +385,40 @@ for region_key,region_val in all_regions_dict.iteritems():
 
 		#rp_s, rp_f, r_only_s, r_only_f
 		diffs = np.where(reject_cue)
-		if diffs:
-			for j in range(len(diffs)):
+		if len(diffs[0]) > 0:
+			for j in range(len(diffs[0])):
 				pair_temp = all_inds[diffs[0][j]]
 				temp_a = pair_temp[0] 
 				temp_b = pair_temp[1] 
-
+				#print '%s vs %s' %(temp_a,temp_b)
+				
 				print unit
-				if (temp_a or temp_b) == r_only_s_cue_ind:
+				if temp_a == r_only_s_cue_ind or temp_b == r_only_s_cue_ind:
 					print "r only s cue"
-				if (temp_a or temp_b) == r_only_f_cue_ind:
+				if temp_a == r_only_f_cue_ind or temp_b == r_only_f_cue_ind:
 					print 'r only f cue'
-				if (temp_a or temp_b) == rp_s_cue_ind:
+				if temp_a == rp_s_cue_ind or temp_b == rp_s_cue_ind:
 					print 'rp s cue'
-				if (temp_a or temp_b) == rp_f_cue_ind:
+				if temp_a == rp_f_cue_ind or temp_b == rp_f_cue_ind:
 					print 'rp f cue'
-				if (temp_a or temp_b) == p_only_s_cue_ind:
+				if temp_a == p_only_s_cue_ind or temp_b == p_only_s_cue_ind:
 					print 'p only s cue'
-				if (temp_a or temp_b) == p_only_f_cue_ind:
+				if temp_a == p_only_f_cue_ind or temp_b == p_only_f_cue_ind:
 					print 'p only f cue'
-				if (temp_a or temp_b) == nrnp_s_cue_ind:
+				if temp_a  == nrnp_s_cue_ind or temp_b == nrnp_s_cue_ind:
 					print 'nrnp s cue'
-				if (temp_a or temp_b) == nrnp_f_cue_ind:
+				if temp_a == nrnp_f_cue_ind or temp_b == nrnp_f_cue_ind:
 					print 'nrnp f cue'
-
-			
-
-		diffs_dict['unit'] = unit
-
+				if temp_a == r_s_catch_cue_ind or temp_b == r_s_catch_cue_ind:
+					print 'r s catch cue'
+				if temp_a == p_f_catch_cue_ind or temp_b == p_f_catch_cue_ind:
+					print 'p f catch cue'
+					
+					
+				diffs_dict['unit'] = unit
+				diffs_dict[unit]['a'] = temp_a
+				diffs_dict[unit]['b'] = temp_b
 	#TODO repeat for delivery, diff for loops b/ diff lengths
-	
-	
-			
-			
 
 	sig_compare[key_temp] = {'sig_cued_rewarding':sig_cued_rewarding,'sig_cued_punishing':sig_cued_punishing,'sig_reward_delivery':sig_reward_delivery,'sig_succ_noreward':sig_succ_noreward,'sig_unsucc_nopunishment':sig_unsucc_nopunishment,'sig_punishment_delivery':sig_punishment_delivery}
 
