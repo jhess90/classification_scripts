@@ -29,6 +29,7 @@ import pandas
 import xlsxwriter
 import pyexcel
 import pyexcel_xlsx
+import os
 
 #TODO: on beaver install statsmodels, pyexcel, pyexcel_xlsx
 
@@ -274,7 +275,6 @@ for region_key,region_val in all_regions_dict.iteritems():
 	sig_unsucc_nopunishment = []
 
 
-	#TODO adjust w/ catch trials?
 	print key_temp
 	for i in range(len(cue_temp['stats_r_only_s_cue_%s' %(key_temp)]['mann_w_sig_bool'])):
 		if cue_temp['stats_r_only_s_cue_%s' %(key_temp)]['mann_w_sig_bool'][i] and cue_temp['stats_r_only_f_cue_%s' %(key_temp)]['mann_w_sig_bool'][i] and cue_temp['stats_rp_s_cue_%s' %(key_temp)]['mann_w_sig_bool'][i] and cue_temp['stats_rp_f_cue_%s' %(key_temp)]['mann_w_sig_bool'][i]:
@@ -341,9 +341,9 @@ for region_key,region_val in all_regions_dict.iteritems():
 		elif 'nrnp_f' in region:
 			nrnp_f_delivery_ind = ind
 		elif 'r_s_catch_nextreset' in region:
-			r_s_catch_nextreset = ind
+			r_s_catch_delivery_ind = ind
 		elif 'p_f_catch_nextreset' in region:
-			p_f_catch_nextreset = ind
+			p_f_catch_delivery_ind = ind
 
 	if not catch_bool:
 		# ind of tukey.reject bool array = val x vs val y in anova
@@ -373,58 +373,115 @@ for region_key,region_val in all_regions_dict.iteritems():
 		#9 = 1 vs 2     #19 = 2 vs 5     #29 = 3 vs 9    #39 = 6 vs 7
 
 		all_inds = np.array(((0,1),(0,2),(0,3),(0,4),(0,5),(0,6),(0,7),(0,8),(0,9),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(2,3),(2,4),(2,5),(2,6),(2,7),(2,8),(2,9),(3,4),(3,5),(3,6),(3,7),(3,8),(3,9),(4,5),(4,6),(4,7),(4,8),(4,9),(5,6),(5,7),(5,8),(5,9),(6,7),(6,8),(6,9),(7,8),(7,9),(8,9)))
-		
+
+	print 'running tukey posthoc'
+	
 	#what to compare? if rewarding trials sig diff from nonrewarding and/or punishing, and if punishing tirals sig diff from nonpunishing and/or rewarding
 	post_hoc_cue = all_regions_dict[region_key]['cue_comp_stats']['for_post_hoc']
 	post_hoc_delivery = all_regions_dict[region_key]['delivery_comp_stats']['for_post_hoc']
-	diffs_dict = {}
+	posthoc_diffs_dict_cue = {}
 	for i in range(len(post_hoc_cue)):
 		tukey_cue = post_hoc_cue[i]['tukey']
 		reject_cue = tukey_cue.reject
 		unit = post_hoc_cue[i]['unit_no']
 
-		#rp_s, rp_f, r_only_s, r_only_f
 		diffs = np.where(reject_cue)
+		paired_name_list = []
 		if len(diffs[0]) > 0:
 			for j in range(len(diffs[0])):
 				pair_temp = all_inds[diffs[0][j]]
 				temp_a = pair_temp[0] 
 				temp_b = pair_temp[1] 
-				#print '%s vs %s' %(temp_a,temp_b)
 				
-				print unit
+				#print unit
+				pair_names = []
 				if temp_a == r_only_s_cue_ind or temp_b == r_only_s_cue_ind:
-					print "r only s cue"
+					#print "r only s cue"
+					pair_names.append('r_only_s_cue')
 				if temp_a == r_only_f_cue_ind or temp_b == r_only_f_cue_ind:
-					print 'r only f cue'
+					#print 'r only f cue'
+					pair_names.append('r_only_f_cue')
 				if temp_a == rp_s_cue_ind or temp_b == rp_s_cue_ind:
-					print 'rp s cue'
+					#print 'rp s cue'
+					pair_names.append('rp_s_cue')
 				if temp_a == rp_f_cue_ind or temp_b == rp_f_cue_ind:
-					print 'rp f cue'
+					#print 'rp f cue'
+					pair_names.append('rp_f_cue')
 				if temp_a == p_only_s_cue_ind or temp_b == p_only_s_cue_ind:
-					print 'p only s cue'
+					#print 'p only s cue'
+					pair_names.append('p_only_s_cue')
 				if temp_a == p_only_f_cue_ind or temp_b == p_only_f_cue_ind:
-					print 'p only f cue'
+					#print 'p only f cue'
+					pair_names.append('p_only_f_cue')
 				if temp_a  == nrnp_s_cue_ind or temp_b == nrnp_s_cue_ind:
-					print 'nrnp s cue'
+					#print 'nrnp s cue'
+					pair_names.append('nrnp_s_cue')
 				if temp_a == nrnp_f_cue_ind or temp_b == nrnp_f_cue_ind:
-					print 'nrnp f cue'
+					#print 'nrnp f cue'
+					pair_names.append('nrnp_f_cue')
 				if temp_a == r_s_catch_cue_ind or temp_b == r_s_catch_cue_ind:
-					print 'r s catch cue'
+					#print 'r s catch cue'
+					pair_names.append('rs_catch_cue')
 				if temp_a == p_f_catch_cue_ind or temp_b == p_f_catch_cue_ind:
-					print 'p f catch cue'
-					
-					
-				diffs_dict['unit'] = unit
-				diffs_dict[unit]['a'] = temp_a
-				diffs_dict[unit]['b'] = temp_b
-	#TODO repeat for delivery, diff for loops b/ diff lengths
+					#print 'p f catch cue'
+					pair_names.append('pf_catch_cue')
 
-	sig_compare[key_temp] = {'sig_cued_rewarding':sig_cued_rewarding,'sig_cued_punishing':sig_cued_punishing,'sig_reward_delivery':sig_reward_delivery,'sig_succ_noreward':sig_succ_noreward,'sig_unsucc_nopunishment':sig_unsucc_nopunishment,'sig_punishment_delivery':sig_punishment_delivery}
+				paired_name_list.append(pair_names)
+ 					
+		posthoc_diffs_dict_cue[unit] = paired_name_list
 
+	posthoc_diffs_dict_delivery = {}
+	for i in range(len(post_hoc_delivery)):
+		tukey_delivery = post_hoc_delivery[i]['tukey']
+		reject_delivery = tukey_delivery.reject
+		unit = post_hoc_delivery[i]['unit_no']
 
+		diffs = np.where(reject_delivery)
+		paired_name_list = []
+		if len(diffs[0]) > 0:
+			for j in range(len(diffs[0])):
+				pair_temp = all_inds[diffs[0][j]]
+				temp_a = pair_temp[0] 
+				temp_b = pair_temp[1] 
+				
+				#print unit
+				pair_names = []
+				if temp_a == r_only_s_delivery_ind or temp_b == r_only_s_delivery_ind:
+					#print "r only s delivery"
+					pair_names.append('r_only_s_delivery')
+				if temp_a == r_only_f_delivery_ind or temp_b == r_only_f_delivery_ind:
+					#print 'r only f delivery'
+					pair_names.append('r_only_f_delivery')
+				if temp_a == rp_s_delivery_ind or temp_b == rp_s_delivery_ind:
+					#print 'rp s delivery'
+					pair_names.append('rp_s_delivery')
+				if temp_a == rp_f_delivery_ind or temp_b == rp_f_delivery_ind:
+					#print 'rp f delivery'
+					pair_names.append('rp_f_delivery')
+				if temp_a == p_only_s_delivery_ind or temp_b == p_only_s_delivery_ind:
+					#print 'p only s delivery'
+					pair_names.append('p_only_s_delivery')
+				if temp_a == p_only_f_delivery_ind or temp_b == p_only_f_delivery_ind:
+					#print 'p only f delivery'
+					pair_names.append('p_only_f_delivery')
+				if temp_a  == nrnp_s_delivery_ind or temp_b == nrnp_s_delivery_ind:
+					#print 'nrnp s delivery'
+					pair_names.append('nrnp_s_delivery')
+				if temp_a == nrnp_f_delivery_ind or temp_b == nrnp_f_delivery_ind:
+					#print 'nrnp f delivery'
+					pair_names.append('nrnp_f_delivery')
+				if temp_a == r_s_catch_delivery_ind or temp_b == r_s_catch_delivery_ind:
+					#print 'r s catch delivery'
+					pair_names.append('rs_catch_delivery')
+				if temp_a == p_f_catch_delivery_ind or temp_b == p_f_catch_delivery_ind:
+					#print 'p f catch delivery'
+					pair_names.append('pf_catch_delivery')
 
+				paired_name_list.append(pair_names)					
+		posthoc_diffs_dict_delivery[unit] = paired_name_list
 
+		
+	sig_compare[key_temp] = {'sig_cued_rewarding':sig_cued_rewarding,'sig_cued_punishing':sig_cued_punishing,'sig_reward_delivery':sig_reward_delivery,'sig_succ_noreward':sig_succ_noreward,'sig_unsucc_nopunishment':sig_unsucc_nopunishment,'sig_punishment_delivery':sig_punishment_delivery,'posthoc_diffs_dict_cue':posthoc_diffs_dict_cue,'posthoc_diffs_dict_delivery':posthoc_diffs_dict_delivery}
 
 
 #save npy and xls files
@@ -463,4 +520,5 @@ for region_key,region_data in all_regions_dict.iteritems():
 	
 pyexcel.merge_all_to_a_book(glob.glob('*.csv'),'post_hoc_results_%s.xlsx' %(filename))
 
-#TODO delete csvs
+for csv in glob.glob('*.csv'):
+	os.remove(csv)

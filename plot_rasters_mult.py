@@ -95,8 +95,8 @@ bin_size = 50 #in ms
 #filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170209_0059/block1/Extracted_0059_2017-02-09-12-52-17.mat'
 #filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170209_0059/block3/Extracted_0059_2017-02-09-13-46-37.mat'
 
-#filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170214_504/Extracted_504_2017-02-14-12-09-21.mat'
-filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170214_504/Extracted_504_2017-02-14-12-35-41.mat'
+filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170214_504/Extracted_504_2017-02-14-12-09-21.mat'
+#filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170214_504/Extracted_504_2017-02-14-12-35-41.mat'
 #filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170214_504/Extracted_504_2017-02-14-13-01-34.mat'
 
 
@@ -115,6 +115,7 @@ Timestamps = sio.loadmat(filename[:-4]+"_timestamps"+filename[-4:]);
 #one reward cue, one punishment cue, successful (rewarding)
 rp_s_rdelivery = Timestamps['rp_s_rdelivery_ts'][0];
 rp_s_cue = Timestamps['rp_s_cue_ts'][0];
+rp_s_nums = Timestamps['rp_s_rnum'][0],Timestamps['rp_s_pnum'][0]
 print ('rp_s trials: %s'%(len(rp_s_rdelivery)))
 #in case there happened to not be any particular trial during a block, this makes the arrays dimensions equal. TODO look into better way instead of creating a timepoint
 if not rp_s_rdelivery.size:
@@ -198,6 +199,47 @@ else:
 	print ('p_f catch trials: %s' %(len(p_f_catch_cue)))
 	pcatch_bool = True
 
+
+######################################################################
+### NEW ##############################################################
+######################################################################
+#maybe simpler way to do this
+#TODO remove earlier stuff that's now redundant
+#TODO make sure catch trials accounted for
+
+trial_breakdown = Timestamps['trial_breakdown']
+
+condensed = np.zeros((np.shape(trial_breakdown)[0],5))
+
+#col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum 
+
+condensed[:,0] = trial_breakdown[:,1]
+condensed[:,1] = trial_breakdown[:,2]
+condensed[:,2] = trial_breakdown[:,3]
+condensed[:,3] = trial_breakdown[:,5]
+condensed[:,4] = trial_breakdown[:,7]
+
+if condensed[-1,1] == condensed[-1,2] == 0:
+	new_condensed = condensed[0:-1,:]
+
+condensed = new_condensed
+
+all_succ = condensed[condensed[:,1] != 0]
+all_fail = condensed[condensed[:,2] != 0]
+
+
+
+
+
+
+
+
+
+
+##############################################################################
+
+
+	
 #Pull neural spikes
 
 neural_data=a['neural_data']
@@ -284,55 +326,55 @@ PmD_spikes = PmD_spikes[0,0:PmD_limit];
 
 
 #Begin main loop of analysis
-for name_of_bin,time_of_bin in time_boundry.iteritems():
-    before_time = -time_of_bin[0]
-    after_time = time_of_bin[1]
-    print( 'bin %s' %(name_of_bin))        
+#for name_of_bin,time_of_bin in time_boundry.iteritems():
+#    before_time = -time_of_bin[0]
+#    after_time = time_of_bin[1]
+#    print( 'bin %s' %(name_of_bin))        
     
-    #Assemble a final dictionary of the final dataset for saving
-    def Make_final_data(data,start_position):
-        dummy = []
-        for i in range(0,data[start_position].shape[0]):
-            dummy.append(np.hstack(data[start_position][i]))
-        rp_s_data = np.array(dummy)
-        rp_s_targets = np.ones(rp_s_data.shape[0])*0
-        dummy = []
-        for i in range(0,data[start_position+8].shape[0]):
-            dummy.append(np.hstack(data[start_position+8][i]))
-        rp_f_data = np.array(dummy)
-        rp_f_targets = np.ones(rp_f_data.shape[0])*1
-        dummy = []
-        for i in range(0,data[start_position+16].shape[0]):
-            dummy.append(np.hstack(data[start_position+16][i]))
-        nrnp_s_data = np.array(dummy)
-        nrnp_s_targets = np.ones(nrnp_s_data.shape[0])*2
-        dummy = []
-        for i in range(0,data[start_position+24].shape[0]):
-            dummy.append(np.hstack(data[start_position+24][i]))
-        nrnp_f_data = np.array(dummy)
-        nrnp_f_targets = np.ones(nrnp_f_data.shape[0])*3
-        dummy = []
-        for i in range(0,data[start_position+32].shape[0]):
-            dummy.append(np.hstack(data[start_position+32][i]))
-        r_only_s_data = np.array(dummy)
-        r_only_s_targets = np.ones(r_only_s_data.shape[0])*4
-        dummy = []
-        for i in range(0,data[start_position+40].shape[0]):
-            dummy.append(np.hstack(data[start_position+40][i]))
-        r_only_f_data = np.array(dummy)
-        r_only_f_targets = np.ones(r_only_f_data.shape[0])*5
-        dummy = []
-        for i in range(0,data[start_position+48].shape[0]):
-            dummy.append(np.hstack(data[start_position+48][i]))
-        p_only_s_data = np.array(dummy)
-        p_only_s_targets = np.ones(p_only_s_data.shape[0])*6
-        dummy = []
-        for i in range(0,data[start_position+56].shape[0]):
-            dummy.append(np.hstack(data[start_position+56][i]))
-        p_only_f_data = np.array(dummy)
-        p_only_f_targets = np.ones(p_only_f_data.shape[0])*7
-		
-        return(np.vstack([rp_s_data,rp_f_data,nrnp_s_data,nrnp_f_data,r_only_s_data,r_only_f_data,p_only_s_data,p_only_f_data]),np.hstack([rp_s_targets,rp_f_targets,nrnp_s_targets,nrnp_f_targets,r_only_s_targets,r_only_f_targets,p_only_s_targets,p_only_f_targets]))
+#    #Assemble a final dictionary of the final dataset for saving
+#    def Make_final_data(data,start_position):
+#        dummy = []
+#        for i in range(0,data[start_position].shape[0]):
+#            dummy.append(np.hstack(data[start_position][i]))
+#        rp_s_data = np.array(dummy)
+#        rp_s_targets = np.ones(rp_s_data.shape[0])*0
+#        dummy = []
+#        for i in range(0,data[start_position+8].shape[0]):
+#            dummy.append(np.hstack(data[start_position+8][i]))
+#        rp_f_data = np.array(dummy)
+#        rp_f_targets = np.ones(rp_f_data.shape[0])*1
+#        dummy = []
+#        for i in range(0,data[start_position+16].shape[0]):
+#            dummy.append(np.hstack(data[start_position+16][i]))
+#        nrnp_s_data = np.array(dummy)
+#        nrnp_s_targets = np.ones(nrnp_s_data.shape[0])*2
+#        dummy = []
+#        for i in range(0,data[start_position+24].shape[0]):
+#            dummy.append(np.hstack(data[start_position+24][i]))
+#        nrnp_f_data = np.array(dummy)
+#        nrnp_f_targets = np.ones(nrnp_f_data.shape[0])*3
+#        dummy = []
+#        for i in range(0,data[start_position+32].shape[0]):
+#            dummy.append(np.hstack(data[start_position+32][i]))
+#        r_only_s_data = np.array(dummy)
+#        r_only_s_targets = np.ones(r_only_s_data.shape[0])*4
+#        dummy = []
+#        for i in range(0,data[start_position+40].shape[0]):
+#            dummy.append(np.hstack(data[start_position+40][i]))
+#        r_only_f_data = np.array(dummy)
+#        r_only_f_targets = np.ones(r_only_f_data.shape[0])*5
+#        dummy = []
+#        for i in range(0,data[start_position+48].shape[0]):
+#            dummy.append(np.hstack(data[start_position+48][i]))
+#        p_only_s_data = np.array(dummy)
+#        p_only_s_targets = np.ones(p_only_s_data.shape[0])*6
+#        dummy = []
+#        for i in range(0,data[start_position+56].shape[0]):
+#            dummy.append(np.hstack(data[start_position+56][i]))
+#        p_only_f_data = np.array(dummy)
+#        p_only_f_targets = np.ones(p_only_f_data.shape[0])*7
+#		
+#        return(np.vstack([rp_s_data,rp_f_data,nrnp_s_data,nrnp_f_data,r_only_s_data,r_only_f_data,p_only_s_data,p_only_f_data]),np.hstack([rp_s_targets,rp_f_targets,nrnp_s_targets,nrnp_f_targets,r_only_s_targets,r_only_f_targets,p_only_s_targets,p_only_f_targets]))
 
 
 time_before = -0.5 #make sure if change to pos time before it still works
@@ -375,82 +417,6 @@ def normalize_data(spike_data):
 	
 	
 	return(nl_dict)
-	
-
-def make_raster(data,spikes,key,key2,unit_no,time_before,time_after):
-
-	dummy = []
-	
-	for i in range(0,data.shape[0]):
-		dummy1=[]
-		b = data[i]
-		for j in range(len(spikes)):
-			a = spikes[j]
-			c = a[np.where(np.logical_and(a>=b+time_before,a<=b+time_after))]
-			dummy1.append(c)
-		dummy.append(dummy1)
-
-	dummy = np.asarray(dummy)
-	ax = plt.gca()
-	adjusted_times = []
-	binned = []
-
-	#rasters
-	plt.subplot(2,1,1)
-	
-	for i in range(dummy.shape[0]):
-		adjusted_times=dummy[i][unit_no]-value[i]
-		plt.vlines(adjusted_times, i+.5, i+1.5)
-		plt.ylim(.5, dummy.shape[0] + .5)
-
-		binned_temp = np.histogram(adjusted_times,bins=no_bins,normed=False,density=False)
-		binned.append(np.nan_to_num(binned_temp[0]))
-
-	binned = np.asarray(binned)
-	firing_rate = np.zeros(len(binned),dtype=object)
-	for i in range(len(binned)):
- 		firing_rate[i] = binned[i] / float(bin_size) * 1000 #because bin_size in ms, want to get Hz
-
-	avg_firing_rate = np.mean(firing_rate)
-	std_dev_firing_rate = np.std(firing_rate)
-	
-	plt.axvline(0.0)
-	
-	plt.title('Raster plot')
-	plt.xlabel('Time from event')
-	plt.ylabel('Trial')
-
-	#average firing rate
-	plt.subplot(2,1,2)
-	plt.title('average firing rate')
-
-	#TODO make time instead of bin
-	plt.xlabel('Bin num')
-	plt.ylabel('Firing rate (Hz)')
-	
-	ymax = avg_firing_rate + std_dev_firing_rate
-	ymin = avg_firing_rate - std_dev_firing_rate
-
-	#plt.plot(avg_firing_rate)
-	#plt.fill_between(ymin,ymax,alpha=1,edgecolor='#3F7F4C',facecolor='#7EFF99',linewidth=0)
-	plt.errorbar(np.arange(no_bins),avg_firing_rate,yerr=std_dev_firing_rate)
-	plt.xlim(0,no_bins)
-	plt.ylim(ymin=0)
-
-	plt.axvline(0.0)
-	
-	plt.suptitle('%s, %s, unit: %s' %(key,key2,str(unit_no)), fontsize = 20)
-
-	plt.tight_layout()
-	plt.subplots_adjust(top=0.85)
-	
-	plt.savefig('raster_%s_%s_unit%s' %(key, key2, str(unit_no)))
-	plt.clf()
-
-	return_dict={'avg_firing_rate':avg_firing_rate,'std_dev_firing_rate':std_dev_firing_rate,'binned':binned,'firing_rate':firing_rate,'adjusted_times':adjusted_times,'dummy':dummy}
-	
-	return(return_dict)
-
 
 
 def make_nl_raster(data,spikes,nl,key,key2,unit_no,time_before,time_after,min_bin,max_bin):
@@ -546,26 +512,104 @@ def make_nl_raster(data,spikes,nl,key,key2,unit_no,time_before,time_after,min_bi
 	plt.savefig('raster_%s_%s_unit%s' %(key, key2, str(unit_no)))
 	plt.clf()
 
-	return_dict={'avg_firing_rate':avg_firing_rate,'std_dev_firing_rate':std_dev_firing_rate,'binned':binned,'firing_rate':firing_rate,'adjusted_times':adjusted_times,'dummy':dummy,'spikes':spikes,'dummy1':dummy1,'a':a,'b':b,'c':c,'nlized':nlized,'binned_temp':binned_temp,'binned_nl':binned_nl} #'a_nl':a_nl,'b_nl':b_nl,'c_nl':c_nl,'nlized':nlized,'dummy_nl':dummy_nl}
-	#return_dict={'avg_firing_rate':avg_firing_rate,'std_dev_firing_rate':std_dev_firing_rate,'adjusted_times':adjusted_times,'binned':binned,'binned_nl':binned_nl,'firing_rate':firing_rate,'avg_nl':avg_nl,'std_dev_nl':std_dev_nl,'dummy':dummy}
+	return_dict={'avg_firing_rate':avg_firing_rate,'std_dev_firing_rate':std_dev_firing_rate,'binned':binned,'firing_rate':firing_rate,'adjusted_times':adjusted_times,'dummy':dummy,'spikes':spikes,'dummy1':dummy1,'a':a,'b':b,'c':c,'binned_temp':binned_temp,'binned_nl':binned_nl,'avg_nl':avg_nl,'std_dev_nl':std_dev_nl}
 	
 	return(return_dict)
 
 
-ts_dict={'rp_s_cue':rp_s_cue, 'rp_s_rdelivery':rp_s_rdelivery, 'rp_f_cue':rp_f_cue, 'rp_f_pdelivery':rp_f_pdelivery, 'nrnp_s_cue':nrnp_s_cue, 'nrnp_s_nextreset':nrnp_s_nextreset, 'nrnp_f_cue':nrnp_f_cue, 'nrnp_f_nextreset':nrnp_f_nextreset, 'r_only_s_cue':r_only_s_cue, 'r_only_s_rdelivery':r_only_s_rdelivery, 'r_only_f_cue':r_only_f_cue, 'r_only_f_nextreset':r_only_f_nextreset, 'p_only_s_cue':p_only_s_cue, 'p_only_s_nextreset':p_only_s_nextreset, 'p_only_f_cue':p_only_f_cue, 'p_only_f_pdelivery':p_only_f_pdelivery}
+#def plot_unit_rp_comparison(save_dict):
+	
+
+
+
+
+
+
+
+
+	
+
+
+
+
+#ts_dict={'rp_s_cue':rp_s_cue, 'rp_s_rdelivery':rp_s_rdelivery, 'rp_f_cue':rp_f_cue, 'rp_f_pdelivery':rp_f_pdelivery, 'nrnp_s_cue':nrnp_s_cue, 'nrnp_s_nextreset':nrnp_s_nextreset, 'nrnp_f_cue':nrnp_f_cue, 'nrnp_f_nextreset':nrnp_f_nextreset, 'r_only_s_cue':r_only_s_cue, 'r_only_s_rdelivery':r_only_s_rdelivery, 'r_only_f_cue':r_only_f_cue, 'r_only_f_nextreset':r_only_f_nextreset, 'p_only_s_cue':p_only_s_cue, 'p_only_s_nextreset':p_only_s_nextreset, 'p_only_f_cue':p_only_f_cue, 'p_only_f_pdelivery':p_only_f_pdelivery}
 #ts_dict = {'rp_s_cue':rp_s_cue,'rp_s_rdelivery':rp_s_rdelivery}
 
 
-if pcatch_bool or rcatch_bool:
-	ts_dict['r_s_catch_cue'] = r_s_catch_cue
-	ts_dict['r_s_catch_nextreset'] = r_s_catch_nextreset
-	ts_dict['p_f_catch_cue'] = p_f_catch_cue
-	ts_dict['p_f_catch_nextreset'] = p_f_catch_nextreset
+####################
+# NEW TS Dict
+####################
+#col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum 
+
+r0_succ = all_succ[all_succ[:,3] == 0]
+r1_succ = all_succ[all_succ[:,3] == 1]
+r2_succ = all_succ[all_succ[:,3] == 2]
+r3_succ = all_succ[all_succ[:,3] == 3]
+r0_fail = all_fail[all_fail[:,3] == 0]
+r1_fail = all_fail[all_fail[:,3] == 1]
+r2_fail = all_fail[all_fail[:,3] == 2]
+r3_fail = all_fail[all_fail[:,3] == 3]
+
+p0_fail = all_fail[all_fail[:,4] == 0]
+p1_fail = all_fail[all_fail[:,4] == 1]
+p2_fail = all_fail[all_fail[:,4] == 2]
+p3_fail = all_fail[all_fail[:,4] == 3]
+p0_succ = all_succ[all_succ[:,4] == 0]
+p1_succ = all_succ[all_succ[:,4] == 1]
+p2_succ = all_succ[all_succ[:,4] == 2]
+p3_succ = all_succ[all_succ[:,4] == 3]
 
 
-#testing dict
-#ts_dict={'rp_s_cue':rp_s_cue, 'r_only_s':r_only_s_rdelivery,'nrnp_s_cue':nrnp_s_cue}
-#ts_dict = {'rp_s_rdelivery':rp_s_rdelivery}
+r0_succ_cue = r0_succ[:,0]
+r1_succ_cue = r1_succ[:,0]
+r2_succ_cue = r2_succ[:,0]
+r3_succ_cue = r3_succ[:,0]
+p0_fail_cue = p0_fail[:,0]
+p1_fail_cue = p1_fail[:,0]
+p2_fail_cue = p2_fail[:,0]
+p3_fail_cue = p3_fail[:,0]
+
+r0_succ_result = r0_succ[:,1]
+r1_succ_result = r1_succ[:,1]
+r2_succ_result = r2_succ[:,1]
+r3_succ_result = r3_succ[:,1]
+p0_fail_result = p0_fail[:,2]
+p1_fail_result = p1_fail[:,2]
+p2_fail_result = p2_fail[:,2]
+p3_fail_result = p3_fail[:,2]
+
+r0_fail_cue = r0_fail[:,0]
+r1_fail_cue = r1_fail[:,0]
+r2_fail_cue = r2_fail[:,0]
+r3_fail_cue = r3_fail[:,0]
+p0_succ_cue = p0_succ[:,0]
+p1_succ_cue = p1_succ[:,0]
+p2_succ_cue = p2_succ[:,0]
+p3_succ_cue = p3_succ[:,0]
+
+r0_fail_result = r0_fail[:,1]
+r1_fail_result = r1_fail[:,1]
+r2_fail_result = r2_fail[:,1]
+r3_fail_result = r3_fail[:,1]
+p0_succ_result = p0_succ[:,2]
+p1_succ_result = p1_succ[:,2]
+p2_succ_result = p2_succ[:,2]
+p3_succ_result = p3_succ[:,2]
+
+
+#ts_dict = {'r0_succ_cue':r0_succ_cue,'r1_succ_cue':r1_succ_cue,'r2_succ_cue':r2_succ_cue,'r3_succ_cue':r3_succ_cue,'p0_fail_cue':p0_fail_cue,'p1_fail_cue':p1_fail_cue,'p2_fail_cue':p2_fail_cue,'p3_fail_cue':p3_fail_cue,'r0_succ_result':r0_succ_result,'r1_succ_result':r1_succ_result,'r2_succ_result':r2_succ_result,'r3_succ_result':r3_succ_result,'p0_fail_result':p0_fail_result,'p1_fail_result':p1_fail_result,'p2_fail_result':p1_fail_result,'p3_fail_result':p3_fail_result}
+ts_dict = {'r0_succ_cue':r0_succ_cue,'r1_succ_cue':r1_succ_cue,'r2_succ_cue':r2_succ_cue,'r3_succ_cue':r3_succ_cue,'p0_fail_cue':p0_fail_cue,'p1_fail_cue':p1_fail_cue,'p2_fail_cue':p2_fail_cue,'p3_fail_cue':p3_fail_cue,'r0_succ_result':r0_succ_result,'r1_succ_result':r1_succ_result,'r2_succ_result':r2_succ_result,'r3_succ_result':r3_succ_result,'p0_fail_result':p0_fail_result,'p1_fail_result':p1_fail_result,'p2_fail_result':p1_fail_result,'p3_fail_result':p3_fail_result,'r0_fail_cue':r0_fail_cue,'r1_fail_cue':r1_fail_cue,'r2_fail_cue':r2_fail_cue,'r3_fail_cue':r3_fail_cue,'p0_succ_cue':p0_succ_cue,'p1_succ_cue':p1_succ_cue,'p2_succ_cue':p2_succ_cue,'p3_succ_cue':p3_succ_cue,'r0_fail_result':r0_fail_result,'r1_fail_result':r1_fail_result,'r2_fail_result':r2_fail_result,'r3_fail_result':r3_fail_result,'p0_succ_result':p0_succ_result,'p1_succ_result':p1_succ_result,'p2_succ_result':p1_succ_result,'p3_succ_result':p3_succ_result}
+
+
+
+#TODO take catch trials into account
+#if pcatch_bool or rcatch_bool:
+#	ts_dict['r_s_catch_cue'] = r_s_catch_cue
+#	ts_dict['r_s_catch_nextreset'] = r_s_catch_nextreset
+#	ts_dict['p_f_catch_cue'] = p_f_catch_cue
+#	ts_dict['p_f_catch_nextreset'] = p_f_catch_nextreset
+
+
 
 data_dict={'M1_spikes':M1_spikes,'S1_spikes':S1_spikes,'PmD_spikes':PmD_spikes,'PmV_spikes':PmV_spikes}
 
@@ -596,31 +640,6 @@ save_dict = {}
 save_dict['data_dict_all'] = data_dict_all
 save_dict['param_dict'] = param_dict
 
-#total_rasters = []
-#for key, value in ts_dict.iteritems():
-#	if not (len(value) == 1 and value[0] == 0):
-#		for key2, value2 in data_dict.iteritems():
-#		#for key2, value2 in data_dict_nl.iteritems():
-#			print 'making rasters %s, %s' %(key, key2)
-#			spikes=[]
-#
-#			if key2 == 'PmV_spikes':
-#				for i in range(len(value2)):
-#					spikes.append(value2[i])
-#			else:
-#				for i in range(len(value2)):
-#					spikes.append(value2[i]['ts'][0,0][0])			
-#				for i in range(len(spikes)):
-#					rasters = make_raster(value,spikes,key,key2,i,time_before,time_after)
-#
-#			#for i in range(len(value2['nl_spike_data'])):
-#				#rasters = make_nl_raster(value,value2['nl_spike_data'],key,key2,i,time_before,time_after)
-#				#total_rasters.append(rasters)
-#			#save_dict['%s_%s' %(key, key2)] = total_rasters
-#	else:
-#		print 'no instances of event %s, no plot generation' %(key)
-
-
 
 total_rasters = []
 for key, value in ts_dict.iteritems():
@@ -645,8 +664,14 @@ for key, value in ts_dict.iteritems():
 	else:
 		print 'no instances of event %s, no plot generation' %(key)
 
+
+#test = plot_unit_rp_comparison(save_dict)
+
+
+
 short_filename = filename[-27:-4]
 if short_filename.startswith('0'):
 	short_filename = '0%s' %(short_filename)
 
+	
 np.save('avg_fr_and_nlized_data_%s_bin%s' %(short_filename,bin_size),save_dict)
