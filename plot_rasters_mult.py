@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+ #!/usr/bin/env python
 
 #import packages
 import scipy.io as sio
@@ -95,12 +95,14 @@ bin_size = 50 #in ms
 #filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170209_0059/block1/Extracted_0059_2017-02-09-12-52-17.mat'
 #filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170209_0059/block3/Extracted_0059_2017-02-09-13-46-37.mat'
 
-filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170214_504/Extracted_504_2017-02-14-12-09-21.mat'
+#filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170214_504/Extracted_504_2017-02-14-12-09-21.mat'
 #filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170214_504/Extracted_504_2017-02-14-12-35-41.mat'
 #filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170214_504/Extracted_504_2017-02-14-13-01-34.mat'
 
-
-
+###### beaver ########
+filename = '/home/jack/workspace/mult_rp/504_test/Extracted_504_2017-02-14-12-09-21.mat'
+#filename = '/home/jack/workspace/mult_rp/504_test/Extracted_504_2017-02-14-12-35-41.mat'
+#filename = '/home/jack/workspace/mult_rp/504_test/Extracted_504_2017-02-14-13-01-34.mat'
 
 
 ######################
@@ -209,45 +211,58 @@ else:
 
 trial_breakdown = Timestamps['trial_breakdown']
 
-condensed = np.zeros((np.shape(trial_breakdown)[0],5))
+condensed = np.zeros((np.shape(trial_breakdown)[0],6))
 
-#col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum 
+#col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum, 5 = catch_num
 
 condensed[:,0] = trial_breakdown[:,1]
 condensed[:,1] = trial_breakdown[:,2]
 condensed[:,2] = trial_breakdown[:,3]
 condensed[:,3] = trial_breakdown[:,5]
 condensed[:,4] = trial_breakdown[:,7]
+condensed[:,5] = trial_breakdown[:,10]
 
 if condensed[-1,1] == condensed[-1,2] == 0:
 	new_condensed = condensed[0:-1,:]
 
 condensed = new_condensed
 
-all_succ = condensed[condensed[:,1] != 0]
-all_fail = condensed[condensed[:,2] != 0]
+#not including catch trials
+#TODO seperate array for catch trials
+both_bool_succ = [x and y for x,y in zip(condensed[:,1] !=0, condensed[:,5] == 0)]
+both_bool_fail = [x and y for x,y in zip(condensed[:,2] !=0, condensed[:,5] == 0)]
+
+#all_succ = np.zeros((sum(both_bool_succ),6))
+#all_fail = np.zeros((sum(both_bool_fail),6))
+
+all_succ = []
+all_fail = []
 
 
+for i in range(np.shape(condensed)[0]):
+        if both_bool_succ[i]:
+                all_succ.append(condensed[i,:])
+        if both_bool_fail[i]:
+                all_fail.append(condensed[i,:])
 
+all_succ = np.asarray(all_succ)
+all_fail = np.asarray(all_fail)
 
+#all_succ = condensed[both_bool_succ]
+#all_fail = condensed[both_bool_fail]
 
-
-
-
-
+#condensed_new = condensed[:,0:5]
+#condensed = condensed_new
 
 ##############################################################################
-
-
 	
 #Pull neural spikes
-
 neural_data=a['neural_data']
-#print neural_data
 
+#print neural_data
 Spikes = a['neural_data']['spikeTimes'];
+
 #Break spikes into M1 S1 pmd 
-#Different for jack/dave- jack has MAP1=PMd, MAP2=M1, MAP3=S1, ALL=PMv
 M1_spikes = Spikes[0,0][0,1];
 PmD_spikes = Spikes[0,0][0,0];
 S1_spikes = Spikes[0,0][0,2];
@@ -324,59 +339,6 @@ PmD_spikes = PmD_spikes[0,0:PmD_limit];
 #time_boundry={'-0.5-0.0':[-0.5,0.0],'0-0.5':[0.0,0.5],'0.5-1.0':[0.5,1.0],'all_incpre':[-0.5,2.0]}
 #time_boundry={'-0.5-0.0':[-0.5,0.0],'0-0.5':[0.0,0.5],'0.5-1.0':[0.5,1.0],'all':[0.0,2.0]}
 
-
-#Begin main loop of analysis
-#for name_of_bin,time_of_bin in time_boundry.iteritems():
-#    before_time = -time_of_bin[0]
-#    after_time = time_of_bin[1]
-#    print( 'bin %s' %(name_of_bin))        
-    
-#    #Assemble a final dictionary of the final dataset for saving
-#    def Make_final_data(data,start_position):
-#        dummy = []
-#        for i in range(0,data[start_position].shape[0]):
-#            dummy.append(np.hstack(data[start_position][i]))
-#        rp_s_data = np.array(dummy)
-#        rp_s_targets = np.ones(rp_s_data.shape[0])*0
-#        dummy = []
-#        for i in range(0,data[start_position+8].shape[0]):
-#            dummy.append(np.hstack(data[start_position+8][i]))
-#        rp_f_data = np.array(dummy)
-#        rp_f_targets = np.ones(rp_f_data.shape[0])*1
-#        dummy = []
-#        for i in range(0,data[start_position+16].shape[0]):
-#            dummy.append(np.hstack(data[start_position+16][i]))
-#        nrnp_s_data = np.array(dummy)
-#        nrnp_s_targets = np.ones(nrnp_s_data.shape[0])*2
-#        dummy = []
-#        for i in range(0,data[start_position+24].shape[0]):
-#            dummy.append(np.hstack(data[start_position+24][i]))
-#        nrnp_f_data = np.array(dummy)
-#        nrnp_f_targets = np.ones(nrnp_f_data.shape[0])*3
-#        dummy = []
-#        for i in range(0,data[start_position+32].shape[0]):
-#            dummy.append(np.hstack(data[start_position+32][i]))
-#        r_only_s_data = np.array(dummy)
-#        r_only_s_targets = np.ones(r_only_s_data.shape[0])*4
-#        dummy = []
-#        for i in range(0,data[start_position+40].shape[0]):
-#            dummy.append(np.hstack(data[start_position+40][i]))
-#        r_only_f_data = np.array(dummy)
-#        r_only_f_targets = np.ones(r_only_f_data.shape[0])*5
-#        dummy = []
-#        for i in range(0,data[start_position+48].shape[0]):
-#            dummy.append(np.hstack(data[start_position+48][i]))
-#        p_only_s_data = np.array(dummy)
-#        p_only_s_targets = np.ones(p_only_s_data.shape[0])*6
-#        dummy = []
-#        for i in range(0,data[start_position+56].shape[0]):
-#            dummy.append(np.hstack(data[start_position+56][i]))
-#        p_only_f_data = np.array(dummy)
-#        p_only_f_targets = np.ones(p_only_f_data.shape[0])*7
-#		
-#        return(np.vstack([rp_s_data,rp_f_data,nrnp_s_data,nrnp_f_data,r_only_s_data,r_only_f_data,p_only_s_data,p_only_f_data]),np.hstack([rp_s_targets,rp_f_targets,nrnp_s_targets,nrnp_f_targets,r_only_s_targets,r_only_f_targets,p_only_s_targets,p_only_f_targets]))
-
-
 time_before = -0.5 #make sure if change to pos time before it still works
 time_after = 1.0
 
@@ -418,11 +380,121 @@ def normalize_data(spike_data):
 	
 	return(nl_dict)
 
+def make_nl_raster_new(ts_value,ts_key,nl_dict,data_key, unit_num,spikes):
+        hist_all = nl_dict['hist_all'][unit_num][0]
+        nlized_hist_data = nl_dict['nl_spike_data'][unit_num]
+        bin_size_sec = bin_size / 1000.0
+        no_bins_before = int(time_before / bin_size_sec) #neg, keep neg
+        no_bins_after = int(time_after / bin_size_sec)
+
+        event_hist = []
+        event_hist_nl = []
+
+        for i in range(len(ts_value)):
+                closest_start_time = round(ts_value[i] /bin_size_sec) * bin_size_sec
+                closest_start_time = np.around(closest_start_time,decimals=2)
+                start_bin = int(closest_start_time / bin_size_sec)
+                event_hist_nl.append(nlized_hist_data[start_bin + no_bins_before:start_bin + no_bins_after])
+                event_hist.append(hist_all[start_bin + no_bins_before : start_bin + no_bins_after])
+                
+                #plt.vlines()
+
+        binned_nl = np.asarray(event_hist_nl)
+        binned = np.asarray(event_hist)
+        
+        #print unit_num
+        #pdb.set_trace()
+        try:
+                if np.amax(binned_nl) > 1.0:
+                        print 'error: binned nl > 1.0 for unit %s, %s, %s' %(unit_num, ts_key, data_key)
+        except:
+                print 'error with unit %s, %s, %s' %(unit_num, ts_key,data_key)
+                return
+
+        #pdb.set_trace()
+
+        ax = plt.gca()
+        plt.subplot(2,2,1)
+
+        dummy = []
+	for i in range(len(ts_value)):
+		dummy1=[]
+		b = ts_value[i]
+		for j in range(len(spikes)):
+			a = spikes[j]
+			c = a[np.where(np.logical_and(a >= b+time_before, a<= b+time_after))]
+			dummy1.append(c)
+		dummy.append(dummy1)
+	dummy = np.asarray(dummy)
+
+        for i in range(dummy.shape[0]):
+                adjusted_times = dummy[i][unit_num] - ts_value[i]
+                plt.vlines(adjusted_times, i + .5, i + 1.5)
+                plt.ylim(.5, dummy.shape[0] + .5)
+
+
+
+        firing_rate = np.zeros(binned.shape)
+	for i in range(len(binned)):
+ 		firing_rate[i] = binned[i] / float(bin_size) * 1000 #because bin_size in ms, want to get Hz
+
+	avg_firing_rate = np.mean(firing_rate,axis=0)
+	std_dev_firing_rate = np.std(firing_rate,axis=0)
+
+	avg_nl = np.mean(binned_nl,axis=0)
+	std_dev_nl = np.std(binned_nl,axis=0)
+	
+	plt.axvline(0.0,color='r')
+	plt.xlim(time_before,time_after)
+	
+	plt.title('Raster plot')
+	plt.xlabel('Time from event')
+	plt.ylabel('Trial')
+
+	#Average firing rate
+	plt.subplot(2,2,2)
+	plt.title('average firing rate')
+	plt.xlabel('Time from event')
+	plt.ylabel('Firing rate (Hz)')
+	
+	ymax = avg_firing_rate + std_dev_firing_rate
+	ymin = avg_firing_rate - std_dev_firing_rate
+        
+        #pdb.set_trace()
+
+        plt.errorbar(np.linspace(time_before,time_after,no_bins,endpoint=True),avg_firing_rate,yerr=std_dev_firing_rate)
+        plt.ylim(ymin=0)
+        plt.xlim(time_before,time_after)
+        plt.axvline(0.0,color='r')
+
+        #normalized firing rate
+        plt.subplot(2,2,3)
+
+        plt.errorbar(np.linspace(time_before,time_after,no_bins,endpoint=True),avg_nl,yerr=std_dev_nl)
+        plt.ylim(0,1.0)
+	plt.xlim(time_before,time_after)
+	plt.axvline(0.0,color='r')
+	
+	plt.title('average normalized firing rate')
+	plt.xlabel('Time from event')
+	plt.ylabel('Normalized firing rate')
+
+	plt.suptitle('%s, %s, unit: %s' %(ts_key,data_key,str(unit_num).zfill(2)), fontsize = 20)
+	plt.tight_layout()
+	plt.subplots_adjust(top=0.85)
+	
+	plt.savefig('raster_%s_%s_unit%s' %(ts_key, data_key, str(unit_num).zfill(2)))
+	plt.clf()
+
+	return_dict={'avg_firing_rate':avg_firing_rate,'std_dev_firing_rate':std_dev_firing_rate,'binned':binned,'firing_rate':firing_rate,'binned_nl':binned_nl,'avg_nl':avg_nl,'std_dev_nl':std_dev_nl}
+	
+	return(return_dict)
+                
+
 
 def make_nl_raster(data,spikes,nl,key,key2,unit_no,time_before,time_after,min_bin,max_bin):
 
 	dummy = []
-
 	for i in range(len(data)):
 		dummy1=[]
 		b = data[i]
@@ -431,36 +503,50 @@ def make_nl_raster(data,spikes,nl,key,key2,unit_no,time_before,time_after,min_bi
 			c = a[np.where(np.logical_and(a >= b+time_before, a<= b+time_after))]
 			dummy1.append(c)
 		dummy.append(dummy1)
-
 	dummy = np.asarray(dummy)
-
 	ax = plt.gca()
 	adjusted_times = []
 	binned = []
 	binned_nl = []
 	plt.subplot(2,2,1)
 
-	for i in range(dummy.shape[0]):
-		adjusted_times = dummy[i][unit_no] - data[i]
-		plt.vlines(adjusted_times, i+.5, i+1.5)
+        #pdb.set_trace()
+
+	for event_num in range(dummy.shape[0]):
+                #print 'unit %s, %s, %s, event %s' %(unit_no,key,key2,str(event_num))
+                #pdb.set_trace()
+                adjusted_times = dummy[event_num][unit_no] - data[event_num]
+		plt.vlines(adjusted_times, event_num+.5, event_num+1.5)
 		plt.ylim(.5, dummy.shape[0] + .5)
 
 		binned_temp = np.histogram(adjusted_times,bins=no_bins,normed=False,density=False)
 		binned.append(np.nan_to_num(binned_temp[0]))
 
-		if i >= len(min_bin):
-			print 'potential indexing error: breaking, i = %s, key = %s, key2 = %s, unit = %s' %(i, key, key2, unit_no)
+		if event_num >= len(min_bin):
+			print 'potential indexing error: breaking, event_num = %s, key = %s, key2 = %s, unit = %s' %(event_num, key, key2, unit_no)
 			break
+                
+                if max(binned_temp[0]) > max_bin[event_num]:
+                        print 'max hist > max_bin event %s unit %s, diff = %s' %(event_num,unit_no,max(binned_temp[0])-max_bin[event_num])
 
-		binned_nl_temp_num = binned_temp[0] - min_bin[i]
-		binned_nl_temp_denom = max_bin[i] - min_bin[i]
+                        #pdb.set_trace()
+                        
+                        max_bin[event_num] = max(binned_temp[0])
+                        
 
-		binned_nl_temp = np.divide(binned_nl_temp_num,binned_nl_temp_denom)
+
+		binned_nl_temp_num = binned_temp[0] - min_bin[event_num]
+		binned_nl_temp_denom = max_bin[event_num] - min_bin[event_num]
+
+		binned_nl_temp = np.true_divide(binned_nl_temp_num,binned_nl_temp_denom)
+                if binned_nl_temp.max() > 1.0:
+                        print 'error: binned nl > 1.0 for event %s, unit %s, %s, %s' %(str(event_num),unit_no, key, key2)
 		binned_nl.append(binned_nl_temp)
 	
 	binned = np.asarray(binned)
 	binned_nl = np.asarray(binned_nl)
-	firing_rate = np.zeros(len(binned),dtype=object)
+        
+        firing_rate = np.zeros(len(binned),dtype=object)
 	for i in range(len(binned)):
  		firing_rate[i] = binned[i] / float(bin_size) * 1000 #because bin_size in ms, want to get Hz
 
@@ -486,18 +572,17 @@ def make_nl_raster(data,spikes,nl,key,key2,unit_no,time_before,time_after,min_bi
 	ymax = avg_firing_rate + std_dev_firing_rate
 	ymin = avg_firing_rate - std_dev_firing_rate
 
-	#plt.plot(avg_firing_rate)
-	#plt.fill_between(ymin,ymax,alpha=1,edgecolor='#3F7F4C',facecolor='#7EFF99',linewidth=0)
-	plt.errorbar(np.linspace(time_before,time_after,no_bins,endpoint=True),avg_firing_rate,yerr=std_dev_firing_rate)
-	plt.ylim(ymin=0)
-	plt.xlim(time_before,time_after)
-	plt.axvline(0.0,color='r')
 
-	#normalized firing rate
-	plt.subplot(2,2,3)
+        plt.errorbar(np.linspace(time_before,time_after,no_bins,endpoint=True),avg_firing_rate,yerr=std_dev_firing_rate)
+        plt.ylim(ymin=0)
+        plt.xlim(time_before,time_after)
+        plt.axvline(0.0,color='r')
 
-	plt.errorbar(np.linspace(time_before,time_after,no_bins,endpoint=True),avg_nl,yerr=std_dev_nl)
-	plt.ylim(0,1.0)
+        #normalized firing rate
+        plt.subplot(2,2,3)
+
+        plt.errorbar(np.linspace(time_before,time_after,no_bins,endpoint=True),avg_nl,yerr=std_dev_nl)
+        plt.ylim(0,1.0)
 	plt.xlim(time_before,time_after)
 	plt.axvline(0.0,color='r')
 	
@@ -517,29 +602,10 @@ def make_nl_raster(data,spikes,nl,key,key2,unit_no,time_before,time_after,min_bi
 	return(return_dict)
 
 
-#def plot_unit_rp_comparison(save_dict):
-	
-
-
-
-
-
-
-
-
-	
-
-
-
-
-#ts_dict={'rp_s_cue':rp_s_cue, 'rp_s_rdelivery':rp_s_rdelivery, 'rp_f_cue':rp_f_cue, 'rp_f_pdelivery':rp_f_pdelivery, 'nrnp_s_cue':nrnp_s_cue, 'nrnp_s_nextreset':nrnp_s_nextreset, 'nrnp_f_cue':nrnp_f_cue, 'nrnp_f_nextreset':nrnp_f_nextreset, 'r_only_s_cue':r_only_s_cue, 'r_only_s_rdelivery':r_only_s_rdelivery, 'r_only_f_cue':r_only_f_cue, 'r_only_f_nextreset':r_only_f_nextreset, 'p_only_s_cue':p_only_s_cue, 'p_only_s_nextreset':p_only_s_nextreset, 'p_only_f_cue':p_only_f_cue, 'p_only_f_pdelivery':p_only_f_pdelivery}
-#ts_dict = {'rp_s_cue':rp_s_cue,'rp_s_rdelivery':rp_s_rdelivery}
-
-
 ####################
 # NEW TS Dict
 ####################
-#col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum 
+#col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum, 5 = catch_num
 
 r0_succ = all_succ[all_succ[:,3] == 0]
 r1_succ = all_succ[all_succ[:,3] == 1]
@@ -587,14 +653,14 @@ p1_succ_cue = p1_succ[:,0]
 p2_succ_cue = p2_succ[:,0]
 p3_succ_cue = p3_succ[:,0]
 
-r0_fail_result = r0_fail[:,1]
-r1_fail_result = r1_fail[:,1]
-r2_fail_result = r2_fail[:,1]
-r3_fail_result = r3_fail[:,1]
-p0_succ_result = p0_succ[:,2]
-p1_succ_result = p1_succ[:,2]
-p2_succ_result = p2_succ[:,2]
-p3_succ_result = p3_succ[:,2]
+r0_fail_result = r0_fail[:,2]
+r1_fail_result = r1_fail[:,2]
+r2_fail_result = r2_fail[:,2]
+r3_fail_result = r3_fail[:,2]
+p0_succ_result = p0_succ[:,1]
+p1_succ_result = p1_succ[:,1]
+p2_succ_result = p2_succ[:,1]
+p3_succ_result = p3_succ[:,1]
 
 
 #ts_dict = {'r0_succ_cue':r0_succ_cue,'r1_succ_cue':r1_succ_cue,'r2_succ_cue':r2_succ_cue,'r3_succ_cue':r3_succ_cue,'p0_fail_cue':p0_fail_cue,'p1_fail_cue':p1_fail_cue,'p2_fail_cue':p2_fail_cue,'p3_fail_cue':p3_fail_cue,'r0_succ_result':r0_succ_result,'r1_succ_result':r1_succ_result,'r2_succ_result':r2_succ_result,'r3_succ_result':r3_succ_result,'p0_fail_result':p0_fail_result,'p1_fail_result':p1_fail_result,'p2_fail_result':p1_fail_result,'p3_fail_result':p3_fail_result}
@@ -642,27 +708,35 @@ save_dict['param_dict'] = param_dict
 
 
 total_rasters = []
-for key, value in ts_dict.iteritems():
-	if not (len(value) == 1 and value[0] == 0):
-		for key2, value2 in data_dict_all.iteritems():
-			print 'making rasters %s, %s' %(key, key2)
+for ts_key, ts_value in ts_dict.iteritems():
+	if not (len(ts_value) == 1 and ts_value[0] == 0):
+		for data_key, data_value in data_dict_all.iteritems():
+			print 'making rasters %s, %s' %(ts_key, data_key)
 
 			spikes=[]
-			if key2 == 'PmV_dicts':
-				for i in range(len(data_dict_all[key2]['spikes'])):
-					spikes.append(data_dict_all[key2]['spikes'][i])
+			if data_key == 'PmV_dicts':
+				for i in range(len(data_dict_all[data_key]['spikes'])):
+					spikes.append(data_dict_all[data_key]['spikes'][i])
 			else:
-				for i in range(len(data_dict_all[key2]['spikes'])):
-					spikes.append(data_dict_all[key2]['spikes'][i]['ts'][0,0][0])			
+				for i in range(len(data_dict_all[data_key]['spikes'])):
+					spikes.append(data_dict_all[data_key]['spikes'][i]['ts'][0,0][0])			
 
-			for i in range(len(data_dict_all[key2]['spikes'])):
-				rasters = make_nl_raster(value,spikes,data_dict_all[key2]['nl']['nl_spike_data'],key,key2,i,time_before,time_after,data_dict_all[key2]['nl']['min_bin'],data_dict_all[key2]['nl']['max_bin'])
+			for i in range(len(data_dict_all[data_key]['spikes'])):
+                                if not value.size == 0:
+				
+                                        #rasters = make_nl_raster(ts_value,spikes,data_dict_all[data_key]['nl']['nl_spike_data'],ts_key,data_key,i,time_before,time_after,data_dict_all[data_key]['nl']['min_bin'],data_dict_all[data_key]['nl']['max_bin'])
 
-				total_rasters.append(rasters)
-			save_dict['%s_%s' %(key, key2)] = total_rasters
-			total_rasters = []
+                                        rasters = make_nl_raster_new(ts_value,ts_key,data_dict_all[data_key]['nl'],data_key,i,spikes)
+                                        if rasters:
+                                                total_rasters.append(rasters)
+                                else:
+                                        print 'no instances of %s' %(ts_key)
+
+                        save_dict['%s_%s' %(ts_key, data_key)] = total_rasters
+			#save_dict['%s' %(key)] = total_rasters
+                        total_rasters = []
 	else:
-		print 'no instances of event %s, no plot generation' %(key)
+		print 'no instances of event %s, no plot generation' %(ts_key)
 
 
 #test = plot_unit_rp_comparison(save_dict)
