@@ -96,10 +96,10 @@ bin_size = 50 #in ms
 #filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170209_0059/block3/Extracted_0059_2017-02-09-13-46-37.mat'
 
 #filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170214_504/Extracted_504_2017-02-14-12-09-21.mat'
-filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170214_504/Extracted_504_2017-02-14-12-35-41.mat'
+#filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170214_504/Extracted_504_2017-02-14-12-35-41.mat'
 #filename = '/Users/johnhessburg/dropbox/mult_rp_files/workspace/20170214_504/Extracted_504_2017-02-14-13-01-34.mat'
 
-
+filename = '/home/jack/workspace/mult_rp/504_test/Extracted_504_2017-02-14-12-09-21.mat'
 
 
 
@@ -485,13 +485,16 @@ def make_nl_raster(data,spikes,nl,key,key2,unit_no,time_before,time_after,min_bi
 		if i >= len(min_bin):
 			print 'potential indexing error: breaking, i = %s, key = %s, key2 = %s, unit = %s' %(i, key, key2, unit_no)
 			break
-
+                
 		binned_nl_temp_num = binned_temp[0] - min_bin[i]
-		binned_nl_temp_denom = max_bin[i] - min_bin[i]
+	 	binned_nl_temp_denom = max_bin[i] - min_bin[i]
 
 		binned_nl_temp = np.divide(binned_nl_temp_num,binned_nl_temp_denom)
 		binned_nl.append(binned_nl_temp)
-	
+                
+                if max(binned_nl_temp) > 1.0:
+                        print 'max binned > 1.0 event %s unit %s' %(i, unit_no)
+
 	binned = np.asarray(binned)
 	binned_nl = np.asarray(binned_nl)
 	firing_rate = np.zeros(len(binned),dtype=object)
@@ -529,6 +532,8 @@ def make_nl_raster(data,spikes,nl,key,key2,unit_no,time_before,time_after,min_bi
 
 	#normalized firing rate
 	plt.subplot(2,2,3)
+        
+        #pdb.set_trace()
 
 	plt.errorbar(np.linspace(time_before,time_after,no_bins,endpoint=True),avg_nl,yerr=std_dev_nl)
 	plt.ylim(0,1.0)
@@ -546,8 +551,8 @@ def make_nl_raster(data,spikes,nl,key,key2,unit_no,time_before,time_after,min_bi
 	plt.savefig('raster_%s_%s_unit%s' %(key, key2, str(unit_no)))
 	plt.clf()
 
-	return_dict={'avg_firing_rate':avg_firing_rate,'std_dev_firing_rate':std_dev_firing_rate,'binned':binned,'firing_rate':firing_rate,'adjusted_times':adjusted_times,'dummy':dummy,'spikes':spikes,'dummy1':dummy1,'a':a,'b':b,'c':c,'nlized':nlized,'binned_temp':binned_temp,'binned_nl':binned_nl} #'a_nl':a_nl,'b_nl':b_nl,'c_nl':c_nl,'nlized':nlized,'dummy_nl':dummy_nl}
-	#return_dict={'avg_firing_rate':avg_firing_rate,'std_dev_firing_rate':std_dev_firing_rate,'adjusted_times':adjusted_times,'binned':binned,'binned_nl':binned_nl,'firing_rate':firing_rate,'avg_nl':avg_nl,'std_dev_nl':std_dev_nl,'dummy':dummy}
+	return_dict={'avg_firing_rate':avg_firing_rate,'std_dev_firing_rate':std_dev_firing_rate,'binned':binned,'firing_rate':firing_rate,'adjusted_times':adjusted_times,'dummy':dummy,'spikes':spikes,'dummy1':dummy1,'a':a,'b':b,'c':c,'binned_temp':binned_temp,'binned_nl':binned_nl} #'a_nl':a_nl,'b_nl':b_nl,'c_nl':c_nl,'nlized':nlized,'dummy_nl':dummy_nl}
+	#return_dict={'avg_firing_rate':avg_firing_rate,'std_dev_firing_rate':std_dev_firing_rate,'adjusted_times':adjusted_times,'binned':binned,'binned_nl':binned_nl,'firing_rate':firing_rate,'avg_nl':avg_nl,'std_dev_nl':std_dev_nl,'dummy':dummy,'nlized':nlized}
 	
 	return(return_dict)
 
