@@ -14,10 +14,10 @@ img_2 <- image_read(files[2])
 img_3 <- image_read(files[3])
 img_4 <- image_read(files[4])
 
-img_1 <- image_convert(img_1,"jpg")
-img_2 <- image_convert(img_2,"jpg")
-img_3 <- image_convert(img_3,"jpg")
-img_4 <- image_convert(img_4,"jpg")
+#img_1 <- image_convert(img_1,"jpg")
+#img_2 <- image_convert(img_2,"jpg")
+#img_3 <- image_convert(img_3,"jpg")
+#img_4 <- image_convert(img_4,"jpg")
 
 top_row <- c(img_1,img_2)
 bot_row <- c(img_3,img_4)
@@ -67,8 +67,8 @@ for (i in 1:length(region_list)){
 
 ###### NEW hopefully faster #####
 #make heatmap
-grid.echo()
-grid.grab()
-grid.newpage()
-grid.arrange(heatmap1,heatmap2,ncol=1)
+#grid.echo()
+#grid.grab()
+#grid.newpage()
+#grid.arrange(heatmap1,heatmap2,ncol=1)
 
