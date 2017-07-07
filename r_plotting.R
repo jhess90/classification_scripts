@@ -19,24 +19,40 @@ time <- seq(from=-0.45,to=0.9,by=0.05)
 
 gf_total <- read.xlsx('gf_avg_data_M1_dict_total.xlsx',sheet=1,colNames=T)
 gf_time <- seq(-0.45,0.90,by=0.005)
-ra_gf_frame <- data.frame(gf_time,cue=gf_total$r0_catch_cue_avg[10:280],result=gf_total$r0_catch_result_avg[10:280])
 
 #########
-test_avg <- gf_total$ra_succ_result_avg[10:280]
-test_std <- gf_total$ra_succ_result_std[10:280]
-test_upper <- test_avg + test_std
-test_lower <- test_avg - test_std
-test_df <- data.frame(gf_time,test_avg,test_upper,test_lower)
-test_melt <- melt(test_df,id.vars="gf_time",variable_name="value")
-p <- ggplot(data=test_melt$test_avg,aes(x=gf_time,y=test_avg)) + geom_line()
-p <- p + geom_ribbon(aes(ymin=test_df$test_lower,ymax=test_df$test_upper,alpha=0.2))
 
-
-                                                                              
-
+plot_gf <- function(gf_value,std_value,key){
+  
+  png(paste(key,"_gf.png",sep=""),width=8,height=6,units="in",res=500)
+  
+  gf_avg <- gf_value[10:280]
+  gf_std <- std_value[10:280]
+  upper <- gf_avg + gf_std
+  lower <- gf_avg - gf_std
+  gf_df <- data.frame(gf_time,gf_avg,upper,lower)
+  gf_melt <- melt(gf_df,id.vars="gf_time",variable_name="value")
+  p <- ggplot(data=gf_melt$gf_avg,aes(x=gf_time,y=gf_avg)) + geom_line()
+  p <- p + geom_ribbon(aes(ymin=gf_df$lower,ymax=gf_df$upper,alpha=0.15),show.legend = F) 
+  #p <- p + labs(title=paste(region_list[region_index],"unit",j,"cue"),y="normalized firing rate", x="time(s)") + geom_vline(xintercept=0)
+  p <- p + labs(title=paste("gripforce",key),y="unit", x="time(s)")
+  plot(p)
+  dev.off()
+  
+  #gf_avg <- gf_total$ra_succ_result_avg[10:280]
+  #test_std <- gf_total$ra_succ_result_std[10:280]
+  #test_upper <- test_avg + test_std
+  #test_lower <- test_avg - test_std
+  #test_df <- data.frame(gf_time,test_avg,test_upper,test_lower)
+  #test_melt <- melt(test_df,id.vars="gf_time",variable_name="value")
+  #p <- ggplot(data=test_melt$test_avg,aes(x=gf_time,y=test_avg)) + geom_line()
+  #p <- p + geom_ribbon(aes(ymin=test_df$test_lower,ymax=test_df$test_upper,alpha=0.15),show.legend = F) 
+  ##p <- p + labs(title=paste(region_list[region_index],"unit",j,"cue"),y="normalized firing rate", x="time(s)") + geom_vline(xintercept=0)
+  #p <- p + labs(title="gripforce test",y="unit", x="time(s)")                                                                            
+}
 
 for(region_index in 1:length(file_list)){
-  cat("\nRegion:",region_list[region_index],"\n")
+  cat("\nplotting region:",region_list[region_index])
   
   filename = file_list[region_index]
   wb <- loadWorkbook(filename)
@@ -154,7 +170,7 @@ for(region_index in 1:length(file_list)){
   no_p_fail_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
   
   for (j in 1:num_sheets){
-    cat('plotting unit', j,"\n")
+    #cat('plotting unit', j,"\n")
     tmp <- read.xlsx(filename,sheet = j, colNames=T)
     png(paste(region_list[region_index],"unit_",j,".png",sep=""),width=8,height=6,units="in",res=500)
     
@@ -320,7 +336,7 @@ for(region_index in 1:length(file_list)){
 }
 
 for(region_index in 1:length(catch_file_list)){
-  cat("\nRegion:",region_list[region_index],"\n")
+  cat("\nplotting region (catch):",region_list[region_index])
   
   filename = catch_file_list[region_index]
   wb <- loadWorkbook(filename)
@@ -340,7 +356,7 @@ for(region_index in 1:length(catch_file_list)){
   p_all_catch_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
   
   for (j in 1:num_sheets){
-    cat('plotting unit', j,"catch trials\n")
+    #cat('plotting unit', j,"catch trials\n")
     tmp <- read.xlsx(filename,sheet = j, colNames=T)
     
     tmp2 <- tmp[1:28,1:20]
@@ -418,29 +434,44 @@ S1_matrix_keys <- c('S1_r3_succ_cue','S1_r3_succ_result','S1_p3_fail_cue','S1_p3
 PmD_matrices <- abind(PmD_r3_succ_cue_all,PmD_r3_succ_result_all,PmD_p3_fail_cue_all,PmD_p3_fail_result_all,PmD_all_r_succ_cue,PmD_all_r_fail_cue,PmD_all_r_succ_result,PmD_all_r_fail_result,PmD_all_p_succ_cue,PmD_all_p_fail_cue,PmD_all_p_succ_result,PmD_all_p_fail_result,PmD_no_r_succ_cue,PmD_no_r_fail_cue,PmD_no_r_succ_result,PmD_no_r_fail_result,PmD_no_p_succ_cue,PmD_no_p_fail_cue,PmD_no_p_succ_result,PmD_no_p_fail_result,PmD_r_all_catch_cue,PmD_r_all_catch_result,PmD_p_all_catch_cue,PmD_p_all_catch_result,along=3)
 PmD_matrix_keys <- c('PmD_r3_succ_cue','PmD_r3_succ_result','PmD_p3_fail_cue','PmD_p3_fail_result','PmD_all_r_succ_cue','PmD_all_r_fail_cue','PmD_all_r_succ_result','PmD_all_r_fail_result','PmD_all_p_succ_cue','PmD_all_p_fail_cue','PmD_all_p_succ_result','PmD_all_p_fail_result','PmD_no_r_succ_cue','PmD_no_r_fail_cue','PmD_no_r_succ_result','PmD_no_r_fail_result','PmD_no_p_succ_cue','PmD_no_p_fail_cue','PmD_no_p_succ_result','PmD_no_p_fail_result','PmD_r_all_catch_cue','PmD_r_all_catch_result','PmD_p_all_catch_cue','PmD_p_all_catch_result')
 
+
 dev.off()
+cat("\nM1 heatmaps")
 for (i in 1:length(M1_matrix_keys)){
   png(paste(M1_matrix_keys[i],".png",sep=""),width=8,height=6,units="in",res=500)
   heatmap.2(M1_matrices[,,i],Colv=F,dendrogram="row",scale="row",col=rev(brewer.pal(11,"RdBu")),main=M1_matrix_keys[i],trace="none",cexRow=0.5,ylab="unit",xlab="time (s)",colsep=9)
   dev.off()
 }
 
+cat("\nS1 heatmaps")
 for (i in 1:length(S1_matrix_keys)){
   png(paste(S1_matrix_keys[i],".png",sep=""),width=8,height=6,units="in",res=500)
   heatmap.2(S1_matrices[,,i],Colv=F,dendrogram="row",scale="row",col=rev(brewer.pal(11,"RdBu")),main=S1_matrix_keys[i],trace="none",cexRow=0.5,ylab="unit",xlab="time (s)",colsep=9)
   dev.off()
 }
 
+cat("\nPmD heatmaps")
 for (i in 1:length(PmD_matrix_keys)){
   png(paste(PmD_matrix_keys[i],".png",sep=""),width=8,height=6,units="in",res=500)
   heatmap.2(PmD_matrices[,,i],Colv=F,dendrogram="row",scale="row",col=rev(brewer.pal(11,"RdBu")),main=PmD_matrix_keys[i],trace="none",cexRow=0.5,ylab="unit",xlab="time (s)",colsep=9)
   dev.off()
 }
 
-cat("saving")
+cat("\ngripforce plots")
+gf_matrix_keys <- c('r3_succ_cue','r3_succ_result','p3_fail_cue','p3_fail_result','ra_succ_cue','ra_fail_cue','ra_succ_result','ra_fail_result','pa_succ_cue','pa_fail_cue','pa_succ_result','pa_fail_result','r0_succ_cue','r0_fail_cue','r0_succ_result','r0_fail_result','p0_succ_cue','p0_fail_cue','p0_succ_result','p0_fail_result','r_all_catch_cue','r_all_catch_result','p_all_catch_cue','p_all_catch_result')
+for (i in 1:length(gf_matrix_keys)){
+  avg_key <- paste(gf_matrix_keys[i],'_avg',sep="")
+  std_key <- paste(gf_matrix_keys[i],'_std',sep="")
+  
+  gf <- gf_total[[avg_key]]
+  std <- gf_total[[std_key]]
+  
+  plot_gf(gf,std,gf_matrix_keys[i])
+  
+}
+
+cat("\nsaving")
 
 save.image(file="rearranged_data.RData")
 rm(list=ls())
 
-
-#sorted_M1_r3_succ_cue_all <- M1_r3_succ_cue_all[order(rowMeans(M1_r3_succ_cue_all),decreasing=F),]
