@@ -24,7 +24,7 @@ gf_time <- seq(-0.45,0.90,by=0.005)
 
 plot_gf <- function(gf_value,std_value,key){
   
-  png(paste(key,"_gf.png",sep=""),width=8,height=6,units="in",res=500)
+  png(paste(key,"_gf.png",sep=""),width=6,height=4,units="in",res=500)
   
   gf_avg <- gf_value[10:280]
   gf_std <- std_value[10:280]
