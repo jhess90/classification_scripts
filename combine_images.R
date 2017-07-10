@@ -22,15 +22,28 @@ combine_fnct <- function(name,files){
   row3 <- c(img_5,img_6)
   row4 <- c(img_7,img_8)
             
-  row1_img <- image_append(image_scale(row1))
-  row2_img <- image_append(image_scale(row2))
-  row3_img <- image_append(image_scale(row3))
-  row4_img <- image_append(image_scale(row4))
+  row1_img <- image_append(image_scale(row1)) #,"2400"))
+  row2_img <- image_append(image_scale(row2)) #,"800"))
+  row3_img <- image_append(image_scale(row3)) #,"2400"))
+  row4_img <- image_append(image_scale(row4)) #,"800"))
+
+  #row1_img <- image_scale(row1_img,"x2400")
+  #row2_img <- image_scale(row2_img,"x800")
+  #row3_img <- image_scale(row3_img,"x2400")
+  #row4_img <- image_scale(row4_img,"x800")
+
+  top_half <- c(row1_img,row2_img)
+  btm_half <- c(row3_img,row4_img)
+  top_half_img <- image_append(image_scale(top_half),stack=T)
+  btm_half_img <- image_append(image_scale(btm_half),stack=T)
   
-  whole <- c(row1_img,row2_img,row3_img,row4_img)
-  whole_img <- image_append(image_scale(whole),stack=T)
-  image_background(whole_img,"white",flatten=T)
-  image_write(whole,path=paste(name,".png",sep=""),format="png")
+  new_whole <- c(top_half_img,btm_half_img)
+  new_whole_img <- image_append(image_scale(new_whole),stack=T)
+
+  #whole <- c(row1_img,row2_img)   #,row3_img,row4_img)
+  #whole_img <- image_append(image_scale(whole),stack=T)
+  image_background(new_whole_img,"white",flatten=T)
+  image_write(new_whole_img,path=paste(name,".png",sep=""),format="png")
 return()
 }
 
