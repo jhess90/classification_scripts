@@ -32,7 +32,8 @@ plot_gf <- function(gf_value,std_value,key){
   lower <- gf_avg - gf_std
   gf_df <- data.frame(gf_time,gf_avg,upper,lower)
   gf_melt <- melt(gf_df,id.vars="gf_time",variable_name="value")
-  p <- ggplot(data=gf_melt$gf_avg,aes(x=gf_time,y=gf_avg)) + geom_line()
+  p <- ggplot(data=gf_melt$gf_avg,aes(x=gf_time,y=gf_avg)) + geom_line() + theme(plot.margin=unit(c(0.5,0.5,0.5,2.5),"cm"))
+
   p <- p + geom_ribbon(aes(ymin=gf_df$lower,ymax=gf_df$upper,alpha=0.15),show.legend = F) 
   #p <- p + labs(title=paste(region_list[region_index],"unit",j,"cue"),y="normalized firing rate", x="time(s)") + geom_vline(xintercept=0)
   p <- p + labs(title=paste("gripforce",key),y="unit", x="time(s)")
