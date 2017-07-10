@@ -987,7 +987,6 @@ for region_key,region_data in all_regions_dict.iteritems():
 
         for i in range(len(nlized_cue_comparison_data['r0_succ_cue%s' %(suffix)])):
                 temp_array = np.zeros((30,40))
-                #temp_array[:,0] = np.mean(nlized_cue_comparison_data['p3_fail_cue%s' %(suffix)], axis = 0)
                 try:
                         temp_array[:,0] = nlized_cue_comparison_data['p3_fail_cue%s' %(suffix)][i,:]
                 except:
@@ -1156,10 +1155,103 @@ for region_key,region_data in all_regions_dict.iteritems():
                 for j in range(temp_array.shape[0]):
                         avg_worksheet.write_row(j+1,0,temp_array[j,:])
 
-###TODO where's PmD?
-##TODO add std to above
+for region_key,region_data in all_regions_dict.iteritems():
+        nl_avg_data_workbook = xlsxwriter.Workbook('catch_nl_avg_data_%s.xlsx' %(region_key),options={'nan_inf_to_errors':True})
+        suffix = '_%ss' %(region_key[0:-6])
 
-#TODO should just do this once
+        nlized_cue_comparison_data = all_regions_dict[region_key]['cue_comp_stats']['nlized_comparison_data']
+        nlized_result_comparison_data = all_regions_dict[region_key]['result_comp_stats']['nlized_comparison_data']
+
+        for i in range(len(nlized_cue_comparison_data['r0_succ_cue%s' %(suffix)])):
+                temp_array = np.zeros((30,40))
+                try:
+                        temp_array[:,0] = nlized_cue_comparison_data['p3_catch_cue%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,1] = nlized_cue_comparison_data['p2_catch_cue%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,2] = nlized_cue_comparison_data['p1_catch_cue%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,3] = nlized_cue_comparison_data['p0_catch_cue%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,4] = nlized_cue_comparison_data['r0_catch_cue%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,5] = nlized_cue_comparison_data['r1_catch_cue%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,6] = nlized_cue_comparison_data['r2_catch_cue%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,7] = nlized_cue_comparison_data['r3_catch_cue%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,8] = nlized_cue_comparison_data['r_all_catch__cue%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,9] = nlized_cue_comparison_data['p_all_catch_cue%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,10] = nlized_result_comparison_data['p3_catch_result%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,11] = nlized_result_comparison_data['p2_catch_result%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,12] = nlized_result_comparison_data['p1_catch_result%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,13] = nlized_result_comparison_data['p0_catch_result%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,14] = nlized_result_comparison_data['r0_catch_result%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,15] = nlized_result_comparison_data['r1_catch_result%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,16] = nlized_result_comparison_data['r2_catch_result%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,17] = nlized_result_comparison_data['r3_catch_result%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,18] = nlized_result_comparison_data['r_all_catch_result%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,19] = nlized_result_comparison_data['p_all_catch_result%s' %(suffix)][i,:]
+                except:
+                        pass
+
+                names = ['p3_catch_cue','p2_catch_cue','p1_catch_cue','p0_catch_cue','r0_catch_cue','r1_catch_cue','r2_catch_cue','r3_catch_cue','r_all_catch_cue','p_all_catch_cue','p3_catch_result','p2_catch_result','p1_catch_result','p0_catch_result','r0_catch_result','r1_catch_result','r2_catch_result','r3_catch_result','r_all_catch_result','p_all_catch_result']
+        
+                avg_worksheet = nl_avg_data_workbook.add_worksheet('unit_%s' %(i))
+                avg_worksheet.write_row(0,0,names)
+                for j in range(temp_array.shape[0]):
+                        avg_worksheet.write_row(j+1,0,temp_array[j,:])
+
 for region_key,region_data in all_regions_dict.iteritems():
         gf_workbook = xlsxwriter.Workbook('gf_avg_data_%s.xlsx' %(region_key),options={'nan_inf_to_errors':True})
         suffix = '_%ss' %(region_key[0:-6])
