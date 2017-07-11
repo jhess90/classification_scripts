@@ -437,7 +437,7 @@ PmD_matrices <- abind(PmD_r3_succ_cue_all,PmD_r3_succ_result_all,PmD_p3_fail_cue
 PmD_matrix_keys <- c('PmD_r3_succ_cue','PmD_r3_succ_result','PmD_p3_fail_cue','PmD_p3_fail_result','PmD_all_r_succ_cue','PmD_all_r_fail_cue','PmD_all_r_succ_result','PmD_all_r_fail_result','PmD_all_p_succ_cue','PmD_all_p_fail_cue','PmD_all_p_succ_result','PmD_all_p_fail_result','PmD_no_r_succ_cue','PmD_no_r_fail_cue','PmD_no_r_succ_result','PmD_no_r_fail_result','PmD_no_p_succ_cue','PmD_no_p_fail_cue','PmD_no_p_succ_result','PmD_no_p_fail_result','PmD_r_all_catch_cue','PmD_r_all_catch_result','PmD_p_all_catch_cue','PmD_p_all_catch_result')
 
 
-dev.off()
+#dev.off()
 cat("\nM1 heatmaps")
 for (i in 1:length(M1_matrix_keys)){
   png(paste(M1_matrix_keys[i],".png",sep=""),width=8,height=6,units="in",res=500)

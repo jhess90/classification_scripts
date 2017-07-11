@@ -1163,7 +1163,7 @@ for region_key,region_data in all_regions_dict.iteritems():
         nlized_result_comparison_data = all_regions_dict[region_key]['result_comp_stats']['nlized_comparison_data']
 
         for i in range(len(nlized_cue_comparison_data['r0_succ_cue%s' %(suffix)])):
-                temp_array = np.zeros((30,40))
+                temp_array = np.zeros((30,20))
                 try:
                         temp_array[:,0] = nlized_cue_comparison_data['p3_catch_cue%s' %(suffix)][i,:]
                 except:
@@ -1197,7 +1197,7 @@ for region_key,region_data in all_regions_dict.iteritems():
                 except:
                         pass
                 try:
-                        temp_array[:,8] = nlized_cue_comparison_data['r_all_catch__cue%s' %(suffix)][i,:]
+                        temp_array[:,8] = nlized_cue_comparison_data['r_all_catch_cue%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
