@@ -437,9 +437,12 @@ PmD_matrices <- abind(PmD_r3_succ_cue_all,PmD_r3_succ_result_all,PmD_p3_fail_cue
 PmD_matrix_keys <- c('PmD_r3_succ_cue','PmD_r3_succ_result','PmD_p3_fail_cue','PmD_p3_fail_result','PmD_all_r_succ_cue','PmD_all_r_fail_cue','PmD_all_r_succ_result','PmD_all_r_fail_result','PmD_all_p_succ_cue','PmD_all_p_fail_cue','PmD_all_p_succ_result','PmD_all_p_fail_result','PmD_no_r_succ_cue','PmD_no_r_fail_cue','PmD_no_r_succ_result','PmD_no_r_fail_result','PmD_no_p_succ_cue','PmD_no_p_fail_cue','PmD_no_p_succ_result','PmD_no_p_fail_result','PmD_r_all_catch_cue','PmD_r_all_catch_result','PmD_p_all_catch_cue','PmD_p_all_catch_result')
 
 
-#dev.off()
 cat("\nM1 heatmaps")
 for (i in 1:length(M1_matrix_keys)){
+  if (any(is.na(M1_matrices[,,i]))){
+    M1_matrices[,,i][is.na(M1_matrices[,,i])] = 0
+    cat("\nna in",M1_matrix_keys[i])
+  }
   png(paste(M1_matrix_keys[i],".png",sep=""),width=8,height=6,units="in",res=500)
   heatmap.2(M1_matrices[,,i],Colv=F,dendrogram="row",scale="row",col=rev(brewer.pal(11,"RdBu")),main=M1_matrix_keys[i],trace="none",cexRow=0.5,ylab="unit",xlab="time (s)",colsep=9)
   dev.off()
@@ -447,6 +450,10 @@ for (i in 1:length(M1_matrix_keys)){
 
 cat("\nS1 heatmaps")
 for (i in 1:length(S1_matrix_keys)){
+  if (any(is.na(S1_matrices[,,i]))){
+    S1_matrices[,,i][is.na(S1_matrices[,,i])] = 0
+    cat("\nna in",S1_matrix_keys[i])
+  }
   png(paste(S1_matrix_keys[i],".png",sep=""),width=8,height=6,units="in",res=500)
   heatmap.2(S1_matrices[,,i],Colv=F,dendrogram="row",scale="row",col=rev(brewer.pal(11,"RdBu")),main=S1_matrix_keys[i],trace="none",cexRow=0.5,ylab="unit",xlab="time (s)",colsep=9)
   dev.off()
@@ -454,6 +461,10 @@ for (i in 1:length(S1_matrix_keys)){
 
 cat("\nPmD heatmaps")
 for (i in 1:length(PmD_matrix_keys)){
+  if (any(is.na(PmD_matrices[,,i]))){
+    PmD_matrices[,,i][is.na(PmD_matrices[,,i])] = 0
+    cat("\nna in",PmD_matrix_keys[i])
+  }
   png(paste(PmD_matrix_keys[i],".png",sep=""),width=8,height=6,units="in",res=500)
   heatmap.2(PmD_matrices[,,i],Colv=F,dendrogram="row",scale="row",col=rev(brewer.pal(11,"RdBu")),main=PmD_matrix_keys[i],trace="none",cexRow=0.5,ylab="unit",xlab="time (s)",colsep=9)
   dev.off()
