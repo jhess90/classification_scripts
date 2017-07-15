@@ -351,6 +351,11 @@ if condensed[-1,2] != 0:
         if condensed[-1,2] > (min_hist_len * 50 / 1000.0 + time_after):
                 condensed = condensed[0:-1,:]
 
+condensed_mv = np.zeros((np.shape(condensed)[0],8))
+condensed_mv[:,0:6] = condensed
+condensed_mv[:,6] = condensed[:,3] - condensed[:,4] #value vector
+condensed_mv[:,7] = condensed[:,3] + condensed[:,4] #motivation vector
+
 #break uo into trial types
 both_bool_succ = [x and y for x,y in zip(condensed[:,1] !=0, condensed[:,5] == 0)]
 both_bool_fail = [x and y for x,y in zip(condensed[:,2] !=0, condensed[:,5] == 0)]

@@ -29,6 +29,7 @@ plot_gf <- function(gf_value,std_value,key){
   
   gf_avg <- gf_value[10:280]
   gf_std <- std_value[10:280]
+  
   upper <- gf_avg + gf_std
   lower <- gf_avg - gf_std
   gf_df <- data.frame(gf_time,gf_avg,upper,lower)
@@ -476,6 +477,8 @@ for (i in 1:length(gf_matrix_keys)){
   avg_key <- paste(gf_matrix_keys[i],'_avg',sep="")
   std_key <- paste(gf_matrix_keys[i],'_std',sep="")
   
+  cat("\n",avg_key)
+  cat("\n",std_key)
   gf <- gf_total[[avg_key]]
   std <- gf_total[[std_key]]
   
@@ -485,6 +488,6 @@ for (i in 1:length(gf_matrix_keys)){
 
 cat("\nsaving")
 
-save.image(file="rearranged_data.RData")
+# save.image(file="rearranged_data.RData")
 rm(list=ls())
 
