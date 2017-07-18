@@ -27,11 +27,10 @@ from sklearn.tree import DecisionTreeClassifier
 #params to set ########
 #######################
 
-plot_bool = True
 bin_size = 50 #in ms
 time_before = -0.5 #negative value
 time_after = 1.0
-
+vm_bool = True
 
 #filename = '/home/jack/Dropbox/to_sort/20170208_0059/Extracted_0059_2017-02-08-11-43-22.mat'
 #filename = '/home/jack/Dropbox/to_sort/20170208_0059/Extracted_0059_2017-02-08-12-09-22.mat'
@@ -93,26 +92,38 @@ def make_nl_raster(ts_value,ts_key,nl_dict,data_key,unit_num,spikes):
         event_hist = []
         event_hist_nl = []
 
-        if 'result' in ts_key and 'all' in ts_key and not 'catch' in ts_key:
+        if 'result' in ts_key and 'all' in ts_key and not 'catch' in ts_key and not vm_bool:
                 result_bool = True
                 prefix = ts_key[0:1]
                 cue_key = prefix + 'all_cue'
                 cue_ts = ts_dict[cue_key]
-        elif 'result' in ts_key and 'all' in ts_key and 'catch' in ts_key:
+        elif 'result' in ts_key and 'all' in ts_key and 'catch' in ts_key and not vm_bool:
                 result_bool = True
                 prefix = ts_key[0:1]
                 cue_key = prefix + '_all_catch_cue'
                 cue_ts = ts_dict[cue_key]
-        elif 'result' in ts_key and 'catch' in ts_key:
+        elif 'result' in ts_key and 'catch' in ts_key and not vm_bool:
                 result_bool = True
                 prefix = ts_key[0:3]
                 cue_key= prefix + 'catch_cue'
                 cue_ts = ts_dict[cue_key]
-        elif 'result' in ts_key:
+        elif 'result' in ts_key and not vm_bool:
                 prefix = ts_key[0:8]
                 cue_key = prefix + 'cue'
                 result_bool = True
                 cue_ts = ts_dict[cue_key]
+
+        elif 'result' in ts_key and vm_bool:
+                #pdb.set_trace()
+                prefix = ts_key[0:9]
+                
+                if ts_key[-2] == '-':
+                        suffix = ts_key[-3:]
+                else:
+                        suffix = ts_key[-2:]
+                cue_key = prefix + 'cue' + suffix
+                cue_ts = ts_dict[cue_key]
+                result_bool = True
         else:
                 result_bool = False
 
@@ -356,6 +367,9 @@ condensed_mv[:,0:6] = condensed
 condensed_mv[:,6] = condensed[:,3] - condensed[:,4] #value vector
 condensed_mv[:,7] = condensed[:,3] + condensed[:,4] #motivation vector
 
+val_sorted = condensed_mv[np.argsort(condensed_mv[:,6])]
+mtv_sorted = condensed_mv[np.argsort(condensed_mv[:,7])]
+
 #break uo into trial types
 both_bool_succ = [x and y for x,y in zip(condensed[:,1] !=0, condensed[:,5] == 0)]
 both_bool_fail = [x and y for x,y in zip(condensed[:,2] !=0, condensed[:,5] == 0)]
@@ -494,6 +508,69 @@ p3_succ_result = p3_succ[:,1]
 ra_fail_result = ra_fail[:,2]
 pa_succ_result = pa_succ[:,1]
 
+
+###########################################3
+vm_ts_dicts = {}
+for i in range(7):
+
+        mtv_succ_cue_key = 'mtv_succ_cue_' + str(i)
+        mtv_fail_cue_key = 'mtv_fail_cue_' + str(i)
+        mtv_all_cue_key = 'mtv_all_cue_' + str(i)
+        mtv_succ_result_key = 'mtv_succ_result_' + str(i)
+        mtv_fail_result_key = 'mtv_fail_result_' + str(i)
+        val_succ_cue_key = 'val_succ_cue_' + str(i-3)
+        val_fail_cue_key = 'val_fail_cue_' + str(i-3)
+        val_all_cue_key = 'val_all_cue_' + str(i-3)
+        val_succ_result_key = 'val_succ_result_' + str(i-3)
+        val_fail_result_key = 'val_fail_result_' + str(i-3)
+        
+        temp_mtv = condensed_mv[condensed_mv[:,7] == i]
+        temp_val = condensed_mv[condensed_mv[:,6] == i-3]
+
+        mtv_all_cue = temp_mtv[:,0]
+        mtv_succ_bool = [x and y for x,y in zip(temp_mtv[:,1] != 0, temp_mtv[:,5] == 0)]
+        mtv_fail_bool = [x and y for x,y in zip(temp_mtv[:,2] != 0, temp_mtv[:,5] == 0)]
+
+        val_all_cue = temp_val[:,0]
+        val_succ_bool = [x and y for x,y in zip(temp_val[:,1] != 0, temp_val[:,5] == 0)]
+        val_fail_bool = [x and y for x,y in zip(temp_val[:,2] != 0, temp_val[:,5] == 0)]
+
+        mtv_succ_cue = []
+        mtv_fail_cue = []
+        mtv_succ_result = []
+        mtv_fail_result = []
+        val_succ_cue = []
+        val_fail_cue = []
+        val_succ_result = []
+        val_fail_result = []
+
+        for i in range(np.shape(temp_mtv)[0]):
+                if mtv_succ_bool[i]:
+                        mtv_succ_cue.append(temp_mtv[i,0])
+                        mtv_succ_result.append(temp_mtv[i,1])
+                if mtv_fail_bool[i]:
+                        mtv_fail_cue.append(temp_mtv[i,0])
+                        mtv_fail_result.append(temp_mtv[i,2])
+        for i in range(np.shape(temp_val)[0]):
+                if val_succ_bool[i]:
+                        val_succ_cue.append(temp_val[i,0])
+                        val_succ_result.append(temp_val[i,1])
+                if val_fail_bool[i]:
+                        val_fail_cue.append(temp_val[i,0])
+                        val_fail_result.append(temp_val[i,2])
+        
+        vm_ts_dicts[mtv_succ_cue_key] = mtv_succ_cue
+        vm_ts_dicts[mtv_succ_result_key] = mtv_succ_result
+        vm_ts_dicts[mtv_fail_cue_key] = mtv_fail_cue
+        vm_ts_dicts[mtv_fail_result_key] = mtv_fail_result
+        vm_ts_dicts[val_succ_cue_key] = val_succ_cue
+        vm_ts_dicts[val_succ_result_key] = val_succ_result
+        vm_ts_dicts[val_fail_cue_key] = val_fail_cue
+        vm_ts_dicts[val_fail_result_key] = val_fail_result
+        vm_ts_dicts[mtv_all_cue_key] = mtv_all_cue
+        vm_ts_dicts[val_all_cue_key] = val_all_cue
+                
+
 if catch_bool:
         ts_dict = {'r0_succ_cue':r0_succ_cue,'r1_succ_cue':r1_succ_cue,'r2_succ_cue':r2_succ_cue,'r3_succ_cue':r3_succ_cue,'p0_fail_cue':p0_fail_cue,'p1_fail_cue':p1_fail_cue,'p2_fail_cue':p2_fail_cue,'p3_fail_cue':p3_fail_cue,'r0_succ_result':r0_succ_result,'r1_succ_result':r1_succ_result,'r2_succ_result':r2_succ_result,'r3_succ_result':r3_succ_result,'p0_fail_result':p0_fail_result,'p1_fail_result':p1_fail_result,'p2_fail_result':p2_fail_result,'p3_fail_result':p3_fail_result,'r0_fail_cue':r0_fail_cue,'r1_fail_cue':r1_fail_cue,'r2_fail_cue':r2_fail_cue,'r3_fail_cue':r3_fail_cue,'p0_succ_cue':p0_succ_cue,'p1_succ_cue':p1_succ_cue,'p2_succ_cue':p2_succ_cue,'p3_succ_cue':p3_succ_cue,'r0_fail_result':r0_fail_result,'r1_fail_result':r1_fail_result,'r2_fail_result':r2_fail_result,'r3_fail_result':r3_fail_result,'p0_succ_result':p0_succ_result,'p1_succ_result':p1_succ_result,'p2_succ_result':p2_succ_result,'p3_succ_result':p3_succ_result,'r0_catch_cue':r0_catch_cue,'r1_catch_cue':r1_catch_cue,'r2_catch_cue':r2_catch_cue,'r3_catch_cue':r3_catch_cue,'p0_catch_cue':p0_catch_cue,'p1_catch_cue':p1_catch_cue,'p2_catch_cue':p2_catch_cue,'p3_catch_cue':p3_catch_cue,'r_all_catch_cue':r_all_catch_cue,'p_all_catch_cue':p_all_catch_cue,'r0_catch_result':r0_catch_result,'r1_catch_result':r1_catch_result,'r2_catch_result':r2_catch_result,'r3_catch_result':r3_catch_result,'p0_catch_result':p0_catch_result,'p1_catch_result':p1_catch_result,'p2_catch_result':p2_catch_result,'p3_catch_result':p3_catch_result,'r_all_catch_result':r_all_catch_result,'p_all_catch_result':p_all_catch_result,'ra_succ_cue':ra_succ_cue,'ra_fail_cue':ra_fail_cue,'ra_succ_result':ra_succ_result,'ra_fail_result':ra_fail_result,'pa_succ_cue':pa_succ_cue,'pa_fail_cue':pa_fail_cue,'pa_succ_result':pa_succ_result,'pa_fail_result':pa_fail_result}        
 else:
@@ -505,6 +582,9 @@ save_dict['param_dict'] = param_dict
 
 
 total_rasters = []
+if vm_bool:
+        ts_dict = vm_ts_dicts
+
 for ts_key, ts_value in ts_dict.iteritems():
 	#if not (len(ts_value) == 1 and ts_value[0] == 0):
 	if len(ts_value) != 0:
@@ -537,4 +617,13 @@ short_filename = filename[-27:-4]
 if short_filename.startswith('0'):
 	short_filename = '0%s' %(short_filename)
 
-np.save('avg_fr_and_nlized_data_%s_bin%s' %(short_filename,bin_size),save_dict)
+if not vm_bool:
+        np.save('avg_fr_and_nlized_data_%s_bin%s' %(short_filename,bin_size),save_dict)
+else:
+        np.save('avg_fr_and_nlized_data_mv_%s_bin%s' %(short_filename,bin_size),save_dict)
+
+        
+
+#for data_key,data_value in data_dict_all.iteritems():
+#        for i in range(7):
+#                print i
