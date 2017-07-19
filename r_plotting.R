@@ -25,8 +25,10 @@ gf_time <- seq(-0.45,0.90,by=0.005)
 
 plot_gf <- function(gf_value,std_value,key){
   
-  png(paste(key,"_gf.png",sep=""),width=6,height=4,units="in",res=500)
-  
+  png(paste(key,"_test2_gf.png",sep=""),width=6,height=4,units="in",res=500)
+
+  cat(key,'\n')
+    
   gf_avg <- gf_value[10:280]
   gf_std <- std_value[10:280]
   
@@ -37,21 +39,10 @@ plot_gf <- function(gf_value,std_value,key){
   p <- ggplot(data=gf_melt$gf_avg,aes(x=gf_time,y=gf_avg)) + geom_line() + theme(plot.margin=unit(c(0.5,1.5,0.5,3.0),"cm")) #margin order: top,right,btm,left
 
   p <- p + geom_ribbon(aes(ymin=gf_df$lower,ymax=gf_df$upper,alpha=0.15),show.legend = F) + geom_vline(xintercept=0)
-  #p <- p + labs(title=paste(region_list[region_index],"unit",j,"cue"),y="normalized firing rate", x="time(s)") + geom_vline(xintercept=0)
   p <- p + labs(title=paste("gripforce",key),y="unit", x="time(s)")
   plot(p)
   dev.off()
   
-  #gf_avg <- gf_total$ra_succ_result_avg[10:280]
-  #test_std <- gf_total$ra_succ_result_std[10:280]
-  #test_upper <- test_avg + test_std
-  #test_lower <- test_avg - test_std
-  #test_df <- data.frame(gf_time,test_avg,test_upper,test_lower)
-  #test_melt <- melt(test_df,id.vars="gf_time",variable_name="value")
-  #p <- ggplot(data=test_melt$test_avg,aes(x=gf_time,y=test_avg)) + geom_line()
-  #p <- p + geom_ribbon(aes(ymin=test_df$test_lower,ymax=test_df$test_upper,alpha=0.15),show.legend = F) 
-  ##p <- p + labs(title=paste(region_list[region_index],"unit",j,"cue"),y="normalized firing rate", x="time(s)") + geom_vline(xintercept=0)
-  #p <- p + labs(title="gripforce test",y="unit", x="time(s)")                                                                            
 }
 
 for(region_index in 1:length(file_list)){
@@ -477,8 +468,8 @@ for (i in 1:length(gf_matrix_keys)){
   avg_key <- paste(gf_matrix_keys[i],'_avg',sep="")
   std_key <- paste(gf_matrix_keys[i],'_std',sep="")
   
-  cat("\n",avg_key)
-  cat("\n",std_key)
+  #cat("\n",avg_key)
+  #cat("\n",std_key)
   gf <- gf_total[[avg_key]]
   std <- gf_total[[std_key]]
   
