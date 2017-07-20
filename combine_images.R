@@ -52,6 +52,10 @@ region_list <- c('M1','S1','PmD')
 for (i in 1:length(region_list)){
   region_key=region_list[i]
   
+  name1 <- paste(region_key,"_val_cue",sep="")
+  files1 <- c(paste(region_key,"_"))
+  
+  
   name1 <- paste(region_key,"_all_r",sep="")
   files1 <- c(paste(region_key,"_all_r_succ_cue.png",sep=""),paste(region_key,"_all_r_fail_cue.png",sep=""),"ra_succ_cue_gf.png","ra_fail_cue_gf.png",paste(region_key,"_all_r_succ_result.png",sep=""),paste(region_key,"_all_r_fail_result.png",sep=""),"ra_succ_result_gf.png","ra_fail_result_gf.png")
   combine_fnct(name1,files1)
