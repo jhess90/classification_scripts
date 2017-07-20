@@ -1,8 +1,8 @@
 library(openxlsx)
 library(ggplot2)
 library(reshape2)
-source("~/dropbox/mult_rp_files/r_test/multiplot.R")
-#source("~/Dropbox/mult_rp_files/r_test/multiplot.R")
+#source("~/dropbox/mult_rp_files/r_test/multiplot.R")
+source("~/Dropbox/mult_rp_files/r_test/multiplot.R")
 library(zoo)
 library(gplots)
 library(RColorBrewer)
@@ -14,7 +14,9 @@ library(gridExtra)
 saveAsPng <- T
 
 file_list <- c('nl_mv_avg_data_M1_dict_total.xlsx','nl_mv_avg_data_S1_dict_total.xlsx','nl_mv_avg_data_PmD_dict_total.xlsx')
+#file_list <- c('nl_mv_avg_data_PmD_dict_total.xlsx')
 region_list <- c('M1','S1','PmD')
+#region_list <-c('PmD')
 time <- seq(from=-0.45,to=0.9,by=0.05)
 
 gf_total <- read.xlsx('gf_mv_avg_data_M1_dict_total.xlsx',sheet=1,colNames=T)
@@ -205,7 +207,7 @@ for(region_index in 1:length(file_list)){
       tmp2[,k] <- rollmeanr(tmp[,k],3)
     }
     total_array[1:28,1:70,j] = data.matrix(tmp2)
-    
+
     #making array to compare between units
     val_all_cue__3_matrix[j,] <- tmp2$`val_all_cue_-3`
     val_all_cue__2_matrix[j,] <- tmp2$`val_all_cue_-2`
@@ -399,7 +401,7 @@ M1_matrices <- abind(`M1_val_all_cue_-3`,`M1_val_all_cue_-2`,`M1_val_all_cue_-1`
                      `M1_val_fail_result_-3`,`M1_val_fail_result_-2`,`M1_val_fail_result_-1`,`M1_val_fail_result_0`,`M1_val_fail_result_1`,`M1_val_fail_result_2`,`M1_val_fail_result_3`,
                      `M1_mtv_all_cue_0`,`M1_mtv_all_cue_1`,`M1_mtv_all_cue_2`,`M1_mtv_all_cue_3`,`M1_mtv_all_cue_4`,`M1_mtv_all_cue_5`,`M1_mtv_all_cue_6`,
                      `M1_mtv_succ_result_0`,`M1_mtv_succ_result_1`,`M1_mtv_succ_result_2`,`M1_mtv_succ_result_3`,`M1_mtv_succ_result_4`,`M1_mtv_succ_result_5`,`M1_mtv_succ_result_6`,
-                     `M1_mtv_fail_result_0`,`M1_mtv_fail_result_1`,`M1_mtv_fail_result_2`,`M1_mtv_fail_result_3`,`M1_mtv_fail_result_4`,`M1_mtv_fail_result_5`,`M1_mtv_fail_result_6`)
+                     `M1_mtv_fail_result_0`,`M1_mtv_fail_result_1`,`M1_mtv_fail_result_2`,`M1_mtv_fail_result_3`,`M1_mtv_fail_result_4`,`M1_mtv_fail_result_5`,`M1_mtv_fail_result_6`,along=3)
 
 M1_matrix_keys <- c('M1_val_all_cue_-3','M1_val_all_cue_-2','M1_val_all_cue_-1','M1_val_all_cue_0','M1_val_all_cue_1','M1_val_all_cue_2','M1_val_all_cue_3', 
                      'M1_val_succ_result_-3','M1_val_succ_result_-2','M1_val_succ_result_-1','M1_val_succ_result_0','M1_val_succ_result_1','M1_val_succ_result_2','M1_val_succ_result_3',
@@ -413,7 +415,7 @@ S1_matrices <- abind(`S1_val_all_cue_-3`,`S1_val_all_cue_-2`,`S1_val_all_cue_-1`
                      `S1_val_fail_result_-3`,`S1_val_fail_result_-2`,`S1_val_fail_result_-1`,`S1_val_fail_result_0`,`S1_val_fail_result_1`,`S1_val_fail_result_2`,`S1_val_fail_result_3`,
                      `S1_mtv_all_cue_0`,`S1_mtv_all_cue_1`,`S1_mtv_all_cue_2`,`S1_mtv_all_cue_3`,`S1_mtv_all_cue_4`,`S1_mtv_all_cue_5`,`S1_mtv_all_cue_6`,
                      `S1_mtv_succ_result_0`,`S1_mtv_succ_result_1`,`S1_mtv_succ_result_2`,`S1_mtv_succ_result_3`,`S1_mtv_succ_result_4`,`S1_mtv_succ_result_5`,`S1_mtv_succ_result_6`,
-                     `S1_mtv_fail_result_0`,`S1_mtv_fail_result_1`,`S1_mtv_fail_result_2`,`S1_mtv_fail_result_3`,`S1_mtv_fail_result_4`,`S1_mtv_fail_result_5`,`S1_mtv_fail_result_6`)
+                     `S1_mtv_fail_result_0`,`S1_mtv_fail_result_1`,`S1_mtv_fail_result_2`,`S1_mtv_fail_result_3`,`S1_mtv_fail_result_4`,`S1_mtv_fail_result_5`,`S1_mtv_fail_result_6`,along=3)
 
 S1_matrix_keys <- c('S1_val_all_cue_-3','S1_val_all_cue_-2','S1_val_all_cue_-1','S1_val_all_cue_0','S1_val_all_cue_1','S1_val_all_cue_2','S1_val_all_cue_3', 
                     'S1_val_succ_result_-3','S1_val_succ_result_-2','S1_val_succ_result_-1','S1_val_succ_result_0','S1_val_succ_result_1','S1_val_succ_result_2','S1_val_succ_result_3',
@@ -427,7 +429,7 @@ PmD_matrices <- abind(`PmD_val_all_cue_-3`,`PmD_val_all_cue_-2`,`PmD_val_all_cue
                      `PmD_val_fail_result_-3`,`PmD_val_fail_result_-2`,`PmD_val_fail_result_-1`,`PmD_val_fail_result_0`,`PmD_val_fail_result_1`,`PmD_val_fail_result_2`,`PmD_val_fail_result_3`,
                      `PmD_mtv_all_cue_0`,`PmD_mtv_all_cue_1`,`PmD_mtv_all_cue_2`,`PmD_mtv_all_cue_3`,`PmD_mtv_all_cue_4`,`PmD_mtv_all_cue_5`,`PmD_mtv_all_cue_6`,
                      `PmD_mtv_succ_result_0`,`PmD_mtv_succ_result_1`,`PmD_mtv_succ_result_2`,`PmD_mtv_succ_result_3`,`PmD_mtv_succ_result_4`,`PmD_mtv_succ_result_5`,`PmD_mtv_succ_result_6`,
-                     `PmD_mtv_fail_result_0`,`PmD_mtv_fail_result_1`,`PmD_mtv_fail_result_2`,`PmD_mtv_fail_result_3`,`PmD_mtv_fail_result_4`,`PmD_mtv_fail_result_5`,`PmD_mtv_fail_result_6`)
+                     `PmD_mtv_fail_result_0`,`PmD_mtv_fail_result_1`,`PmD_mtv_fail_result_2`,`PmD_mtv_fail_result_3`,`PmD_mtv_fail_result_4`,`PmD_mtv_fail_result_5`,`PmD_mtv_fail_result_6`,along=3)
 
 PmD_matrix_keys <- c('PmD_val_all_cue_-3','PmD_val_all_cue_-2','PmD_val_all_cue_-1','PmD_val_all_cue_0','PmD_val_all_cue_1','PmD_val_all_cue_2','PmD_val_all_cue_3', 
                     'PmD_val_succ_result_-3','PmD_val_succ_result_-2','PmD_val_succ_result_-1','PmD_val_succ_result_0','PmD_val_succ_result_1','PmD_val_succ_result_2','PmD_val_succ_result_3',
