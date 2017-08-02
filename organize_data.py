@@ -22,6 +22,7 @@ from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier
+import xlsxwriter
 
 #######################
 #params to set ########
@@ -36,13 +37,13 @@ vm_bool = True
 #filename = '/home/jack/Dropbox/to_sort/20170208_0059/Extracted_0059_2017-02-08-12-09-22.mat'
 #filename = '/home/jack/Dropbox/to_sort/20170209_0059/Extracted_0059_2017-02-09-12-52-17.mat'
 #filename = '/home/jack/Dropbox/to_sort/20170209_0059/Extracted_0059_2017-02-09-13-46-37.mat'
-filename = '/home/jack/Dropbox/to_sort/20170208_504/Extracted_504_2017-02-08-10-36-11.mat'
+#filename = '/home/jack/Dropbox/to_sort/20170208_504/Extracted_504_2017-02-08-10-36-11.mat'
 #filename = '/home/jack/Dropbox/to_sort/20170208_504/Extracted_504_2017-02-08-11-02-03.mat'
 #filename = '/home/jack/Dropbox/to_sort/20170209_504/Extracted_504_2017-02-09-11-50-03.mat'
 #filename = '/home/jack/Dropbox/to_sort/20170209_504/Extracted_504_2017-02-09-12-15-57.mat'
 #filename = '/home/jack/Dropbox/to_sort/20170214_504/Extracted_504_2017-02-14-12-09-21.mat'
 #filename = '/home/jack/Dropbox/to_sort/20170214_504/Extracted_504_2017-02-14-12-35-41.mat'
-#filename = '/home/jack/Dropbox/to_sort/20170214_504/Extracted_504_2017-02-14-13-01-34.mat'
+filename = '/home/jack/Dropbox/to_sort/20170214_504/Extracted_504_2017-02-14-13-01-34.mat'
 
 ###############################################
 #functions #####################################
@@ -569,6 +570,10 @@ for i in range(7):
         vm_ts_dicts[val_fail_result_key] = val_fail_result
         vm_ts_dicts[mtv_all_cue_key] = mtv_all_cue
         vm_ts_dicts[val_all_cue_key] = val_all_cue
+
+#for key,value in vm_ts_dicts.iteritems():
+#        if np.shape(value)[0] == 0:
+#                vm_ts_dicts[key] = [0]
                 
 
 if catch_bool:
@@ -600,7 +605,7 @@ for ts_key, ts_value in ts_dict.iteritems():
 					spikes.append(data_dict_all[data_key]['spikes'][i]['ts'][0,0][0])			
 
 			for i in range(len(data_dict_all[data_key]['spikes'])):
-                                if not value.size == 0:				
+                                if not np.shape(ts_value)[0] == 0:				
                                         rasters = make_nl_raster(ts_value,ts_key,data_dict_all[data_key]['nl'],data_key,i,spikes)
                                         if rasters:
                                                 total_rasters.append(rasters)
@@ -622,8 +627,27 @@ if not vm_bool:
 else:
         np.save('avg_fr_and_nlized_data_mv_%s_bin%s' %(short_filename,bin_size),save_dict)
 
-        
 
-#for data_key,data_value in data_dict_all.iteritems():
-#        for i in range(7):
-#                print i
+#all_binned_nl_data_workbook = xlsxwriter.Workbook('all_binned_nl_data_%s.xlsx' %(short_filename),options={'nan_inf_to_errors':True})
+all_binned_nl_data_workbook = xlsxwriter.Workbook('all_binned_nl_data.xlsx' ,options={'nan_inf_to_errors':True})
+for key,value in save_dict.iteritems():
+        if key == 'data_dict_all' or key == 'param_dict' or 'PmV' in key:
+                continue
+        print key
+        worksheet_name = all_binned_nl_data_workbook.add_worksheet('%s' %(key))
+        for unit in range(np.shape(save_dict[key])[0]):
+                #print unit
+                for events in range(np.shape(save_dict[key][unit]['binned_nl'])[0]):
+                        col = unit
+                        
+                        for i in range(30):
+                                worksheet_name.write(events*30 + i,col,save_dict[key][unit]['binned_nl'][events,i])
+
+
+
+
+
+
+
+
+                

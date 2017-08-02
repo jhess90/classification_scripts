@@ -16,21 +16,29 @@ saveAsPng <- T
 file_list <- c('nl_avg_data_M1_dict_total.xlsx','nl_avg_data_S1_dict_total.xlsx','nl_avg_data_PmD_dict_total.xlsx')
 catch_file_list <- c('catch_nl_avg_data_M1_dict_total.xlsx','catch_nl_avg_data_S1_dict_total.xlsx','catch_nl_avg_data_PmD_dict_total.xlsx')
 region_list <- c('M1','S1','PmD')
-time <- seq(from=-0.45,to=0.9,by=0.05)
+time <- seq(from=-0.35,to=1.0,by=0.05)
 
 gf_total <- read.xlsx('gf_avg_data_M1_dict_total.xlsx',sheet=1,colNames=T)
-gf_time <- seq(-0.45,0.90,by=0.005)
+gf_time <- seq(-0.35,1.0,by=0.005)
 
 #########
 
 plot_gf <- function(gf_value,std_value,key){
   
-  png(paste(key,"_test2_gf.png",sep=""),width=6,height=4,units="in",res=500)
+  png(paste(key,"_gf.png",sep=""),width=6,height=4,units="in",res=500)
 
-  cat(key,'\n')
-    
-  gf_avg <- gf_value[10:280]
-  gf_std <- std_value[10:280]
+  #cat(key,'\n')
+  
+  gf_avg <- rollmeanr(gf_value,3)
+  gf_std <- rollmeanr(std_value,3)
+  
+  #align with rollmeanr binned data  
+  gf_avg <- gf_avg[28:298]
+  gf_std <- gf_std[28:298]
+  
+  #gf_avg <- gf_value[10:50]
+  #gf_std <- std_value[10:50]
+  #gf_time <- seq(-0.45,0-.25,by=0.005)
   
   upper <- gf_avg + gf_std
   lower <- gf_avg - gf_std
@@ -169,39 +177,39 @@ for(region_index in 1:length(file_list)){
     png(paste(region_list[region_index],"unit_",j,".png",sep=""),width=8,height=6,units="in",res=500)
     
     tmp2 <- tmp[1:28,1:32]
-    tmp2$p3_fail_cue <- rollmean(tmp$p3_fail_cue,3)
-    tmp2$p2_fail_cue <- rollmean(tmp$p2_fail_cue,3)
-    tmp2$p1_fail_cue <- rollmean(tmp$p1_fail_cue,3)
-    tmp2$p0_fail_cue <- rollmean(tmp$p0_fail_cue,3)
-    tmp2$r0_succ_cue <- rollmean(tmp$r0_succ_cue,3)
-    tmp2$r1_succ_cue <- rollmean(tmp$r1_succ_cue,3)
-    tmp2$r2_succ_cue <- rollmean(tmp$r2_succ_cue,3)
-    tmp2$r3_succ_cue <- rollmean(tmp$r3_succ_cue,3)
-    tmp2$p3_fail_result <- rollmean(tmp$p3_fail_result,3)
-    tmp2$p2_fail_result <- rollmean(tmp$p2_fail_result,3)
-    tmp2$p1_fail_result <- rollmean(tmp$p1_fail_result,3)
-    tmp2$p0_fail_result <- rollmean(tmp$p0_fail_result,3)
-    tmp2$r0_succ_result <- rollmean(tmp$r0_succ_result,3)
-    tmp2$r1_succ_result <- rollmean(tmp$r1_succ_result,3)
-    tmp2$r2_succ_result <- rollmean(tmp$r2_succ_result,3)
-    tmp2$r3_succ_result <- rollmean(tmp$r3_succ_result,3)
+    tmp2$p3_fail_cue <- rollmeanr(tmp$p3_fail_cue,3)
+    tmp2$p2_fail_cue <- rollmeanr(tmp$p2_fail_cue,3)
+    tmp2$p1_fail_cue <- rollmeanr(tmp$p1_fail_cue,3)
+    tmp2$p0_fail_cue <- rollmeanr(tmp$p0_fail_cue,3)
+    tmp2$r0_succ_cue <- rollmeanr(tmp$r0_succ_cue,3)
+    tmp2$r1_succ_cue <- rollmeanr(tmp$r1_succ_cue,3)
+    tmp2$r2_succ_cue <- rollmeanr(tmp$r2_succ_cue,3)
+    tmp2$r3_succ_cue <- rollmeanr(tmp$r3_succ_cue,3)
+    tmp2$p3_fail_result <- rollmeanr(tmp$p3_fail_result,3)
+    tmp2$p2_fail_result <- rollmeanr(tmp$p2_fail_result,3)
+    tmp2$p1_fail_result <- rollmeanr(tmp$p1_fail_result,3)
+    tmp2$p0_fail_result <- rollmeanr(tmp$p0_fail_result,3)
+    tmp2$r0_succ_result <- rollmeanr(tmp$r0_succ_result,3)
+    tmp2$r1_succ_result <- rollmeanr(tmp$r1_succ_result,3)
+    tmp2$r2_succ_result <- rollmeanr(tmp$r2_succ_result,3)
+    tmp2$r3_succ_result <- rollmeanr(tmp$r3_succ_result,3)
     
-    tmp2$p3_succ_cue <- rollmean(tmp$p3_succ_cue,3)
-    tmp2$p2_succ_cue <- rollmean(tmp$p2_succ_cue,3)
-    tmp2$p1_succ_cue <- rollmean(tmp$p1_succ_cue,3)
-    tmp2$p0_succ_cue <- rollmean(tmp$p0_succ_cue,3)
-    tmp2$r0_fail_cue <- rollmean(tmp$r0_fail_cue,3)
-    tmp2$r1_fail_cue <- rollmean(tmp$r1_fail_cue,3)
-    tmp2$r2_fail_cue <- rollmean(tmp$r2_fail_cue,3)
-    tmp2$r3_fail_cue <- rollmean(tmp$r3_fail_cue,3)
-    tmp2$p3_succ_result <- rollmean(tmp$p3_succ_result,3)
-    tmp2$p2_succ_result <- rollmean(tmp$p2_succ_result,3)
-    tmp2$p1_succ_result <- rollmean(tmp$p1_succ_result,3)
-    tmp2$p0_succ_result <- rollmean(tmp$p0_succ_result,3)
-    tmp2$r0_fail_result <- rollmean(tmp$r0_fail_result,3)
-    tmp2$r1_fail_result <- rollmean(tmp$r1_fail_result,3)
-    tmp2$r2_fail_result <- rollmean(tmp$r2_fail_result,3)
-    tmp2$r3_fail_result <- rollmean(tmp$r3_fail_result,3)
+    tmp2$p3_succ_cue <- rollmeanr(tmp$p3_succ_cue,3)
+    tmp2$p2_succ_cue <- rollmeanr(tmp$p2_succ_cue,3)
+    tmp2$p1_succ_cue <- rollmeanr(tmp$p1_succ_cue,3)
+    tmp2$p0_succ_cue <- rollmeanr(tmp$p0_succ_cue,3)
+    tmp2$r0_fail_cue <- rollmeanr(tmp$r0_fail_cue,3)
+    tmp2$r1_fail_cue <- rollmeanr(tmp$r1_fail_cue,3)
+    tmp2$r2_fail_cue <- rollmeanr(tmp$r2_fail_cue,3)
+    tmp2$r3_fail_cue <- rollmeanr(tmp$r3_fail_cue,3)
+    tmp2$p3_succ_result <- rollmeanr(tmp$p3_succ_result,3)
+    tmp2$p2_succ_result <- rollmeanr(tmp$p2_succ_result,3)
+    tmp2$p1_succ_result <- rollmeanr(tmp$p1_succ_result,3)
+    tmp2$p0_succ_result <- rollmeanr(tmp$p0_succ_result,3)
+    tmp2$r0_fail_result <- rollmeanr(tmp$r0_fail_result,3)
+    tmp2$r1_fail_result <- rollmeanr(tmp$r1_fail_result,3)
+    tmp2$r2_fail_result <- rollmeanr(tmp$r2_fail_result,3)
+    tmp2$r3_fail_result <- rollmeanr(tmp$r3_fail_result,3)
     
     total_array[1:28,1:32,j] = data.matrix(tmp2)
     

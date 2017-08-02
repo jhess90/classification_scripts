@@ -246,29 +246,22 @@ def plot_comparison(region_key,region_val):
         print "plotting %s" %(region_key)
         suffix = '_%ss' %(region_key[0:-6])
 
-        try:
-                for i in range(6):
-                        for j in range(len(all_regions_dict[region_key]['r0_succ_cue%s'%(suffix)])):
-                                #print 'unit %s' %(j)
-                                temp = np.zeros((8))
-                                temp[0] = np.max(all_regions_dict[region_key]['r%s_succ_cue%s'%(i,suffix)][j]['avg_nl'])
-                                temp[1] = np.max(all_regions_dict[region_key]['r%s_fail_cue%s'%(i,suffix)][j]['avg_nl'])
-                                temp[2] = np.max(all_regions_dict[region_key]['p%s_succ_cue%s'%(i,suffix)][j]['avg_nl'])
-                                temp[3] = np.max(all_regions_dict[region_key]['p%s_fail_cue%s'%(i,suffix)][j]['avg_nl'])
-                                temp[4] = np.max(all_regions_dict[region_key]['r%s_succ_result%s'%(i,suffix)][j]['avg_nl'])
-                                temp[5] = np.max(all_regions_dict[region_key]['r%s_fail_result%s'%(i,suffix)][j]['avg_nl'])
-                                temp[6] = np.max(all_regions_dict[region_key]['p%s_succ_result%s'%(i,suffix)][j]['avg_nl'])
-                                temp[7] = np.max(all_regions_dict[region_key]['p%s_fail_result%s'%(i,suffix)][j]['avg_nl'])
+        num_units = len(all_regions_dict[region_key]['val_all_cue_0%s' %(suffix)])
 
-
-                                if np.max(temp) > 1.0:
-                                        print 'nlization error: %s, unit %s, level %s, %s' %(region_key,j,i,np.argmax(temp))
-        except:
-                print 'error finding nl error'
+        #col 1= slope, 2= intercept, 3= r_value, 4=p_value, 5=std_err
+        val_all_cue_linreg_results = np.zeros((num_units,5))
+        val_succ_cue_linreg_results = np.zeros((num_units,5))
+        val_fail_cue_linreg_results = np.zeros((num_units,5))
+        val_succ_result_linreg_results = np.zeros((num_units,5))
+        val_fail_result_linreg_results = np.zeros((num_units,5))
+        mtv_all_cue_linreg_results = np.zeros((num_units,5))
+        mtv_succ_cue_linreg_results = np.zeros((num_units,5))
+        mtv_fail_cue_linreg_results = np.zeros((num_units,5))
+        mtv_succ_result_linreg_results = np.zeros((num_units,5))
+        mtv_fail_result_linreg_results = np.zeros((num_units,5))
 
         avg_std_unit_dict = {}
-        #for j in range(7):
-        for i in range(len(all_regions_dict[region_key]['val_all_cue_0%s' %(suffix)])):
+        for i in range(num_units):
                 for j in range(7):
                         val_all_cue_name = 'val_all_cue_%s%s' %(j-3,suffix)
                         val_succ_cue_name = 'val_succ_cue_%s%s' %(j-3,suffix)
@@ -282,43 +275,78 @@ def plot_comparison(region_key,region_val):
                         mtv_succ_result_name = 'mtv_succ_result_%s%s' %(j,suffix)
                         mtv_fail_result_name = 'mtv_fail_result_%s%s' %(j,suffix)
 
-                        val_all_cue_avg = sum(all_regions_dict[region_key]['val_all_cue_%s%s' %(j-3,suffix)][i]['avg_nl'][num_bins_before:2*num_bins_before]) / float(num_bins_before)
-                        val_succ_cue_avg = sum(all_regions_dict[region_key]['val_succ_cue_%s%s' %(j-3,suffix)][i]['avg_nl'][num_bins_before:2*num_bins_before]) / float(num_bins_before)
-                        val_fail_cue_avg = sum(all_regions_dict[region_key]['val_fail_cue_%s%s' %(j-3,suffix)][i]['avg_nl'][num_bins_before:2*num_bins_before]) / float(num_bins_before)
-                        val_succ_result_avg = sum(all_regions_dict[region_key]['val_succ_result_%s%s' %(j-3,suffix)][i]['avg_nl'][num_bins_before:2*num_bins_before]) / float(num_bins_before)
-                        val_fail_result_avg = sum(all_regions_dict[region_key]['val_fail_result_%s%s' %(j-3,suffix)][i]['avg_nl'][num_bins_before:2*num_bins_before]) / float(num_bins_before)
+                        #looking at 1 second after cue/delivery psuedo-hardcoded in 
+                        try:
+                                val_all_cue_avg = sum(all_regions_dict[region_key]['val_all_cue_%s%s' %(j-3,suffix)][i]['avg_nl'][num_bins_before:]) / float(2*num_bins_before)
+                                val_all_cue_std_devs = all_regions_dict[region_key]['val_all_cue_%s%s' %(j-3,suffix)][i]['std_dev_nl'][num_bins_before:]
+                                val_all_cue_pooled_std = np.sqrt(sum(np.square(val_all_cue_std_devs))/len(val_all_cue_std_devs))
+                        except:
+                                val_all_cue_avg = 0
+                                val_all_cue_pooled_std = 0
+                        try:
+                                val_succ_cue_avg = sum(all_regions_dict[region_key]['val_succ_cue_%s%s' %(j-3,suffix)][i]['avg_nl'][num_bins_before:]) / float(2*num_bins_before)
+                                val_succ_cue_std_devs = all_regions_dict[region_key]['val_succ_cue_%s%s' %(j-3,suffix)][i]['std_dev_nl'][num_bins_before:]
+                                val_succ_cue_pooled_std = np.sqrt(sum(np.square(val_succ_cue_std_devs))/len(val_succ_cue_std_devs))
+                        except:
+                                val_succ_cue_avg = 0
+                                val_succ_cue_pooled_std = 0
+                        try:
+                                val_fail_cue_avg = sum(all_regions_dict[region_key]['val_fail_cue_%s%s' %(j-3,suffix)][i]['avg_nl'][num_bins_before:]) / float(2*num_bins_before)
+                                val_fail_cue_std_devs = all_regions_dict[region_key]['val_fail_cue_%s%s' %(j-3,suffix)][i]['std_dev_nl'][num_bins_before:]
+                                val_fail_cue_pooled_std = np.sqrt(sum(np.square(val_fail_cue_std_devs))/len(val_fail_cue_std_devs))
+                        except:
+                                val_fail_cue_avg = 0
+                                val_fail_cue_pooled_std = 0
+                        try:
+                                val_succ_result_avg = sum(all_regions_dict[region_key]['val_succ_result_%s%s' %(j-3,suffix)][i]['avg_nl'][num_bins_before:]) / float(2*num_bins_before)
+                                val_succ_result_std_devs = all_regions_dict[region_key]['val_succ_result_%s%s' %(j-3,suffix)][i]['std_dev_nl'][num_bins_before:]
+                                val_succ_result_pooled_std = np.sqrt(sum(np.square(val_succ_result_std_devs))/len(val_succ_result_std_devs))
+                        except:
+                                val_succ_result_avg = 0
+                                val_succ_result_pooled_std = 0
+                        try:
+                                val_fail_result_avg = sum(all_regions_dict[region_key]['val_fail_result_%s%s' %(j-3,suffix)][i]['avg_nl'][num_bins_before:]) / float(2*num_bins_before)
+                                val_fail_result_std_devs = all_regions_dict[region_key]['val_fail_result_%s%s' %(j-3,suffix)][i]['std_dev_nl'][num_bins_before:] 
+                                val_fail_result_pooled_std = np.sqrt(sum(np.square(val_fail_result_std_devs))/len(val_fail_result_std_devs))
+                        except:
+                                val_succ_result_avg = 0
+                                val_succ_result_pooled_std = 0
+                        try:        
+                                mtv_all_cue_avg = sum(all_regions_dict[region_key]['mtv_all_cue_%s%s' %(j,suffix)][i]['avg_nl'][num_bins_before:]) / float(2*num_bins_before)
+                                mtv_all_cue_std_devs = all_regions_dict[region_key]['mtv_all_cue_%s%s' %(j,suffix)][i]['std_dev_nl'][num_bins_before:]
+                                mtv_all_cue_pooled_std = np.sqrt(sum(np.square(mtv_all_cue_std_devs))/len(mtv_all_cue_std_devs))
+                        except:
+                                mtv_all_cue_avg = 0
+                                mtv_all_cue_pooled_std = 0
+                        try:
+                                mtv_succ_cue_avg = sum(all_regions_dict[region_key]['mtv_succ_cue_%s%s' %(j,suffix)][i]['avg_nl'][num_bins_before:]) / float(2*num_bins_before)
+                                mtv_succ_cue_std_devs = all_regions_dict[region_key]['mtv_succ_cue_%s%s' %(j,suffix)][i]['std_dev_nl'][num_bins_before:]
+                                mtv_succ_cue_pooled_std = np.sqrt(sum(np.square(mtv_succ_cue_std_devs))/len(mtv_succ_cue_std_devs))
+                        except:
+                                mtv_succ_cue_avg = 0
+                                mtv_succ_cue_pooled_std = 0
+                        try:
+                                mtv_fail_cue_avg = sum(all_regions_dict[region_key]['mtv_fail_cue_%s%s' %(j,suffix)][i]['avg_nl'][num_bins_before:]) / float(2*num_bins_before)
+                                mtv_fail_cue_std_devs = all_regions_dict[region_key]['mtv_fail_cue_%s%s' %(j,suffix)][i]['std_dev_nl'][num_bins_before:] 
+                                mtv_fail_cue_pooled_std = np.sqrt(sum(np.square(mtv_fail_cue_std_devs))/len(mtv_fail_cue_std_devs))
+                        except:
+                                mtv_fail_cue_avg = 0
+                                mtv_fail_cue_pooled_std = 0
+                        try:
+                                mtv_succ_result_avg = sum(all_regions_dict[region_key]['mtv_succ_result_%s%s' %(j,suffix)][i]['avg_nl'][num_bins_before:]) / float(2*num_bins_before)
+                                mtv_succ_result_std_devs = all_regions_dict[region_key]['mtv_succ_result_%s%s' %(j,suffix)][i]['std_dev_nl'][num_bins_before:] 
+                                mtv_succ_result_pooled_std = np.sqrt(sum(np.square(mtv_succ_result_std_devs))/len(mtv_succ_result_std_devs))
+                        except:
+                                mtv_succ_result_avg = 0
+                                mtv_succ_result_pooled_std = 0
+                        try:
+                                mtv_fail_result_avg = sum(all_regions_dict[region_key]['mtv_fail_result_%s%s' %(j,suffix)][i]['avg_nl'][num_bins_before:]) / float(2*num_bins_before)
+                                mtv_fail_result_std_devs = all_regions_dict[region_key]['mtv_fail_result_%s%s' %(j,suffix)][i]['std_dev_nl'][num_bins_before:] 
+                                mtv_fail_result_pooled_std = np.sqrt(sum(np.square(mtv_fail_result_std_devs))/len(mtv_fail_result_std_devs))
+                        except:
+                                mtv_fail_result_avg = 0
+                                mtv_fail_result_pooled_std = 0
 
-                        mtv_all_cue_avg = sum(all_regions_dict[region_key]['mtv_all_cue_%s%s' %(j,suffix)][i]['avg_nl'][num_bins_before:2*num_bins_before]) / float(num_bins_before)
-                        mtv_succ_cue_avg = sum(all_regions_dict[region_key]['mtv_succ_cue_%s%s' %(j,suffix)][i]['avg_nl'][num_bins_before:2*num_bins_before]) / float(num_bins_before)
-                        mtv_fail_cue_avg = sum(all_regions_dict[region_key]['mtv_fail_cue_%s%s' %(j,suffix)][i]['avg_nl'][num_bins_before:2*num_bins_before]) / float(num_bins_before)
-                        mtv_succ_result_avg = sum(all_regions_dict[region_key]['mtv_succ_result_%s%s' %(j,suffix)][i]['avg_nl'][num_bins_before:2*num_bins_before]) / float(num_bins_before)
-                        mtv_fail_result_avg = sum(all_regions_dict[region_key]['mtv_fail_result_%s%s' %(j,suffix)][i]['avg_nl'][num_bins_before:2*num_bins_before]) / float(num_bins_before)
-
-                        val_all_cue_std_devs = all_regions_dict[region_key]['val_all_cue_%s%s' %(j-3,suffix)][i]['std_dev_nl'][num_bins_before:2*num_bins_before]
-                        val_succ_cue_std_devs = all_regions_dict[region_key]['val_succ_cue_%s%s' %(j-3,suffix)][i]['std_dev_nl'][num_bins_before:2*num_bins_before]
-                        val_fail_cue_std_devs = all_regions_dict[region_key]['val_fail_cue_%s%s' %(j-3,suffix)][i]['std_dev_nl'][num_bins_before:2*num_bins_before]
-                        val_succ_result_std_devs = all_regions_dict[region_key]['val_succ_result_%s%s' %(j-3,suffix)][i]['std_dev_nl'][num_bins_before:2*num_bins_before]
-                        val_fail_result_std_devs = all_regions_dict[region_key]['val_fail_result_%s%s' %(j-3,suffix)][i]['std_dev_nl'][num_bins_before:2*num_bins_before] 
-
-                        mtv_all_cue_std_devs = all_regions_dict[region_key]['mtv_all_cue_%s%s' %(j,suffix)][i]['std_dev_nl'][num_bins_before:2*num_bins_before]
-                        mtv_succ_cue_std_devs = all_regions_dict[region_key]['mtv_succ_cue_%s%s' %(j,suffix)][i]['std_dev_nl'][num_bins_before:2*num_bins_before]
-                        mtv_fail_cue_std_devs = all_regions_dict[region_key]['mtv_fail_cue_%s%s' %(j,suffix)][i]['std_dev_nl'][num_bins_before:2*num_bins_before] 
-                        mtv_succ_result_std_devs = all_regions_dict[region_key]['mtv_succ_result_%s%s' %(j,suffix)][i]['std_dev_nl'][num_bins_before:2*num_bins_before] 
-                        mtv_fail_result_std_devs = all_regions_dict[region_key]['mtv_fail_result_%s%s' %(j,suffix)][i]['std_dev_nl'][num_bins_before:2*num_bins_before] 
-
-                        #pdb.set_trace()
-                        val_all_cue_pooled_std = np.sqrt(sum(np.square(val_all_cue_std_devs))/len(val_all_cue_std_devs))
-                        val_succ_cue_pooled_std = np.sqrt(sum(np.square(val_succ_cue_std_devs))/len(val_succ_cue_std_devs))
-                        val_fail_cue_pooled_std = np.sqrt(sum(np.square(val_fail_cue_std_devs))/len(val_fail_cue_std_devs))
-                        val_succ_result_pooled_std = np.sqrt(sum(np.square(val_succ_result_std_devs))/len(val_succ_result_std_devs))
-                        val_fail_result_pooled_std = np.sqrt(sum(np.square(val_fail_result_std_devs))/len(val_fail_result_std_devs))
-
-                        mtv_all_cue_pooled_std = np.sqrt(sum(np.square(mtv_all_cue_std_devs))/len(mtv_all_cue_std_devs))
-                        mtv_succ_cue_pooled_std = np.sqrt(sum(np.square(mtv_succ_cue_std_devs))/len(mtv_succ_cue_std_devs))
-                        mtv_fail_cue_pooled_std = np.sqrt(sum(np.square(mtv_fail_cue_std_devs))/len(mtv_fail_cue_std_devs))
-                        mtv_succ_result_pooled_std = np.sqrt(sum(np.square(mtv_succ_result_std_devs))/len(mtv_succ_result_std_devs))
-                        mtv_fail_result_pooled_std = np.sqrt(sum(np.square(mtv_fail_result_std_devs))/len(mtv_fail_result_std_devs))
-                        
                         avg_std_unit_dict['%s_avg' %(val_all_cue_name)] = val_all_cue_avg
                         avg_std_unit_dict['%s_avg' %(val_succ_cue_name)] = val_succ_cue_avg
                         avg_std_unit_dict['%s_avg' %(val_fail_cue_name)] = val_fail_cue_avg
@@ -376,98 +404,108 @@ def plot_comparison(region_key,region_val):
                 
                 #plot 1- cue val
                 linestyle = {'marker':'o','color':'b','linestyle':'none'}
-                plt.errorbar(val_levels,val_all_cue_avgs,yerr=val_all_cue_stds,label='all cue',**linestyle)
+                plt.errorbar(val_levels,val_all_cue_avgs,yerr=val_all_cue_stds,label='all',**linestyle)
                 linestyle = {'marker':'o','color':'palegreen','linestyle':'none'}
-                plt.errorbar(val_levels,val_succ_cue_avgs,yerr=val_succ_cue_stds,label='succ cue',**linestyle)
+                plt.errorbar(val_levels,val_succ_cue_avgs,yerr=val_succ_cue_stds,label='succ',**linestyle)
                 linestyle = {'marker':'o','color':'pink','linestyle':'none'}
-                plt.errorbar(val_levels,val_fail_cue_avgs,yerr=val_fail_cue_stds,label='fail cue',**linestyle)
+                plt.errorbar(val_levels,val_fail_cue_avgs,yerr=val_fail_cue_stds,label='fail',**linestyle)
 
                 slope, intercept, r_value, p_value, std_err = sp.stats.linregress(val_levels,val_all_cue_avgs)
+                val_all_cue_linreg_results[i,:] = [slope,intercept,r_value,p_value,std_err]
                 line = np.multiply(val_linspace,slope)+intercept
                 plt.plot(val_linspace,line,color='b')
                 val_all_cue_linreg = {'slope':slope,'intercept':intercept,'r_value':r_value,'p_value':p_value,'std_err':std_err,'avg_total':val_all_cue_avgs,'pooled_std':val_all_cue_stds}
         
                 slope, intercept, r_value, p_value, std_err = sp.stats.linregress(val_levels,val_succ_cue_avgs)
+                val_succ_cue_linreg_results[i,:] = [slope,intercept,r_value,p_value,std_err]
                 line = np.multiply(val_linspace,slope)+intercept
                 plt.plot(val_linspace,line,color='palegreen')
                 val_succ_cue_linreg = {'slope':slope,'intercept':intercept,'r_value':r_value,'p_value':p_value,'std_err':std_err,'avg_total':val_succ_cue_avgs,'pooled_std':val_succ_cue_stds}
 
                 slope, intercept, r_value, p_value, std_err = sp.stats.linregress(val_levels,val_fail_cue_avgs)
+                val_fail_cue_linreg_results[i,:] = [slope,intercept,r_value,p_value,std_err]
                 line = np.multiply(val_linspace,slope)+intercept
                 plt.plot(val_linspace,line,color='pink')
                 val_fail_cue_linreg = {'slope':slope,'intercept':intercept,'r_value':r_value,'p_value':p_value,'std_err':std_err,'avg_total':val_fail_cue_avgs,'pooled_std':val_fail_cue_stds}
         
-                plt.legend(loc='upper center', bbox_to_anchor=(1.30, 0.8),ncol=1)
+                plt.legend(loc='upper center', bbox_to_anchor=(1.30, 0.8),ncol=1,fontsize='small')
                 plt.xlim(xmin = -3.5, xmax = 3.5)
                 plt.title('value cue')
-
-                #plot 2- val result
-                plt.subplot(2,2,3)
-                linestyle = {'marker':'o','color':'g','linestyle':'none'}
-                plt.errorbar(val_levels,val_succ_result_avgs,yerr=val_succ_result_stds,label='succ result',**linestyle)
-                linestyle = {'marker':'o','color':'r','linestyle':'none'}
-                plt.errorbar(val_levels,val_fail_result_avgs,yerr=val_fail_result_stds,label='fail result',**linestyle)
-
-                slope, intercept, r_value, p_value, std_err = sp.stats.linregress(val_levels,val_succ_result_avgs)
-                line = np.multiply(val_linspace,slope)+intercept
-                plt.plot(val_linspace,line,color='g')
-                val_succ_result_linreg = {'slope':slope,'intercept':intercept,'r_value':r_value,'p_value':p_value,'std_err':std_err,'avg_total':val_succ_result_avgs,'pooled_std':val_succ_result_stds}
-
-                slope, intercept, r_value, p_value, std_err = sp.stats.linregress(val_levels,val_fail_result_avgs)
-                line = np.multiply(val_linspace,slope)+intercept
-                plt.plot(val_linspace,line,color='r')
-                val_fail_result_linreg = {'slope':slope,'intercept':intercept,'r_value':r_value,'p_value':p_value,'std_err':std_err,'avg_total':val_fail_result_avgs,'pooled_std':val_fail_result_stds}
-
-                plt.legend(loc='upper center', bbox_to_anchor=(1.30, 0.8),ncol=1)
-                plt.xlim(xmin = -3.5, xmax = 3.5)
-                plt.title('value result')
 
                 #plot 3- mtv cue
                 plt.subplot(2,2,2)
                 linestyle = {'marker':'o','color':'b','linestyle':'none'}
-                plt.errorbar(mtv_levels,mtv_all_cue_avgs,yerr=mtv_all_cue_stds,label='all cue',**linestyle)
+                plt.errorbar(mtv_levels,mtv_all_cue_avgs,yerr=mtv_all_cue_stds,label='all',**linestyle)
                 linestyle = {'marker':'o','color':'palegreen','linestyle':'none'}
-                plt.errorbar(mtv_levels,mtv_succ_cue_avgs,yerr=mtv_succ_cue_stds,label='succ cue',**linestyle)
+                plt.errorbar(mtv_levels,mtv_succ_cue_avgs,yerr=mtv_succ_cue_stds,label='succ',**linestyle)
                 linestyle = {'marker':'o','color':'pink','linestyle':'none'}
-                plt.errorbar(mtv_levels,mtv_fail_cue_avgs,yerr=mtv_fail_cue_stds,label='fail cue',**linestyle)
+                plt.errorbar(mtv_levels,mtv_fail_cue_avgs,yerr=mtv_fail_cue_stds,label='fail',**linestyle)
 
                 slope, intercept, r_value, p_value, std_err = sp.stats.linregress(mtv_levels,mtv_all_cue_avgs)
+                mtv_all_cue_linreg_results[i,:] = [slope,intercept,r_value,p_value,std_err]
                 line = np.multiply(mtv_linspace,slope)+intercept
                 plt.plot(mtv_linspace,line,color='b')
                 mtv_all_cue_linreg = {'slope':slope,'intercept':intercept,'r_value':r_value,'p_value':p_value,'std_err':std_err,'avg_total':val_all_cue_avgs,'pooled_std':val_all_cue_stds}
         
                 slope, intercept, r_value, p_value, std_err = sp.stats.linregress(mtv_levels,mtv_succ_cue_avgs)
+                mtv_succ_cue_linreg_results[i,:] = [slope,intercept,r_value,p_value,std_err]
                 line = np.multiply(mtv_linspace,slope)+intercept
                 plt.plot(mtv_linspace,line,color='palegreen')
                 mtv_succ_cue_linreg = {'slope':slope,'intercept':intercept,'r_value':r_value,'p_value':p_value,'std_err':std_err,'avg_total':val_succ_cue_avgs,'pooled_std':val_succ_cue_stds}
 
                 slope, intercept, r_value, p_value, std_err = sp.stats.linregress(mtv_levels,mtv_fail_cue_avgs)
+                mtv_fail_cue_linreg_results[i,:] = [slope,intercept,r_value,p_value,std_err]
                 line = np.multiply(val_linspace,slope)+intercept
                 plt.plot(mtv_linspace,line,color='pink')
                 mtv_fail_cue_linreg = {'slope':slope,'intercept':intercept,'r_value':r_value,'p_value':p_value,'std_err':std_err,'avg_total':val_fail_cue_avgs,'pooled_std':val_fail_cue_stds}
         
-                plt.legend(loc='upper center', bbox_to_anchor=(1.30, 0.8),ncol=1)
+                plt.legend(loc='upper center', bbox_to_anchor=(1.30, 0.8),ncol=1,fontsize='small')
                 plt.xlim(xmin = -0.5, xmax = 6.5)
                 plt.title('motivation cue')
+
+                #plot 2- val result
+                plt.subplot(2,2,3)
+                linestyle = {'marker':'o','color':'g','linestyle':'none'}
+                plt.errorbar(val_levels,val_succ_result_avgs,yerr=val_succ_result_stds,label='succ',**linestyle)
+                linestyle = {'marker':'o','color':'r','linestyle':'none'}
+                plt.errorbar(val_levels,val_fail_result_avgs,yerr=val_fail_result_stds,label='fail',**linestyle)
+
+                slope, intercept, r_value, p_value, std_err = sp.stats.linregress(val_levels,val_succ_result_avgs)
+                val_succ_result_linreg_results[i,:] = [slope,intercept,r_value,p_value,std_err]
+                line = np.multiply(val_linspace,slope)+intercept
+                plt.plot(val_linspace,line,color='g')
+                val_succ_result_linreg = {'slope':slope,'intercept':intercept,'r_value':r_value,'p_value':p_value,'std_err':std_err,'avg_total':val_succ_result_avgs,'pooled_std':val_succ_result_stds}
+
+                slope, intercept, r_value, p_value, std_err = sp.stats.linregress(val_levels,val_fail_result_avgs)
+                val_fail_result_linreg_results[i,:] = [slope,intercept,r_value,p_value,std_err]
+                line = np.multiply(val_linspace,slope)+intercept
+                plt.plot(val_linspace,line,color='r')
+                val_fail_result_linreg = {'slope':slope,'intercept':intercept,'r_value':r_value,'p_value':p_value,'std_err':std_err,'avg_total':val_fail_result_avgs,'pooled_std':val_fail_result_stds}
+
+                plt.legend(loc='upper center', bbox_to_anchor=(1.30, 0.8),ncol=1,fontsize='small')
+                plt.xlim(xmin = -3.5, xmax = 3.5)
+                plt.title('value result')
 
                 #plot 4- mtv result
                 plt.subplot(2,2,4)
                 linestyle = {'marker':'o','color':'g','linestyle':'none'}
-                plt.errorbar(mtv_levels,mtv_succ_result_avgs,yerr=mtv_succ_result_stds,label='succ result',**linestyle)
+                plt.errorbar(mtv_levels,mtv_succ_result_avgs,yerr=mtv_succ_result_stds,label='succ',**linestyle)
                 linestyle = {'marker':'o','color':'r','linestyle':'none'}
-                plt.errorbar(mtv_levels,mtv_fail_result_avgs,yerr=mtv_fail_result_stds,label='fail result',**linestyle)
+                plt.errorbar(mtv_levels,mtv_fail_result_avgs,yerr=mtv_fail_result_stds,label='fail',**linestyle)
 
                 slope, intercept, r_value, p_value, std_err = sp.stats.linregress(mtv_levels,mtv_succ_result_avgs)
+                mtv_succ_result_linreg_results[i,:] = [slope,intercept,r_value,p_value,std_err]
                 line = np.multiply(mtv_linspace,slope)+intercept
                 plt.plot(mtv_linspace,line,color='g')
                 mtv_succ_result_linreg = {'slope':slope,'intercept':intercept,'r_value':r_value,'p_value':p_value,'std_err':std_err,'avg_total':val_succ_result_avgs,'pooled_std':val_succ_result_stds}
 
                 slope, intercept, r_value, p_value, std_err = sp.stats.linregress(mtv_levels,mtv_fail_result_avgs)
+                mtv_fail_result_linreg_results[i,:] = [slope,intercept,r_value,p_value,std_err]
                 line = np.multiply(mtv_linspace,slope)+intercept
                 plt.plot(mtv_linspace,line,color='r')
                 mtv_fail_result_linreg = {'slope':slope,'intercept':intercept,'r_value':r_value,'p_value':p_value,'std_err':std_err,'avg_total':val_fail_result_avgs,'pooled_std':val_fail_result_stds}
 
-                plt.legend(loc='upper center', bbox_to_anchor=(1.30, 0.8),ncol=1)
+                plt.legend(loc='upper center', bbox_to_anchor=(1.30, 0.8),ncol=1,fontsize='small')
                 plt.xlim(xmin = -0.5, xmax = 6.5)
                 plt.title('motivation result')
 
@@ -480,21 +518,19 @@ def plot_comparison(region_key,region_val):
                 #label_sig(0,2,'p=0.01',rp_levels_r,avg_result_total_r)
                 #label_sig(2,3,'p=0.01',rp_levels_r,avg_result_total_r)
                 
-                plt.suptitle('region: %s, unit: %s, 0.5s window' %(region_key, str(i).zfill(2)), fontsize = 20) 
+                plt.suptitle('region: %s, unit: %s, 1.0s window' %(region_key, str(i).zfill(2)), fontsize = 20) 
                 plt.tight_layout()
-                #plt.subplots_adjust(top = 0.85)
-                #plt.subplots_adjust(right = 0.65)
+                plt.subplots_adjust(top = 0.85,wspace=0.7,right=0.85)
                 plt.savefig('avg_rp_%s_%s' %(region_key,str(i).zfill(2)))
                 plt.clf()
-        
-                #avg_std_dict = {'avg_cue_total_p_fail':avg_cue_total_p_fail,'avg_cue_total_r_succ':avg_cue_total_r_succ,'avg_cue_total_p_succ':avg_cue_total_p_succ,'avg_cue_total_r_fail':avg_cue_total_r_fail,'pooled_std_cue_total_p_fail':pooled_std_cue_total_p_fail,'pooled_std_cue_total_r_succ':pooled_std_cue_total_r_succ,'pooled_std_cue_total_p_succ':pooled_std_cue_total_p_succ,'pooled_std_cue_total_r_fail':pooled_std_cue_total_r_fail,'avg_result_total_p_fail':avg_result_total_p_fail,'avg_result_total_r_succ':avg_result_total_r_succ,'avg_result_total_p_succ':avg_result_total_p_succ,'avg_result_total_r_fail':avg_result_total_r_fail,'pooled_std_result_total_p_fail':pooled_std_result_total_p_fail,'pooled_std_result_total_r_succ':pooled_std_result_total_r_succ,'pooled_std_result_total_p_succ':pooled_std_result_total_p_succ,'pooled_std_result_total_r_fail':pooled_std_result_total_r_fail}
 
-                #if plot_both_bool:
-                #        return_unit_dict = {'p_fail_cue_linreg':p_fail_cue_linreg,'r_succ_cue_linreg':r_succ_cue_linreg,'p_succ_cue_linreg':p_succ_cue_linreg,'r_fail_cue_linreg':r_fail_cue_linreg,'p_fail_result_linreg':p_fail_result_linreg,'r_succ_result_linreg':r_succ_result_linreg,'p_succ_result_linreg':p_succ_result_linreg,'r_fail_result_linreg':r_fail_result_linreg,'avg_std_dict':avg_std_dict}
-                #else:
-                #        return_unit_dict = {'p_fail_cue_linreg':p_fail_cue_linreg,'r_succ_cue_linreg':r_succ_cue_linreg,'p_fail_result_linreg':p_fail_result_linreg,'r_succ_result_linreg':r_succ_result_linreg,'avg_std_dict':avg_std_dict}
-                #return_dicts.append(return_unit_dict)
-                return_dicts = {}
+                #TODO: bool for just all cue vs adding succ and fail
+                avg_std_dict = {'val_all_cue_avgs':val_all_cue_avgs,'val_succ_cue_avgs':val_succ_cue_avgs,'val_fail_cue_avgs':val_fail_cue_avgs,'val_succ_result_avgs':val_succ_result_avgs,'val_fail_result_avgs':val_fail_result_avgs,'mtv_all_cue_avgs':mtv_all_cue_avgs,'mtv_succ_cue_avgs':mtv_succ_cue_avgs,'mtv_fail_cue_avgs':mtv_fail_cue_avgs,'mtv_succ_result_avgs':mtv_succ_result_avgs,'mtv_fail_result_avgs':mtv_fail_result_avgs,'val_all_cue_stds':val_all_cue_stds,'val_succ_cue_stds':val_succ_cue_stds,'val_fail_cue_stds':val_fail_cue_stds,'val_succ_result_stds':val_succ_result_stds,'val_fail_result_stds':val_fail_result_stds,'mtv_all_cue_stds':mtv_all_cue_stds,'mtv_succ_cue_stds':mtv_succ_cue_stds,'mtv_fail_cue_stds':mtv_fail_cue_stds,'mtv_succ_result_stds':mtv_succ_result_stds,'mtv_fail_result_stds':mtv_fail_result_stds}
+                return_unit_dict = {'val_all_cue_linreg':val_all_cue_linreg,'val_succ_cue_linreg':val_succ_cue_linreg,'val_fail_cue_linreg':val_fail_cue_linreg,'mtv_all_cue_linreg':mtv_all_cue_linreg,'mtv_succ_cue_linreg':mtv_succ_cue_linreg,'mtv_fail_cue_linreg':mtv_fail_cue_linreg,'val_succ_result_linreg':val_succ_result_linreg,'val_fail_result_linreg':val_fail_result_linreg,'mtv_succ_result_linreg':mtv_succ_result_linreg,'mtv_fail_result_linreg':mtv_fail_result_linreg,'avg_std_dict':avg_std_dict}
+
+                return_dicts.append(return_unit_dict)
+        totals_dict = {'val_all_cue_linreg_results':val_all_cue_linreg_results,'val_succ_cue_linreg_results':val_succ_cue_linreg_results,'val_fail_cue_linreg_results':val_fail_cue_linreg_results,'val_succ_result_linreg_results':val_succ_result_linreg_results,'val_fail_result_linreg_results':val_fail_result_linreg_results,'mtv_all_cue_linreg_results':mtv_all_cue_linreg_results,'mtv_succ_cue_linreg_results':mtv_succ_cue_linreg_results,'mtv_fail_cue_linreg_results':mtv_fail_cue_linreg_results,'mtv_succ_result_linreg_results':mtv_succ_result_linreg_results,'mtv_fail_result_linreg_results':mtv_fail_result_linreg_results}
+        linreg_total_dicts[region_key] = totals_dict
         return(return_dicts)
 
 
@@ -794,6 +830,7 @@ if plot_bool:
 	print "begin plotting\n"
 
         plot_return = {}
+        linreg_total_dicts = {}
 	for region_key,region_val in all_regions_dict.iteritems():		
 		plot_return[region_key] = plot_comparison(region_key,region_val)
 
@@ -805,6 +842,7 @@ for region_key,region_val in plot_return.iteritems():
         pos_slopes = []
         neg_slopes = []
         linreg_analysis[region_key]={}
+        slope_all = []
         for unit_num in range(len(plot_return[region_key])):
                 for type_key,type_data in plot_return[region_key][unit_num].iteritems():
                         if type_key == 'avg_std_dict':
@@ -830,7 +868,10 @@ for region_key,region_val in plot_return.iteritems():
                                 temp = [type_key,unit_num,slope]
                                 neg_slopes.append(temp)
      
+                        np.append(slope_all,slope)
+                
 
+                
         linreg_analysis[region_key]['r_p_sig'] = r_p_sig
         linreg_analysis[region_key]['pos_slopes'] = pos_slopes
         linreg_analysis[region_key]['neg_slopes'] = neg_slopes
@@ -838,10 +879,11 @@ for region_key,region_val in plot_return.iteritems():
 if save_bool:	
 	#save npy and xls files
 	print 'saving data'
-        dict_to_save = {'all_regions_dict':all_regions_dict,'sig_compare':sig_compare,'plot_return':plot_return,'linreg_analysis':linreg_analysis}
-	np.save('data_%s' %(filename),dict_to_save)
+        #dict_to_save = {'all_regions_dict':all_regions_dict,'sig_compare':sig_compare,'plot_return':plot_return,'linreg_analysis':linreg_analysis}
+	dict_to_save = {'all_regions_dict':all_regions_dict,'plot_return':plot_return,'linreg_analysis':linreg_analysis}
+        np.save('data_mv_%s' %(filename),dict_to_save)
 
-	workbook = xlsxwriter.Workbook('data_%s.xlsx' %(filename),options={'nan_inf_to_errors':True})
+	workbook = xlsxwriter.Workbook('data_mv_%s.xlsx' %(filename),options={'nan_inf_to_errors':True})
 	worksheet = workbook.add_worksheet()
 
 	row = 0
@@ -902,800 +944,1027 @@ for csv in glob.glob('*.csv'):
 
 name_list = ['avg_cue_p_fail','std_cue_p_fail','avg_cue_r_succ','std_cue_r_succ','avg_cue_p_succ','std_cue_p_succ','avg_cue_r_fail','std_cue_r_fail','avg_result_p_fail','std_result_p_fail','avg_result_r_succ','std_result_r_succ','avg_result_p_succ','std_result_p_succ','avg_result_r_fail','std_result_r_fail']
 
-for region_key,region_data in plot_return.iteritems():
-        nlized_data_workbook = xlsxwriter.Workbook('avg_std_nlized_data_%s.xlsx' %(region_key),options={'nan_inf_to_errors':True})
-        for i in range(len(plot_return[region_key])):
+#for region_key,region_data in plot_return.iteritems():
+#        nlized_data_workbook = xlsxwriter.Workbook('avg_std_nlized_data_%s.xlsx' %(region_key),options={'nan_inf_to_errors':True})
+#        for i in range(len(plot_return[region_key])):
+#                
+#                temp_array = np.zeros((4,16))
+#                temp_array[:,0] = plot_return[region_key][i]['avg_std_dict']['avg_cue_total_p_fail']
+#                temp_array[:,1] = plot_return[region_key][i]['avg_std_dict']['pooled_std_cue_total_p_fail']
+#                temp_array[:,2] = plot_return[region_key][i]['avg_std_dict']['avg_cue_total_r_succ']
+#                temp_array[:,3] = plot_return[region_key][i]['avg_std_dict']['pooled_std_cue_total_r_succ']
+#                temp_array[:,4] = plot_return[region_key][i]['avg_std_dict']['avg_cue_total_p_succ']
+#                temp_array[:,5] = plot_return[region_key][i]['avg_std_dict']['pooled_std_cue_total_p_succ']
+#                temp_array[:,6] = plot_return[region_key][i]['avg_std_dict']['avg_cue_total_r_fail']
+#                temp_array[:,7] = plot_return[region_key][i]['avg_std_dict']['pooled_std_cue_total_r_fail']
+#                temp_array[:,8] = plot_return[region_key][i]['avg_std_dict']['avg_result_total_p_fail']
+#                temp_array[:,9] = plot_return[region_key][i]['avg_std_dict']['pooled_std_result_total_p_fail']
+#                temp_array[:,10] = plot_return[region_key][i]['avg_std_dict']['avg_result_total_r_succ']
+#                temp_array[:,11] = plot_return[region_key][i]['avg_std_dict']['pooled_std_result_total_r_succ']
+#                temp_array[:,12] = plot_return[region_key][i]['avg_std_dict']['avg_result_total_p_succ']
+#                temp_array[:,13] = plot_return[region_key][i]['avg_std_dict']['pooled_std_result_total_p_succ']
+#                temp_array[:,14] = plot_return[region_key][i]['avg_std_dict']['avg_result_total_r_fail']
+#                temp_array[:,15] = plot_return[region_key][i]['avg_std_dict']['pooled_std_result_total_r_fail']
                 
-                temp_array = np.zeros((4,16))
-                temp_array[:,0] = plot_return[region_key][i]['avg_std_dict']['avg_cue_total_p_fail']
-                temp_array[:,1] = plot_return[region_key][i]['avg_std_dict']['pooled_std_cue_total_p_fail']
-                temp_array[:,2] = plot_return[region_key][i]['avg_std_dict']['avg_cue_total_r_succ']
-                temp_array[:,3] = plot_return[region_key][i]['avg_std_dict']['pooled_std_cue_total_r_succ']
-                temp_array[:,4] = plot_return[region_key][i]['avg_std_dict']['avg_cue_total_p_succ']
-                temp_array[:,5] = plot_return[region_key][i]['avg_std_dict']['pooled_std_cue_total_p_succ']
-                temp_array[:,6] = plot_return[region_key][i]['avg_std_dict']['avg_cue_total_r_fail']
-                temp_array[:,7] = plot_return[region_key][i]['avg_std_dict']['pooled_std_cue_total_r_fail']
-                temp_array[:,8] = plot_return[region_key][i]['avg_std_dict']['avg_result_total_p_fail']
-                temp_array[:,9] = plot_return[region_key][i]['avg_std_dict']['pooled_std_result_total_p_fail']
-                temp_array[:,10] = plot_return[region_key][i]['avg_std_dict']['avg_result_total_r_succ']
-                temp_array[:,11] = plot_return[region_key][i]['avg_std_dict']['pooled_std_result_total_r_succ']
-                temp_array[:,12] = plot_return[region_key][i]['avg_std_dict']['avg_result_total_p_succ']
-                temp_array[:,13] = plot_return[region_key][i]['avg_std_dict']['pooled_std_result_total_p_succ']
-                temp_array[:,14] = plot_return[region_key][i]['avg_std_dict']['avg_result_total_r_fail']
-                temp_array[:,15] = plot_return[region_key][i]['avg_std_dict']['pooled_std_result_total_r_fail']
-                
-                worksheet_nld = nlized_data_workbook.add_worksheet('unit_%s' %(i))
-                worksheet_nld.write_row(0,0,name_list)
-                for j in range(temp_array.shape[0]):
-                        worksheet_nld.write_row(j+1,0,temp_array[j,:])
+#                worksheet_nld = nlized_data_workbook.add_worksheet('unit_%s' %(i))
+#                worksheet_nld.write_row(0,0,name_list)
+#                for j in range(temp_array.shape[0]):
+#                        worksheet_nld.write_row(j+1,0,temp_array[j,:])
                         
 for region_key,region_data in all_regions_dict.iteritems():
-        nl_avg_data_workbook = xlsxwriter.Workbook('nl_avg_data_%s.xlsx' %(region_key),options={'nan_inf_to_errors':True})
+        nl_avg_data_workbook = xlsxwriter.Workbook('nl_mv_avg_data_%s.xlsx' %(region_key),options={'nan_inf_to_errors':True})
         suffix = '_%ss' %(region_key[0:-6])
 
         nlized_cue_comparison_data = all_regions_dict[region_key]['cue_comp_stats']['nlized_comparison_data']
         nlized_result_comparison_data = all_regions_dict[region_key]['result_comp_stats']['nlized_comparison_data']
 
-        for i in range(len(nlized_cue_comparison_data['r0_succ_cue%s' %(suffix)])):
-                temp_array = np.zeros((30,40))
+        for i in range(len(nlized_cue_comparison_data['val_all_cue_-3%s' %(suffix)])):
+                temp_array = np.zeros((30,70))
                 try:
-                        temp_array[:,0] = nlized_cue_comparison_data['p3_fail_cue%s' %(suffix)][i,:]
+                        temp_array[:,0] = nlized_cue_comparison_data['val_all_cue_-3%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,1] = nlized_cue_comparison_data['p2_fail_cue%s' %(suffix)][i,:]
+                        temp_array[:,1] = nlized_cue_comparison_data['val_all_cue_-2%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,2] = nlized_cue_comparison_data['p1_fail_cue%s' %(suffix)][i,:]
+                        temp_array[:,2] = nlized_cue_comparison_data['val_all_cue_-1%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,3] = nlized_cue_comparison_data['p0_fail_cue%s' %(suffix)][i,:]
+                        temp_array[:,3] = nlized_cue_comparison_data['val_all_cue_0%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,4] = nlized_cue_comparison_data['r0_succ_cue%s' %(suffix)][i,:]
+                        temp_array[:,4] = nlized_cue_comparison_data['val_all_cue_1%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,5] = nlized_cue_comparison_data['r1_succ_cue%s' %(suffix)][i,:]
+                        temp_array[:,5] = nlized_cue_comparison_data['val_all_cue_2%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,6] = nlized_cue_comparison_data['r2_succ_cue%s' %(suffix)][i,:]
+                        temp_array[:,6] = nlized_cue_comparison_data['val_all_cue_3%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,7] = nlized_cue_comparison_data['r3_succ_cue%s' %(suffix)][i,:]
+                        temp_array[:,7] = nlized_cue_comparison_data['val_succ_cue_-3%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,8] = nlized_cue_comparison_data['p3_succ_cue%s' %(suffix)][i,:]
+                        temp_array[:,8] = nlized_cue_comparison_data['val_succ_cue_-2%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,9] = nlized_cue_comparison_data['p2_succ_cue%s' %(suffix)][i,:]
+                        temp_array[:,9] = nlized_cue_comparison_data['val_succ_cue_-1%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,10] = nlized_cue_comparison_data['p1_succ_cue%s' %(suffix)][i,:]
+                        temp_array[:,10] = nlized_cue_comparison_data['val_succ_cue_0%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,11] = nlized_cue_comparison_data['p0_succ_cue%s' %(suffix)][i,:]
+                        temp_array[:,11] = nlized_cue_comparison_data['val_succ_cue_1%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,12] = nlized_cue_comparison_data['r0_fail_cue%s' %(suffix)][i,:]
+                        temp_array[:,12] = nlized_cue_comparison_data['val_succ_cue_2%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,13] = nlized_cue_comparison_data['r1_fail_cue%s' %(suffix)][i,:]
+                        temp_array[:,13] = nlized_cue_comparison_data['val_succ_cue_3%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,14] = nlized_cue_comparison_data['r2_fail_cue%s' %(suffix)][i,:]
+                        temp_array[:,14] = nlized_cue_comparison_data['val_fail_cue_-3%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,15] = nlized_cue_comparison_data['r3_fail_cue%s' %(suffix)][i,:]
+                        temp_array[:,15] = nlized_cue_comparison_data['val_fail_cue_-2%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,16] = nlized_result_comparison_data['p3_fail_result%s' %(suffix)][i,:]
+                        temp_array[:,16] = nlized_cue_comparison_data['val_fail_cue_-1%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,17] = nlized_result_comparison_data['p2_fail_result%s' %(suffix)][i,:]
+                        temp_array[:,17] = nlized_cue_comparison_data['val_fail_cue_0%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,18] = nlized_result_comparison_data['p1_fail_result%s' %(suffix)][i,:]
+                        temp_array[:,18] = nlized_cue_comparison_data['val_fail_cue_1%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,19] = nlized_result_comparison_data['p0_fail_result%s' %(suffix)][i,:]
+                        temp_array[:,19] = nlized_cue_comparison_data['val_fail_cue_2%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,20] = nlized_result_comparison_data['r0_succ_result%s' %(suffix)][i,:]
+                        temp_array[:,20] = nlized_cue_comparison_data['val_fail_cue_3%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,21] = nlized_result_comparison_data['r1_succ_result%s' %(suffix)][i,:]
+                        temp_array[:,21] = nlized_cue_comparison_data['mtv_all_cue_0%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,22] = nlized_result_comparison_data['r2_succ_result%s' %(suffix)][i,:]
+                        temp_array[:,22] = nlized_cue_comparison_data['mtv_all_cue_1%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,23] = nlized_result_comparison_data['r3_succ_result%s' %(suffix)][i,:]
+                        temp_array[:,23] = nlized_cue_comparison_data['mtv_all_cue_2%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,24] = nlized_result_comparison_data['p3_succ_result%s' %(suffix)][i,:]
+                        temp_array[:,24] = nlized_cue_comparison_data['mtv_all_cue_3%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,25] = nlized_result_comparison_data['p2_succ_result%s' %(suffix)][i,:]
+                        temp_array[:,25] = nlized_cue_comparison_data['mtv_all_cue_4%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,26] = nlized_result_comparison_data['p1_succ_result%s' %(suffix)][i,:]
+                        temp_array[:,26] = nlized_cue_comparison_data['mtv_all_cue_5%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,27] = nlized_result_comparison_data['p0_succ_result%s' %(suffix)][i,:]
+                        temp_array[:,27] = nlized_cue_comparison_data['mtv_all_cue_6%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,28] = nlized_result_comparison_data['r0_fail_result%s' %(suffix)][i,:]
+                        temp_array[:,28] = nlized_cue_comparison_data['mtv_succ_cue_0%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,29] = nlized_result_comparison_data['r1_fail_result%s' %(suffix)][i,:]
+                        temp_array[:,29] = nlized_cue_comparison_data['mtv_succ_cue_1%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,30] = nlized_result_comparison_data['r2_fail_result%s' %(suffix)][i,:]
+                        temp_array[:,30] = nlized_cue_comparison_data['mtv_succ_cue_2%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,31] = nlized_result_comparison_data['r3_fail_result%s' %(suffix)][i,:]
+                        temp_array[:,31] = nlized_cue_comparison_data['mtv_succ_cue_3%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,32] = nlized_result_comparison_data['ra_succ_cue%s' %(suffix)][i,:]
+                        temp_array[:,32] = nlized_cue_comparison_data['mtv_succ_cue_4%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,33] = nlized_result_comparison_data['ra_fail_cue%s' %(suffix)][i,:]
+                        temp_array[:,33] = nlized_cue_comparison_data['mtv_succ_cue_5%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,34] = nlized_result_comparison_data['pa_succ_cue%s' %(suffix)][i,:]
+                        temp_array[:,34] = nlized_cue_comparison_data['mtv_succ_cue_6%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,35] = nlized_result_comparison_data['pa_fail_cue%s' %(suffix)][i,:]
+                        temp_array[:,35] = nlized_cue_comparison_data['mtv_fail_cue_0%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,36] = nlized_result_comparison_data['ra_succ_result%s' %(suffix)][i,:]
+                        temp_array[:,36] = nlized_cue_comparison_data['mtv_fail_cue_1%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,37] = nlized_result_comparison_data['ra_fail_result%s' %(suffix)][i,:]
+                        temp_array[:,37] = nlized_cue_comparison_data['mtv_fail_cue_2%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,38] = nlized_result_comparison_data['pa_succ_result%s' %(suffix)][i,:]
+                        temp_array[:,38] = nlized_cue_comparison_data['mtv_fail_cue_3%s' %(suffix)][i,:]
                 except:
                         pass
                 try:
-                        temp_array[:,39] = nlized_result_comparison_data['pa_fail_result%s' %(suffix)][i,:]
+                        temp_array[:,39] = nlized_cue_comparison_data['mtv_fail_cue_4%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,40] = nlized_cue_comparison_data['mtv_fail_cue_5%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,41] = nlized_cue_comparison_data['mtv_fail_cue_6%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,42] = nlized_result_comparison_data['val_succ_result_-3%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,43] = nlized_result_comparison_data['val_succ_result_-2%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,44] = nlized_result_comparison_data['val_succ_result_-1%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,45] = nlized_result_comparison_data['val_succ_result_0%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,46] = nlized_result_comparison_data['val_succ_result_1%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,47] = nlized_result_comparison_data['val_succ_result_2%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,48] = nlized_result_comparison_data['val_succ_result_3%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,49] = nlized_result_comparison_data['val_fail_result_-3%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,50] = nlized_result_comparison_data['val_fail_result_-2%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,51] = nlized_result_comparison_data['val_fail_result_-1%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,52] = nlized_result_comparison_data['val_fail_result_0%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,53] = nlized_result_comparison_data['val_fail_result_1%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,54] = nlized_result_comparison_data['val_fail_result_2%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,55] = nlized_result_comparison_data['val_fail_result_3%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,56] = nlized_result_comparison_data['mtv_succ_result_0%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,57] = nlized_result_comparison_data['mtv_succ_result_1%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,58] = nlized_result_comparison_data['mtv_succ_result_2%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,59] = nlized_result_comparison_data['mtv_succ_result_3%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,60] = nlized_result_comparison_data['mtv_succ_result_4%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,61] = nlized_result_comparison_data['mtv_succ_result_5%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,62] = nlized_result_comparison_data['mtv_succ_result_6%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,63] = nlized_result_comparison_data['mtv_fail_result_0%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,64] = nlized_result_comparison_data['mtv_fail_result_1%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,65] = nlized_result_comparison_data['mtv_fail_result_2%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,66] = nlized_result_comparison_data['mtv_fail_result_3%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,67] = nlized_result_comparison_data['mtv_fail_result_4%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,68] = nlized_result_comparison_data['mtv_fail_result_5%s' %(suffix)][i,:]
+                except:
+                        pass
+                try:
+                        temp_array[:,69] = nlized_result_comparison_data['mtv_fail_result_6%s' %(suffix)][i,:]
                 except:
                         pass
 
-                names = ['p3_fail_cue','p2_fail_cue','p1_fail_cue','p0_fail_cue','r0_succ_cue','r1_succ_cue','r2_succ_cue','r3_succ_cue','p3_succ_cue','p2_succ_cue','p1_succ_cue','p0_succ_cue','r0_fail_cue','r1_fail_cue','r2_fail_cue','r3_fail_cue','p3_fail_result','p2_fail_result','p1_fail_result','p0_fail_result','r0_succ_result','r1_succ_result','r2_succ_result','r3_succ_result','p3_succ_result','p2_succ_result','p1_succ_result','p0_succ_result','r0_fail_result','r1_fail_result','r2_fail_result','r3_fail_result','ra_succ_cue','ra_fail_cue','pa_succ_cue','pa_fail_cue','ra_succ_result','ra_fail_result','pa_succ_result','pa_fail_result']
-        
+                names = ['val_all_cue_-3','val_all_cue_-2','val_all_cue_-1','val_all_cue_0','val_all_cue_1','val_all_cue_2','val_all_cue_3','val_succ_cue_-3','val_succ_cue_-2','val_succ_cue_-1','val_succ_cue_0','val_succ_cue_1','val_succ_cue_2','val_succ_cue_3','val_fail_cue_-3','val_fail_cue_-2','val_fail_cue_-1','val_fail_cue_0','val_fail_cue_1','val_fail_cue_2','val_fail_cue_3','mtv_all_cue_0','mtv_all_cue_1','mtv_all_cue_2','mtv_all_cue_3','mtv_all_cue_4','mtv_all_cue_5','mtv_all_cue_6','mtv_succ_cue_0','mtv_succ_cue_1','mtv_succ_cue_2','mtv_succ_cue_3','mtv_succ_cue_4','mtv_succ_cue_5','mtv_succ_cue_6','mtv_fail_cue_0','mtv_fail_cue_1','mtv_fail_cue_2','mtv_fail_cue_3','mtv_fail_cue_4','mtv_fail_cue_5','mtv_fail_cue_6','val_succ_result_-3','val_succ_result_-2','val_succ_result_-1','val_succ_result_0','val_succ_result_1','val_succ_result_2','val_succ_result_3','val_fail_result_-3','val_fail_result_-2','val_fail_result_-1','val_fail_result_0','val_fail_result_1','val_fail_result_2','val_fail_result_3','mtv_succ_result_0','mtv_succ_result_1','mtv_succ_result_2','mtv_succ_result_3','mtv_succ_result_4','mtv_succ_result_5','mtv_succ_result_6','mtv_fail_result_0','mtv_fail_result_1','mtv_fail_result_2','mtv_fail_result_3','mtv_fail_result_4','mtv_fail_result_5','mtv_fail_result_6']
+
                 avg_worksheet = nl_avg_data_workbook.add_worksheet('unit_%s' %(i))
                 avg_worksheet.write_row(0,0,names)
                 for j in range(temp_array.shape[0]):
                         avg_worksheet.write_row(j+1,0,temp_array[j,:])
 
-for region_key,region_data in all_regions_dict.iteritems():
-        nl_avg_data_workbook = xlsxwriter.Workbook('catch_nl_avg_data_%s.xlsx' %(region_key),options={'nan_inf_to_errors':True})
-        suffix = '_%ss' %(region_key[0:-6])
+#for region_key,region_data in all_regions_dict.iteritems():
+#        nl_avg_data_workbook = xlsxwriter.Workbook('catch_nl_avg_data_%s.xlsx' %(region_key),options={'nan_inf_to_er#rors':True})
+#        suffix = '_%ss' %(region_key[0:-6])
+#
+#        nlized_cue_comparison_data = all_regions_dict[region_key]['cue_comp_stats']['nlized_comparison_data']
+#        nlized_result_comparison_data = all_regions_dict[region_key]['result_comp_stats']['nlized_comparison_data']
 
-        nlized_cue_comparison_data = all_regions_dict[region_key]['cue_comp_stats']['nlized_comparison_data']
-        nlized_result_comparison_data = all_regions_dict[region_key]['result_comp_stats']['nlized_comparison_data']
+#        for i in range(len(nlized_cue_comparison_data['r0_succ_cue%s' %(suffix)])):
+#                temp_array = np.zeros((30,20))
+#                try:
+#                        temp_array[:,0] = nlized_cue_comparison_data['p3_catch_cue%s' %(suffix)][i,:]
+#                except:
+#                        pass
+#                try:
+#                        temp_array[:,1] = nlized_cue_comparison_data['p2_catch_cue%s' %(suffix)][i,:]
+#                except:
+#                        pass
 
-        for i in range(len(nlized_cue_comparison_data['r0_succ_cue%s' %(suffix)])):
-                temp_array = np.zeros((30,20))
-                try:
-                        temp_array[:,0] = nlized_cue_comparison_data['p3_catch_cue%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,1] = nlized_cue_comparison_data['p2_catch_cue%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,2] = nlized_cue_comparison_data['p1_catch_cue%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,3] = nlized_cue_comparison_data['p0_catch_cue%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,4] = nlized_cue_comparison_data['r0_catch_cue%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,5] = nlized_cue_comparison_data['r1_catch_cue%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,6] = nlized_cue_comparison_data['r2_catch_cue%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,7] = nlized_cue_comparison_data['r3_catch_cue%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,8] = nlized_cue_comparison_data['r_all_catch_cue%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,9] = nlized_cue_comparison_data['p_all_catch_cue%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,10] = nlized_result_comparison_data['p3_catch_result%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,11] = nlized_result_comparison_data['p2_catch_result%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,12] = nlized_result_comparison_data['p1_catch_result%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,13] = nlized_result_comparison_data['p0_catch_result%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,14] = nlized_result_comparison_data['r0_catch_result%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,15] = nlized_result_comparison_data['r1_catch_result%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,16] = nlized_result_comparison_data['r2_catch_result%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,17] = nlized_result_comparison_data['r3_catch_result%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,18] = nlized_result_comparison_data['r_all_catch_result%s' %(suffix)][i,:]
-                except:
-                        pass
-                try:
-                        temp_array[:,19] = nlized_result_comparison_data['p_all_catch_result%s' %(suffix)][i,:]
-                except:
-                        pass
-
-                names = ['p3_catch_cue','p2_catch_cue','p1_catch_cue','p0_catch_cue','r0_catch_cue','r1_catch_cue','r2_catch_cue','r3_catch_cue','r_all_catch_cue','p_all_catch_cue','p3_catch_result','p2_catch_result','p1_catch_result','p0_catch_result','r0_catch_result','r1_catch_result','r2_catch_result','r3_catch_result','r_all_catch_result','p_all_catch_result']
-        
-                avg_worksheet = nl_avg_data_workbook.add_worksheet('unit_%s' %(i))
-                avg_worksheet.write_row(0,0,names)
-                for j in range(temp_array.shape[0]):
-                        avg_worksheet.write_row(j+1,0,temp_array[j,:])
+#                names = ['p3_catch_cue','p2_catch_cue','p1_catch_cue','p0_catch_cue','r0_catch_cue','r1_catch_cue','r2_catch_cue','r3_catch_cue','r_all_catch_cue','p_all_catch_cue','p3_catch_result','p2_catch_result','p1_catch_result','p0_catch_result','r0_catch_result','r1_catch_result','r2_catch_result','r3_catch_result','r_all_catch_result','p_all_catch_result']
+#        
+#                avg_worksheet = nl_avg_data_workbook.add_worksheet('unit_%s' %(i))
+#                avg_worksheet.write_row(0,0,names)
+#                for j in range(temp_array.shape[0]):
+#                        avg_worksheet.write_row(j+1,0,temp_array[j,:])
 
 for region_key,region_data in all_regions_dict.iteritems():
-        gf_workbook = xlsxwriter.Workbook('gf_avg_data_%s.xlsx' %(region_key),options={'nan_inf_to_errors':True})
+        gf_workbook = xlsxwriter.Workbook('gf_mv_avg_data_%s.xlsx' %(region_key),options={'nan_inf_to_errors':True})
         suffix = '_%ss' %(region_key[0:-6])
-        temp_array = np.zeros((300,120))
+        temp_array = np.zeros((300,140))
+
         try:
-                temp_array[:,0] = all_regions_dict[region_key]['p3_fail_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,0] = all_regions_dict[region_key]['val_all_cue_-3%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,1] = all_regions_dict[region_key]['p2_fail_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,1] = all_regions_dict[region_key]['val_all_cue_-2%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,2] = all_regions_dict[region_key]['p1_fail_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,2] = all_regions_dict[region_key]['val_all_cue_-1%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,3] = all_regions_dict[region_key]['p0_fail_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,3] = all_regions_dict[region_key]['val_all_cue_0%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,4] = all_regions_dict[region_key]['r0_succ_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,4] = all_regions_dict[region_key]['val_all_cue_1%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,5] = all_regions_dict[region_key]['r1_succ_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,5] = all_regions_dict[region_key]['val_all_cue_2%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,6] = all_regions_dict[region_key]['r2_succ_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,6] = all_regions_dict[region_key]['val_all_cue_3%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,7] = all_regions_dict[region_key]['r3_succ_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,7] = all_regions_dict[region_key]['val_succ_cue_-3%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,8] = all_regions_dict[region_key]['p3_succ_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,8] = all_regions_dict[region_key]['val_succ_cue_-2%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,9] = all_regions_dict[region_key]['p2_succ_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,9] = all_regions_dict[region_key]['val_succ_cue_-1%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,10] = all_regions_dict[region_key]['p1_succ_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,10] = all_regions_dict[region_key]['val_succ_cue_0%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,11] = all_regions_dict[region_key]['p0_succ_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,11] = all_regions_dict[region_key]['val_succ_cue_1%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,12] = all_regions_dict[region_key]['r0_fail_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,12] = all_regions_dict[region_key]['val_succ_cue_2%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,13] = all_regions_dict[region_key]['r1_fail_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,13] = all_regions_dict[region_key]['val_succ_cue_3%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,14] = all_regions_dict[region_key]['r2_fail_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,14] = all_regions_dict[region_key]['val_fail_cue_-3%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,15] = all_regions_dict[region_key]['r3_fail_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,15] = all_regions_dict[region_key]['val_fail_cue_-2%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,16] = all_regions_dict[region_key]['p3_fail_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,16] = all_regions_dict[region_key]['val_fail_cue_-1%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,17] = all_regions_dict[region_key]['p2_fail_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,17] = all_regions_dict[region_key]['val_fail_cue_0%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,18] = all_regions_dict[region_key]['p1_fail_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,18] = all_regions_dict[region_key]['val_fail_cue_1%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,19] = all_regions_dict[region_key]['p0_fail_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,19] = all_regions_dict[region_key]['val_fail_cue_2%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,20] = all_regions_dict[region_key]['r0_succ_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,20] = all_regions_dict[region_key]['val_fail_cue_3%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,21] = all_regions_dict[region_key]['r1_succ_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,21] = all_regions_dict[region_key]['mtv_all_cue_0%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,22] = all_regions_dict[region_key]['r2_succ_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,22] = all_regions_dict[region_key]['mtv_all_cue_1%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,23] = all_regions_dict[region_key]['r3_succ_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,23] = all_regions_dict[region_key]['mtv_all_cue_2%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,24] = all_regions_dict[region_key]['p3_succ_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,24] = all_regions_dict[region_key]['mtv_all_cue_3%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,25] = all_regions_dict[region_key]['p2_succ_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,25] = all_regions_dict[region_key]['mtv_all_cue_4%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,26] = all_regions_dict[region_key]['p1_succ_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,26] = all_regions_dict[region_key]['mtv_all_cue_5%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,27] = all_regions_dict[region_key]['p0_succ_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,27] = all_regions_dict[region_key]['mtv_all_cue_6%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,28] = all_regions_dict[region_key]['r0_fail_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,28] = nlized_cue_comparison_data['mtv_succ_cue_0%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,29] = all_regions_dict[region_key]['r1_fail_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,29] = all_regions_dict[region_key]['mtv_succ_cue_1%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,30] = all_regions_dict[region_key]['r2_fail_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,30] = all_regions_dict[region_key]['mtv_succ_cue_2%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,31] = all_regions_dict[region_key]['r3_fail_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,31] = all_regions_dict[region_key]['mtv_succ_cue_3%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,32] = all_regions_dict[region_key]['p3_catch_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,32] = all_regions_dict[region_key]['mtv_succ_cue_4%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,33] = all_regions_dict[region_key]['p2_catch_cuet%s' %(suffix)][0]['gf_avg']
+                temp_array[:,33] = all_regions_dict[region_key]['mtv_succ_cue_5%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,34] = all_regions_dict[region_key]['p1_catch_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,34] = all_regions_dict[region_key]['mtv_succ_cue_6%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,35] = all_regions_dict[region_key]['p0_catch_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,35] = all_regions_dict[region_key]['mtv_fail_cue_0%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,36] = all_regions_dict[region_key]['r0_catch_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,36] = all_regions_dict[region_key]['mtv_fail_cue_1%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,37] = all_regions_dict[region_key]['r1_catch_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,37] = all_regions_dict[region_key]['mtv_fail_cue_2%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,38] = all_regions_dict[region_key]['r2_catch_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,38] = all_regions_dict[region_key]['mtv_fail_cue_3%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,39] = all_regions_dict[region_key]['r3_catch_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,39] = all_regions_dict[region_key]['mtv_fail_cue_4%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,40] = all_regions_dict[region_key]['p3_catch_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,40] = all_regions_dict[region_key]['mtv_fail_cue_5%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,41] = all_regions_dict[region_key]['p2_catch_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,41] = all_regions_dict[region_key]['mtv_fail_cue_6%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,42] = all_regions_dict[region_key]['p1_catch_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,42] = all_regions_dict[region_key]['val_succ_result_-3%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,43] = all_regions_dict[region_key]['p0_catch_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,43] = all_regions_dict[region_key]['val_succ_result_-2%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,44] = all_regions_dict[region_key]['r0_catch_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,44] = all_regions_dict[region_key]['val_succ_result_-1%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,45] = all_regions_dict[region_key]['r1_catch_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,45] = all_regions_dict[region_key]['val_succ_result_0%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,46] = all_regions_dict[region_key]['r2_catch_result%s' %(suffix)][0]['gf_avg']
+                temp_array[:,46] = all_regions_dict[region_key]['val_succ_result_1%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,47] = all_regions_dict[region_key]['r3_catch_cue%s' %(suffix)][0]['gf_avg']
+                temp_array[:,47] = all_regions_dict[region_key]['val_succ_result_2%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,48] = all_regions_dict[region_key]['p3_fail_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,48] = all_regions_dict[region_key]['val_succ_result_3%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,49] = all_regions_dict[region_key]['p2_fail_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,49] = all_regions_dict[region_key]['val_fail_result_-3%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,50] = all_regions_dict[region_key]['p1_fail_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,50] = all_regions_dict[region_key]['val_fail_result_-2%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,51] = all_regions_dict[region_key]['p0_fail_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,51] = all_regions_dict[region_key]['val_fail_result_-1%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,52] = all_regions_dict[region_key]['r0_succ_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,52] = all_regions_dict[region_key]['val_fail_result_0%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,53] = all_regions_dict[region_key]['r1_succ_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,53] = all_regions_dict[region_key]['val_fail_result_1%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,54] = all_regions_dict[region_key]['r2_succ_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,54] = all_regions_dict[region_key]['val_fail_result_2%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,55] = all_regions_dict[region_key]['r3_succ_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,55] = all_regions_dict[region_key]['val_fail_result_3%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,56] = all_regions_dict[region_key]['p3_succ_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,56] = all_regions_dict[region_key]['mtv_succ_result_0%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,57] = all_regions_dict[region_key]['p2_succ_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,57] = all_regions_dict[region_key]['mtv_succ_result_1%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,58] = all_regions_dict[region_key]['p1_succ_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,58] = all_regions_dict[region_key]['mtv_succ_result_2%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,59] = all_regions_dict[region_key]['p0_succ_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,59] = all_regions_dict[region_key]['mtv_succ_result_3%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,60] = all_regions_dict[region_key]['r0_fail_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,60] = all_regions_dict[region_key]['mtv_succ_result_4%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,61] = all_regions_dict[region_key]['r1_fail_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,61] = all_regions_dict[region_key]['mtv_succ_result_5%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,62] = all_regions_dict[region_key]['r2_fail_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,62] = all_regions_dict[region_key]['mtv_succ_result_6%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,63] = all_regions_dict[region_key]['r3_fail_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,63] = all_regions_dict[region_key]['mtv_fail_result_0%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,64] = all_regions_dict[region_key]['p3_fail_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,64] = all_regions_dict[region_key]['mtv_fail_result_1%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,65] = all_regions_dict[region_key]['p2_fail_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,65] = all_regions_dict[region_key]['mtv_fail_result_2%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,66] = all_regions_dict[region_key]['p1_fail_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,66] = all_regions_dict[region_key]['mtv_fail_result_3%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,67] = all_regions_dict[region_key]['p0_fail_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,67] = all_regions_dict[region_key]['mtv_fail_result_4%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,68] = all_regions_dict[region_key]['r0_succ_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,68] = all_regions_dict[region_key]['mtv_fail_result_5%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,69] = all_regions_dict[region_key]['r1_succ_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,69] = all_regions_dict[region_key]['mtv_fail_result_6%s' %(suffix)][0]['gf_avg']
         except:
                 pass
         try:
-                temp_array[:,70] = all_regions_dict[region_key]['r2_succ_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,70] = all_regions_dict[region_key]['val_all_cue_-3%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,71] = all_regions_dict[region_key]['r3_succ_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,71] = all_regions_dict[region_key]['val_all_cue_-2%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,72] = all_regions_dict[region_key]['p3_succ_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,72] = all_regions_dict[region_key]['val_all_cue_-1%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,73] = all_regions_dict[region_key]['p2_succ_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,73] = all_regions_dict[region_key]['val_all_cue_0%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,74] = all_regions_dict[region_key]['p1_succ_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,74] = all_regions_dict[region_key]['val_all_cue_1%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,75] = all_regions_dict[region_key]['p0_succ_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,75] = all_regions_dict[region_key]['val_all_cue_2%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,76] = all_regions_dict[region_key]['r0_fail_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,76] = all_regions_dict[region_key]['val_all_cue_3%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,77] = all_regions_dict[region_key]['r1_fail_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,77] = all_regions_dict[region_key]['val_succ_cue_-3%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,78] = all_regions_dict[region_key]['r2_fail_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,78] = all_regions_dict[region_key]['val_succ_cue_-2%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,79] = all_regions_dict[region_key]['r3_fail_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,79] = all_regions_dict[region_key]['val_succ_cue_-1%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,80] = all_regions_dict[region_key]['p3_catch_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,80] = all_regions_dict[region_key]['val_succ_cue_0%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,81] = all_regions_dict[region_key]['p2_catch_cuet%s' %(suffix)][0]['gf_std']
+                temp_array[:,81] = all_regions_dict[region_key]['val_succ_cue_1%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,82] = all_regions_dict[region_key]['p1_catch_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,82] = all_regions_dict[region_key]['val_succ_cue_2%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,83] = all_regions_dict[region_key]['p0_catch_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,83] = all_regions_dict[region_key]['val_succ_cue_3%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,84] = all_regions_dict[region_key]['r0_catch_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,84] = all_regions_dict[region_key]['val_fail_cue_-3%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,85] = all_regions_dict[region_key]['r1_catch_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,85] = all_regions_dict[region_key]['val_fail_cue_-2%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,86] = all_regions_dict[region_key]['r2_catch_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,86] = all_regions_dict[region_key]['val_fail_cue_-1%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,87] = all_regions_dict[region_key]['r3_catch_cue%s' %(suffix)][0]['gf_std']
+                temp_array[:,87] = all_regions_dict[region_key]['val_fail_cue_0%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,88] = all_regions_dict[region_key]['p3_catch_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,88] = all_regions_dict[region_key]['val_fail_cue_1%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,89] = all_regions_dict[region_key]['p2_catch_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,89] = all_regions_dict[region_key]['val_fail_cue_2%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,90] = all_regions_dict[region_key]['p1_catch_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,90] = all_regions_dict[region_key]['val_fail_cue_3%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,91] = all_regions_dict[region_key]['p0_catch_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,91] = all_regions_dict[region_key]['mtv_all_cue_0%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,92] = all_regions_dict[region_key]['r0_catch_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,92] = all_regions_dict[region_key]['mtv_all_cue_1%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,93] = all_regions_dict[region_key]['r1_catch_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,93] = all_regions_dict[region_key]['mtv_all_cue_2%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,94] = all_regions_dict[region_key]['r2_catch_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,94] = all_regions_dict[region_key]['mtv_all_cue3%s' %(suffix)][0]['gf_std']
         except:
                 pass
         try:
-                temp_array[:,95] = all_regions_dict[region_key]['r3_catch_result%s' %(suffix)][0]['gf_std']
+                temp_array[:,95] = all_regions_dict[region_key]['mtv_all_cue_4%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,96] = all_regions_dict[region_key]['mtv_all_cue_5%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,97] = all_regions_dict[region_key]['mtv_all_cue_6%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,98] = nlized_cue_comparison_data['mtv_succ_cue_0%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,99] = all_regions_dict[region_key]['mtv_succ_cue_1%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,100] = all_regions_dict[region_key]['mtv_succ_cue_2%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,101] = all_regions_dict[region_key]['mtv_succ_cue_3%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,102] = all_regions_dict[region_key]['mtv_succ_cue_4%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,103] = all_regions_dict[region_key]['mtv_succ_cue_5%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,104] = all_regions_dict[region_key]['mtv_succ_cue_6%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,105] = all_regions_dict[region_key]['mtv_fail_cue_0%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,106] = all_regions_dict[region_key]['mtv_fail_cue_1%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,107] = all_regions_dict[region_key]['mtv_fail_cue_2%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,108] = all_regions_dict[region_key]['mtv_fail_cue_3%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,109] = all_regions_dict[region_key]['mtv_fail_cue_4%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,110] = all_regions_dict[region_key]['mtv_fail_cue_5%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,111] = all_regions_dict[region_key]['mtv_fail_cue_6%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,112] = all_regions_dict[region_key]['val_succ_result_-3%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,113] = all_regions_dict[region_key]['val_succ_result_-2%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,114] = all_regions_dict[region_key]['val_succ_result_-1%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,115] = all_regions_dict[region_key]['val_succ_result_0%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,116] = all_regions_dict[region_key]['val_succ_result_1%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,117] = all_regions_dict[region_key]['val_succ_result_2%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,118] = all_regions_dict[region_key]['val_succ_result_3%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,119] = all_regions_dict[region_key]['val_fail_result_-3%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,120] = all_regions_dict[region_key]['val_fail_result_-2%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,121] = all_regions_dict[region_key]['val_fail_result_-1%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,122] = all_regions_dict[region_key]['val_fail_result_0%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,123] = all_regions_dict[region_key]['val_fail_result_1%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,124] = all_regions_dict[region_key]['val_fail_result_2%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,125] = all_regions_dict[region_key]['val_fail_result_3%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,126] = all_regions_dict[region_key]['mtv_succ_result_0%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,127] = all_regions_dict[region_key]['mtv_succ_result_1%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,128] = all_regions_dict[region_key]['mtv_succ_result_2%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,129] = all_regions_dict[region_key]['mtv_succ_result_3%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,130] = all_regions_dict[region_key]['mtv_succ_result_4%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,131] = all_regions_dict[region_key]['mtv_succ_result_5%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,132] = all_regions_dict[region_key]['mtv_succ_result_6%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,133] = all_regions_dict[region_key]['mtv_fail_result_0%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,134] = all_regions_dict[region_key]['mtv_fail_result_1%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,135] = all_regions_dict[region_key]['mtv_fail_result_2%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,136] = all_regions_dict[region_key]['mtv_fail_result_3%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,137] = all_regions_dict[region_key]['mtv_fail_result_4%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,138] = all_regions_dict[region_key]['mtv_fail_result_5%s' %(suffix)][0]['gf_std']
+        except:
+                pass
+        try:
+                temp_array[:,139] = all_regions_dict[region_key]['mtv_fail_result_6%s' %(suffix)][0]['gf_std']
         except:
                 pass
 
-        ###################
-        try:
-                temp_array[:,96] = all_regions_dict[region_key]['r_all_catch_cue%s' %(suffix)][0]['gf_avg']
-        except:
-                pass
-        try:
-                temp_array[:,97] = all_regions_dict[region_key]['p_all_catch_cue%s' %(suffix)][0]['gf_avg']
-        except:
-                pass
-        try:
-                temp_array[:,98] = all_regions_dict[region_key]['r_all_catch_result%s' %(suffix)][0]['gf_avg']
-        except:
-                pass
-        try:
-                temp_array[:,99] = all_regions_dict[region_key]['p_all_catch_result%s' %(suffix)][0]['gf_avg']
-        except:
-                pass
-        try:
-                temp_array[:,100] = all_regions_dict[region_key]['r_all_catch_cue%s' %(suffix)][0]['gf_std']
-        except:
-                pass
-        try:
-                temp_array[:,101] = all_regions_dict[region_key]['p_all_catch_cue%s' %(suffix)][0]['gf_std']
-        except:
-                pass
-        try:
-                temp_array[:,102] = all_regions_dict[region_key]['r_all_catch_result%s' %(suffix)][0]['gf_std']
-        except:
-                pass
-        try:
-                temp_array[:,103] = all_regions_dict[region_key]['p_all_catch_result%s' %(suffix)][0]['gf_std']
-        except:
-                pass
-        #########
-        try:
-                temp_array[:,104] = all_regions_dict[region_key]['ra_succ_cue%s' %(suffix)][0]['gf_avg']
-        except:
-                pass
-        try:
-                temp_array[:,105] = all_regions_dict[region_key]['ra_fail_cue%s' %(suffix)][0]['gf_avg']
-        except:
-                pass
-        try:
-                temp_array[:,106] = all_regions_dict[region_key]['pa_succ_cue%s' %(suffix)][0]['gf_avg']
-        except:
-                pass
-        try:
-                temp_array[:,107] = all_regions_dict[region_key]['pa_fail_cue%s' %(suffix)][0]['gf_avg']
-        except:
-                pass
-        try:
-                temp_array[:,108] = all_regions_dict[region_key]['ra_succ_result%s' %(suffix)][0]['gf_avg']
-        except:
-                pass
-        try:
-                temp_array[:,109] = all_regions_dict[region_key]['ra_fail_result%s' %(suffix)][0]['gf_avg']
-        except:
-                pass
-        try:
-                temp_array[:,110] = all_regions_dict[region_key]['pa_succ_result%s' %(suffix)][0]['gf_avg']
-        except:
-                pass
-        try:
-                temp_array[:,111] = all_regions_dict[region_key]['pa_fail_result%s' %(suffix)][0]['gf_avg']
-        except:
-                pass
-        try:
-                temp_array[:,112] = all_regions_dict[region_key]['ra_succ_cue%s' %(suffix)][0]['gf_std']
-        except:
-                pass
-        try:
-                temp_array[:,113] = all_regions_dict[region_key]['ra_fail_cue%s' %(suffix)][0]['gf_std']
-        except:
-                pass
-        try:
-                temp_array[:,114] = all_regions_dict[region_key]['pa_succ_cue%s' %(suffix)][0]['gf_std']
-        except:
-                pass
-        try:
-                temp_array[:,115] = all_regions_dict[region_key]['pa_fail_cue%s' %(suffix)][0]['gf_std']
-        except:
-                pass
-        try:
-                temp_array[:,116] = all_regions_dict[region_key]['ra_succ_result%s' %(suffix)][0]['gf_std']
-        except:
-                pass
-        try:
-                temp_array[:,117] = all_regions_dict[region_key]['ra_fail_result%s' %(suffix)][0]['gf_std']
-        except:
-                pass
-        try:
-                temp_array[:,118] = all_regions_dict[region_key]['pa_succ_result%s' %(suffix)][0]['gf_std']
-        except:
-                pass
-        try:
-                temp_array[:,119] = all_regions_dict[region_key]['pa_fail_result%s' %(suffix)][0]['gf_std']
-        except:
-                pass
+        names = ['val_all_cue_-3_avg','val_all_cue_-2_avg','val_all_cue_-1_avg','val_all_cue_0_avg','val_all_cue_1_avg','val_all_cue_2_avg','val_all_cue_3_avg','val_succ_cue_-3_avg','val_succ_cue_-2_avg','val_succ_cue_-1_avg','val_succ_cue_0_avg','val_succ_cue_1_avg','val_succ_cue_2_avg','val_succ_cue_3_avg','val_fail_cue_-3_avg','val_fail_cue_-2_avg','val_fail_cue_-1_avg','val_fail_cue_0_avg','val_fail_cue_1_avg','val_fail_cue_2_avg','val_fail_cue_3_avg','mtv_all_cue_0_avg','mtv_all_cue_1_avg','mtv_all_cue_2_avg','mtv_all_cue_3_avg','mtv_all_cue_4_avg','mtv_all_cue_5_avg','mtv_all_cue_6_avg','mtv_succ_cue_0_avg','mtv_succ_cue_1_avg','mtv_succ_cue_2_avg','mtv_succ_cue_3_avg','mtv_succ_cue_4_avg','mtv_succ_cue_5_avg','mtv_succ_cue_6_avg','mtv_fail_cue_0_avg','mtv_fail_cue_1_avg','mtv_fail_cue_2_avg','mtv_fail_cue_3_avg','mtv_fail_cue_4_avg','mtv_fail_cue_5_avg','mtv_fail_cue_6_avg','val_succ_result_-3_avg','val_succ_result_-2_avg','val_succ_result_-1_avg','val_succ_result_0_avg','val_succ_result_1_avg','val_succ_result_2_avg','val_succ_result_3_avg','val_fail_result_-3_avg','val_fail_result_-2_avg','val_fail_result_-1_avg','val_fail_result_0_avg','val_fail_result_1_avg','val_fail_result_2_avg','val_fail_result_3_avg','mtv_succ_result_0_avg','mtv_succ_result_1_avg','mtv_succ_result_2_avg','mtv_succ_result_3_avg','mtv_succ_result_4_avg','mtv_succ_result_5_avg','mtv_succ_result_6_avg','mtv_fail_result_0_avg','mtv_fail_result_1_avg','mtv_fail_result_2_avg','mtv_fail_result_3_avg','mtv_fail_result_4_avg','mtv_fail_result_5_avg','mtv_fail_result_6_avg','val_all_cue_-3_std','val_all_cue_-2_std','val_all_cue_-1_std','val_all_cue_0_std','val_all_cue_1_std','val_all_cue_2_std','val_all_cue_3_std','val_succ_cue_-3_std','val_succ_cue_-2_std','val_succ_cue_-1_std','val_succ_cue_0_std','val_succ_cue_1_std','val_succ_cue_2_std','val_succ_cue_3_std','val_fail_cue_-3_std','val_fail_cue_-2_std','val_fail_cue_-1_std','val_fail_cue_0_std','val_fail_cue_1_std','val_fail_cue_2_std','val_fail_cue_3_std','mtv_all_cue_0_std','mtv_all_cue_1_std','mtv_all_cue_2_std','mtv_all_cue_3_std','mtv_all_cue_4_std','mtv_all_cue_5_std','mtv_all_cue_6_std','mtv_succ_cue_0_std','mtv_succ_cue_1_std','mtv_succ_cue_2_std','mtv_succ_cue_3_std','mtv_succ_cue_4_std','mtv_succ_cue_5_std','mtv_succ_cue_6_std','mtv_fail_cue_0_std','mtv_fail_cue_1_std','mtv_fail_cue_2_std','mtv_fail_cue_3_std','mtv_fail_cue_4_std','mtv_fail_cue_5_std','mtv_fail_cue_6_std','val_succ_result_-3_std','val_succ_result_-2_std','val_succ_result_-1_std','val_succ_result_0_std','val_succ_result_1_std','val_succ_result_2_std','val_succ_result_3_std','val_fail_result_-3_std','val_fail_result_-2_std','val_fail_result_-1_std','val_fail_result_0_std','val_fail_result_1_std','val_fail_result_2_std','val_fail_result_3_std','mtv_succ_result_0_std','mtv_succ_result_1_std','mtv_succ_result_2_std','mtv_succ_result_3_std','mtv_succ_result_4_std','mtv_succ_result_5_std','mtv_succ_result_6_std','mtv_fail_result_0_std','mtv_fail_result_1_std','mtv_fail_result_2_std','mtv_fail_result_3_std','mtv_fail_result_4_std','mtv_fail_result_5_std','mtv_fail_result_6_std']
 
-
-        names = ['p3_fail_cue_avg','p2_fail_cue_avg','p1_fail_cue_avg','p0_fail_cue_avg','r0_succ_cue_avg','r1_succ_cue_avg','r2_succ_cue_avg','r3_succ_cue_avg','p3_succ_cue_avg','p2_succ_cue_avg','p1_succ_cue_avg','p0_succ_cue_avg','r0_fail_cue_avg','r1_fail_cue_avg','r2_fail_cue_avg','r3_fail_cue_avg','p3_fail_result_avg','p2_fail_result_avg','p1_fail_result_avg','p0_fail_result_avg','r0_succ_result_avg','r1_succ_result_avg','r2_succ_result_avg','r3_succ_result_avg','p3_succ_result_avg','p2_succ_result_avg','p1_succ_result_avg','p0_succ_result_avg','r0_fail_result_avg','r1_fail_result_avg','r2_fail_result_avg','r3_fail_result_avg','p3_catch_cue_avg','p2_catch_cue_avg','p1_catch_cue_avg','p0_catch_cue_avg','r0_catch_cue_avg','r1_catch_cue_avg','r2_catch_cue_avg','r3_catch_cue_avg','p3_catch_result_avg','p2_catch_result_avg','p1_catch_result_avg','p0_catch_result_avg','r0_catch_result_avg','r1_catch_result_avg','r2_catch_result_avg','r3_catch_result_avg','p3_fail_cue_std','p2_fail_cue_std','p1_fail_cue_std','p0_fail_cue_std','r0_succ_cue_std','r1_succ_cue_std','r2_succ_cue_std','r3_succ_cue_std','p3_succ_cue_std','p2_succ_cue_std','p1_succ_cue_std','p0_succ_cue_std','r0_fail_cue_std','r1_fail_cue_std','r2_fail_cue_std','r3_fail_cue_std','p3_fail_result_std','p2_fail_result_std','p1_fail_result_std','p0_fail_result_std','r0_succ_result_std','r1_succ_result_std','r2_succ_result_std','r3_succ_result_std','p3_succ_result_std','p2_succ_result_std','p1_succ_result_std','p0_succ_result_std','r0_fail_result_std','r1_fail_result_std','r2_fail_result_std','r3_fail_result_std','p3_catch_cue_std','p2_catch_cue_std','p1_catch_cue_std','p0_catch_cue_std','r0_catch_cue_std','r1_catch_cue_std','r2_catch_cue_std','r3_catch_cue_std','p3_catch_result_std','p2_catch_result_std','p1_catch_result_std','p0_catch_result_std','r0_catch_result_std','r1_catch_result_std','r2_catch_result_std','r3_catch_result_std','r_all_catch_cue_avg','p_all_catch_cue_avg','r_all_catch_result_avg','p_all_catch_result_avg','r_all_catch_cue_std','p_all_catch_cue_std','r_all_catch_result_std','p_all_catch_result_std','ra_succ_cue_avg','ra_fail_cue_avg','pa_succ_cue_avg','pa_fail_cue_avg','ra_succ_result_avg','ra_fail_result_avg','pa_succ_result_avg','pa_fail_result_avg','ra_succ_cue_std','ra_fail_cue_std','pa_succ_cue_std','pa_fail_cue_std','ra_succ_result_std','ra_fail_result_std','pa_succ_result_std','pa_fail_result_std']
-        
         gf_worksheet = gf_workbook.add_worksheet('unit_%s' %(0))
         gf_worksheet.write_row(0,0,names)
         for j in range(temp_array.shape[0]):
                 gf_worksheet.write_row(j+1,0,temp_array[j,:])
 
+
+###### TODO ADD TO PARAMS ###
+plot_linreg_hist_bool = True
+sig_pval = 0.10 #to two digits
+#############################
+
+#col 0= slope, 1= intercept, 2= r_value, 3=p_value, 4=std_err
+if plot_linreg_hist_bool:
+        print 'plotting histograms'
+        
+        for region_key,region_value in linreg_total_dicts.iteritems():
+                if 'PmV' in region_key:
+                        continue
+
+                val_all_cue_slopes = linreg_total_dicts[region_key]['val_all_cue_linreg_results'][:,0]
+                val_succ_cue_slopes = linreg_total_dicts[region_key]['val_succ_cue_linreg_results'][:,0]
+                val_fail_cue_slopes = linreg_total_dicts[region_key]['val_fail_cue_linreg_results'][:,0]
+                val_succ_result_slopes = linreg_total_dicts[region_key]['val_succ_result_linreg_results'][:,0]
+                val_fail_result_slopes = linreg_total_dicts[region_key]['val_fail_result_linreg_results'][:,0]
+                mtv_all_cue_slopes = linreg_total_dicts[region_key]['mtv_all_cue_linreg_results'][:,0]
+                mtv_succ_cue_slopes = linreg_total_dicts[region_key]['mtv_succ_cue_linreg_results'][:,0]
+                mtv_fail_cue_slopes = linreg_total_dicts[region_key]['mtv_fail_cue_linreg_results'][:,0]
+                mtv_succ_result_slopes = linreg_total_dicts[region_key]['mtv_succ_result_linreg_results'][:,0]
+                mtv_fail_result_slopes = linreg_total_dicts[region_key]['mtv_fail_result_linreg_results'][:,0]
+
+                ax = plt.gca()
+                plt.subplot(3,2,1)                
+                plt.hist(val_all_cue_slopes)
+                plt.title('Value: All cue',fontsize='small')
+                plt.subplot(3,2,2)                
+                plt.hist(val_succ_result_slopes)
+                plt.title('Value: Success result',fontsize='small')
+                plt.subplot(3,2,3)                
+                plt.hist(val_fail_result_slopes)
+                plt.title('Value: Failure result',fontsize='small')
+                plt.subplot(3,2,4)                
+                plt.hist(mtv_all_cue_slopes)
+                plt.title('Motivation: All cue',fontsize='small')
+                plt.subplot(3,2,5)                
+                plt.hist(mtv_succ_result_slopes)
+                plt.title('Motivation: Success result',fontsize='small')
+                plt.subplot(3,2,6)                
+                plt.hist(mtv_fail_result_slopes)
+                plt.title('Motivation: Failure result',fontsize='small')
+
+                plt.tight_layout()
+                plt.rcParams['xtick.labelsize'] = 8
+                plt.subplots_adjust(top=0.9)
+                plt.suptitle('linreg slopes region: %s' %(region_key),fontsize=20)
+                plt.savefig('linreg_hist_%s' %(region_key))
+                plt.clf()
+
+                #sig results
+                val_all_cue_sigs = linreg_total_dicts[region_key]['val_all_cue_linreg_results'][:,0][linreg_total_dicts[region_key]['val_all_cue_linreg_results'][:,3] <= sig_pval]
+                val_succ_cue_sigs = linreg_total_dicts[region_key]['val_succ_cue_linreg_results'][:,0][linreg_total_dicts[region_key]['val_succ_cue_linreg_results'][:,3] <= sig_pval]
+                val_fail_cue_sigs = linreg_total_dicts[region_key]['val_fail_cue_linreg_results'][:,0][linreg_total_dicts[region_key]['val_fail_cue_linreg_results'][:,3] <= sig_pval]
+                val_succ_result_sigs = linreg_total_dicts[region_key]['val_succ_result_linreg_results'][:,0][linreg_total_dicts[region_key]['val_succ_result_linreg_results'][:,3] <= sig_pval]
+                val_fail_result_sigs = linreg_total_dicts[region_key]['val_fail_result_linreg_results'][:,0][linreg_total_dicts[region_key]['val_fail_result_linreg_results'][:,3] <= sig_pval]
+                mtv_all_cue_sigs = linreg_total_dicts[region_key]['mtv_all_cue_linreg_results'][:,0][linreg_total_dicts[region_key]['mtv_all_cue_linreg_results'][:,3] <= sig_pval]
+                mtv_succ_cue_sigs = linreg_total_dicts[region_key]['mtv_succ_cue_linreg_results'][:,0][linreg_total_dicts[region_key]['mtv_succ_cue_linreg_results'][:,3] <= sig_pval]
+                mtv_fail_cue_sigs = linreg_total_dicts[region_key]['mtv_fail_cue_linreg_results'][:,0][linreg_total_dicts[region_key]['mtv_fail_cue_linreg_results'][:,3] <= sig_pval]
+                mtv_succ_result_sigs = linreg_total_dicts[region_key]['mtv_succ_result_linreg_results'][:,0][linreg_total_dicts[region_key]['mtv_succ_result_linreg_results'][:,3] <= sig_pval]
+                mtv_fail_result_sigs = linreg_total_dicts[region_key]['mtv_fail_result_linreg_results'][:,0][linreg_total_dicts[region_key]['mtv_fail_result_linreg_results'][:,3] <= sig_pval]
+                
+                all_sigs = {'val_all_cue_sigs':val_all_cue_sigs,'val_succ_result_sigs':val_succ_result_sigs,'val_fail_result_sigs':val_fail_result_sigs,'mtv_all_cue_sigs':mtv_all_cue_sigs,'mtv_succ_result_sigs':mtv_succ_result_sigs,'mtv_fail_result_sigs':mtv_fail_result_sigs}
+                for sig_key,sig_val in all_sigs.iteritems():
+                        if np.shape(sig_val)[0] == 0:
+                                all_sigs[sig_key] = [0]
+
+                ax = plt.gca()
+                plt.subplot(3,2,1)                
+                plt.hist(all_sigs['val_all_cue_sigs'])
+                plt.title('Value: All cue',fontsize='small')
+                plt.subplot(3,2,2)                
+                plt.hist(all_sigs['val_succ_result_sigs'])
+                plt.title('Value: Success result',fontsize='small')
+                plt.subplot(3,2,3)                
+                plt.hist(all_sigs['val_fail_result_sigs'])
+                plt.title('Value: Failure result',fontsize='small')
+                plt.subplot(3,2,4)                
+                plt.hist(all_sigs['mtv_all_cue_sigs'])
+                plt.title('Motivation: All cue',fontsize='small')
+                plt.subplot(3,2,5)                
+                plt.hist(all_sigs['mtv_succ_result_sigs'])
+                plt.title('Motivation: Success result',fontsize='small')
+                plt.subplot(3,2,6)                
+                plt.hist(all_sigs['mtv_fail_result_sigs'])
+                plt.title('Motivation: Failure result',fontsize='small')
+
+                plt.tight_layout()
+                plt.rcParams['xtick.labelsize'] = 8
+                plt.subplots_adjust(top=0.9)
+                plt.suptitle('sig linreg slopes region: %s, pval = 0.%s' %(region_key,str(int(sig_pval*100))),fontsize=20)
+                plt.savefig('linreg_hist_sig_%s_%s' %(str(int(sig_pval*100)),region_key))
+                plt.clf()
+
+
+
+
+
+
+                
