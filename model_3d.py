@@ -15,6 +15,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import statsmodels.api as sm
 import pandas as pd
+from matplotlib import cm
+import xlsxwriter
 
 #######################
 #params to set ########
@@ -25,8 +27,9 @@ time_before = -0.5 #negative value
 time_after = 1.0
 baseline_time = -1.0 #negative value
 normalize_bool = True
-plot_model_bool = True
 sqrt_bool = False
+plot_3d_bool = False
+mv_bool = True
 
 ts_filename = glob.glob('Extracted*_timestamps.mat')[0]
 extracted_filename = ts_filename[:-15] + '.mat'
@@ -135,597 +138,125 @@ def calc_firing_rates(hists,data_key,condensed):
         return_dict = {'bfr_cue_fr':bfr_cue_fr,'aft_cue_fr':aft_cue_fr,'bfr_result_fr':bfr_result_fr,'aft_result_fr':aft_result_fr,'bfr_cue_nl_fr':bfr_cue_nl_fr,'aft_cue_nl_fr':aft_cue_nl_fr,'bfr_result_nl_fr':bfr_result_nl_fr,'aft_result_nl_fr':aft_result_nl_fr,'baseline_fr':baseline_fr}
         return(return_dict)
 
-def make_3d_plot(fr_data,condensed,region_key,type_key):
+def make_3d_model(fr_data,condensed,region_key,type_key):
         
         avg_fr_data = np.mean(fr_data,axis=2)
+
+        return_dict = {}
+        conc_r_vals = []
+        conc_p_vals = []
+        conc_avg_frs = []
+        sig_rsquared = []
+        sig_fpvalue = []
+        sig_pvals = []
+        sig_const = []
+        sig_alpha = []
+        sig_beta = []
 
         for unit_num in range(fr_data.shape[1]):
                 r_vals = condensed[:,3]
                 p_vals = condensed[:,4]
                 avg_frs = avg_fr_data[:,unit_num]
         
+                conc_r_vals = np.append(conc_r_vals,r_vals)
+                conc_p_vals = np.append(conc_p_vals,p_vals)
+                conc_avg_frs = np.append(conc_avg_frs,avg_frs)
+
                 df_dict = {'R':r_vals,'P':p_vals,'fr':avg_frs}
                 df = pd.DataFrame(df_dict)
 
                 X = df[['R','P']]
                 y = df['fr']
-        
-                X = sm.add_constant(X)
+                X = sm.add_constant(X) #adds k value
+                
+                #fitting to: avg firing rate = alpha * R + beta * P + k
+
                 model = sm.OLS(y,X).fit()
-                print model.summary()
+                param_dict = model.params
+                stat_result_dict = {'rsquared':model.rsquared,'rsquared_adj':model.rsquared_adj,'fvalue':model.fvalue,'f_pvalue':model.f_pvalue,'pvalues':model.pvalues,'conf_int':model.conf_int(),'std_err':model.bse}
+                unit_dict = {'model':model,'param_dict':param_dict,'stat_result_dict':stat_result_dict}
+                return_dict[unit_num] = unit_dict
 
+                if model.rsquared >= 0.8:
+                        sig_rsquared = np.append(sig_rsquared,unit_num)
+                if model.f_pvalue <= 0.05:
+                        sig_fpvalue = np.append(sig_fpvalue,unit_num)
+                #if (model.pvalues < 0.05).any():
+                if model.pvalues[1] <= 0.05 or model.pvalues[2] <= 0.05:
+                        sig_pvals = np.append(sig_pvals,unit_num)
+                if model.pvalues[0] <= 0.05:
+                        sig_const = np.append(sig_const,unit_num)
+                if model.pvalues[1] <= 0.05:
+                        sig_alpha = np.append(sig_alpha,unit_num)  #alpha * R
+                if model.pvalues[2] <= 0.05:
+                        sig_beta = np.append(sig_beta,unit_num)   #beta * P
 
-
-                fig = plt.figure()
-                ax = fig.add_subplot(111,projection='3d')
-                ax.scatter(r_vals,p_vals,avg_frs,c='purple',marker='o')
-                plt.title('Region %s, unit %s' %(region_key,unit_num))
-
-                ax.set_xlabel('R value')
-                ax.set_ylabel('P value')
-                ax.set_zlabel('avg firing rate')
-
-                #flipping z axis to left
-                tmp_planes = ax.zaxis._PLANES
-                ax.zaxis._PLANES = ( tmp_planes[2], tmp_planes[3],
-                                     tmp_planes[0], tmp_planes[1],
-                                     tmp_planes[4], tmp_planes[5])
-                view_1 = (25,-135)
-                view_2 = (15,-55)
-                init_view = view_2
-                ax.view_init(*init_view)
-
-                plt.savefig('plot3d_%s_%s' %(region_key,str(unit_num).zfill(2)))
-                plt.clf()
-
-        return_dict = {}
-        return(return_dict)
-
-
-
-
-def func(X,alpha,beta,k):
-        R,P = X
-        return (alpha * R + beta * P + k)
-
-def make_model(fr_data,condensed,region_key,type_key):
-    
-        best_fit_params = np.zeros((fr_data.shape[0],fr_data.shape[1],5))
-        pcov_noninf = []
-        for unit_num in range(fr_data.shape[1]):
-                for event_num in range(fr_data.shape[0]):
-                
-                        R = condensed[event_num,3]
-                        P = condensed[event_num,4]
-                        X=R,P
-                
-                        fr = fr_data[event_num,unit_num,:]
-                        try:
-                                popt,pcov = curve_fit(func,X,fr)
-                        except:
-                                print 'exception %s, unit %s, event %s' %(region_key,unit_num,event_num)
-                                best_fit_params[event_num,unit_num,:] = [9999, 9999, 9999, R, P]
-
-                        #popt 0 = alpha, 1 = beta, 2 = k, 3 = R, 4 = P
-                        best_fit_params[event_num,unit_num,:] = [popt[0], popt[1], popt[2], R, P]
+                if plot_3d_bool:
+                        fig = plt.figure()
+                        ax = fig.add_subplot(111,projection='3d')
+                        ax.scatter(r_vals,p_vals,avg_frs,c='purple',marker='o')
                         
-                        #pcov 3x3 matrix, or inf
-                        #one std dev error on params = perr = np.sqrt(np.diag(pcov))
-                        if not np.isinf(pcov).any():
-                                perr= np.sqrt(np.diag(pcov))
-                                pcov_row = [event_num, unit_num, perr[0], perr[1], perr[2]]
-                                pcov_noninf.append(pcov_row)
+                        x_linspace = np.linspace(np.min(r_vals)-1,np.max(r_vals)+1)
+                        y_linspace = np.linspace(np.min(p_vals)-1,np.max(p_vals)+1)
+                        x,y = np.meshgrid(x_linspace,y_linspace)
+                        z = param_dict['R'] * x + param_dict['P'] * y + param_dict['const']
+                        surf = ax.plot_surface(x, y, z,cmap='Blues',alpha=0.4,linewidth=0)
 
-        #avg_temp = best_fit_params[best_fit_params != 9999]
-        avg_temp = best_fit_params
-        avg_temp[avg_temp == 9999] = np.nan
 
-        unit_avg = np.nanmean(avg_temp,axis=0)
+                        plt.title('Region %s, %s, unit %s' %(region_key,type_key,unit_num))
 
-        return_dict = {'best_fit_params':best_fit_params,'pcov_noninf':pcov_noninf,'unit_avg':unit_avg}
+                        ax.set_xlabel('R value')
+                        ax.set_ylabel('P value')
+                        ax.set_zlabel('avg firing rate')
+
+                        #flipping z axis to left
+                        tmp_planes = ax.zaxis._PLANES
+                        ax.zaxis._PLANES = ( tmp_planes[2], tmp_planes[3],
+                                             tmp_planes[0], tmp_planes[1],
+                                             tmp_planes[4], tmp_planes[5])
+                        view_1 = (25,-135)
+                        view_2 = (15,-55)
+                        init_view = view_2
+                        ax.view_init(*init_view)
+
+                        ax.set_xlim(np.min(r_vals)-1,np.max(r_vals)+1)
+                        ax.set_ylim(np.min(p_vals)-1,np.max(p_vals)+1)
+
+                        plt.savefig('plot3dmodel_%s_%s_%s' %(region_key,type_key,str(unit_num).zfill(2)))
+                        plt.clf()
+        
+        #pdb.set_trace()
+        df_conc_dict = {'conc_R_vals':conc_r_vals,'conc_P_vals':conc_p_vals,'conc_avg_frs':conc_avg_frs}
+        df_conc = pd.DataFrame(df_conc_dict)
+        X = df_conc[['conc_R_vals','conc_P_vals']]
+        y = df_conc['conc_avg_frs']
+        X = sm.add_constant(X)
+        conc_model = sm.OLS(y,X).fit()
+        param_conc_dict = conc_model.params
+        stat_conc_result_dict = {'rsquared':conc_model.rsquared,'rsquared_adj':conc_model.rsquared_adj,'fvalue':conc_model.fvalue,'f_pvalue':conc_model.f_pvalue,'pvalues':conc_model.pvalues,'conf_int':conc_model.conf_int(),'std_err':conc_model.bse}
+
+        perc_sig_f_pvals = np.shape(sig_fpvalue)[0] / float(unit_num)
+        perc_sig_rsquared = np.shape(sig_rsquared)[0] / float(unit_num)
+        perc_sig_pvals = np.shape(sig_pvals)[0] / float(unit_num)
+        perc_sig_const = np.shape(sig_const)[0] / float(unit_num)
+        perc_sig_alpha = np.shape(sig_alpha)[0] / float(unit_num)
+        perc_sig_beta = np.shape(sig_beta)[0] / float(unit_num)
+
+        return_dict['conc'] = {'conc_model':conc_model,'param_conc_dict':param_conc_dict,'stat_conc_result_dict':stat_conc_result_dict,'sig_rsquared':sig_rsquared,'sig_fpvalue':sig_fpvalue,'sig_pvals':sig_pvals,'sig_const':sig_const,'sig_alpha':sig_alpha,'sig_beta':sig_beta,'perc_sic_f_pvals':perc_sig_f_pvals,'perc_sig_rsquared':perc_sig_rsquared,'perc_sig_pvals':perc_sig_pvals,'perc_sig_const':perc_sig_const,'perc_sig_alpha':perc_sig_alpha,'perc_sig_beta':perc_sig_beta,'df_conc_dict':df_conc_dict,'avg_frs':avg_frs,'avg_fr_data':avg_fr_data}
+                
         return(return_dict)
 
 
-def plot_avgs(bfr_cue_model,aft_cue_model,bfr_result_model,aft_result_model,bfr_cue_fr,aft_cue_fr,bfr_result_fr,aft_result_fr,region_key,type_key):
-        #if type_key == 'succ':
-        #        pdb.set_trace()
-
-        print 'plotting hists %s %s' %(region_key,type_key)
-
-        #plot avg for each unit
-        #plot hist for each unit
-
-        bfr_cue_params = bfr_cue_model['best_fit_params']
-        bfr_cue_unit_avg = bfr_cue_model['unit_avg']
-        aft_cue_params = aft_cue_model['best_fit_params']
-        aft_cue_unit_avg = aft_cue_model['unit_avg']
-        bfr_result_params = bfr_result_model['best_fit_params']
-        bfr_result_unit_avg = bfr_result_model['unit_avg']
-        aft_result_params = aft_result_model['best_fit_params']
-        aft_result_unit_avg = aft_result_model['unit_avg']
-
-        bfr_cue_fr_avg = np.mean(bfr_cue_fr,axis=0)
-        aft_cue_fr_avg = np.mean(aft_cue_fr,axis=0)
-        bfr_result_fr_avg = np.mean(bfr_result_fr,axis=0)
-        aft_result_fr_avg = np.mean(aft_result_fr,axis=0)
-        
-        #popt 0 = alpha, 1 = beta, 2 = k, 3 = R, 4 = P
-        for unit_num in range(np.shape(bfr_cue_params)[1]):
-                bfr_cue_unit_vals = bfr_cue_params[:,unit_num,:]
-                aft_cue_unit_vals = aft_cue_params[:,unit_num,:]
-                bfr_result_unit_vals = bfr_result_params[:,unit_num,:]
-                aft_result_unit_vals = aft_result_params[:,unit_num,:]
-
-                #bfr_cue_unit_vals = bfr_cue_unit_vals[bfr_cue_unit_vals != 9999]
-                #aft_cue_unit_vals = aft_cue_unit_vals[aft_cue_unit_vals != 9999]
-                #bfr_result_unit_vals = bfr_result_unit_vals[bfr_result_unit_vals != 9999]
-                #aft_result_unit_vals = aft_result_unit_vals[aft_result_unit_vals != 9999]
-
-                bfr_cue_unit_alpha = bfr_cue_unit_vals[:,0]
-                bfr_cue_unit_beta = bfr_cue_unit_vals[:,1]
-                bfr_cue_unit_k = bfr_cue_unit_vals[:,2]
-                aft_cue_unit_alpha = aft_cue_unit_vals[:,0]
-                aft_cue_unit_beta = aft_cue_unit_vals[:,1]
-                aft_cue_unit_k = aft_cue_unit_vals[:,2]
-                bfr_result_unit_alpha = bfr_result_unit_vals[:,0]
-                bfr_result_unit_beta = bfr_result_unit_vals[:,1]
-                bfr_result_unit_k = bfr_result_unit_vals[:,2]
-                aft_result_unit_alpha = aft_result_unit_vals[:,0]
-                aft_result_unit_beta = aft_result_unit_vals[:,1]
-                aft_result_unit_k = aft_result_unit_vals[:,2]
-
-                bfr_cue_unit_alpha = bfr_cue_unit_alpha[bfr_cue_unit_alpha != 9999]
-                bfr_cue_unit_beta = bfr_cue_unit_beta[bfr_cue_unit_beta != 9999]
-                bfr_cue_unit_k = bfr_cue_unit_k[bfr_cue_unit_k != 9999]
-                aft_cue_unit_alpha = aft_cue_unit_alpha[aft_cue_unit_alpha != 9999]
-                aft_cue_unit_beta = aft_cue_unit_beta[aft_cue_unit_beta != 9999]
-                aft_cue_unit_k = aft_cue_unit_k[aft_cue_unit_k != 9999]
-                bfr_result_unit_alpha = bfr_result_unit_alpha[bfr_result_unit_alpha != 9999]
-                bfr_result_unit_beta = bfr_result_unit_beta[bfr_result_unit_beta != 9999]
-                bfr_result_unit_k = bfr_result_unit_k[bfr_result_unit_k != 9999]
-                aft_result_unit_alpha = aft_result_unit_alpha[aft_result_unit_alpha != 9999]
-                aft_result_unit_beta = aft_result_unit_beta[aft_result_unit_beta != 9999]
-                aft_result_unit_k = aft_result_unit_k[aft_result_unit_k != 9999]
-
-                ax = plt.gca()
-                plt.subplot(4,3,1)
-                plt.hist(bfr_cue_unit_alpha)
-                plt.title('before cue: alpha',fontsize='small')
-                plt.subplot(4,3,2)
-                plt.hist(bfr_cue_unit_beta)
-                plt.title('beta',fontsize='small')
-                plt.subplot(4,3,3)
-                plt.hist(bfr_cue_unit_k)
-                plt.title('k',fontsize='small')
-
-                plt.subplot(4,3,4)
-                plt.hist(aft_cue_unit_alpha)
-                plt.title('after cue: alpha',fontsize='small')
-                plt.subplot(4,3,5)
-                plt.hist(aft_cue_unit_beta)
-                plt.title('beta',fontsize='small')
-                plt.subplot(4,3,6)
-                plt.hist(aft_cue_unit_k)
-                plt.title('k',fontsize='small')
-
-                plt.subplot(4,3,7)
-                plt.hist(bfr_result_unit_alpha)
-                plt.title('before result: alpha',fontsize='small')
-                plt.subplot(4,3,8)
-                plt.hist(bfr_result_unit_beta)
-                plt.title('beta',fontsize='small')
-                plt.subplot(4,3,9)
-                plt.hist(bfr_result_unit_k)
-                plt.title('k',fontsize='small')
-
-                plt.subplot(4,3,10)
-                plt.hist(aft_result_unit_alpha)
-                plt.title('after result: alpha',fontsize='small')
-                plt.subplot(4,3,11)
-                plt.hist(aft_result_unit_beta)
-                plt.title('beta',fontsize='small')
-                plt.subplot(4,3,12)
-                plt.hist(aft_result_unit_k)
-                plt.title('k',fontsize='small')
-        
-                plt.tight_layout()
-                plt.subplots_adjust(top=0.9)
-                plt.rcParams['xtick.labelsize'] = 8
-                plt.rcParams['ytick.labelsize'] = 8
-                plt.suptitle('Region %s, unit %s: param hists %s' %(region_key,unit_num,type_key))
-                plt.savefig('param_hists_%s_unit%s_%s' %(region_key,str(unit_num).zfill(2),type_key))
-                plt.clf()
-
-        #average
-        ax = plt.gca()
-        plt.subplot(4,3,1)
-        plt.hist(bfr_cue_unit_avg[:,0])
-        plt.title('before cue: alpha',fontsize='small')
-        plt.subplot(4,3,2)
-        plt.hist(bfr_cue_unit_avg[:,1])
-        plt.title('beta',fontsize='small')
-        plt.subplot(4,3,3)
-        plt.hist(bfr_cue_unit_avg[:,2])
-        plt.title('k',fontsize='small')
-                
-        plt.subplot(4,3,4)
-        plt.hist(aft_cue_unit_avg[:,0])
-        plt.title('after cue: alpha',fontsize='small')
-        plt.subplot(4,3,5)
-        plt.hist(aft_cue_unit_avg[:,1])
-        plt.title('beta',fontsize='small')
-        plt.subplot(4,3,6)
-        plt.hist(aft_cue_unit_avg[:,2])
-        plt.title('k',fontsize='small')
-
-        plt.subplot(4,3,7)
-        plt.hist(bfr_result_unit_avg[:,0])
-        plt.title('before result: alpha',fontsize='small')
-        plt.subplot(4,3,8)
-        plt.hist(bfr_result_unit_avg[:,1])
-        plt.title('beta',fontsize='small')
-        plt.subplot(4,3,9)
-        plt.hist(bfr_result_unit_avg[:,2])
-        plt.title('k',fontsize='small')
-
-        plt.subplot(4,3,10)
-        plt.hist(aft_result_unit_avg[:,0])
-        plt.title('after result: alpha',fontsize='small')
-        plt.subplot(4,3,11)
-        plt.hist(aft_result_unit_avg[:,1])
-        plt.title('beta',fontsize='small')
-        plt.subplot(4,3,12)
-        plt.hist(aft_result_unit_avg[:,2])
-        plt.title('k',fontsize='small')
-        
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.9)
-        plt.rcParams['xtick.labelsize'] = 8
-        plt.rcParams['ytick.labelsize'] = 8
-        plt.suptitle('Region %s average: param hists %s' %(region_key,type_key))
-        plt.savefig('param_hists_avg_%s_%s' %(region_key,type_key))
-        plt.clf()
-
-        #concatenated hists
-        bfr_cue_flattened_alpha = np.ndarray.flatten(bfr_cue_params[:,:,0])
-        bfr_cue_flattened_beta = np.ndarray.flatten(bfr_cue_params[:,:,1])
-        bfr_cue_flattened_k = np.ndarray.flatten(bfr_cue_params[:,:,2])
-        bfr_cue_flattened_alpha = bfr_cue_flattened_alpha[bfr_cue_flattened_alpha != 9999]
-        bfr_cue_flattened_beta = bfr_cue_flattened_beta[bfr_cue_flattened_beta != 9999]
-        bfr_cue_flattened_k = bfr_cue_flattened_k[bfr_cue_flattened_k != 9999]
-
-        aft_cue_flattened_alpha = np.ndarray.flatten(aft_cue_params[:,:,0])
-        aft_cue_flattened_beta = np.ndarray.flatten(aft_cue_params[:,:,1])
-        aft_cue_flattened_k = np.ndarray.flatten(aft_cue_params[:,:,2])
-        aft_cue_flattened_alpha = aft_cue_flattened_alpha[aft_cue_flattened_alpha != 9999]
-        aft_cue_flattened_beta = aft_cue_flattened_beta[aft_cue_flattened_beta != 9999]
-        aft_cue_flattened_k = aft_cue_flattened_k[aft_cue_flattened_k != 9999]
-
-        bfr_result_flattened_alpha = np.ndarray.flatten(bfr_result_params[:,:,0])
-        bfr_result_flattened_beta = np.ndarray.flatten(bfr_result_params[:,:,1])
-        bfr_result_flattened_k = np.ndarray.flatten(bfr_result_params[:,:,2])
-        bfr_result_flattened_alpha = bfr_result_flattened_alpha[bfr_result_flattened_alpha != 9999]
-        bfr_result_flattened_beta = bfr_result_flattened_beta[bfr_result_flattened_beta != 9999]
-        bfr_result_flattened_k = bfr_result_flattened_k[bfr_result_flattened_k != 9999]
-
-        aft_result_flattened_alpha = np.ndarray.flatten(aft_result_params[:,:,0])
-        aft_result_flattened_beta = np.ndarray.flatten(aft_result_params[:,:,1])
-        aft_result_flattened_k = np.ndarray.flatten(aft_result_params[:,:,2])
-        aft_result_flattened_alpha = aft_result_flattened_alpha[aft_result_flattened_alpha != 9999]
-        aft_result_flattened_beta = aft_result_flattened_beta[aft_result_flattened_beta != 9999]
-        aft_result_flattened_k = aft_result_flattened_k[aft_result_flattened_k != 9999]
-
-        ax = plt.gca()
-        plt.subplot(4,3,1)
-        plt.hist(bfr_cue_flattened_alpha)
-        plt.title('before cue: alpha',fontsize='small')
-        plt.subplot(4,3,2)
-        plt.hist(bfr_cue_flattened_beta)
-        plt.title('beta',fontsize='small')
-        plt.subplot(4,3,3)
-        plt.hist(bfr_cue_flattened_k)
-        plt.title('k',fontsize='small')
-                
-        plt.subplot(4,3,4)
-        plt.hist(aft_cue_flattened_alpha)
-        plt.title('after cue: alpha',fontsize='small')
-        plt.subplot(4,3,5)
-        plt.hist(np.ndarray.flatten(aft_cue_params[:,:,1]))
-        plt.hist(aft_cue_flattened_beta)
-        plt.title('beta',fontsize='small',color='b')
-        plt.subplot(4,3,6)
-        plt.hist(aft_cue_flattened_k)
-        plt.title('k',fontsize='small')
-
-        plt.subplot(4,3,7)
-        plt.hist(bfr_result_flattened_alpha)
-        plt.title('before result: alpha',fontsize='small')
-        plt.subplot(4,3,8)
-        plt.hist(bfr_result_flattened_beta)
-        plt.title('beta',fontsize='small')
-        plt.subplot(4,3,9)
-        plt.hist(bfr_result_flattened_k)
-        plt.title('k',fontsize='small')
-
-        plt.subplot(4,3,10)
-        plt.hist(aft_result_flattened_alpha)
-        plt.title('after result: alpha',fontsize='small')
-        plt.subplot(4,3,11)
-        plt.hist(aft_result_flattened_beta)
-        plt.title('beta',fontsize='small')
-        plt.subplot(4,3,12)
-        plt.hist(aft_result_flattened_k)
-        plt.title('k',fontsize='small')
-        
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.9)
-        plt.rcParams['xtick.labelsize'] = 8
-        plt.rcParams['ytick.labelsize'] = 8
-        plt.suptitle('Region %s conc: param hists %s' %(region_key,type_key))
-        plt.savefig('param_hists_conc_%s_%s' %(region_key,type_key))
-        plt.clf()
-        
-        #plt averages
-        #if nl bool for labeling, already passing the correct one
-
-        return_dict = {}
-        return(return_dict)
 
 
-def plot_stacked_avgs(bfr_cue_model,aft_cue_model,bfr_result_model,aft_result_model,bfr_cue_fr,aft_cue_fr,bfr_result_fr,aft_result_fr,condensed,region_key,type_key):
-
-        print 'plotting stacked hists %s %s' %(region_key,type_key)
-
-        bfr_cue_params = bfr_cue_model['best_fit_params']
-        bfr_cue_unit_avg = bfr_cue_model['unit_avg']
-        aft_cue_params = aft_cue_model['best_fit_params']
-        aft_cue_unit_avg = aft_cue_model['unit_avg']
-        bfr_result_params = bfr_result_model['best_fit_params']
-        bfr_result_unit_avg = bfr_result_model['unit_avg']
-        aft_result_params = aft_result_model['best_fit_params']
-        aft_result_unit_avg = aft_result_model['unit_avg']
-
-        bfr_cue_fr_avg = np.mean(bfr_cue_fr,axis=0)
-        aft_cue_fr_avg = np.mean(aft_cue_fr,axis=0)
-        bfr_result_fr_avg = np.mean(bfr_result_fr,axis=0)
-        aft_result_fr_avg = np.mean(aft_result_fr,axis=0)
-        
-        bfr_cue_succ_params = bfr_cue_params[condensed[:,5] == 1]
-        bfr_cue_fail_params = bfr_cue_params[condensed[:,5] == -1]
-        aft_cue_succ_params = aft_cue_params[condensed[:,5] == 1]
-        aft_cue_fail_params = aft_cue_params[condensed[:,5] == -1]
-        bfr_result_succ_params = bfr_result_params[condensed[:,5] == 1]
-        bfr_result_fail_params = bfr_result_params[condensed[:,5] == -1]
-        aft_result_succ_params = aft_result_params[condensed[:,5] == 1]
-        aft_result_fail_params = aft_result_params[condensed[:,5] == -1]
 
 
-        #popt 0 = alpha, 1 = beta, 2 = k, 3 = R, 4 = P
-        for unit_num in range(np.shape(bfr_cue_params)[1]):
-                bfr_cue_succ_unit_vals = bfr_cue_succ_params[:,unit_num,:]
-                aft_cue_succ_unit_vals = aft_cue_succ_params[:,unit_num,:]
-                bfr_result_succ_unit_vals = bfr_result_succ_params[:,unit_num,:]
-                aft_result_succ_unit_vals = aft_result_succ_params[:,unit_num,:]
 
-                bfr_cue_fail_unit_vals = bfr_cue_fail_params[:,unit_num,:]
-                aft_cue_fail_unit_vals = aft_cue_fail_params[:,unit_num,:]
-                bfr_result_fail_unit_vals = bfr_result_fail_params[:,unit_num,:]
-                aft_result_fail_unit_vals = aft_result_fail_params[:,unit_num,:]
 
-                bfr_cue_succ_unit_alpha = bfr_cue_succ_unit_vals[:,0]
-                bfr_cue_succ_unit_beta = bfr_cue_succ_unit_vals[:,1]
-                bfr_cue_succ_unit_k = bfr_cue_succ_unit_vals[:,2]
-                aft_cue_succ_unit_alpha = aft_cue_succ_unit_vals[:,0]
-                aft_cue_succ_unit_beta = aft_cue_succ_unit_vals[:,1]
-                aft_cue_succ_unit_k = aft_cue_succ_unit_vals[:,2]
-                bfr_result_succ_unit_alpha = bfr_result_succ_unit_vals[:,0]
-                bfr_result_succ_unit_beta = bfr_result_succ_unit_vals[:,1]
-                bfr_result_succ_unit_k = bfr_result_succ_unit_vals[:,2]
-                aft_result_succ_unit_alpha = aft_result_succ_unit_vals[:,0]
-                aft_result_succ_unit_beta = aft_result_succ_unit_vals[:,1]
-                aft_result_succ_unit_k = aft_result_succ_unit_vals[:,2]
 
-                bfr_cue_succ_unit_alpha = bfr_cue_succ_unit_alpha[bfr_cue_succ_unit_alpha != 9999]
-                bfr_cue_succ_unit_beta = bfr_cue_succ_unit_beta[bfr_cue_succ_unit_beta != 9999]
-                bfr_cue_succ_unit_k = bfr_cue_succ_unit_k[bfr_cue_succ_unit_k != 9999]
-                aft_cue_succ_unit_alpha = aft_cue_succ_unit_alpha[aft_cue_succ_unit_alpha != 9999]
-                aft_cue_succ_unit_beta = aft_cue_succ_unit_beta[aft_cue_succ_unit_beta != 9999]
-                aft_cue_succ_unit_k = aft_cue_succ_unit_k[aft_cue_succ_unit_k != 9999]
-                bfr_result_succ_unit_alpha = bfr_result_succ_unit_alpha[bfr_result_succ_unit_alpha != 9999]
-                bfr_result_succ_unit_beta = bfr_result_succ_unit_beta[bfr_result_succ_unit_beta != 9999]
-                bfr_result_succ_unit_k = bfr_result_succ_unit_k[bfr_result_succ_unit_k != 9999]
-                aft_result_succ_unit_alpha = aft_result_succ_unit_alpha[aft_result_succ_unit_alpha != 9999]
-                aft_result_succ_unit_beta = aft_result_succ_unit_beta[aft_result_succ_unit_beta != 9999]
-                aft_result_succ_unit_k = aft_result_succ_unit_k[aft_result_succ_unit_k != 9999]
 
-                bfr_cue_fail_unit_alpha = bfr_cue_fail_unit_vals[:,0]
-                bfr_cue_fail_unit_beta = bfr_cue_fail_unit_vals[:,1]
-                bfr_cue_fail_unit_k = bfr_cue_fail_unit_vals[:,2]
-                aft_cue_fail_unit_alpha = aft_cue_fail_unit_vals[:,0]
-                aft_cue_fail_unit_beta = aft_cue_fail_unit_vals[:,1]
-                aft_cue_fail_unit_k = aft_cue_fail_unit_vals[:,2]
-                bfr_result_fail_unit_alpha = bfr_result_fail_unit_vals[:,0]
-                bfr_result_fail_unit_beta = bfr_result_fail_unit_vals[:,1]
-                bfr_result_fail_unit_k = bfr_result_fail_unit_vals[:,2]
-                aft_result_fail_unit_alpha = aft_result_fail_unit_vals[:,0]
-                aft_result_fail_unit_beta = aft_result_fail_unit_vals[:,1]
-                aft_result_fail_unit_k = aft_result_fail_unit_vals[:,2]
 
-                bfr_cue_fail_unit_alpha = bfr_cue_fail_unit_alpha[bfr_cue_fail_unit_alpha != 9999]
-                bfr_cue_fail_unit_beta = bfr_cue_fail_unit_beta[bfr_cue_fail_unit_beta != 9999]
-                bfr_cue_fail_unit_k = bfr_cue_fail_unit_k[bfr_cue_fail_unit_k != 9999]
-                aft_cue_fail_unit_alpha = aft_cue_fail_unit_alpha[aft_cue_fail_unit_alpha != 9999]
-                aft_cue_fail_unit_beta = aft_cue_fail_unit_beta[aft_cue_fail_unit_beta != 9999]
-                aft_cue_fail_unit_k = aft_cue_fail_unit_k[aft_cue_fail_unit_k != 9999]
-                bfr_result_fail_unit_alpha = bfr_result_fail_unit_alpha[bfr_result_fail_unit_alpha != 9999]
-                bfr_result_fail_unit_beta = bfr_result_fail_unit_beta[bfr_result_fail_unit_beta != 9999]
-                bfr_result_fail_unit_k = bfr_result_fail_unit_k[bfr_result_fail_unit_k != 9999]
-                aft_result_fail_unit_alpha = aft_result_fail_unit_alpha[aft_result_fail_unit_alpha != 9999]
-                aft_result_fail_unit_beta = aft_result_fail_unit_beta[aft_result_fail_unit_beta != 9999]
-                aft_result_fail_unit_k = aft_result_fail_unit_k[aft_result_fail_unit_k != 9999]
 
-                ax = plt.gca()
-                plt.subplot(4,3,1)
-                plt.hist([bfr_cue_succ_unit_alpha,bfr_cue_fail_unit_alpha], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-                plt.title('before cue: alpha',fontsize='small')
-                plt.subplot(4,3,2)
-                plt.hist([bfr_cue_succ_unit_beta,bfr_cue_fail_unit_beta], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-                plt.title('beta',fontsize='small')
-                plt.subplot(4,3,3)
-                plt.hist([bfr_cue_succ_unit_k,bfr_cue_fail_unit_k], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-                plt.title('k',fontsize='small')
-
-                plt.subplot(4,3,4)
-                plt.hist([aft_cue_succ_unit_alpha,aft_cue_fail_unit_alpha], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-                plt.title('after cue: alpha',fontsize='small')
-                plt.subplot(4,3,5)
-                plt.hist([aft_cue_succ_unit_beta,aft_cue_fail_unit_beta], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-                plt.title('beta',fontsize='small')
-                plt.subplot(4,3,6)
-                plt.hist([aft_cue_succ_unit_k,aft_cue_fail_unit_k], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-                plt.title('k',fontsize='small')
-
-                plt.subplot(4,3,7)
-                plt.hist([bfr_result_succ_unit_alpha,bfr_result_fail_unit_alpha], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-                plt.title('before result: alpha',fontsize='small')
-                plt.subplot(4,3,8)
-                plt.hist([bfr_result_succ_unit_beta,bfr_result_fail_unit_beta], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-                plt.title('beta',fontsize='small')
-                plt.subplot(4,3,9)
-                plt.hist([bfr_result_succ_unit_k,bfr_result_fail_unit_k], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-                plt.title('k',fontsize='small')
-
-                plt.subplot(4,3,10)
-                plt.hist([aft_result_succ_unit_alpha,aft_result_fail_unit_alpha], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-                plt.title('after result: alpha',fontsize='small')
-                plt.subplot(4,3,11)
-                plt.hist([aft_result_succ_unit_beta,aft_result_fail_unit_beta], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-                plt.title('beta',fontsize='small')
-                plt.subplot(4,3,12)
-                plt.hist([aft_result_succ_unit_k,aft_result_fail_unit_k], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-                plt.title('k',fontsize='small')
-        
-                plt.legend(bbox_to_anchor=[1.6,3.2],fontsize='small')
-                plt.tight_layout()
-                plt.subplots_adjust(top=0.9,right=0.85)
-                plt.rcParams['xtick.labelsize'] = 8
-                plt.rcParams['ytick.labelsize'] = 8
-                plt.suptitle('Region %s, unit %s: param hists %s stacked' %(region_key,unit_num,type_key))
-                plt.savefig('param_hists_%s_unit%s_%s_stacked' %(region_key,str(unit_num).zfill(2),type_key))
-                plt.clf()
-
-        #concatenated hists
-        bfr_cue_succ_flattened_alpha = np.ndarray.flatten(bfr_cue_succ_params[:,:,0])
-        bfr_cue_succ_flattened_beta = np.ndarray.flatten(bfr_cue_succ_params[:,:,1])
-        bfr_cue_succ_flattened_k = np.ndarray.flatten(bfr_cue_succ_params[:,:,2])
-        bfr_cue_succ_flattened_alpha = bfr_cue_succ_flattened_alpha[bfr_cue_succ_flattened_alpha != 9999]
-        bfr_cue_succ_flattened_beta = bfr_cue_succ_flattened_beta[bfr_cue_succ_flattened_beta != 9999]
-        bfr_cue_succ_flattened_k = bfr_cue_succ_flattened_k[bfr_cue_succ_flattened_k != 9999]
-
-        aft_cue_succ_flattened_alpha = np.ndarray.flatten(aft_cue_succ_params[:,:,0])
-        aft_cue_succ_flattened_beta = np.ndarray.flatten(aft_cue_succ_params[:,:,1])
-        aft_cue_succ_flattened_k = np.ndarray.flatten(aft_cue_succ_params[:,:,2])
-        aft_cue_succ_flattened_alpha = aft_cue_succ_flattened_alpha[aft_cue_succ_flattened_alpha != 9999]
-        aft_cue_succ_flattened_beta = aft_cue_succ_flattened_beta[aft_cue_succ_flattened_beta != 9999]
-        aft_cue_succ_flattened_k = aft_cue_succ_flattened_k[aft_cue_succ_flattened_k != 9999]
-
-        bfr_result_succ_flattened_alpha = np.ndarray.flatten(bfr_result_succ_params[:,:,0])
-        bfr_result_succ_flattened_beta = np.ndarray.flatten(bfr_result_succ_params[:,:,1])
-        bfr_result_succ_flattened_k = np.ndarray.flatten(bfr_result_succ_params[:,:,2])
-        bfr_result_succ_flattened_alpha = bfr_result_succ_flattened_alpha[bfr_result_succ_flattened_alpha != 9999]
-        bfr_result_succ_flattened_beta = bfr_result_succ_flattened_beta[bfr_result_succ_flattened_beta != 9999]
-        bfr_result_succ_flattened_k = bfr_result_succ_flattened_k[bfr_result_succ_flattened_k != 9999]
-
-        aft_result_succ_flattened_alpha = np.ndarray.flatten(aft_result_succ_params[:,:,0])
-        aft_result_succ_flattened_beta = np.ndarray.flatten(aft_result_succ_params[:,:,1])
-        aft_result_succ_flattened_k = np.ndarray.flatten(aft_result_succ_params[:,:,2])
-        aft_result_succ_flattened_alpha = aft_result_succ_flattened_alpha[aft_result_succ_flattened_alpha != 9999]
-        aft_result_succ_flattened_beta = aft_result_succ_flattened_beta[aft_result_succ_flattened_beta != 9999]
-        aft_result_succ_flattened_k = aft_result_succ_flattened_k[aft_result_succ_flattened_k != 9999]
-
-        bfr_cue_fail_flattened_alpha = np.ndarray.flatten(bfr_cue_fail_params[:,:,0])
-        bfr_cue_fail_flattened_beta = np.ndarray.flatten(bfr_cue_fail_params[:,:,1])
-        bfr_cue_fail_flattened_k = np.ndarray.flatten(bfr_cue_fail_params[:,:,2])
-        bfr_cue_fail_flattened_alpha = bfr_cue_fail_flattened_alpha[bfr_cue_fail_flattened_alpha != 9999]
-        bfr_cue_fail_flattened_beta = bfr_cue_fail_flattened_beta[bfr_cue_fail_flattened_beta != 9999]
-        bfr_cue_fail_flattened_k = bfr_cue_fail_flattened_k[bfr_cue_fail_flattened_k != 9999]
-
-        aft_cue_fail_flattened_alpha = np.ndarray.flatten(aft_cue_fail_params[:,:,0])
-        aft_cue_fail_flattened_beta = np.ndarray.flatten(aft_cue_fail_params[:,:,1])
-        aft_cue_fail_flattened_k = np.ndarray.flatten(aft_cue_fail_params[:,:,2])
-        aft_cue_fail_flattened_alpha = aft_cue_fail_flattened_alpha[aft_cue_fail_flattened_alpha != 9999]
-        aft_cue_fail_flattened_beta = aft_cue_fail_flattened_beta[aft_cue_fail_flattened_beta != 9999]
-        aft_cue_fail_flattened_k = aft_cue_fail_flattened_k[aft_cue_fail_flattened_k != 9999]
-
-        bfr_result_fail_flattened_alpha = np.ndarray.flatten(bfr_result_fail_params[:,:,0])
-        bfr_result_fail_flattened_beta = np.ndarray.flatten(bfr_result_fail_params[:,:,1])
-        bfr_result_fail_flattened_k = np.ndarray.flatten(bfr_result_fail_params[:,:,2])
-        bfr_result_fail_flattened_alpha = bfr_result_fail_flattened_alpha[bfr_result_fail_flattened_alpha != 9999]
-        bfr_result_fail_flattened_beta = bfr_result_fail_flattened_beta[bfr_result_fail_flattened_beta != 9999]
-        bfr_result_fail_flattened_k = bfr_result_fail_flattened_k[bfr_result_fail_flattened_k != 9999]
-
-        aft_result_fail_flattened_alpha = np.ndarray.flatten(aft_result_fail_params[:,:,0])
-        aft_result_fail_flattened_beta = np.ndarray.flatten(aft_result_fail_params[:,:,1])
-        aft_result_fail_flattened_k = np.ndarray.flatten(aft_result_fail_params[:,:,2])
-        aft_result_fail_flattened_alpha = aft_result_fail_flattened_alpha[aft_result_fail_flattened_alpha != 9999]
-        aft_result_fail_flattened_beta = aft_result_fail_flattened_beta[aft_result_fail_flattened_beta != 9999]
-        aft_result_fail_flattened_k = aft_result_fail_flattened_k[aft_result_fail_flattened_k != 9999]
-
-        ax = plt.gca()
-        plt.subplot(4,3,1)
-        plt.hist([bfr_cue_succ_flattened_alpha,bfr_cue_fail_flattened_alpha], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-        plt.title('before cue: alpha',fontsize='small')
-        plt.subplot(4,3,2)
-        plt.hist([bfr_cue_succ_flattened_beta,bfr_cue_fail_flattened_beta], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-        plt.title('beta',fontsize='small')
-        plt.subplot(4,3,3)
-        plt.hist([bfr_cue_succ_flattened_k,bfr_cue_fail_flattened_k], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-        plt.title('k',fontsize='small')
-                
-        plt.subplot(4,3,4)
-        plt.hist([aft_cue_succ_flattened_alpha,aft_cue_fail_flattened_alpha], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-        plt.title('after cue: alpha',fontsize='small')
-        plt.subplot(4,3,5)
-        plt.hist(np.ndarray.flatten(aft_cue_params[:,:,1]))
-        plt.hist([aft_cue_succ_flattened_beta,aft_cue_fail_flattened_beta], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-        plt.title('beta',fontsize='small')
-        plt.subplot(4,3,6)
-        plt.hist([aft_cue_succ_flattened_k,aft_cue_fail_flattened_k], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-        plt.title('k',fontsize='small')
-
-        plt.subplot(4,3,7)
-        plt.hist([bfr_result_succ_flattened_alpha,bfr_result_fail_flattened_alpha], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-        plt.title('before result: alpha',fontsize='small')
-        plt.subplot(4,3,8)
-        plt.hist([bfr_result_succ_flattened_beta,bfr_result_fail_flattened_beta], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-        plt.title('beta',fontsize='small')
-        plt.subplot(4,3,9)
-        plt.hist([bfr_result_succ_flattened_k,bfr_result_fail_flattened_k], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-        plt.title('k',fontsize='small')
-
-        plt.subplot(4,3,10)
-        plt.hist([aft_result_succ_flattened_alpha,aft_result_fail_flattened_alpha], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-        plt.title('after result: alpha',fontsize='small')
-        plt.subplot(4,3,11)
-        plt.hist([aft_result_succ_flattened_beta,aft_result_fail_flattened_beta], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-        plt.title('beta',fontsize='small')
-        plt.subplot(4,3,12)
-        plt.hist([aft_result_succ_flattened_k,aft_result_fail_flattened_k], stacked=True, label=('succ','fail'),color=('cornflowerblue','darkmagenta'))
-        plt.title('k',fontsize='small')
-        
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.9,right=0.85)
-        plt.legend(bbox_to_anchor=[1.6,3.2],fontsize='small')
-        plt.rcParams['xtick.labelsize'] = 8
-        plt.rcParams['ytick.labelsize'] = 8
-        plt.suptitle('Region %s conc: param hists %s stacked' %(region_key,type_key))
-        plt.savefig('param_hists_conc_%s_%s_stacked' %(region_key,type_key))
-        plt.clf()
-        
-        return_dict = {}
-        return(return_dict)
-
-#TODO Mult val/motiv vectors as stacked hist? might be too much
 
 
 
@@ -889,8 +420,9 @@ for region_key,region_value in data_dict_all.iteritems():
         data_dict_all[region_key]['fr_dict'] = fr_dict
         
 
-print 'modeling'
+#print 'modeling'
 for region_key,region_value in data_dict_all.iteritems():
+        print 'modeling: %s' %(region_key)
         succ = condensed[condensed[:,5] == 1]
         fail = condensed[condensed[:,5] == -1]
         
@@ -923,36 +455,222 @@ for region_key,region_value in data_dict_all.iteritems():
         aft_result_fail = aft_result[condensed[:,5] == -1]
         
 
+        bfr_cue_model = make_3d_model(bfr_cue,condensed,region_key,'bfr_cue')
+        aft_cue_model = make_3d_model(aft_cue,condensed,region_key,'aft_cue')
+        bfr_result_model = make_3d_model(bfr_result,condensed,region_key,'bfr_result')
+        aft_result_model = make_3d_model(aft_result,condensed,region_key,'aft_result')
 
-        test = make_3d_plot(bfr_cue,condensed,region_key,'bfr_cue')
-        
 
-
-
-        bfr_cue_model = make_model(bfr_cue,condensed,region_key,'bfr_cue')
-        aft_cue_model = make_model(aft_cue,condensed,region_key,'aft_cue')
-        bfr_result_model = make_model(bfr_result,condensed,region_key,'bfr_result')
-        aft_result_model = make_model(aft_result,condensed,region_key,'aft_result')
-
-        bfr_cue_model_succ = make_model(bfr_cue_succ,succ,region_key,'bfr_cue_succ')
-        aft_cue_model_succ = make_model(aft_cue_succ,succ,region_key,'aft_cue_succ')
-        bfr_result_model_succ = make_model(bfr_result_succ,succ,region_key,'bfr_result_succ')
-        aft_result_model_succ = make_model(aft_result_succ,succ,region_key,'aft_result_succ')
-
-        bfr_cue_model_fail = make_model(bfr_cue_fail,fail,region_key,'bfr_cue_fail')
-        aft_cue_model_fail = make_model(aft_cue_fail,fail,region_key,'aft_cue_fail')
-        bfr_result_model_fail = make_model(bfr_result_fail,fail,region_key,'bfr_result_fail')
-        aft_result_model_fail = make_model(aft_result_fail,fail,region_key,'aft_result_fail')
-
-        model_return= {'bfr_cue_model':bfr_cue_model,'aft_cue_model':aft_cue_model,'bfr_result_model':bfr_result_model,'aft_result_model':aft_result_model,'bfr_cue_model_succ':bfr_cue_model_succ,'aft_cue_model_succ':aft_cue_model_succ,'bfr_result_model_succ':bfr_result_model_succ,'aft_result_model_succ':aft_result_model_succ,'bfr_cue_model_fail':bfr_cue_model_fail,'aft_cue_model_fail':aft_cue_model_fail,'bfr_result_model_fail':bfr_result_model_fail,'aft_result_model_fail':aft_result_model_fail}
+        #TODO succ vs fail
+        model_return= {'bfr_cue_model':bfr_cue_model,'aft_cue_model':aft_cue_model,'bfr_result_model':bfr_result_model,'aft_result_model':aft_result_model}
 
         data_dict_all[region_key]['model_return'] = model_return
 
-        #temp = plot_avgs(bfr_cue_model,aft_cue_model,bfr_result_model,aft_result_model,bfr_cue,aft_cue,bfr_result,aft_result,region_key,'all')
-        #temp_succ = plot_avgs(bfr_cue_model_succ,aft_cue_model_succ,bfr_result_model_succ,aft_result_model_succ,bfr_cue,aft_cue,bfr_result,aft_result,region_key,'succ')
-        #temp_fail = plot_avgs(bfr_cue_model_fail,aft_cue_model_fail,bfr_result_model_fail,aft_result_model_fail,bfr_cue,aft_cue,bfr_result,aft_result,region_key,'fail')
 
-        temp_stacked = plot_stacked_avgs(bfr_cue_model,aft_cue_model,bfr_result_model,aft_result_model,bfr_cue,aft_cue,bfr_result,aft_result,condensed,region_key,'all_flat')
 
-#save
+for region_key,region_value in data_dict_all.iteritems():
+        data_dict_all[region_key]['slopes'] = {}
+        data_dict_all[region_key]['sig_all_slopes'] = {}
+        data_dict_all[region_key]['alpha_beta_only_sig'] = {}
+        for type_key,type_value in data_dict_all[region_key]['model_return'].iteritems():
+                sig_rsquared = data_dict_all[region_key]['model_return'][type_key]['conc']['sig_rsquared']
+                sig_fpvalue =  data_dict_all[region_key]['model_return'][type_key]['conc']['sig_fpvalue']
+                sig_pvals =  data_dict_all[region_key]['model_return'][type_key]['conc']['sig_pvals']
+                sig_const =  data_dict_all[region_key]['model_return'][type_key]['conc']['sig_const']
+                sig_alpha =  data_dict_all[region_key]['model_return'][type_key]['conc']['sig_alpha']
+                sig_beta =  data_dict_all[region_key]['model_return'][type_key]['conc']['sig_beta']
+
+                alpha_only_sig = 0
+                beta_only_sig = 0
+                both_pos = 0
+                both_neg = 0
+                alpha_pos = 0
+                beta_pos = 0
+
+                if np.shape(sig_fpvalue)[0] > 0:
+                        print 'Sig fpvalue- %s %s: %s' %(region_key,type_key,sig_fpvalue)
+                if np.shape(sig_pvals)[0] > 0:
+                        print 'Sig pvals- %s %s: %s' %(region_key,type_key,sig_pvals)
+
+                        slopes = np.zeros((np.shape(sig_pvals)[0],7))
+                        sig_all_slopes = np.zeros((np.shape(sig_pvals)[0],7))
+                        sig_all_index = 0
+                        
+                        for i in range(np.shape(sig_pvals)[0]):
+                                unit_num = sig_pvals[i]
+                                slopes[i,0] = unit_num
+                                #alpha
+                                slopes[i,1] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][1]
+                                #beta
+                                slopes[i,2] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][2]
+                                #const
+                                slopes[i,3] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][0]
+
+                                #alpha p val
+                                slopes[i,4] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][1]
+                                #alpha p val
+                                slopes[i,5] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][2]
+                                #alpha p val
+                                slopes[i,6] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][0]
+                                
+                                if slopes[i,4] <= 0.05 and slopes[i,5] <= 0.05:
+                                        sig_all_slopes[sig_all_index,:] = slopes[i,:]
+                                        sig_all_index = sig_all_index + 1
+                                elif slopes[i,4] <= 0.05:
+                                        alpha_only_sig +=1
+                                elif slopes[i,5] <= 0.05:
+                                        beta_only_sig <= 0.05
+
+                                if slopes[i,1] > 0 and slopes[i,2] > 0:
+                                        both_pos += 1
+                                elif slopes[i,1] < 0 and slopes[i,2] < 0:
+                                        both_neg += 1
+                                elif slopes[i,1] > 0 and slopes[i,2] < 0:
+                                        alpha_pos += 1
+                                elif slopes[i,1] < 0 and slopes[i,2] > 0:
+                                        beta_pos += 1
+
+                        sig_all_slopes = sig_all_slopes[sig_all_slopes[:,1] != 0]
+                        data_dict_all[region_key]['slopes'][type_key] = slopes
+                        data_dict_all[region_key]['sig_all_slopes'][type_key] = sig_all_slopes
+                        data_dict_all[region_key]['alpha_beta_only_sig'][type_key] = [alpha_only_sig,beta_only_sig,both_pos,both_neg,alpha_pos,beta_pos]
+                        
+                #do same for units where alpha and beta both sig
+
+#slopes_workbook = xlsxwriter.Workbook('sig_slopes.xlsx',options={'nan_inf_to_errors':True})
+for region_key,region_val in data_dict_all.iteritems():
+        slopes_workbook = xlsxwriter.Workbook('sig_slopes_%s.xlsx' %(region_key),options={'nan_inf_to_errors':True})
+        total_unit_num = np.shape(data_dict_all[region_key]['fr_dict']['baseline_fr'])[1]
+        names = ['unit_num','alpha','beta','const','alpha_p','beta_p','const_p']
+
+        percs = {}
+        for type_key,type_val in data_dict_all[region_key]['slopes'].iteritems():
+                
+                slopes = np.asarray(data_dict_all[region_key]['slopes'][type_key])
+                sig_slopes = np.asarray(data_dict_all[region_key]['sig_all_slopes'][type_key])
+                sig_alpha = slopes[slopes[:,4] <= 0.05]
+                sig_beta = slopes[slopes[:,5] <= 0.05]
+                perc_sig_alpha = np.shape(sig_alpha)[0] / float(total_unit_num)
+                perc_sig_beta = np.shape(sig_beta)[0] / float(total_unit_num)
+                num_sig_alpha = np.shape(sig_alpha)[0]
+                num_sig_beta = np.shape(sig_beta)[0]
+                perc_slopes = np.shape(slopes)[0] / float(total_unit_num)
+                perc_sig_slopes = np.shape(sig_slopes)[0] / float(total_unit_num)
+                perc_sig_alpha_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][0] / float(total_unit_num)
+                num_sig_alpha_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][0]
+                perc_sig_beta_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][1] / float(total_unit_num)
+                num_sig_beta_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][0]
+                perc_both_pos = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][2] / float(np.shape(slopes)[0]) #of at least one sig
+                perc_both_neg = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][3] / float(np.shape(slopes)[0])
+                perc_alpha_pos = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][4] / float(np.shape(slopes)[0])
+                perc_beta_pos = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][5] / float(np.shape(slopes)[0])
+
+                #pdb.set_trace()
+                worksheet = slopes_workbook.add_worksheet('slopes_%s' %(type_key))
+                worksheet.write_row(0,0,names)
+                if slopes.ndim == 2:
+                        len_slopes = np.shape(slopes)[0]
+                elif np.shape(slopes)[0] == 0:
+                        len_slopes = -1
+                else:
+                        len_slopes = 0
+                
+                if not len_slopes == -1:
+                        for i in range(len_slopes):
+                                worksheet.write_row(i+1,0,slopes[i,:])
+                
+                worksheet = slopes_workbook.add_worksheet('sig_all_%s' %(type_key))
+                worksheet.write_row(0,0,names)
+                if sig_slopes.ndim == 2:
+                        len_sig_slopes = np.shape(sig_slopes)[0]
+                elif np.shape(sig_slopes)[0] == 0:
+                        len_sig_slopes = -1
+                else:
+                        len_sig_slopes = 0
+                                
+                if not len_sig_slopes == -1:
+                        for i in range(len_sig_slopes):
+                                worksheet.write_row(i+1,0,sig_slopes[i,:])
+                
+                type_dict = {'perc_slopes':perc_slopes,'perc_sig_slopes':perc_sig_slopes,'num_slopes':np.shape(slopes)[0],'num_sig_slopes':np.shape(sig_slopes)[0],'total_unit_num':total_unit_num,'perc_sig_alpha':perc_sig_alpha,'perc_sig_beta':perc_sig_beta,'num_sig_alpha':num_sig_alpha,'num_sig_beta':num_sig_beta,'perc_sig_alpha_only':perc_sig_alpha_only,'num_sig_alpha_only':num_sig_alpha_only,'perc_sig_beta_only':perc_sig_beta_only,'num_sig_beta_only':num_sig_beta_only,'perc_both_pos':perc_both_pos,'perc_both_neg':perc_both_neg,'perc_alpha_pos':perc_alpha_pos,'perc_beta_pos':perc_beta_pos}
+                percs[type_key] = type_dict
+        data_dict_all[region_key]['percs'] = percs
+
+        
+percs_workbook = xlsxwriter.Workbook('percs_workbook.xlsx',options={'nan_inf_to_errors':True})
+for region_key,region_val in data_dict_all.iteritems():
+        worksheet = percs_workbook.add_worksheet('%s' %(region_key))
+        worksheet.write(1,0,'perc slopes')
+        worksheet.write(2,0,'perc sig slopes')
+        worksheet.write(3,0,'num slopes')
+        worksheet.write(4,0,'num sig slopes')
+        worksheet.write(5,0,'total unit num')
+        worksheet.write(6,0,'perc sig alpha')
+        worksheet.write(7,0,'perc sig beta')
+        worksheet.write(8,0,'num sig alpha')
+        worksheet.write(9,0,'num sig beta')
+        worksheet.write(10,0,'perc sig alpha only')
+        worksheet.write(11,0,'perc sig beta only')
+        worksheet.write(12,0,'num sig alpha only')
+        worksheet.write(13,0,'num sig beta only')
+        worksheet.write(14,0,'both alpha and beta pos')
+        worksheet.write(15,0,'both alpha and beta neg')
+        worksheet.write(16,0,'alpha pos beta neg')
+        worksheet.write(17,0,'alpha neg beta pos')
+        
+        
+        percs = data_dict_all[region_key]['percs']
+
+        i = 1
+        for type_key,val in percs.iteritems():
+                worksheet.write(0,i,type_key)
+                worksheet.write_column(1,i,[percs[type_key]['perc_slopes'],percs[type_key]['perc_sig_slopes'],percs[type_key]['num_slopes'],percs[type_key]['num_sig_slopes'],percs[type_key]['total_unit_num'],percs[type_key]['perc_sig_alpha'],percs[type_key]['perc_sig_beta'],percs[type_key]['num_sig_alpha'],percs[type_key]['num_sig_beta'],percs[type_key]['perc_sig_alpha_only'],percs[type_key]['perc_sig_beta_only'],percs[type_key]['num_sig_alpha_only'],percs[type_key]['num_sig_beta_only'],percs[type_key]['perc_both_pos'],percs[type_key]['perc_both_neg'],percs[type_key]['perc_alpha_pos'],percs[type_key]['perc_beta_pos']])
+                i += 1
+
+
+
+if mv_bool:
+        #calc updated motiv and val vectors
+        for region_key,region_val in data_dict_all.iteritems():
+                #for now individ. should avg across windows? And if so does that affect any other of the analysis?
+                data_dict_all[region_key]['mv'] = {}
+                for type_key,type_val in data_dict_all[region_key]['slopes'].iteritems():
+                        slopes = data_dict_all[region_key]['slopes'][type_key]
+                        sig_units = slopes[:,0]
+
+                        alphas = slopes[:,1]
+                        betas = slopes[:,2]
+                        rnums = condensed[:,3]
+                        pnums = condensed[:,4]
+
+                        #mv_array = np.zeros((np.shape(condensed)[0],np.shape(slopes)[0],5))
+                        temp = np.zeros((np.shape(slopes)[0],np.shape(condensed)[0],8))
+                        for i in range(np.shape(slopes)[0]):
+                                unit = sig_units[i]
+                                #alpha = abs(alphas[i])
+                                #beta = abs(betas[i])
+                                alpha = alphas[i]
+                                beta = betas[i]
+
+                                #question: for now taking abs value for alpha and beta
+                                unit_condensed = np.zeros((np.shape(condensed)[0],8))
+                                unit_condensed[:,0] = rnums
+                                unit_condensed[:,1] = pnums
+                                unit_condensed[:,2] = alpha
+                                unit_condensed[:,3] = beta
+                                unit_condensed[:,4] = rnums * alpha - pnums * beta #value
+                                unit_condensed[:,5] = rnums * alpha + pnums * beta #motiv
+
+                                window_avg_unit_fr = data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'][:,unit]
+                                unit_condensed[:,6] = window_avg_unit_fr
+                                unit_condensed[:,7] = unit
+                                
+                                temp[i,:,:] = unit_condensed
+
+                        new_mv_array = temp
+                                
+                        data_dict_all[region_key]['mv'][type_key] = new_mv_array
+
+                        np.save('%s_%s_mv_array.npy' %(region_key,type_key),new_mv_array)
+                        sio.savemat('%s_%s_mv_array.mat' %(region_key,type_key),{'mv_array':new_mv_array},format='5')
 
