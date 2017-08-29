@@ -17,6 +17,7 @@ import statsmodels.api as sm
 import pandas as pd
 from matplotlib import cm
 import xlsxwriter
+import scipy.stats as stats
 
 #######################
 #params to set ########
@@ -26,10 +27,12 @@ bin_size = 50 #in ms
 time_before = -0.5 #negative value
 time_after = 1.0
 baseline_time = -1.0 #negative value
-normalize_bool = True
+normalize_bool = False
 sqrt_bool = False
 plot_3d_bool = False
 mv_bool = True
+zscore = True
+abs_alphabeta = True
 
 ts_filename = glob.glob('Extracted*_timestamps.mat')[0]
 extracted_filename = ts_filename[:-15] + '.mat'
@@ -65,6 +68,9 @@ def make_hist_all(spike_data):
 def calc_firing_rates(hists,data_key,condensed):
         bin_size_sec = bin_size / 1000.0
 
+        if zscore:
+                hists = stats.zscore(hists,axis=1)
+
         baseline_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*baseline_bins))
         bfr_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
         aft_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
@@ -91,17 +97,19 @@ def calc_firing_rates(hists,data_key,condensed):
                                 bfr_result_hist = hists[j,bins_before + result_start_bin : result_start_bin]
                                 aft_result_hist = hists[j,result_start_bin : result_start_bin + bins_after]
                         
-                                baseline_fr[i,j,:] = baseline_hist / float(bin_size) * 1000
-                                bfr_cue_fr[i,j,:] = bfr_cue_hist / float(bin_size) * 1000
-                                try:
+                                if not zscore:
+                                        baseline_fr[i,j,:] = baseline_hist / float(bin_size) * 1000
+                                        bfr_cue_fr[i,j,:] = bfr_cue_hist / float(bin_size) * 1000
                                         aft_cue_fr[i,j,:] = aft_cue_hist / float(bin_size) * 1000
-                                except:
-                                        pdb.set_trace()
-                                try:
                                         bfr_result_fr[i,j,:] = bfr_result_hist / float(bin_size) * 1000
-                                except:
-                                        pdb.set_trace()
-                                aft_result_fr[i,j,:] = aft_result_hist / float(bin_size) * 1000                        
+                                        aft_result_fr[i,j,:] = aft_result_hist / float(bin_size) * 1000                        
+                                elif zscore:
+                                        baseline_fr[i,j,:] = baseline_hist
+                                        bfr_cue_fr[i,j,:] = bfr_cue_hist
+                                        aft_cue_fr[i,j,:] = aft_cue_hist
+                                        bfr_result_fr[i,j,:] = bfr_result_hist
+                                        aft_result_fr[i,j,:] = aft_result_hist
+
                 else:
                         continue
                         
@@ -250,16 +258,6 @@ def make_3d_model(fr_data,condensed,region_key,type_key):
 
 
 
-
-
-
-
-
-
-
-
-
-
 ###############################################
 #start ########################################
 ###############################################
@@ -270,7 +268,7 @@ baseline_bins = int(baseline_time / float(bin_size) * 1000) #neg
 
 print 'bin size: %s' %(bin_size)
 print 'time before: %s, time after: %s, baseline time: %s' %(time_before,time_after,baseline_time)
-print 'nlize: %s, sqrt: %s' %(normalize_bool,sqrt_bool)
+print 'nlize: %s, sqrt: %s, zscore: %s' %(normalize_bool,sqrt_bool,zscore)
 
 #load files (from Extracted and timestamp files)
 print extracted_filename
@@ -431,7 +429,7 @@ for region_key,region_value in data_dict_all.iteritems():
                 aft_cue = data_dict_all[region_key]['fr_dict']['aft_cue_nl_fr']
                 bfr_result = data_dict_all[region_key]['fr_dict']['bfr_result_nl_fr']
                 aft_result = data_dict_all[region_key]['fr_dict']['aft_result_nl_fr']
-                
+
         else:
                 bfr_cue = data_dict_all[region_key]['fr_dict']['bfr_cue_fr']
                 aft_cue = data_dict_all[region_key]['fr_dict']['aft_cue_fr']
@@ -472,6 +470,9 @@ for region_key,region_value in data_dict_all.iteritems():
         data_dict_all[region_key]['slopes'] = {}
         data_dict_all[region_key]['sig_all_slopes'] = {}
         data_dict_all[region_key]['alpha_beta_only_sig'] = {}
+        data_dict_all[region_key]['all_slopes'] = {}
+        data_dict_all[region_key]['all_sig_all_slopes'] = {}
+        data_dict_all[region_key]['all_alpha_beta_only_sig'] = {}
         for type_key,type_value in data_dict_all[region_key]['model_return'].iteritems():
                 sig_rsquared = data_dict_all[region_key]['model_return'][type_key]['conc']['sig_rsquared']
                 sig_fpvalue =  data_dict_all[region_key]['model_return'][type_key]['conc']['sig_fpvalue']
@@ -534,8 +535,167 @@ for region_key,region_value in data_dict_all.iteritems():
                         data_dict_all[region_key]['slopes'][type_key] = slopes
                         data_dict_all[region_key]['sig_all_slopes'][type_key] = sig_all_slopes
                         data_dict_all[region_key]['alpha_beta_only_sig'][type_key] = [alpha_only_sig,beta_only_sig,both_pos,both_neg,alpha_pos,beta_pos]
+
+                #########
+
+                all_alpha_only_sig = 0
+                all_beta_only_sig = 0
+                all_both_pos = 0
+                all_both_neg = 0
+                all_alpha_pos = 0
+                all_beta_pos = 0
+
+                all_slopes = np.zeros((np.shape(data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'])[1],7))
+                all_sig_all_slopes = np.zeros((np.shape(data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'])[1],7))
+                all_sig_all_index = 0
+
+                for i in range(np.shape(data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'])[1]):
+                        unit_num = i
+                        all_slopes[i,0] = unit_num
+                        #alpha
+                        all_slopes[i,1] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][1]
+                        #beta
+                        all_slopes[i,2] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][2]
+                        #const
+                        all_slopes[i,3] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][0]
+
+                        #alpha p val
+                        all_slopes[i,4] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][1]
+                        #alpha p val
+                        all_slopes[i,5] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][2]
+                        #alpha p val
+                        all_slopes[i,6] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][0]
+                
+                        if all_slopes[i,4] <= 0.05 and all_slopes[i,5] <= 0.05:
+                                all_sig_all_slopes[all_sig_all_index,:] = all_slopes[i,:]
+                                all_sig_all_index = all_sig_all_index + 1
+                        elif all_slopes[i,4] <= 0.05:
+                                all_alpha_only_sig +=1
+                        elif all_slopes[i,5] <= 0.05:
+                                all_beta_only_sig <= 0.05
+                        if all_slopes[i,1] > 0 and all_slopes[i,2] > 0:
+                                all_both_pos += 1
+                        elif all_slopes[i,1] < 0 and all_slopes[i,2] < 0:
+                                all_both_neg += 1
+                        elif all_slopes[i,1] > 0 and all_slopes[i,2] < 0:
+                                all_alpha_pos += 1
+                        elif all_slopes[i,1] < 0 and all_slopes[i,2] > 0:
+                                all_beta_pos += 1
+
+
+                all_sig_all_slopes = all_sig_all_slopes[sig_all_slopes[:,1] != 0]
+                data_dict_all[region_key]['all_slopes'][type_key] = all_slopes
+                data_dict_all[region_key]['all_sig_all_slopes'][type_key] = all_sig_all_slopes
+                data_dict_all[region_key]['all_alpha_beta_only_sig'][type_key] = [all_alpha_only_sig,all_beta_only_sig,all_both_pos,all_both_neg,all_alpha_pos,all_beta_pos]
+
                         
                 #do same for units where alpha and beta both sig
+
+#######
+for region_key,region_val in data_dict_all.iteritems():
+        
+        data_dict_all[region_key]['mv'] = {}
+
+        bfr_cue_array = data_dict_all[region_key]['all_slopes']['bfr_cue_model']
+        aft_cue_array = data_dict_all[region_key]['all_slopes']['aft_cue_model']
+        bfr_result_array = data_dict_all[region_key]['all_slopes']['bfr_result_model']
+        aft_result_array = data_dict_all[region_key]['all_slopes']['aft_result_model']
+
+        avg_alphas = (bfr_cue_array[:,1] + aft_cue_array[:,1] + bfr_result_array[:,1] + aft_result_array[:,1]) / float(4)
+        avg_betas = (bfr_cue_array[:,2] + aft_cue_array[:,2] + bfr_result_array[:,2] + aft_result_array[:,2]) / float(4)
+
+        rnums = condensed[:,3]
+        pnums = condensed[:,4]
+        data_dict_all[region_key]['mv']['avg'] = {}
+        for type_key,type_val in data_dict_all[region_key]['all_slopes'].iteritems():
+                slopes = data_dict_all[region_key]['all_slopes'][type_key]
+                #mv_array = np.zeros((np.shape(condensed)[0],np.shape(slopes)[0],5))
+                temp = np.zeros((np.shape(avg_alphas)[0],np.shape(condensed)[0],8))
+                rnums = condensed[:,3]
+                pnums = condensed[:,4]
+
+                for i in range(np.shape(avg_alphas)[0]):
+                        unit = i
+                        
+                        alpha = avg_alphas[i]
+                        beta= avg_betas[i]
+                                                
+                        unit_condensed = np.zeros((np.shape(condensed)[0],8))
+                        unit_condensed[:,0] = rnums
+                        unit_condensed[:,1] = pnums
+                        unit_condensed[:,2] = alpha
+                        unit_condensed[:,3] = beta
+                        
+                        if abs_alphabeta:
+                                alpha = abs(alpha)
+                                beta = abs(beta)
+
+                        unit_condensed[:,4] = rnums * alpha - pnums * beta #value
+                        unit_condensed[:,5] = rnums * alpha + pnums * beta #motiv
+                
+                        window_avg_unit_fr = data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'][:,unit]
+                        unit_condensed[:,6] = window_avg_unit_fr
+                        unit_condensed[:,7] = unit
+                        
+                        temp[i,:,:] = unit_condensed
+                
+                        new_mv_array = temp
+                
+                        data_dict_all[region_key]['mv']['avg'][type_key] = new_mv_array
+                
+                        np.save('%s_%s_all_avg_mv_array.npy' %(region_key,type_key),new_mv_array)
+                        sio.savemat('%s_%s_all_avg_mv_array.mat' %(region_key,type_key),{'mv_array':new_mv_array},format='5')
+
+
+
+
+###### all ##########
+        data_dict_all[region_key]['mv']['all'] = {}
+        for type_key,type_val in data_dict_all[region_key]['all_slopes'].iteritems():
+                slopes = data_dict_all[region_key]['all_slopes'][type_key]
+                #mv_array = np.zeros((np.shape(condensed)[0],np.shape(slopes)[0],5))
+                temp = np.zeros((np.shape(avg_alphas)[0],np.shape(condensed)[0],8))
+                alphas = slopes[:,1]
+                betas = slopes[:,2]
+                rnums = condensed[:,3]
+                pnums = condensed[:,4]
+
+                for i in range(np.shape(avg_alphas)[0]):
+                        unit = i
+                        
+                        alpha = alphas[i]
+                        beta= betas[i]
+                                                
+                        unit_condensed = np.zeros((np.shape(condensed)[0],8))
+                        unit_condensed[:,0] = rnums
+                        unit_condensed[:,1] = pnums
+                        unit_condensed[:,2] = alpha
+                        unit_condensed[:,3] = beta
+                        
+                        if abs_alphabeta:
+                                alpha = abs(alpha)
+                                beta = abs(beta)
+
+                        unit_condensed[:,4] = rnums * alpha - pnums * beta #value
+                        unit_condensed[:,5] = rnums * alpha + pnums * beta #motiv
+                
+                        window_avg_unit_fr = data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'][:,unit]
+                        unit_condensed[:,6] = window_avg_unit_fr
+                        unit_condensed[:,7] = unit
+                        
+                        temp[i,:,:] = unit_condensed
+                
+                        new_mv_array = temp
+                
+                        data_dict_all[region_key]['mv']['all'][type_key] = new_mv_array
+                
+                        np.save('%s_%s_all_mv_array.npy' %(region_key,type_key),new_mv_array)
+                        sio.savemat('%s_%s_all_mv_array.mat' %(region_key,type_key),{'mv_array':new_mv_array},format='5')
+
+###########
+
+
+
 
 #slopes_workbook = xlsxwriter.Workbook('sig_slopes.xlsx',options={'nan_inf_to_errors':True})
 for region_key,region_val in data_dict_all.iteritems():
@@ -633,7 +793,7 @@ if mv_bool:
         #calc updated motiv and val vectors
         for region_key,region_val in data_dict_all.iteritems():
                 #for now individ. should avg across windows? And if so does that affect any other of the analysis?
-                data_dict_all[region_key]['mv'] = {}
+                #data_dict_all[region_key]['mv'] = {}
                 for type_key,type_val in data_dict_all[region_key]['slopes'].iteritems():
                         slopes = data_dict_all[region_key]['slopes'][type_key]
                         sig_units = slopes[:,0]
@@ -647,12 +807,14 @@ if mv_bool:
                         temp = np.zeros((np.shape(slopes)[0],np.shape(condensed)[0],8))
                         for i in range(np.shape(slopes)[0]):
                                 unit = sig_units[i]
-                                #alpha = abs(alphas[i])
-                                #beta = abs(betas[i])
-                                alpha = alphas[i]
-                                beta = betas[i]
+                                
+                                if abs_alphabeta:
+                                        alpha = abs(alphas[i])
+                                        beta = abs(betas[i])
+                                else:
+                                        alpha = alphas[i]
+                                        beta = betas[i]
 
-                                #question: for now taking abs value for alpha and beta
                                 unit_condensed = np.zeros((np.shape(condensed)[0],8))
                                 unit_condensed[:,0] = rnums
                                 unit_condensed[:,1] = pnums
@@ -664,7 +826,6 @@ if mv_bool:
                                 window_avg_unit_fr = data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'][:,unit]
                                 unit_condensed[:,6] = window_avg_unit_fr
                                 unit_condensed[:,7] = unit
-                                
                                 temp[i,:,:] = unit_condensed
 
                         new_mv_array = temp
@@ -674,3 +835,51 @@ if mv_bool:
                         np.save('%s_%s_mv_array.npy' %(region_key,type_key),new_mv_array)
                         sio.savemat('%s_%s_mv_array.mat' %(region_key,type_key),{'mv_array':new_mv_array},format='5')
 
+
+#for region_key,region_val in data_dict_all.iteritems():
+#        bfr_cue_array = data_dict_all[region_key]['all_slopes']['bfr_cue_model']
+#        aft_cue_array = data_dict_all[region_key]['all_slopes']['aft_cue_model']
+#        bfr_result_array = data_dict_all[region_key]['all_slopes']['bfr_result_model']
+#        aft_result_array = data_dict_all[region_key]['all_slopes']['aft_result_model']
+#
+#        avg_alphas = (bfr_cue_array[:,1] + aft_cue_array[:,1] + bfr_result_array[:,1] + aft_result_array[:,1]) / float(4)
+#        avg_betas = (bfr_cue_array[:,2] + aft_cue_array[:,2] + bfr_result_array[:,2] + aft_result_array[:,2]) / float(4)
+#
+#        rnums = condensed[:,3]
+#        pnums = condensed[:,4]
+#        data_dict_all[region_key]['mv']['all'] = {}
+
+#        for type_key,type_val in data_dict_all[region_key]['all_slopes'].iteritems():
+#
+#                #mv_array = np.zeros((np.shape(condensed)[0],np.shape(slopes)[0],5))
+#                temp = np.zeros((np.shape(avg_alphas)[0],np.shape(condensed)[0],8))
+#                for i in range(np.shape(avg_alphas)[0]):
+#                        unit = i
+#                                
+#                        if abs_alphabeta:
+#                                alpha = abs(avg_alphas[i])
+#                                beta = abs(avg_betas[i])
+#                        else:
+#                                alpha = avg_alphas[i]
+#                                beta = avg_betas[i]
+                        
+#                        unit_condensed = np.zeros((np.shape(condensed)[0],8))
+#                        unit_condensed[:,0] = rnums
+#                        unit_condensed[:,1] = pnums
+#                        unit_condensed[:,2] = alpha
+#                        unit_condensed[:,3] = beta
+#                        unit_condensed[:,4] = rnums * alpha - pnums * beta #value
+#                        unit_condensed[:,5] = rnums * alpha + pnums * beta #motiv
+#                
+#                        window_avg_unit_fr = data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'][:,unit]
+#                        unit_condensed[:,6] = window_avg_unit_fr
+#                        unit_condensed[:,7] = unit
+#                        
+#                        temp[i,:,:] = unit_condensed
+                
+#                        new_mv_array = temp
+#                
+#                        data_dict_all[region_key]['mv']['all'][type_key] = new_mv_array
+#                
+#                        np.save('%s_%s_all_mv_array.npy' %(region_key,type_key),new_mv_array)
+#                        sio.savemat('%s_%s_all_mv_array.mat' %(region_key,type_key),{'mv_array':new_mv_array},format='5')
