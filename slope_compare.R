@@ -18,7 +18,7 @@ library(reshape)
 #######
 
 avg_alphabeta_bool = FALSE
-all_alphabeta_bool = TRUE
+all_alphabeta_bool = FALSE
 
 if (avg_alphabeta_bool & all_alphabeta_bool){cat('ERROR both cant be true')}
 
@@ -461,6 +461,9 @@ plot_newmv <- function(mv_array,region_key,type_key){
   sig_slopes <- rbind(sig_val_slopes.df,sig_mtv_slopes.df)
   all_slopes <- rbind(all_val_slopes.df,all_mtv_slopes.df)
   
+  sig_slopes <- sig_slopes[complete.cases(sig_slopes$slopes),]
+  all_slopes <- all_slopes[complete.cases(all_slopes$slopes),]
+    
   png(paste('slope_hist_',region_key,'_',type_key,'.png',sep=""),width=8,height=6,units="in",res=500)
   
   sig_plt <- ggplot(sig_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
@@ -920,8 +923,6 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
 }
 
 
-
-
-#rm(list=ls())
+rm(list=ls())
 
  
