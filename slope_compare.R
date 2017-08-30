@@ -545,7 +545,7 @@ for (region_ind in 1:length(region_list)){
   aft_cue_sig_neg_slope <- aft_cue_list$sig_slopes[aft_cue_list$sig_slopes$slopes < -0.1,]
   temp <- aft_cue_list$sig_slopes[aft_cue_list$sig_slopes$slopes <= 0.1,]
   aft_cue_sig_zero_slope <- temp[temp$slopes >= -0.1,]
-  bfr_result_sig_pos_slope <- bfr_result_list$sig_slopes[bfr_result_list$sig_slopsetwes$slopes > 0.1,]
+  bfr_result_sig_pos_slope <- bfr_result_list$sig_slopes[bfr_result_list$sig_slopes$slopes > 0.1,]
   bfr_result_sig_neg_slope <- bfr_result_list$sig_slopes[bfr_result_list$sig_slopes$slopes < -0.1,]
   temp <- bfr_result_list$sig_slopes[bfr_result_list$sig_slopes$slopes <= 0.1,]
   bfr_result_sig_zero_slope <- temp[temp$slopes >= -0.1,]
@@ -935,6 +935,6 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
 }
 
 
-rm(list=ls())
+#rm(list=ls())
 
  
