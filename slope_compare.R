@@ -1,8 +1,8 @@
 library(openxlsx)
 library(ggplot2)
 library(reshape2)
-#source("~/dropbox/mult_rp_files/r_test/multiplot.R")
-source("~/Dropbox/mult_rp_files/r_test/multiplot.R")
+source("~/dropbox/mult_rp_files/r_test/multiplot.R")
+#source("~/Dropbox/mult_rp_files/r_test/multiplot.R")
 library(zoo)
 library(gplots)
 library(RColorBrewer)
@@ -17,7 +17,7 @@ library(reshape)
 
 #######
 
-avg_alphabeta_bool = FALSE
+avg_alphabeta_bool = TRUE
 all_alphabeta_bool = FALSE
 
 if (avg_alphabeta_bool & all_alphabeta_bool){cat('ERROR both cant be true')}
@@ -418,12 +418,24 @@ plot_newmv <- function(mv_array,region_key,type_key){
     val_lm <- tidy(lm(fr~x_val,data=df_val))
     mtv_lm <- tidy(lm(fr~x_mtv,data=df_mtv))
     
-    if (val_lm$p.value[2] < 0.05){
+    #will this (or the other complete cases) affect outcomes? see what's causing
+    val_lm <- val_lm[complete.cases(val_lm$p.value),]
+    mtv_lm <- mtv_lm[complete.cases(mtv_lm$p.value),]
+    
+    cat(region_key,' ',type_key, ' ',val_lm$p.value[2], ' ', unit_ind,'\n')
+    
+    if (length(val_lm$p.value) == 0){
+      sig_val <- sig_val
+      sig_val_slopes <- sig_val_slopes
+    }else if (val_lm$p.value[2] <= 0.05){
       sig_val <- sig_val + 1
       sig_val_slopes <- c(sig_val_slopes,val_lm$estimate[2])
       }
       
-    if (mtv_lm$p.value[2] < 0.05){
+    if (length(val_lm$p.value) == 0){
+      sig_mtv <- sig_mtv
+      sig_mtv_sloeps <- sig_mtv_slopes
+    }else if (mtv_lm$p.value[2] <= 0.05){
       sig_mtv <- sig_mtv + 1
       sig_mtv_slopes <- c(sig_mtv_slopes,mtv_lm$estimate[2])
       }
@@ -528,19 +540,19 @@ for (region_ind in 1:length(region_list)){
   bfr_cue_sig_pos_slope <- bfr_cue_list$sig_slopes[bfr_cue_list$sig_slopes$slopes > 0.1,]
   bfr_cue_sig_neg_slope <- bfr_cue_list$sig_slopes[bfr_cue_list$sig_slopes$slopes < -0.1,]
   temp <- bfr_cue_list$sig_slopes[bfr_cue_list$sig_slopes$slopes <= 0.1,]
-  bfr_cue_sig_zero_slope <- temp[temp$slopes >= -0.1]
+  bfr_cue_sig_zero_slope <- temp[temp$slopes >= -0.1,]
   aft_cue_sig_pos_slope <- aft_cue_list$sig_slopes[aft_cue_list$sig_slopes$slopes > 0.1,]
   aft_cue_sig_neg_slope <- aft_cue_list$sig_slopes[aft_cue_list$sig_slopes$slopes < -0.1,]
   temp <- aft_cue_list$sig_slopes[aft_cue_list$sig_slopes$slopes <= 0.1,]
-  aft_cue_sig_zero_slope <- temp[temp$slopes >= -0.1]
-  bfr_result_sig_pos_slope <- bfr_result_list$sig_slopes[bfr_result_list$sig_slopes$slopes > 0.1,]
+  aft_cue_sig_zero_slope <- temp[temp$slopes >= -0.1,]
+  bfr_result_sig_pos_slope <- bfr_result_list$sig_slopes[bfr_result_list$sig_slopsetwes$slopes > 0.1,]
   bfr_result_sig_neg_slope <- bfr_result_list$sig_slopes[bfr_result_list$sig_slopes$slopes < -0.1,]
   temp <- bfr_result_list$sig_slopes[bfr_result_list$sig_slopes$slopes <= 0.1,]
-  bfr_result_sig_zero_slope <- temp[temp$slopes >= -0.1]
+  bfr_result_sig_zero_slope <- temp[temp$slopes >= -0.1,]
   aft_result_sig_pos_slope <- aft_result_list$sig_slopes[aft_result_list$sig_slopes$slopes > 0.1,]
   aft_result_sig_neg_slope <- aft_result_list$sig_slopes[aft_result_list$sig_slopes$slopes < -0.1,]
   temp <- aft_result_list$sig_slopes[aft_result_list$sig_slopes$slopes <= 0.1,]
-  aft_result_sig_zero_slope <- temp[temp$slopes >= -0.1]
+  aft_result_sig_zero_slope <- temp[temp$slopes >= -0.1,]
   
   bfr_cue_all_pos_slope <- bfr_cue_list$all_slopes[bfr_cue_list$all_slopes$slopes > 0.1,]
   bfr_cue_all_neg_slope <- bfr_cue_list$all_slopes[bfr_cue_list$all_slopes$slopes < -0.1,]
