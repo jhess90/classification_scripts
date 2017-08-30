@@ -1,8 +1,8 @@
 library(openxlsx)
 library(ggplot2)
 library(reshape2)
-source("~/dropbox/mult_rp_files/r_test/multiplot.R")
-#source("~/Dropbox/mult_rp_files/r_test/multiplot.R")
+#source("~/dropbox/mult_rp_files/r_test/multiplot.R")
+source("~/Dropbox/mult_rp_files/r_test/multiplot.R")
 library(zoo)
 library(gplots)
 library(RColorBrewer)
@@ -422,7 +422,7 @@ plot_newmv <- function(mv_array,region_key,type_key){
     val_lm <- val_lm[complete.cases(val_lm$p.value),]
     mtv_lm <- mtv_lm[complete.cases(mtv_lm$p.value),]
     
-    cat(region_key,' ',type_key, ' ',val_lm$p.value[2], ' ', unit_ind,'\n')
+    #cat(region_key,' ',type_key, ' ',val_lm$p.value[2], ' ', unit_ind,'\n')
     
     if (length(val_lm$p.value) == 0){
       sig_val <- sig_val
@@ -434,7 +434,7 @@ plot_newmv <- function(mv_array,region_key,type_key){
       
     if (length(val_lm$p.value) == 0){
       sig_mtv <- sig_mtv
-      sig_mtv_sloeps <- sig_mtv_slopes
+      sig_mtv_slopes <- sig_mtv_slopes
     }else if (mtv_lm$p.value[2] <= 0.05){
       sig_mtv <- sig_mtv + 1
       sig_mtv_slopes <- c(sig_mtv_slopes,mtv_lm$estimate[2])
@@ -768,7 +768,7 @@ det_signs <- function(alpha,beta){
     }else if (alpha[j] < 0 & beta[j] < 0){both_neg <- both_neg + 1
     }else if (alpha[j] > 0 & beta[j] < 0){alpha_pos <- alpha_pos + 1
     }else if (alpha[j] < 0 & beta[j] > 0){beta_pos <- beta_pos + 1
-    }else{cat('\nerror, val = 0 or indexing')}
+    }else{cat('\nab error: alpha=',alpha[j],' beta=',beta[j],' unit=',j, '\n')}
   }
     
   perc_both_pos <- both_pos / num_units
@@ -919,7 +919,7 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
     aft_result_df <- ddply(aft_result_df,.(type),transform,label=paste(scales::percent(aft_result_df$perc),' n=',aft_result_nums,sep=""))
     
     if (all_alphabeta_bool){png(paste('signs_bar_plotted_all_',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)
-    }else if (avg_alphabeta_bool){png(paste('signs_bar_plotted_all_',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)}
+    }else if (avg_alphabeta_bool){png(paste('signs_bar_plotted_avg_',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)}
     
     df_all <- rbind(bfr_cue_df,aft_cue_df,bfr_result_df,aft_result_df)
     df_all <- df_all[which(df_all$perc > 0),]
