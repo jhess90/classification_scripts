@@ -475,8 +475,12 @@ plot_newmv <- function(mv_array,region_key,type_key){
   
   sig_slopes <- sig_slopes[complete.cases(sig_slopes$slopes),]
   all_slopes <- all_slopes[complete.cases(all_slopes$slopes),]
-    
-  png(paste('slope_hist_',region_key,'_',type_key,'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  if (all_alphabeta_bool){png(paste('slope_hist_all_',region_key,'_',type_key,'.png',sep=""),width=8,height=6,units="in",res=500)
+  }else if (avg_alphabeta_bool){png(paste('slope_hist_avg_',region_key,'_',type_key,'.png',sep=""),width=8,height=6,units="in",res=500)
+  }else{png(paste('slope_hist_',region_key,'_',type_key,'.png',sep=""),width=8,height=6,units="in",res=500)}
+  
+  
   
   sig_plt <- ggplot(sig_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
   sig_plt <- sig_plt + labs(title=paste(region_key,type_key,'significant')) #+ xlim(-1.0,1.0)
