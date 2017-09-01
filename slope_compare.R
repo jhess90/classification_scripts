@@ -18,7 +18,7 @@ library(reshape)
 #######
 
 avg_alphabeta_bool = FALSE
-all_alphabeta_bool = TRUE
+all_alphabeta_bool = FALSE
 
 if (avg_alphabeta_bool & all_alphabeta_bool){cat('ERROR both cant be true')}
 
@@ -97,8 +97,8 @@ for (region_index in 1:length(file_list)){
   
 }
 
-for (region_ind in 1:length(region_list)){
-  sheet_name = paste(region_list[region_ind],"_dicts",sep="")
+for (region_index in 1:length(region_list)){
+  sheet_name = paste(region_list[region_index],"_dicts",sep="")
   percs <- read.xlsx('percs_workbook.xlsx',sheet=sheet_name,colNames=T)
   
   bfr_cue <- percs$bfr_cue_model
@@ -158,7 +158,7 @@ for (region_ind in 1:length(region_list)){
   aft_result_df <- data.frame(aft_result_vals,labs)
   aft_result_sigall_df <- data.frame(aft_result_sigall_vals,labs)
   
-  png(paste('sig_plots',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)
+  png(paste('sig_plots',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
   bfr_cue_plt <- ggplot(bfr_cue_df,aes(x="",y=bfr_cue_vals,fill=labs)) + geom_bar(width=1,stat="identity") + coord_polar('y',start=0)
   bfr_cue_plt <- bfr_cue_plt + theme_minimal() +  theme(axis.title=element_blank(),axis.text=element_blank(),panel.grid=element_blank(),axis.ticks=element_blank())
   bfr_cue_plt <- bfr_cue_plt + geom_text(aes(y = bfr_cue_vals/2 + c(0, cumsum(bfr_cue_vals)[-length(bfr_cue_vals)]),label = scales::percent(bfr_cue_vals)))
@@ -182,7 +182,7 @@ for (region_ind in 1:length(region_list)){
   multiplot(bfr_cue_plt,aft_cue_plt,bfr_result_plt,aft_result_plt,cols=2)
   graphics.off()
 
-  png(paste('both_sig_plots',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)
+  png(paste('both_sig_plots',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
   bfr_cue_plt_sigall <- ggplot(bfr_cue_sigall_df,aes(x="",y=bfr_cue_sigall_vals,fill=labs)) + geom_bar(width=1,stat="identity") + coord_polar('y',start=0)
   bfr_cue_plt_sigall <- bfr_cue_plt_sigall + theme_minimal() +  theme(axis.title=element_blank(),axis.text=element_blank(),panel.grid=element_blank(),axis.ticks=element_blank())
   bfr_cue_plt_sigall <- bfr_cue_plt_sigall + geom_text(aes(y = bfr_cue_sigall_vals/2 + c(0, cumsum(bfr_cue_sigall_vals)[-length(bfr_cue_sigall_vals)]),label = scales::percent(bfr_cue_sigall_vals)))
@@ -261,13 +261,13 @@ for (region_ind in 1:length(region_list)){
   bfr_result_df <- ddply(bfr_result_df,.(type),transform,label=paste(scales::percent(bfr_result_df$perc),' n=',bfr_result_nums,sep=""))
   aft_result_df <- ddply(aft_result_df,.(type),transform,label=paste(scales::percent(aft_result_df$perc),' n=',aft_result_nums,sep=""))
   
-  png(paste('all_bar_plotted_',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)
+  png(paste('all_bar_plotted_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
   
   df_all <- rbind(bfr_cue_df,aft_cue_df,bfr_result_df,aft_result_df)
   df_all <- df_all[which(df_all$perc > 0),]
   
   bar_plt <- ggplot() + geom_bar(aes(x=df_all$type,y=df_all$perc,fill=df_all$labs),data=df_all,stat="identity") 
-  bar_plt <- bar_plt + labs(title=region_list[region_ind],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
+  bar_plt <- bar_plt + labs(title=region_list[region_index],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
   bar_plt <- bar_plt + geom_text(aes(x=df_all$type,y=df_all$position,label=df_all$label),size=3,stat="identity")
   
   plot(bar_plt)
@@ -372,13 +372,13 @@ for (region_ind in 1:length(region_list)){
   bfr_result_df <- ddply(bfr_result_df,.(type),transform,label=paste(scales::percent(bfr_result_df$perc),' n=',bfr_result_nums,sep=""))
   aft_result_df <- ddply(aft_result_df,.(type),transform,label=paste(scales::percent(aft_result_df$perc),' n=',aft_result_nums,sep=""))
   
-  png(paste('signs_bar_plotted_',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)
+  png(paste('signs_bar_plotted_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
 
   df_all <- rbind(bfr_cue_df,aft_cue_df,bfr_result_df,aft_result_df)
   df_all <- df_all[which(df_all$perc > 0),]
   
   bar_plt <- ggplot() + geom_bar(aes(x=df_all$type,y=df_all$perc,fill=df_all$labs),data=df_all,stat="identity") 
-  bar_plt <- bar_plt + labs(title=region_list[region_ind],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
+  bar_plt <- bar_plt + labs(title=region_list[region_index],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
   bar_plt <- bar_plt + geom_text(aes(x=df_all$type,y=df_all$position,label=df_all$label),size=3,stat="identity")
   
   plot(bar_plt)
@@ -448,9 +448,9 @@ plot_newmv <- function(mv_array,region_key,type_key){
     alpha_list <- c(alpha_list,unit_array[1,3])
     beta_list <- c(beta_list,unit_array[1,4])
 
-    if (all_alphabeta_bool){png(paste(region_list[region_ind],'_',type_key,'_unit',unit_num,'_all_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)
-    }else if (avg_alphabeta_bool){png(paste(region_list[region_ind],'_',type_key,'_unit',unit_num,'_avg_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)
-    }else{png(paste(region_list[region_ind],'_',type_key,'_unit',unit_num,'_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)}
+    if (all_alphabeta_bool){png(paste(region_list[region_index],'_',type_key,'_unit',unit_num,'_all_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)
+    }else if (avg_alphabeta_bool){png(paste(region_list[region_index],'_',type_key,'_unit',unit_num,'_avg_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)
+    }else{png(paste(region_list[region_index],'_',type_key,'_unit',unit_num,'_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)}
     
     multiplot(val_plt,mtv_plt,cols=2)
     graphics.off()    
@@ -501,44 +501,44 @@ plot_newmv <- function(mv_array,region_key,type_key){
 
 
 type_list = c('bfr_cue','aft_cue','bfr_result','aft_result')
-for (region_ind in 1:length(region_list)){
+for (region_index in 1:length(region_list)){
   
   if (all_alphabeta_bool){
-    npy_readin <- readMat(paste(region_list[region_ind],'_dicts_bfr_cue_model_all_mv_array.mat',sep=""))
+    npy_readin <- readMat(paste(region_list[region_index],'_dicts_bfr_cue_model_all_mv_array.mat',sep=""))
     bfr_cue_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_ind],'_dicts_aft_cue_model_all_mv_array.mat',sep=""))
+    npy_readin <- readMat(paste(region_list[region_index],'_dicts_aft_cue_model_all_mv_array.mat',sep=""))
     aft_cue_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_ind],'_dicts_bfr_result_model_all_mv_array.mat',sep=""))
+    npy_readin <- readMat(paste(region_list[region_index],'_dicts_bfr_result_model_all_mv_array.mat',sep=""))
     bfr_result_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_ind],'_dicts_aft_result_model_all_mv_array.mat',sep=""))
+    npy_readin <- readMat(paste(region_list[region_index],'_dicts_aft_result_model_all_mv_array.mat',sep=""))
     aft_result_mv_array <- npy_readin$mv.array
   }else if(avg_alphabeta_bool){
-    npy_readin <- readMat(paste(region_list[region_ind],'_dicts_bfr_cue_model_all_avg_mv_array.mat',sep=""))
+    npy_readin <- readMat(paste(region_list[region_index],'_dicts_bfr_cue_model_all_avg_mv_array.mat',sep=""))
     bfr_cue_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_ind],'_dicts_aft_cue_model_all_avg_mv_array.mat',sep=""))
+    npy_readin <- readMat(paste(region_list[region_index],'_dicts_aft_cue_model_all_avg_mv_array.mat',sep=""))
     aft_cue_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_ind],'_dicts_bfr_result_model_all_avg_mv_array.mat',sep=""))
+    npy_readin <- readMat(paste(region_list[region_index],'_dicts_bfr_result_model_all_avg_mv_array.mat',sep=""))
     bfr_result_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_ind],'_dicts_aft_result_model_all_avg_mv_array.mat',sep=""))
+    npy_readin <- readMat(paste(region_list[region_index],'_dicts_aft_result_model_all_avg_mv_array.mat',sep=""))
     aft_result_mv_array <- npy_readin$mv.array
   }else{
-    npy_readin <- readMat(paste(region_list[region_ind],'_dicts_bfr_cue_model_mv_array.mat',sep=""))
+    npy_readin <- readMat(paste(region_list[region_index],'_dicts_bfr_cue_model_mv_array.mat',sep=""))
     bfr_cue_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_ind],'_dicts_aft_cue_model_mv_array.mat',sep=""))
+    npy_readin <- readMat(paste(region_list[region_index],'_dicts_aft_cue_model_mv_array.mat',sep=""))
     aft_cue_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_ind],'_dicts_bfr_result_model_mv_array.mat',sep=""))
+    npy_readin <- readMat(paste(region_list[region_index],'_dicts_bfr_result_model_mv_array.mat',sep=""))
     bfr_result_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_ind],'_dicts_aft_result_model_mv_array.mat',sep=""))
+    npy_readin <- readMat(paste(region_list[region_index],'_dicts_aft_result_model_mv_array.mat',sep=""))
     aft_result_mv_array <- npy_readin$mv.array
   }
   
-  bfr_cue_list <- plot_newmv(bfr_cue_mv_array,region_list[region_ind],'bfr_cue')
-  aft_cue_list <- plot_newmv(aft_cue_mv_array,region_list[region_ind],'aft_cue')
-  bfr_result_list <- plot_newmv(bfr_result_mv_array,region_list[region_ind],'bfr_result')
-  aft_result_list <- plot_newmv(aft_result_mv_array,region_list[region_ind],'aft_result')
+  bfr_cue_list <- plot_newmv(bfr_cue_mv_array,region_list[region_index],'bfr_cue')
+  aft_cue_list <- plot_newmv(aft_cue_mv_array,region_list[region_index],'aft_cue')
+  bfr_result_list <- plot_newmv(bfr_result_mv_array,region_list[region_index],'bfr_result')
+  aft_result_list <- plot_newmv(aft_result_mv_array,region_list[region_index],'aft_result')
   
   all_list <- list(bfr_cue_list = bfr_cue_list,aft_cue_list = aft_cue_list,bfr_result_list = bfr_result_list,aft_result_list = aft_result_list)
-  region_name <- paste(region_list[region_ind],'_vals',sep="")
+  region_name <- paste(region_list[region_index],'_vals',sep="")
   assign(region_name,all_list)
     
   bfr_cue_sig_pos_slope <- bfr_cue_list$sig_slopes[bfr_cue_list$sig_slopes$slopes > 0.1,]
@@ -733,9 +733,9 @@ for (region_ind in 1:length(region_list)){
   val_all <- ddply(val_all,.(type),transform,label=paste(scales::percent(val_all$perc),' n=',val_all$num,sep=""))
   mtv_all <- ddply(mtv_all,.(type),transform,label=paste(scales::percent(mtv_all$perc),' n=',mtv_all$num,sep=""))
   
-  if(all_alphabeta_bool){png(paste('linreg_all_',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)
-  }else if (avg_alphabeta_bool){png(paste('linreg_avg_',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)
-  }else{png(paste('linreg_',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)}
+  if(all_alphabeta_bool){png(paste('linreg_all_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  }else if (avg_alphabeta_bool){png(paste('linreg_avg_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  }else{png(paste('linreg_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)}
   
   val_sig_plt <- ggplot() + geom_bar(aes(x=val_sig$window,y=val_sig$perc,fill=val_sig$labs),data=val_sig,stat="identity")
   val_sig_plt <- val_sig_plt + labs(title='Value, sig',fill="",x="Time Window",y="percentage") + scale_fill_manual(values=c("lightblue","seagreen","slateblue"))
@@ -791,10 +791,10 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
   #plot avg alpha and beta vals (all)
   #plot signs bar plot (all)
   
-  for (region_ind in 1:length(region_list)){
-    if (region_list[region_ind] == 'M1'){region_vals <- M1_vals
-    }else if (region_list[region_ind] == 'S1'){region_vals <- S1_vals
-    }else if (region_list[region_ind] == 'PmD'){region_vals <- PmD_vals}
+  for (region_index in 1:length(region_list)){
+    if (region_list[region_index] == 'M1'){region_vals <- M1_vals
+    }else if (region_list[region_index] == 'S1'){region_vals <- S1_vals
+    }else if (region_list[region_index] == 'PmD'){region_vals <- PmD_vals}
     
     all_bfr_cue_alpha <- region_vals$bfr_cue_list$alpha_list
     all_bfr_cue_beta <- region_vals$bfr_cue_list$beta_list
@@ -811,15 +811,15 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
     #####
     file_list <- c('sig_slopes_M1_dicts.xlsx','sig_slopes_S1_dicts.xlsx','sig_slopes_PmD_dicts.xlsx')
 
-    slopes_bfr_cue <- read.xlsx(file_list[region_ind],sheet='slopes_bfr_cue_model',colNames=T)
-    slopes_aft_cue <- read.xlsx(file_list[region_ind],sheet='slopes_aft_cue_model',colNames=T)
-    slopes_bfr_result <- read.xlsx(file_list[region_ind],sheet='slopes_bfr_result_model',colNames=T)
-    slopes_aft_result <- read.xlsx(file_list[region_ind],sheet='slopes_aft_result_model',colNames=T)
+    slopes_bfr_cue <- read.xlsx(file_list[region_index],sheet='slopes_bfr_cue_model',colNames=T)
+    slopes_aft_cue <- read.xlsx(file_list[region_index],sheet='slopes_aft_cue_model',colNames=T)
+    slopes_bfr_result <- read.xlsx(file_list[region_index],sheet='slopes_bfr_result_model',colNames=T)
+    slopes_aft_result <- read.xlsx(file_list[region_index],sheet='slopes_aft_result_model',colNames=T)
     
-    slopes_bfr_cue_sigall <- read.xlsx(file_list[region_ind],sheet='sig_all_bfr_cue_model',colNames=T)
-    slopes_aft_cue_sigall <- read.xlsx(file_list[region_ind],sheet='sig_all_aft_cue_model',colNames=T)
-    slopes_bfr_result_sigall <- read.xlsx(file_list[region_ind],sheet='sig_all_bfr_result_model',colNames=T)
-    slopes_aft_result_sigall <- read.xlsx(file_list[region_ind],sheet='sig_all_aft_result_model',colNames=T)
+    slopes_bfr_cue_sigall <- read.xlsx(file_list[region_index],sheet='sig_all_bfr_cue_model',colNames=T)
+    slopes_aft_cue_sigall <- read.xlsx(file_list[region_index],sheet='sig_all_aft_cue_model',colNames=T)
+    slopes_bfr_result_sigall <- read.xlsx(file_list[region_index],sheet='sig_all_bfr_result_model',colNames=T)
+    slopes_aft_result_sigall <- read.xlsx(file_list[region_index],sheet='sig_all_aft_result_model',colNames=T)
     
     avg_bfr_cue <- c(mean(abs(slopes_bfr_cue$alpha)),mean(abs(slopes_bfr_cue$beta)),mean(abs(slopes_bfr_cue_sigall$alpha)),mean(abs(slopes_bfr_cue_sigall$beta)),mean(abs(all_bfr_cue_alpha)),mean(abs(all_bfr_cue_beta)))
     avg_aft_cue <- c(mean(abs(slopes_aft_cue$alpha)),mean(abs(slopes_aft_cue$beta)),mean(abs(slopes_aft_cue_sigall$alpha)),mean(abs(slopes_aft_cue_sigall$beta)),mean(abs(all_aft_cue_alpha)),mean(abs(all_aft_cue_beta)))
@@ -922,14 +922,14 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
     bfr_result_df <- ddply(bfr_result_df,.(type),transform,label=paste(scales::percent(bfr_result_df$perc),' n=',bfr_result_nums,sep=""))
     aft_result_df <- ddply(aft_result_df,.(type),transform,label=paste(scales::percent(aft_result_df$perc),' n=',aft_result_nums,sep=""))
     
-    if (all_alphabeta_bool){png(paste('signs_bar_plotted_all_',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)
-    }else if (avg_alphabeta_bool){png(paste('signs_bar_plotted_avg_',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)}
+    if (all_alphabeta_bool){png(paste('signs_bar_plotted_all_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+    }else if (avg_alphabeta_bool){png(paste('signs_bar_plotted_avg_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)}
     
     df_all <- rbind(bfr_cue_df,aft_cue_df,bfr_result_df,aft_result_df)
     df_all <- df_all[which(df_all$perc > 0),]
     
     bar_plt <- ggplot() + geom_bar(aes(x=df_all$type,y=df_all$perc,fill=df_all$labs),data=df_all,stat="identity") 
-    bar_plt <- bar_plt + labs(title=region_list[region_ind],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
+    bar_plt <- bar_plt + labs(title=region_list[region_index],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
     bar_plt <- bar_plt + geom_text(aes(x=df_all$type,y=df_all$position,label=df_all$label),size=3,stat="identity")
     
     plot(bar_plt)
@@ -938,7 +938,6 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
   }
 }
 
-
-#rm(list=ls())
+rm(list=ls())
 
  
