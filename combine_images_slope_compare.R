@@ -6,7 +6,6 @@ library(magick)
 avg_bool = TRUE
 
 combine_fnct <- function(name,files){
-  #files <- Sys.glob("M1_all_r*.png")
   cat("\n",name)
 
   img_1 <- image_read(files[1])
@@ -30,7 +29,6 @@ return()
 }
 
 combine3_fnct <- function(name,files){
-  #files <- Sys.glob("M1_all_r*.png")
   cat("\n",name)
   
   img_1 <- image_read(files[1])
@@ -38,7 +36,6 @@ combine3_fnct <- function(name,files){
   img_3 <- image_read(files[3])
 
   row <- c(img_1,img_2,img_3)
-
   row_img <- image_append(image_scale(row)) #,"2400"))
 
   image_background(row_img,"white",flatten=T)
@@ -46,7 +43,6 @@ combine3_fnct <- function(name,files){
   
   return()
 }
-
 
 
 region_list <- c('M1','S1','PmD')
@@ -71,29 +67,60 @@ for (i in 1:length(region_list)){
 if (avg_bool){
   
   avg_plots_list <- c('M1_avg_slopes.png','S1_avg_slopes.png','PmD_avg_slopes.png')
-  
+  combine3_fnct('avg_plots',avg_plots_list)
   avg_abs_plots_list <- c('M1_avg_abs_slopes.png','S1_avg_abs_slopes.png','PmD_avg_abs_slopes.png')
+  combine3_fnct('avg_abs_plots',avg_abs_plots_list)
   
   avg_avg_plots_list <- c('M1_avg_avg_slopes.png','S1_avg_avg_slopes.png','PmD_avg_avg_slopes.png')
+  combine3_fnct('avg_avg_plots',avg_avg_plots_list)
+  avg_avg_abs_plots_list <- c('M1_avg_avg_abs_slopes.png','S1_avg_avg_abs_slopes.png','PmD_avg_avg_abs_slopes.png')
+  combine3_fnct('avg_avg_abs_plots',avg_avg_abs_plots_list)
   
-  avg_avg_plots_list <- c('M1_avg_avg_slopes.png','S1_avg_avg_slopes.png','PmD_avg_avg_slopes.png')
+  all_avg_plots_list <- c('M1_all_avg_slopes.png','S1_all_avg_slopes.png','PmD_all_avg_slopes.png')
+  combine3_fnct('all_avg_plots',all_avg_plots_list)
+  all_avg_abs_plots_list <- c('M1_all_avg_abs_slopes.png','S1_all_avg_abs_slopes.png','PmD_all_avg_abs_slopes.png')
+  combine3_fnct('all_avg_abs_plots',all_avg_abs_plots_list)
   
+  all_bar_plotted_list <- c('all_bar_plotted_M1.png','all_bar_plotted_S1.png','all_bar_plotted_PmD.png')
+  combine3_fnct('all_bar_plotted',all_bar_plotted_list)
+  both_sig_plots_list <- c('both_sig_plotsM1.png','both_sig_plotsS1.png','both_sig_plotsPmD.png')
+  combine3_fnct('both_sig_plots',both_sig_plots_list)
+  
+  linreg_all_list <- c('linreg_all_M1.png','linreg_all_S1.png','linreg_all_PmD.png')
+  combine3_fnct('linreg_all',linreg_all_list)
+  linreg_avg_list <- c('linreg_avg_M1.png','linreg_avg_S1.png','linreg_avg_PmD.png')
+  combine3_fnct('linreg_avg',linreg_avg_list)
   
   sig_plots_list <- c('sig_plotsM1.png','sig_plotsS1.png','sig_plotsPmD.png')
+  combine3_fnct('sig_plots',sig_plots_list)
   
   signs_bar_plotted_all_list <- c('signs_bar_plotted_all_M1.png','signs_bar_plotted_all_S1.png','signs_bar_plotted_all_PmD.png')
-  
+  combine3_fnct('signs_bar_plotted_all',signs_bar_plotted_all_list)
   signs_bar_plotted_avg_list <- c('signs_bar_plotted_avg_M1.png','signs_bar_plotted_avg_S1.png','signs_bar_plotted_avg_PmD.png')
-  
+  combine3_fnct('signs_bar_plotted_avg',signs_bar_plotted_avg_list)
   signs_bar_plotted_list <- c('signs_bar_plotted_M1.png','signs_bar_plotted_S1.png','signs_bar_plotted_PmD.png')
-  
-  
+  combine3_fnct('signs_bar_plotted',signs_bar_ploted_list)
   
 }else{
+  all_bar_plotted_list <- c('all_bar_plotted_M1.png','all_bar_plotted_S1.png','all_bar_plotted_PmD.png')
+  combine3_fnct('all_bar_plotted',all_bar_plotted_list)
+  
+  both_sig_plots_list <- c('both_sig_plotsM1.png','both_sig_plotsS1.png','both_sig_plotsPmD.png')
+  combine3_fnct('both_sig_plots',both_sig_plots_list)
+  
+  linreg_list <- c('linreg_M1.png','linreg_S1.png','linreg_PmD.png')
+  combine3_fnct('linreg',linreg_list)
+  
+  avg_plots_list <- c('M1_avg_slopes.png','S1_avg_slopes.png','PmD_avg_slopes.png')
+  combine3_fnct('avg_plots',avg_plots_list)
+  avg_abs_plots_list <- c('M1_avg_abs_slopes.png','S1_avg_abs_slopes.png','PmD_avg_abs_slopes.png')
+  combine3_fnct('avg_abs_plots',avg_abs_plots_list)
+  
   sig_plots_list <- c('sig_plotsM1.png','sig_plotsS1.png','sig_plotsPmD.png')
+  combine3_fnct('sig_plots',sig_plots_list)
   
   signs_bar_plotted_list <- c('signs_bar_plotted_M1.png','signs_bar_plotted_S1.png','signs_bar_plotted_PmD.png')
-  
+  combine3_fnct('signs_bar_plotted',signs_bar_plotted_list)
 }
 
 
