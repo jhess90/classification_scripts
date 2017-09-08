@@ -23,16 +23,16 @@ import scipy.stats as stats
 #params to set ########
 #######################
 
-bin_size = 50 #in ms
+bin_size = 1 #in ms
 time_before = -0.5 #negative value
 time_after = 1.0
 baseline_time = -1.0 #negative value
 normalize_bool = False
 sqrt_bool = False
 plot_3d_bool = False
-mv_bool = True
-zscore = True
-abs_alphabeta = True
+mv_bool = False
+zscore = False
+abs_alphabeta = False
 
 ts_filename = glob.glob('Extracted*_timestamps.mat')[0]
 extracted_filename = ts_filename[:-15] + '.mat'
