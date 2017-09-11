@@ -76,6 +76,13 @@ def calc_firing_rates(hists,data_key,condensed):
         aft_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
         bfr_result_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
         aft_result_fr = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
+        
+        bfr_cue_hist_all = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
+        aft_cue_hist_all = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
+        bfr_result_hist_all = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
+        aft_result_hist_all = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
+        
+        
 
         #col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum, 5 = succ/fail
         for i in range(np.shape(condensed)[0]):
@@ -96,7 +103,12 @@ def calc_firing_rates(hists,data_key,condensed):
                                 aft_cue_hist = hists[j,cue_start_bin : cue_start_bin + bins_after]
                                 bfr_result_hist = hists[j,bins_before + result_start_bin : result_start_bin]
                                 aft_result_hist = hists[j,result_start_bin : result_start_bin + bins_after]
-                        
+   
+                                bfr_cue_hist_all[i,j,:] = bfr_cue_hist
+                                aft_cue_hist_all[i,j,:] = aft_cue_hist
+                                bfr_result_hist_all[i,j,:] = bfr_result_hist
+                                aft_result_hist_all[i,j,:] = aft_result_hist
+                     
                                 if not zscore:
                                         baseline_fr[i,j,:] = baseline_hist / float(bin_size) * 1000
                                         bfr_cue_fr[i,j,:] = bfr_cue_hist / float(bin_size) * 1000
@@ -143,7 +155,7 @@ def calc_firing_rates(hists,data_key,condensed):
                                 num = np.subtract(aft_result_fr[i,j,:],baseline_min)
                                 aft_result_nl_fr[i,j,:] = np.true_divide(num,denom)
                         
-        return_dict = {'bfr_cue_fr':bfr_cue_fr,'aft_cue_fr':aft_cue_fr,'bfr_result_fr':bfr_result_fr,'aft_result_fr':aft_result_fr,'bfr_cue_nl_fr':bfr_cue_nl_fr,'aft_cue_nl_fr':aft_cue_nl_fr,'bfr_result_nl_fr':bfr_result_nl_fr,'aft_result_nl_fr':aft_result_nl_fr,'baseline_fr':baseline_fr}
+        return_dict = {'bfr_cue_fr':bfr_cue_fr,'aft_cue_fr':aft_cue_fr,'bfr_result_fr':bfr_result_fr,'aft_result_fr':aft_result_fr,'bfr_cue_nl_fr':bfr_cue_nl_fr,'aft_cue_nl_fr':aft_cue_nl_fr,'bfr_result_nl_fr':bfr_result_nl_fr,'aft_result_nl_fr':aft_result_nl_fr,'baseline_fr':baseline_fr,'bfr_cue_hist':bfr_cue_hist_all,'aft_cue_hist':aft_cue_hist_all,'bfr_result_hist':bfr_result_hist_all,'aft_result_hist':aft_result_hist_all}
         return(return_dict)
 
 def make_3d_model(fr_data,condensed,region_key,type_key):
@@ -883,3 +895,17 @@ if mv_bool:
 #                
 #                        np.save('%s_%s_all_mv_array.npy' %(region_key,type_key),new_mv_array)
 #                        sio.savemat('%s_%s_all_mv_array.mat' %(region_key,type_key),{'mv_array':new_mv_array},format='5')
+
+
+M1_hist_dict = {'bfr_cue':data_dict_all['M1_dicts']['fr_dict']['bfr_cue_hist'],'aft_cue':data_dict_all['M1_dicts']['fr_dict']['aft_cue_hist'],'bfr_result':data_dict_all['M1_dicts']['fr_dict']['bfr_result_hist'],'aft_result':data_dict_all['M1_dicts']['fr_dict']['aft_result_hist']}
+
+S1_hist_dict = {'bfr_cue':data_dict_all['S1_dicts']['fr_dict']['bfr_cue_hist'],'aft_cue':data_dict_all['S1_dicts']['fr_dict']['aft_cue_hist'],'bfr_result':data_dict_all['S1_dicts']['fr_dict']['bfr_result_hist'],'aft_result':data_dict_all['S1_dicts']['fr_dict']['aft_result_hist']}
+
+PmD_hist_dict = {'bfr_cue':data_dict_all['PmD_dicts']['fr_dict']['bfr_cue_hist'],'aft_cue':data_dict_all['PmD_dicts']['fr_dict']['aft_cue_hist'],'bfr_result':data_dict_all['PmD_dicts']['fr_dict']['bfr_result_hist'],'aft_result':data_dict_all['PmD_dicts']['fr_dict']['aft_result_hist']}
+
+master_hist_dict = {'M1_hist_dict':M1_hist_dict,'S1_hist_dict':S1_hist_dict,'PmD_hist_dict':PmD_hist_dict,'condensed':condensed}
+
+sio.savemat('master_hist',master_hist_dict)
+
+
+

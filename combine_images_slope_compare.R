@@ -99,7 +99,7 @@ if (avg_bool){
   signs_bar_plotted_avg_list <- c('signs_bar_plotted_avg_M1.png','signs_bar_plotted_avg_S1.png','signs_bar_plotted_avg_PmD.png')
   combine3_fnct('signs_bar_plotted_avg',signs_bar_plotted_avg_list)
   signs_bar_plotted_list <- c('signs_bar_plotted_M1.png','signs_bar_plotted_S1.png','signs_bar_plotted_PmD.png')
-  combine3_fnct('signs_bar_plotted',signs_bar_ploted_list)
+  combine3_fnct('signs_bar_plotted',signs_bar_plotted_list)
   
 }else{
   all_bar_plotted_list <- c('all_bar_plotted_M1.png','all_bar_plotted_S1.png','all_bar_plotted_PmD.png')
@@ -124,3 +124,4 @@ if (avg_bool){
 }
 
 
+cat('\n')
