@@ -1,8 +1,13 @@
 load('mat_sample/all.mat');
+load('mat_sample/trial_type.mat');
+
+dat = a_struct;
+rewarding = rewarding';
+
 
 % Results will be saved in mat_results/runXXX/, where XXX is runIdx.
 % Use a new runIdx for each dataset.
-runIdx = 3;
+runIdx = 5;
 
 % Select method to extract neural trajectories:
 % 'gpfa' -- Gaussian-process factor analysis
@@ -33,7 +38,9 @@ result = neuralTraj(runIdx, dat, 'method', method, 'xDim', xDim,...
 %       pp.621-622 of Yu et al., J Neurophysiol, 2009.
 
 % Plot neural trajectories in 3D space
-plot3D(seqTrain, 'xorth', 'dimsToPlot', 1:3,'160',rewarding);
+
+
+plot3D(seqTrain, 'xorth', 'dimsToPlot',1:3,'nPlotMax',160,'redTrials',rewarding);
 % NOTES:
 % - This figure shows the time-evolution of neural population
 %   activity on a single-trial basis.  Each trajectory is extracted from
@@ -75,7 +82,7 @@ fprintf('Basic extraction and plotting of neural trajectories is complete.\n');
 fprintf('Press any key to start cross-validation...\n');
 fprintf('[Depending on the dataset, this can take many minutes to hours.]\n');
 pause;
-
+% 
 % 
 % % ========================================================
 % % 2) Full cross-validation to find:
@@ -129,4 +136,4 @@ pause;
 % % - In this particular example, the optimal standard deviation of a
 % %   Gaussian smoothing kernel with FA is 30 ms.
 % % - Analogous to Figures 5B and 5C in Yu et al., J Neurophysiol, 2009.
-
+% 

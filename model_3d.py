@@ -12,7 +12,7 @@ import xlsxwriter
 import glob
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+#from mpl_toolkits.mplot3d import Axes3D
 import statsmodels.api as sm
 import pandas as pd
 from matplotlib import cm
@@ -23,14 +23,14 @@ import scipy.stats as stats
 #params to set ########
 #######################
 
-bin_size = 1 #in ms
+bin_size = 50 #in ms
 time_before = -0.5 #negative value
 time_after = 1.0
 baseline_time = -1.0 #negative value
 normalize_bool = False
 sqrt_bool = False
 plot_3d_bool = False
-mv_bool = False
+mv_bool = True
 zscore = False
 abs_alphabeta = False
 
@@ -897,6 +897,7 @@ if mv_bool:
 #                        sio.savemat('%s_%s_all_mv_array.mat' %(region_key,type_key),{'mv_array':new_mv_array},format='5')
 
 
+#For input into GPFA. Run on bin size of 1ms, other params = False (ie no normalizing, etc)
 M1_hist_dict = {'bfr_cue':data_dict_all['M1_dicts']['fr_dict']['bfr_cue_hist'],'aft_cue':data_dict_all['M1_dicts']['fr_dict']['aft_cue_hist'],'bfr_result':data_dict_all['M1_dicts']['fr_dict']['bfr_result_hist'],'aft_result':data_dict_all['M1_dicts']['fr_dict']['aft_result_hist']}
 
 S1_hist_dict = {'bfr_cue':data_dict_all['S1_dicts']['fr_dict']['bfr_cue_hist'],'aft_cue':data_dict_all['S1_dicts']['fr_dict']['aft_cue_hist'],'bfr_result':data_dict_all['S1_dicts']['fr_dict']['bfr_result_hist'],'aft_result':data_dict_all['S1_dicts']['fr_dict']['aft_result_hist']}
@@ -906,6 +907,18 @@ PmD_hist_dict = {'bfr_cue':data_dict_all['PmD_dicts']['fr_dict']['bfr_cue_hist']
 master_hist_dict = {'M1_hist_dict':M1_hist_dict,'S1_hist_dict':S1_hist_dict,'PmD_hist_dict':PmD_hist_dict,'condensed':condensed}
 
 sio.savemat('master_hist',master_hist_dict)
+
+
+#For input into tdr. Run with zscore normalization, whatever bin size.
+M1_fr_dict = {'bfr_cue':data_dict_all['M1_dicts']['fr_dict']['bfr_cue_fr'],'aft_cue':data_dict_all['M1_dicts']['fr_dict']['aft_cue_fr'],'bfr_result':data_dict_all['M1_dicts']['fr_dict']['bfr_result_fr'],'aft_result':data_dict_all['M1_dicts']['fr_dict']['aft_result_fr']}
+S1_fr_dict = {'bfr_cue':data_dict_all['S1_dicts']['fr_dict']['bfr_cue_fr'],'aft_cue':data_dict_all['S1_dicts']['fr_dict']['aft_cue_fr'],'bfr_result':data_dict_all['S1_dicts']['fr_dict']['bfr_result_fr'],'aft_result':data_dict_all['S1_dicts']['fr_dict']['aft_result_fr']}
+PmD_fr_dict = {'bfr_cue':data_dict_all['PmD_dicts']['fr_dict']['bfr_cue_fr'],'aft_cue':data_dict_all['PmD_dicts']['fr_dict']['aft_cue_fr'],'bfr_result':data_dict_all['PmD_dicts']['fr_dict']['bfr_result_fr'],'aft_result':data_dict_all['PmD_dicts']['fr_dict']['aft_result_fr']}
+
+master_fr_dict = {'M1_fr_dict':M1_fr_dict,'S1_fr_dict':S1_fr_dict,'PmD_fr_dict':PmD_fr_dict,'condensed':condensed}
+
+np.save('master_fr_dict.npy',master_fr_dict)
+
+
 
 
 

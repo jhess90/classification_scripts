@@ -5,6 +5,8 @@ aft_cue = M1_hist_dict.aft_cue;
 bfr_result = M1_hist_dict.bfr_result;
 aft_result = M1_hist_dict.aft_result;
 
+%TODO should be arrays of 1/0, some 2 though
+
 [trials,units,bfr_bins] = size(bfr_cue);
 [trials2,units2,aft_bins] = size(aft_cue);
 
@@ -49,3 +51,4 @@ punishing = find(condensed(:,5) > 0 & condensed(:,6) == -1);
 save('cue.mat','c_struct')
 save('result.mat','r_struct')
 save('all.mat','a_struct')
+save('trial_type.mat','rewarding','punishing')
