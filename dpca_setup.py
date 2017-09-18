@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-#targeted dimensionality reduction (based on Mante et al 2013)
-
+#dPCA, based on Kobak et al 2016
 
 #import packages
 import scipy.io as sio
@@ -63,6 +62,23 @@ def sort_and_avg(fr_array,sort_dict):
 	sq6 = sort_dict['s_stim']['rxpx'][np.in1d(sort_dict['s_stim']['rxpx'],sort_dict['q_result']['succ_trials'])]
 	sq7 = sort_dict['s_stim']['rxpx'][np.in1d(sort_dict['s_stim']['rxpx'],sort_dict['q_result']['fail_trials'])]
 
+	######### deal w/ unbalanced data #######
+	fr_all_dict = {'comb0':fr_array[sq0,:,:],'comb1':fr_array[sq1,:,:],'comb2':fr_array[sq2,:,:],'comb3':fr_array[sq3,:,:],'comb4':fr_array[sq4,:,:],'comb5':fr_array[sq5,:,:],'comb6':fr_array[sq6,:,:],'comb7':fr_array[sq7,:,:]}
+
+	min_trial_num = 1000
+	for i in range(8):
+		var_name = 'sq%s' %(i)
+		if np.shape(fr_array[var_name,:,:])[0] < min_trial_num:
+			min_trial_num = np.shape(fr_array[var_name,:,:])
+
+	bal_fr_array = np.zeros((min_trial_num,np.shape(fr_array[sq0,:,:])[1],np.shape(fr_array[sq0,:,:])[2])
+	for i in range(8):
+		var_name = 'sq%s' %(i)
+		comb_fr= fr_array[var_name,:,:]
+		idx = np.random.randint(np.size(comb_fr)[0],size=min_trial_num)
+	
+
+	
 	sq0_avg = np.mean(fr_array[sq0,:,:],axis=0)
 	sq1_avg = np.mean(fr_array[sq1,:,:],axis=0)
 	sq2_avg = np.mean(fr_array[sq2,:,:],axis=0)
@@ -71,43 +87,39 @@ def sort_and_avg(fr_array,sort_dict):
 	sq5_avg = np.mean(fr_array[sq5,:,:],axis=0)
 	sq6_avg = np.mean(fr_array[sq6,:,:],axis=0)
 	sq7_avg = np.mean(fr_array[sq7,:,:],axis=0)
-
+	
+	pdb.set_trace()
+	#x = np.dstack((sq0_fr,sq1_fr,sq2_fr,sq3_fr,sq4_fr,sq5_fr,sq6_fr,sq7_fr))
 	#xavg = avg across K trials for each of SQ conditions
 	x_avg = np.dstack((sq0_avg,sq1_avg,sq2_avg,sq3_avg,sq4_avg,sq5_avg,sq6_avg,sq7_avg))
 	x_avg = np.reshape(x_avg,(np.shape(x_avg)[0],np.shape(x_avg)[2],np.shape(x_avg)[1]))
+
+	#TODO unhardcode conditions
+	x_avg_shaped = np.zeros((N,T,4,2))
+	x_avg_shaped[:,:,0,0] = sq0_avg
+	x_avg_shaped[:,:,1,0] = sq2_avg
+	x_avg_shaped[:,:,2,0] = sq4_avg
+	x_avg_shaped[:,:,3,0] = sq6_avg
+	x_avg_shaped[:,:,0,1] = sq1_avg
+	x_avg_shaped[:,:,1,1] = sq3_avg
+	x_avg_shaped[:,:,2,1] = sq5_avg
+	x_avg_shaped[:,:,3,1] = sq7_avg
+
+
 	
-	return(x_avg)
+	
+	
+	return x_avg_shaped
 
 	
-	#unit_fr_mean = np.squeeze(np.apply_over_axes(np.mean,fr_array,(0,2)))
-	#unit_fr_std = np.squeeze(np.apply_over_axes(np.std,fr_array,(0,2)))
-
+def marginalization(x_avg):
 	
-	#zscore_array_all = []
-	#for i in range(int(np.max(sort_ind[:,1]) + 1)):
-	#	temp = sort_ind[sort_ind[:,1] == i]
-	#	for j in range(np.shape(temp)[0]):
-	#		cond_trial_nums = temp[:,0]
-	#		cond_trial_nums = cond_trial_nums.astype(int)
-#
-#			fr_array_cond = fr_array[cond_trial_nums,:,:]
-#			mean_fr_cond = np.mean(fr_array_cond,axis=0)
-#			
-#			#gaussian_smoothed = gaussian_filter(mean_fr_cond,sigma=sigma_val)
-#			zscore_array = np.zeros((np.shape(mean_fr_cond)))
-#			for k in range(np.shape(mean_fr_cond)[0]):
-#				zscore_array[k,:] = (mean_fr_cond[k,:] - unit_fr_mean[k]) / unit_fr_std[k]
-#
-#		zscore_array_all.append(zscore_array)
-#
-#	zscore_array_all = np.asarray(zscore_array_all)
-#	dims = np.shape(zscore_array_all)
-#	zscore_array_all = zscore_array_all.reshape((dims[1],dims[0],dims[2]))
 
 
 
-#	return(zscore_array_all)
 
+	marg = []
+	return(marg)
 
 
 
@@ -127,8 +139,15 @@ S1_fr_dict = data['S1_fr_dict']
 PmD_fr_dict = data['PmD_fr_dict']
 condensed = data['condensed']
 
-#condensed: col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum, 5 = succ(1) / fail(-1), 6 = value, 7 = motivation
+all_dict = {}
+all_dict['M1'] = {}
+all_dict['S1'] = {}
+all_dict['PmD'] = {}
+all_dict['M1']['M1_fr_dict'] = M1_fr_dict
+all_dict['S1']['S1_fr_dict'] = S1_fr_dict
+all_dict['PmD']['PmD_fr_dict'] = PmD_fr_dict
 
+#condensed: col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum, 5 = succ(1) / fail(-1), 6 = value, 7 = motivation
 new_condensed = np.zeros((np.shape(condensed)[0],8))
 new_condensed[:,0:6] = condensed
 new_condensed[:,6] = new_condensed[:,3] - new_condensed[:,4]
@@ -138,12 +157,6 @@ condensed = new_condensed
 #stim = S
 #for now seperate into all-R, no-R, no-P, and all-P, so four combinations
 #TODO make work for multiple levels (16 combinations)
-
-#all_r = np.squeeze(np.where(condensed[:,3] > 0))
-#no_r = np.squeeze(np.where(condensed[:,3] == 0))
-#all_p = np.squeeze(np.where(condensed[:,4] > 0))
-#no_p = np.squeeze(np.where(condensed[:,4] == 0))
-
 r0p0 = []
 rxp0 = []
 r0px = []
@@ -169,13 +182,44 @@ q_result = {'succ_trials':np.asarray(succ_trials),'fail_trials':np.asarray(fail_
 
 sort_dict = {'q_result':q_result,'s_stim':s_stim,'condensed':condensed}
 
+for region_key,region_val in all_dict.iteritems():
+	fr_dict_str = '%s_fr_dict' %(region_key)
 
-test = sort_and_avg(M1_fr_dict['aft_result'],sort_dict)
-test2 = sort_and_avg(M1_fr_dict['aft_result'],sort_dict)
+	bfr_cue_avg = sort_and_avg(all_dict[region_key][fr_dict_str]['bfr_cue'],sort_dict)
+	aft_cue_avg = sort_and_avg(all_dict[region_key][fr_dict_str]['aft_cue'],sort_dict)
+	bfr_result_avg = sort_and_avg(all_dict[region_key][fr_dict_str]['bfr_result'],sort_dict)
+	aft_result_avg = sort_and_avg(all_dict[region_key][fr_dict_str]['aft_result'],sort_dict)
 
-#arrange 3d structure for PCA
-coditions_dict = {}
+	all_avg = np.zeros((np.shape(bfr_cue_avg)[0],6*np.shape(bfr_cue_avg)[1],np.shape(bfr_cue_avg)[2],np.shape(bfr_cue_avg)[3]))
+	#TODO unhardcode
+	all_avg[:,0:10,:,:] = bfr_cue_avg
+	all_avg[:,10:30,:,:] = aft_cue_avg
+	all_avg[:,30:40,:,:] = bfr_result_avg
+	all_avg[:,40:60,:,:] = aft_result_avg
 
+
+
+	
+	#all_avg = np.dstack((bfr_cue_avg,aft_cue_avg,bfr_result_avg,aft_result_avg))
+	#all_sort = np.dstack((bfr_cue_sort,aft_cue_sort,bfr_result_sort,aft_result_sort))
+	#all_dict[region_key]['all_avg'] = all_avg
+	#all_dict[region_key]['all_sort'] = all_sort
+	
+	#fr_all = np.dstack((all_dict[region_key][fr_dict_str]['bfr_cue'],all_dict[region_key][fr_dict_str]['aft_cue'],all_dict[region_key][fr_dict_str]['bfr_result'],all_dict[region_key][fr_dict_str]['aft_result']))
+	
+	#RESHAPING
+	#fr_labeled = np.zeros((np.shape(all_avg)[0],np.shape(all_avg)[2],np.shape(all_avg)[1],np.shape()[1]))
+
+
+	
+
+
+######### from test ########
+dpca = dPCA.dPCA(labels='tsd') #,regularizer='auto')
+dpca.protect = ['t']
+#Z = dpca.fit_transform(R,trialR)
+Z = dpca.fit_transform(all_avg)
+	
 
 #pca=PCA(n_components = 20)
 #for each unit
