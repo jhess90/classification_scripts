@@ -94,18 +94,31 @@ def sort_and_avg(fr_array,sort_dict):
 	x_avg = np.dstack((sq0_avg,sq1_avg,sq2_avg,sq3_avg,sq4_avg,sq5_avg,sq6_avg,sq7_avg))
 	x_avg = np.reshape(x_avg,(np.shape(x_avg)[0],np.shape(x_avg)[2],np.shape(x_avg)[1]))
 
-	#TODO unhardcode conditions
-	x_avg_shaped = np.zeros((N,T,4,2))
-	x_avg_shaped[:,:,0,0] = sq0_avg
-	x_avg_shaped[:,:,1,0] = sq2_avg
-	x_avg_shaped[:,:,2,0] = sq4_avg
-	x_avg_shaped[:,:,3,0] = sq6_avg
-	x_avg_shaped[:,:,0,1] = sq1_avg
-	x_avg_shaped[:,:,1,1] = sq3_avg
-	x_avg_shaped[:,:,2,1] = sq5_avg
-	x_avg_shaped[:,:,3,1] = sq7_avg
+	#Reshape so x_avg shape = [N,stim,result,T]
+	#           bal_fr shape = [min_trial_num,N,stim,result,T]  
+	x_avg_shaped = np.zeros((N,4,2,T))
+	x_avg_shaped[:,0,0,:] = sq0_avg
+	x_avg_shaped[:,1,0,:] = sq2_avg
+	x_avg_shaped[:,2,0,:] = sq4_avg
+	x_avg_shaped[:,3,0,:] = sq6_avg
+	x_avg_shaped[:,0,1,:] = sq1_avg
+	x_avg_shaped[:,1,1,:] = sq3_avg
+	x_avg_shaped[:,2,1,:] = sq5_avg
+	x_avg_shaped[:,3,1,:] = sq7_avg
+
+	temp = bal_fr_array.reshape((8,min_trial_num,N,T))
+	bal_fr_shaped = np.zeros((min_trial_num,N,4,2,T))
+	bal_fr_shaped[:,:,0,0,:] = temp[0,:,:,:]
+	bal_fr_shaped[:,:,1,0,:] = temp[2,:,:,:]
+	bal_fr_shaped[:,:,2,0,:] = temp[4,:,:,:]
+	bal_fr_shaped[:,:,3,0,:] = temp[6,:,:,:]
+	bal_fr_shaped[:,:,0,1,:] = temp[1,:,:,:]
+	bal_fr_shaped[:,:,1,1,:] = temp[3,:,:,:]
+	bal_fr_shaped[:,:,2,1,:] = temp[5,:,:,:]
+	bal_fr_shaped[:,:,3,1,:] = temp[7,:,:,:]
+
 	
-	return x_avg_shaped,bal_fr_array
+	return x_avg_shaped,bal_fr_shaped
 
 	
 def marginalization(x_avg):
@@ -180,46 +193,23 @@ sort_dict = {'q_result':q_result,'s_stim':s_stim,'condensed':condensed}
 
 for region_key,region_val in all_dict.iteritems():
 	fr_dict_str = '%s_fr_dict' %(region_key)
+	bfr_cue = all_dict[region_key][fr_dict_str]['bfr_cue']
+	aft_cue = all_dict[region_key][fr_dict_str]['aft_cue']
+	bfr_result = all_dict[region_key][fr_dict_str]['bfr_result']
+	aft_result = all_dict[region_key][fr_dict_str]['aft_result']
 
-	bfr_cue_avg,bfr_cue_bal = sort_and_avg(all_dict[region_key][fr_dict_str]['bfr_cue'],sort_dict)
-	aft_cue_avg,aft_cue_bal = sort_and_avg(all_dict[region_key][fr_dict_str]['aft_cue'],sort_dict)
-	bfr_result_avg,bfr_result_bal = sort_and_avg(all_dict[region_key][fr_dict_str]['bfr_result'],sort_dict)
-	aft_result_avg,aft_result_bal = sort_and_avg(all_dict[region_key][fr_dict_str]['aft_result'],sort_dict)
+	all_fr = np.zeros((np.shape(bfr_cue)[0],np.shape(bfr_cue)[1],60))
+	all_fr[:,:,0:10] = bfr_cue
+	all_fr[:,:,10:30] = aft_cue
+	all_fr[:,:,30:40] = bfr_result
+	all_fr[:,:,40:60] = aft_result
 
-	all_avg = np.zeros((np.shape(bfr_cue_avg)[0],6*np.shape(bfr_cue_avg)[1],np.shape(bfr_cue_avg)[2],np.shape(bfr_cue_avg)[3]))
-	#TODO unhardcode
-	all_avg[:,0:10,:,:] = bfr_cue_avg
-	all_avg[:,10:30,:,:] = aft_cue_avg
-	all_avg[:,30:40,:,:] = bfr_result_avg
-	all_avg[:,40:60,:,:] = aft_result_avg
+	all_avg,all_bal = sort_and_avg(all_fr,sort_dict)
 
 
-
+	######### from test ########
+	dpca = dPCA.dPCA(labels='sdt',regularizer='auto')
+	dpca.protect = ['t']
+	Z = dpca.fit_transform(all_avg,all_bal)
 	
-	#all_avg = np.dstack((bfr_cue_avg,aft_cue_avg,bfr_result_avg,aft_result_avg))
-	#all_sort = np.dstack((bfr_cue_sort,aft_cue_sort,bfr_result_sort,aft_result_sort))
-	#all_dict[region_key]['all_avg'] = all_avg
-	#all_dict[region_key]['all_sort'] = all_sort
-	
-	#fr_all = np.dstack((all_dict[region_key][fr_dict_str]['bfr_cue'],all_dict[region_key][fr_dict_str]['aft_cue'],all_dict[region_key][fr_dict_str]['bfr_result'],all_dict[region_key][fr_dict_str]['aft_result']))
-	
-	#RESHAPING
-	#fr_labeled = np.zeros((np.shape(all_avg)[0],np.shape(all_avg)[2],np.shape(all_avg)[1],np.shape()[1]))
-
-
-	
-
-
-######### from test ########
-dpca = dPCA.dPCA(labels='tsd') #,regularizer='auto')
-dpca.protect = ['t']
-#Z = dpca.fit_transform(R,trialR)
-Z = dpca.fit_transform(all_avg)
-	
-
-#pca=PCA(n_components = 20)
-#for each unit
-#pca.fit(test[0,:,:])
-#fitted = pca.fit(test[0,:,:]).transform(test[0,:,:])
-
 
