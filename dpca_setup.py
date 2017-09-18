@@ -64,21 +64,23 @@ def sort_and_avg(fr_array,sort_dict):
 
 	######### deal w/ unbalanced data #######
 	fr_all_dict = {'comb0':fr_array[sq0,:,:],'comb1':fr_array[sq1,:,:],'comb2':fr_array[sq2,:,:],'comb3':fr_array[sq3,:,:],'comb4':fr_array[sq4,:,:],'comb5':fr_array[sq5,:,:],'comb6':fr_array[sq6,:,:],'comb7':fr_array[sq7,:,:]}
+	sq_dict = {'sq0':sq0,'sq1':sq1,'sq2':sq2,'sq3':sq3,'sq4':sq4,'sq5':sq5,'sq6':sq6,'sq7':sq7}
 
+	
 	min_trial_num = 1000
 	for i in range(8):
-		var_name = 'sq%s' %(i)
+		var_name = sq_dict['sq%s' %(i)]
 		if np.shape(fr_array[var_name,:,:])[0] < min_trial_num:
-			min_trial_num = np.shape(fr_array[var_name,:,:])
+			min_trial_num = np.shape(fr_array[var_name,:,:])[0]
 
-	bal_fr_array = np.zeros((min_trial_num,np.shape(fr_array[sq0,:,:])[1],np.shape(fr_array[sq0,:,:])[2])
+	bal_fr_array = np.zeros((8,min_trial_num,np.shape(fr_array[sq0,:,:])[1],np.shape(fr_array[sq0,:,:])[2]))
 	for i in range(8):
-		var_name = 'sq%s' %(i)
+		var_name = sq_dict['sq%s' %(i)]
 		comb_fr= fr_array[var_name,:,:]
-		idx = np.random.randint(np.size(comb_fr)[0],size=min_trial_num)
-	
+		idx = np.random.randint(np.shape(comb_fr)[0],size=min_trial_num)
+		bal_fr_array[i,:,:,:] = comb_fr[idx,:,:]
 
-	
+		
 	sq0_avg = np.mean(fr_array[sq0,:,:],axis=0)
 	sq1_avg = np.mean(fr_array[sq1,:,:],axis=0)
 	sq2_avg = np.mean(fr_array[sq2,:,:],axis=0)
@@ -88,8 +90,6 @@ def sort_and_avg(fr_array,sort_dict):
 	sq6_avg = np.mean(fr_array[sq6,:,:],axis=0)
 	sq7_avg = np.mean(fr_array[sq7,:,:],axis=0)
 	
-	pdb.set_trace()
-	#x = np.dstack((sq0_fr,sq1_fr,sq2_fr,sq3_fr,sq4_fr,sq5_fr,sq6_fr,sq7_fr))
 	#xavg = avg across K trials for each of SQ conditions
 	x_avg = np.dstack((sq0_avg,sq1_avg,sq2_avg,sq3_avg,sq4_avg,sq5_avg,sq6_avg,sq7_avg))
 	x_avg = np.reshape(x_avg,(np.shape(x_avg)[0],np.shape(x_avg)[2],np.shape(x_avg)[1]))
@@ -104,12 +104,8 @@ def sort_and_avg(fr_array,sort_dict):
 	x_avg_shaped[:,:,1,1] = sq3_avg
 	x_avg_shaped[:,:,2,1] = sq5_avg
 	x_avg_shaped[:,:,3,1] = sq7_avg
-
-
 	
-	
-	
-	return x_avg_shaped
+	return x_avg_shaped,bal_fr_array
 
 	
 def marginalization(x_avg):
@@ -185,10 +181,10 @@ sort_dict = {'q_result':q_result,'s_stim':s_stim,'condensed':condensed}
 for region_key,region_val in all_dict.iteritems():
 	fr_dict_str = '%s_fr_dict' %(region_key)
 
-	bfr_cue_avg = sort_and_avg(all_dict[region_key][fr_dict_str]['bfr_cue'],sort_dict)
-	aft_cue_avg = sort_and_avg(all_dict[region_key][fr_dict_str]['aft_cue'],sort_dict)
-	bfr_result_avg = sort_and_avg(all_dict[region_key][fr_dict_str]['bfr_result'],sort_dict)
-	aft_result_avg = sort_and_avg(all_dict[region_key][fr_dict_str]['aft_result'],sort_dict)
+	bfr_cue_avg,bfr_cue_bal = sort_and_avg(all_dict[region_key][fr_dict_str]['bfr_cue'],sort_dict)
+	aft_cue_avg,aft_cue_bal = sort_and_avg(all_dict[region_key][fr_dict_str]['aft_cue'],sort_dict)
+	bfr_result_avg,bfr_result_bal = sort_and_avg(all_dict[region_key][fr_dict_str]['bfr_result'],sort_dict)
+	aft_result_avg,aft_result_bal = sort_and_avg(all_dict[region_key][fr_dict_str]['aft_result'],sort_dict)
 
 	all_avg = np.zeros((np.shape(bfr_cue_avg)[0],6*np.shape(bfr_cue_avg)[1],np.shape(bfr_cue_avg)[2],np.shape(bfr_cue_avg)[3]))
 	#TODO unhardcode
