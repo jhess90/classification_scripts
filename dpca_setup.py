@@ -147,24 +147,109 @@ def marginalization(x_avg):
 #start ########################################
 ###############################################
 
-data = np.load('master_fr_dict.npy')[()]
+#data = np.load('master_fr_dict.npy')[()]
 
-
-
-
-#For each region, 3D dict [trial x unit x binned data]
-M1_fr_dict = data['M1_fr_dict']
-S1_fr_dict = data['S1_fr_dict']
-PmD_fr_dict = data['PmD_fr_dict']
-condensed = data['condensed']
+filelist = glob.glob('master_fr*.npy')
 
 all_dict = {}
 all_dict['M1'] = {}
 all_dict['S1'] = {}
 all_dict['PmD'] = {}
-all_dict['M1']['M1_fr_dict'] = M1_fr_dict
-all_dict['S1']['S1_fr_dict'] = S1_fr_dict
-all_dict['PmD']['PmD_fr_dict'] = PmD_fr_dict
+
+all_input = {}
+condensed_all = []
+bfr_cue_all = []
+aft_cue_all = []
+bfr_result_all = []
+aft_result_all = []
+min_unit_num = [10000,1000,1000]
+for i in range(len(filelist)):
+	data = np.load(filelist[i])[()]
+
+	M1_fr_dict = data['M1_fr_dict']
+	S1_fr_dict = data['S1_fr_dict']
+	PmD_fr_dict = data['PmD_fr_dict']
+	condensed = data['condensed']
+
+	
+	if np.shape(M1_fr_dict['bfr_cue'])[1] < min_unit_num[0]:
+		min_unit_num[0] = np.shape(M1_fr_dict['bfr_cue'])[1]
+	if np.shape(S1_fr_dict['bfr_cue'])[1] < min_unit_num[1]:
+		min_unit_num[1] = np.shape(S1_fr_dict['bfr_cue'])[1]
+	if np.shape(PmD_fr_dict['bfr_cue'])[1] < min_unit_num[2]:
+		min_unit_num[2] = np.shape(PmD_fr_dict['bfr_cue'])[1]
+
+	M1_dims = np.shape(M1_fr_dict)
+	S1_dims = np.shape(S1_fr_dict)
+	PmD_dims = np.shape(PmD_fr_dict)
+	dims = {'M1_dims':M1_dims,'S1_dims':S1_dims,'PmD_dims':PmD_dims}
+	all_input['%s'%(i)] = {'M1_fr_dict':M1_fr_dict,'S1_fr_dict':S1_fr_dict,'PmD_fr_dict':PmD_fr_dict,'condensed':condensed,'dims':dims}
+
+	if i == 0:
+		condensed_all = condensed
+	else:
+		condensed_all = np.append(condensed_all,condensed,axis=0)
+
+#TODO different windows, check all
+M1_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[0],10))
+M1_aft_cue_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[0],20))
+M1_bfr_result_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[0],10))
+M1_aft_result_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[0],20))
+S1_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[1],10))
+S1_aft_cue_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[1],20))
+S1_bfr_result_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[1],10))
+S1_aft_result_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[1],20))
+PmD_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[2],10))
+PmD_aft_cue_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[2],20))
+PmD_bfr_result_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[2],10))
+PmD_aft_result_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[2],20))
+
+
+count = 0
+for i in range(len(filelist)):
+	data = all_input[str(i)]
+	M1_fr_dict = data['M1_fr_dict']
+	S1_fr_dict = data['S1_fr_dict']
+	PmD_fr_dict = data['PmD_fr_dict']
+	condensed = data['condensed']
+
+	M1_unit_ind = np.sort(np.random.choice(np.shape(M1_fr_dict['bfr_cue'])[1],size=min_unit_num[0],replace=False))
+	S1_unit_ind = np.sort(np.random.choice(np.shape(S1_fr_dict['bfr_cue'])[1],size=min_unit_num[1],replace=False))
+	PmD_unit_ind = np.sort(np.random.choice(np.shape(PmD_fr_dict['bfr_cue'])[1],size=min_unit_num[2],replace=False))
+	
+	M1_bfr_cue_all[count:count+np.shape(condensed)[0],i*min_unit_num[0]:(i+1)*min_unit_num[0]:,:] = M1_fr_dict['bfr_cue'][:,M1_unit_ind,:]
+	M1_aft_cue_all[count:count+np.shape(condensed)[0],i*min_unit_num[0]:(i+1)*min_unit_num[0]:,:] = M1_fr_dict['aft_cue'][:,M1_unit_ind,:]
+	M1_bfr_result_all[count:count+np.shape(condensed)[0],i*min_unit_num[0]:(i+1)*min_unit_num[0]:,:] = M1_fr_dict['bfr_result'][:,M1_unit_ind,:]
+	M1_aft_result_all[count:count+np.shape(condensed)[0],i*min_unit_num[0]:(i+1)*min_unit_num[0]:,:] = M1_fr_dict['aft_result'][:,M1_unit_ind,:]
+	S1_bfr_cue_all[count:count+np.shape(condensed)[0],i*min_unit_num[1]:(i+1)*min_unit_num[1]:,:] = S1_fr_dict['bfr_cue'][:,S1_unit_ind,:]
+	S1_aft_cue_all[count:count+np.shape(condensed)[0],i*min_unit_num[1]:(i+1)*min_unit_num[1]:,:] = S1_fr_dict['aft_cue'][:,S1_unit_ind,:]
+	S1_bfr_result_all[count:count+np.shape(condensed)[0],i*min_unit_num[1]:(i+1)*min_unit_num[1]:,:] = S1_fr_dict['bfr_result'][:,S1_unit_ind,:]
+	S1_aft_result_all[count:count+np.shape(condensed)[0],i*min_unit_num[1]:(i+1)*min_unit_num[1]:,:] = S1_fr_dict['aft_result'][:,S1_unit_ind,:]
+	PmD_bfr_cue_all[count:count+np.shape(condensed)[0],i*min_unit_num[2]:(i+1)*min_unit_num[2]:,:] = PmD_fr_dict['bfr_cue'][:,PmD_unit_ind,:]
+	PmD_aft_cue_all[count:count+np.shape(condensed)[0],i*min_unit_num[2]:(i+1)*min_unit_num[2]:,:] = PmD_fr_dict['aft_cue'][:,PmD_unit_ind,:]
+	PmD_bfr_result_all[count:count+np.shape(condensed)[0],i*min_unit_num[2]:(i+1)*min_unit_num[2]:,:] = PmD_fr_dict['bfr_result'][:,PmD_unit_ind,:]
+	PmD_aft_result_all[count:count+np.shape(condensed)[0],i*min_unit_num[2]:(i+1)*min_unit_num[2]:,:] = PmD_fr_dict['aft_result'][:,PmD_unit_ind,:]
+
+	count += np.shape(condensed)[0]
+	
+	
+
+	
+#For each region, 3D dict [trial x unit x binned data]
+#M1_fr_dict = data['M1_fr_dict']
+#S1_fr_dict = data['S1_fr_dict']
+#PmD_fr_dict = data['PmD_fr_dict']
+#condensed = data['condensed']
+
+#all_dict['M1']['M1_fr_dict'] = M1_fr_dict
+#all_dict['S1']['S1_fr_dict'] = S1_fr_dict
+#all_dict['PmD']['PmD_fr_dict'] = PmD_fr_dict
+
+all_dict['M1']['M1_fr_dict'] = {'bfr_cue':M1_bfr_cue_all,'aft_cue':M1_aft_cue_all,'bfr_result':M1_bfr_result_all,'aft_result':M1_aft_result_all}
+all_dict['S1']['S1_fr_dict'] = {'bfr_cue':S1_bfr_cue_all,'aft_cue':S1_aft_cue_all,'bfr_result':S1_bfr_result_all,'aft_result':S1_aft_result_all}
+all_dict['PmD']['PmD_fr_dict'] = {'bfr_cue':PmD_bfr_cue_all,'aft_cue':PmD_aft_cue_all,'bfr_result':PmD_bfr_result_all,'aft_result':PmD_aft_result_all}
+
+condensed = condensed_all
 
 #condensed: col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum, 5 = succ(1) / fail(-1), 6 = value, 7 = motivation
 new_condensed = np.zeros((np.shape(condensed)[0],8))
@@ -365,7 +450,7 @@ for region_key,region_val in all_dict.iteritems():
 				plt.plot(time,Z[comb_ind][i,s,1,:])
 			plt.title('Component: %s, R: 1')
 
-		plt.tight_layout()
+		#plt.tight_layout()
 		plt.subplots_adjust(top=0.9)
 		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
 		plt.savefig('compmonents_%s_%s' %(region_key,comb_ind))
