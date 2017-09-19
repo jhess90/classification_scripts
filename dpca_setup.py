@@ -44,6 +44,14 @@ def sort_and_avg(fr_array,sort_dict):
 	N = np.shape(fr_array)[1]
 	T = np.shape(fr_array)[2]
 
+	#demean data
+	unit_fr_mean = np.squeeze(np.apply_over_axes(np.mean,fr_array,(0,2)))
+	demeaned_fr = np.zeros((K,N,T))
+	for i in range(N):
+		demeaned_fr[:,i,:] = fr_array[:,i,:] - unit_fr_mean[i]
+
+	fr_array = demeaned_fr
+	
 	#sq0 = r0p0, succ   sq1 = r0p0, fail
 	#sq2 = rxp0, succ   sq3 = rxp0, fail
 	#sq4 = r0px, succ   sq5 = r0px, fail
@@ -139,8 +147,10 @@ def marginalization(x_avg):
 #start ########################################
 ###############################################
 
-#TODO load multiple days of data, collate data
 data = np.load('master_fr_dict.npy')[()]
+
+
+
 
 #For each region, 3D dict [trial x unit x binned data]
 M1_fr_dict = data['M1_fr_dict']
@@ -192,6 +202,7 @@ q_result = {'succ_trials':np.asarray(succ_trials),'fail_trials':np.asarray(fail_
 sort_dict = {'q_result':q_result,'s_stim':s_stim,'condensed':condensed}
 
 for region_key,region_val in all_dict.iteritems():
+	print 'running region: %s' %(region_key)
 	fr_dict_str = '%s_fr_dict' %(region_key)
 	bfr_cue = all_dict[region_key][fr_dict_str]['bfr_cue']
 	aft_cue = all_dict[region_key][fr_dict_str]['aft_cue']
@@ -205,11 +216,209 @@ for region_key,region_val in all_dict.iteritems():
 	all_fr[:,:,40:60] = aft_result
 
 	all_avg,all_bal = sort_and_avg(all_fr,sort_dict)
-
+	[bal_cond,N,S,R,T] = np.shape(all_bal)
+	
 
 	######### from test ########
-	dpca = dPCA.dPCA(labels='sdt',regularizer='auto')
+	dpca = dPCA.dPCA(labels='sdt',regularizer='auto',n_components = 5)
 	dpca.protect = ['t']
 	Z = dpca.fit_transform(all_avg,all_bal)
 	
+	time = np.arange(T)
 
+	# Z has keys ['sdt', 'd', 'st', 's', 't', 'dt', 'sd']
+	#each key of shape [n_components,S,R,T]
+
+	
+	# ax = plt.gca()
+	# plt.subplot(7,3,1)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['t'][0,s,r,:])
+	# plt.title('t')
+	# plt.subplot(7,3,2)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['t'][1,s,r,:])
+	# plt.title('t')
+	# plt.subplot(7,3,3)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['t'][2,s,r,:])
+	# plt.title('t')
+
+	
+	# plt.subplot(7,3,4)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['s'][0,s,r,:])
+	# plt.title('s')
+	# plt.subplot(7,3,5)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['s'][1,s,r,:])
+	# plt.title('s')
+	# plt.subplot(7,3,6)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['s'][2,s,r,:])
+	# plt.title('s')
+
+	# plt.subplot(7,3,7)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['d'][0,s,r,:])
+	# plt.title('d')
+	# plt.subplot(7,3,8)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['d'][1,s,r,:])
+	# plt.title('d')
+	# plt.subplot(7,3,9)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['d'][2,s,r,:])
+	# plt.title('d')
+
+	# plt.subplot(7,3,10)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['st'][0,s,r,:])
+	# plt.title('st')
+	# plt.subplot(7,3,11)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['st'][1,s,r,:])
+	# plt.title('st')
+	# plt.subplot(7,3,12)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['st'][2,s,r,:])
+	# plt.title('st')
+
+	# plt.subplot(7,3,13)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['sd'][0,s,r,:])
+	# plt.title('sd')
+	# plt.subplot(7,3,14)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['sd'][1,s,r,:])
+	# plt.title('sd')
+	# plt.subplot(7,3,15)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['sd'][2,s,r,:])
+	# plt.title('sd')
+
+	# plt.subplot(7,3,16)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['dt'][0,s,r,:])
+	# plt.title('dt')
+	# plt.subplot(7,3,17)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['dt'][1,s,r,:])
+	# plt.title('dt')
+	# plt.subplot(7,3,18)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['dt'][2,s,r,:])
+	# plt.title('dt')
+
+	# plt.subplot(7,3,19)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['sdt'][0,s,r,:])
+	# plt.title('sdt')
+	# plt.subplot(7,3,20)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['sdt'][1,s,r,:])
+	# plt.title('sdt')
+	# plt.subplot(7,3,21)
+	# for s in range(S):
+	# 	for r in range(R):
+	# 		plt.plot(time,Z['sdt'][2,s,r,:])
+	# plt.title('sdt')
+
+	# plt.tight_layout()
+	# plt.subplots_adjust(top=0.9)
+	# plt.suptitle('Region %s' %(region_key))
+	# plt.savefig('test_%s' %(region_key))
+	# plt.clf()
+
+	#PARAM
+	components_plot = 3
+	for comb_ind,comb_val in Z.iteritems():
+		ax = plt.gca()
+		for i in range(components_plot):
+			plt.subplot(2,components_plot,i+1)
+			for s in range(S):
+				plt.plot(time,Z[comb_ind][i,s,0,:])
+			plt.title('Component: %s, R: 0' %(i))
+		for i in range(components_plot):
+			plt.subplot(2,components_plot,i+components_plot+1)
+			for s in range(S):
+				plt.plot(time,Z[comb_ind][i,s,1,:])
+			plt.title('Component: %s, R: 1')
+
+		plt.tight_layout()
+		plt.subplots_adjust(top=0.9)
+		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
+		plt.savefig('compmonents_%s_%s' %(region_key,comb_ind))
+		plt.clf()
+
+	
+
+
+# ax = plt.gca()
+#                 plt.subplot(4,3,1)
+#                 plt.hist(bfr_cue_unit_alpha)
+#                 plt.title('before cue: alpha',fontsize='small')
+#                 plt.subplot(4,3,2)
+#                 plt.hist(bfr_cue_unit_beta)
+                # plt.title('beta',fontsize='small')
+                # plt.subplot(4,3,3)
+                # plt.hist(bfr_cue_unit_k)
+                # plt.title('k',fontsize='small')
+
+                # plt.subplot(4,3,4)
+                # plt.hist(aft_cue_unit_alpha)
+                # plt.title('after cue: alpha',fontsize='small')
+                # plt.subplot(4,3,5)
+                # plt.hist(aft_cue_unit_beta)
+                # plt.title('beta',fontsize='small')
+                # plt.subplot(4,3,6)
+                # plt.hist(aft_cue_unit_k)
+                # plt.title('k',fontsize='small')
+
+                # plt.subplot(4,3,7)
+                # plt.hist(bfr_result_unit_alpha)
+                # plt.title('before result: alpha',fontsize='small')
+                # plt.subplot(4,3,8)
+                # plt.hist(bfr_result_unit_beta)
+                # plt.title('beta',fontsize='small')
+                # plt.subplot(4,3,9)
+                # plt.hist(bfr_result_unit_k)
+                # plt.title('k',fontsize='small')
+
+                # plt.subplot(4,3,10)
+                # plt.hist(aft_result_unit_alpha)
+                # plt.title('after result: alpha',fontsize='small')
+                # plt.subplot(4,3,11)
+                # plt.hist(aft_result_unit_beta)
+                # plt.title('beta',fontsize='small')
+                # plt.subplot(4,3,12)
+                # plt.hist(aft_result_unit_k)
+                # plt.title('k',fontsize='small')
+        
+                # plt.tight_layout()
+                # plt.subplots_adjust(top=0.9)
+                # plt.rcParams['xtick.labelsize'] = 8
+                # plt.rcParams['ytick.labelsize'] = 8
+                # plt.suptitle('Region %s, unit %s: param hists %s' %(region_key,unit_num,type_key))
+                # plt.savefig('param_hists_%s_unit%s_%s' %(region_key,str(unit_num).zfill(2),type_key))
+                # plt.clf()
