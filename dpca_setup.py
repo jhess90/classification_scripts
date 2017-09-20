@@ -309,201 +309,50 @@ for region_key,region_val in all_dict.iteritems():
 	dpca.protect = ['t']
 	Z = dpca.fit_transform(all_avg,all_bal)
 	
-	time = np.arange(T)
+	bins = np.arange(T)
 
 	# Z has keys ['sdt', 'd', 'st', 's', 't', 'dt', 'sd']
 	#each key of shape [n_components,S,R,T]
 
-	
-	# ax = plt.gca()
-	# plt.subplot(7,3,1)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['t'][0,s,r,:])
-	# plt.title('t')
-	# plt.subplot(7,3,2)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['t'][1,s,r,:])
-	# plt.title('t')
-	# plt.subplot(7,3,3)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['t'][2,s,r,:])
-	# plt.title('t')
-
-	
-	# plt.subplot(7,3,4)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['s'][0,s,r,:])
-	# plt.title('s')
-	# plt.subplot(7,3,5)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['s'][1,s,r,:])
-	# plt.title('s')
-	# plt.subplot(7,3,6)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['s'][2,s,r,:])
-	# plt.title('s')
-
-	# plt.subplot(7,3,7)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['d'][0,s,r,:])
-	# plt.title('d')
-	# plt.subplot(7,3,8)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['d'][1,s,r,:])
-	# plt.title('d')
-	# plt.subplot(7,3,9)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['d'][2,s,r,:])
-	# plt.title('d')
-
-	# plt.subplot(7,3,10)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['st'][0,s,r,:])
-	# plt.title('st')
-	# plt.subplot(7,3,11)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['st'][1,s,r,:])
-	# plt.title('st')
-	# plt.subplot(7,3,12)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['st'][2,s,r,:])
-	# plt.title('st')
-
-	# plt.subplot(7,3,13)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['sd'][0,s,r,:])
-	# plt.title('sd')
-	# plt.subplot(7,3,14)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['sd'][1,s,r,:])
-	# plt.title('sd')
-	# plt.subplot(7,3,15)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['sd'][2,s,r,:])
-	# plt.title('sd')
-
-	# plt.subplot(7,3,16)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['dt'][0,s,r,:])
-	# plt.title('dt')
-	# plt.subplot(7,3,17)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['dt'][1,s,r,:])
-	# plt.title('dt')
-	# plt.subplot(7,3,18)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['dt'][2,s,r,:])
-	# plt.title('dt')
-
-	# plt.subplot(7,3,19)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['sdt'][0,s,r,:])
-	# plt.title('sdt')
-	# plt.subplot(7,3,20)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['sdt'][1,s,r,:])
-	# plt.title('sdt')
-	# plt.subplot(7,3,21)
-	# for s in range(S):
-	# 	for r in range(R):
-	# 		plt.plot(time,Z['sdt'][2,s,r,:])
-	# plt.title('sdt')
-
-	# plt.tight_layout()
-	# plt.subplots_adjust(top=0.9)
-	# plt.suptitle('Region %s' %(region_key))
-	# plt.savefig('test_%s' %(region_key))
-	# plt.clf()
-
 	#PARAM
 	components_plot = 3
+	my_ticks = ['-10','0','10','-10','0','10','20']
+	my_ticks_num = [0,10,20,30,40,50,60]
+	labels = ['r0p0','rxp0','r0px','rxpx']
+	lines = []
 	for comb_ind,comb_val in Z.iteritems():
 		ax = plt.gca()
 		for i in range(components_plot):
 			plt.subplot(2,components_plot,i+1)
 			for s in range(S):
-				plt.plot(time,Z[comb_ind][i,s,0,:])
-			plt.title('Component: %s, R: 0' %(i))
-		for i in range(components_plot):
+				line_name = 'line%s' %(s)
+				line = plt.plot(bins,Z[comb_ind][i,s,0,:],label=labels[s])
+				lines = np.append(lines,line)
+			plt.axvline(x=10,color='g',linestyle='--')
+			plt.axvline(x=30,color='k')
+			plt.axvline(x=40,color='b',linestyle='--')
+			plt.title('Component: %s, R: 0' %(i+1),fontsize='small')
+			plt.xticks(my_ticks_num,my_ticks)
+
 			plt.subplot(2,components_plot,i+components_plot+1)
 			for s in range(S):
-				plt.plot(time,Z[comb_ind][i,s,1,:])
-			plt.title('Component: %s, R: 1')
+				plt.plot(bins,Z[comb_ind][i,s,1,:],label=labels[s])
+				plt.xticks(my_ticks_num,my_ticks)
+				
+			plt.axvline(x=10,color='g',linestyle='--')
+			plt.axvline(x=30,color='k')
+			plt.axvline(x=40,color='b',linestyle='--')
+			plt.title('Component: %s, R: 1' %(i+1),fontsize='small')
 
-		#plt.tight_layout()
-		plt.subplots_adjust(top=0.9)
+		plt.figlegend(lines,labels,loc='right',ncol=1,fontsize='small')
+		plt.tight_layout(w_pad=0.1)
+		plt.subplots_adjust(top=0.9,right=0.85)
+		plt.rcParams['xtick.labelsize'] = 8
+		plt.rcParams['ytick.labelsize'] = 8
 		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
 		plt.savefig('compmonents_%s_%s' %(region_key,comb_ind))
 		plt.clf()
 
 	
-
-
-# ax = plt.gca()
-#                 plt.subplot(4,3,1)
-#                 plt.hist(bfr_cue_unit_alpha)
-#                 plt.title('before cue: alpha',fontsize='small')
-#                 plt.subplot(4,3,2)
-#                 plt.hist(bfr_cue_unit_beta)
-                # plt.title('beta',fontsize='small')
-                # plt.subplot(4,3,3)
-                # plt.hist(bfr_cue_unit_k)
-                # plt.title('k',fontsize='small')
-
-                # plt.subplot(4,3,4)
-                # plt.hist(aft_cue_unit_alpha)
-                # plt.title('after cue: alpha',fontsize='small')
-                # plt.subplot(4,3,5)
-                # plt.hist(aft_cue_unit_beta)
-                # plt.title('beta',fontsize='small')
-                # plt.subplot(4,3,6)
-                # plt.hist(aft_cue_unit_k)
-                # plt.title('k',fontsize='small')
-
-                # plt.subplot(4,3,7)
-                # plt.hist(bfr_result_unit_alpha)
-                # plt.title('before result: alpha',fontsize='small')
-                # plt.subplot(4,3,8)
-                # plt.hist(bfr_result_unit_beta)
-                # plt.title('beta',fontsize='small')
-                # plt.subplot(4,3,9)
-                # plt.hist(bfr_result_unit_k)
-                # plt.title('k',fontsize='small')
-
-                # plt.subplot(4,3,10)
-                # plt.hist(aft_result_unit_alpha)
-                # plt.title('after result: alpha',fontsize='small')
-                # plt.subplot(4,3,11)
-                # plt.hist(aft_result_unit_beta)
-                # plt.title('beta',fontsize='small')
-                # plt.subplot(4,3,12)
-                # plt.hist(aft_result_unit_k)
-                # plt.title('k',fontsize='small')
-        
-                # plt.tight_layout()
-                # plt.subplots_adjust(top=0.9)
-                # plt.rcParams['xtick.labelsize'] = 8
-                # plt.rcParams['ytick.labelsize'] = 8
-                # plt.suptitle('Region %s, unit %s: param hists %s' %(region_key,unit_num,type_key))
-                # plt.savefig('param_hists_%s_unit%s_%s' %(region_key,str(unit_num).zfill(2),type_key))
-                # plt.clf()
+		sig_analysis = dpca.significance_analysis(all_avg,all_bal)
+		
