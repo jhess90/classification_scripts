@@ -21,8 +21,8 @@ import xlsxwriter
 import scipy.stats as stats
 from scipy.ndimage.filters import gaussian_filter
 from sklearn.decomposition import PCA
-from dPCA import dPCA
-
+#from dPCA import dPCA
+import dPCA_new as dPCA
 
 #######################
 #params to set ########
@@ -308,6 +308,7 @@ for region_key,region_val in all_dict.iteritems():
 	dpca = dPCA.dPCA(labels='sdt',regularizer='auto',n_components = 5)
 	dpca.protect = ['t']
 	Z = dpca.fit_transform(all_avg,all_bal)
+	explained_var = dpca.explained_variance_ratio_
 	
 	bins = np.arange(T)
 
@@ -355,4 +356,7 @@ for region_key,region_val in all_dict.iteritems():
 
 	
 		sig_analysis = dpca.significance_analysis(all_avg,all_bal)
-		
+		transformed = dpca.transform(all_avg)
+
+		dpca_results = {'Z':Z,'explained_var':explained_var,'sig_analysis':sig_analysis,'transformed':transformed}
+		all_dict[region_key]['dpca_results'] = dpca_results
