@@ -191,18 +191,20 @@ for i in range(len(filelist)):
 		condensed_all = np.append(condensed_all,condensed,axis=0)
 
 #TODO different windows, check all
-M1_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[0],10))
-M1_aft_cue_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[0],20))
-M1_bfr_result_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[0],10))
-M1_aft_result_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[0],20))
-S1_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[1],10))
-S1_aft_cue_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[1],20))
-S1_bfr_result_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[1],10))
-S1_aft_result_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[1],20))
-PmD_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[2],10))
-PmD_aft_cue_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[2],20))
-PmD_bfr_result_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[2],10))
-PmD_aft_result_all = np.zeros((np.shape(condensed_all)[0],4*min_unit_num[2],20))
+filenum = len(filelist)
+
+M1_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],10))
+M1_aft_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],20))
+M1_bfr_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],10))
+M1_aft_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],20))
+S1_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],10))
+S1_aft_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],20))
+S1_bfr_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],10))
+S1_aft_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],20))
+PmD_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],10))
+PmD_aft_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],20))
+PmD_bfr_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],10))
+PmD_aft_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],20))
 
 
 count = 0
@@ -236,14 +238,6 @@ for i in range(len(filelist)):
 
 	
 #For each region, 3D dict [trial x unit x binned data]
-#M1_fr_dict = data['M1_fr_dict']
-#S1_fr_dict = data['S1_fr_dict']
-#PmD_fr_dict = data['PmD_fr_dict']
-#condensed = data['condensed']
-
-#all_dict['M1']['M1_fr_dict'] = M1_fr_dict
-#all_dict['S1']['S1_fr_dict'] = S1_fr_dict
-#all_dict['PmD']['PmD_fr_dict'] = PmD_fr_dict
 
 all_dict['M1']['M1_fr_dict'] = {'bfr_cue':M1_bfr_cue_all,'aft_cue':M1_aft_cue_all,'bfr_result':M1_bfr_result_all,'aft_result':M1_aft_result_all}
 all_dict['S1']['S1_fr_dict'] = {'bfr_cue':S1_bfr_cue_all,'aft_cue':S1_aft_cue_all,'bfr_result':S1_bfr_result_all,'aft_result':S1_aft_result_all}
@@ -303,6 +297,7 @@ for region_key,region_val in all_dict.iteritems():
 	all_avg,all_bal = sort_and_avg(all_fr,sort_dict)
 	[bal_cond,N,S,R,T] = np.shape(all_bal)
 	
+        print 'N= %s, S= %s, R= %s, T= %s, bal_cond= %s' %(N,S,R,T,bal_cond)
 
 	######### from test ########
 	dpca = dPCA.dPCA(labels='sdt',regularizer='auto',n_components = 5)
@@ -358,5 +353,8 @@ for region_key,region_val in all_dict.iteritems():
 		sig_analysis = dpca.significance_analysis(all_avg,all_bal)
 		transformed = dpca.transform(all_avg)
 
-		dpca_results = {'Z':Z,'explained_var':explained_var,'sig_analysis':sig_analysis,'transformed':transformed}
+		dpca_results = {'Z':Z,'explained_var':explained_var,'sig_analysis':sig_analysis,'transformed':transformed,'all_avg':all_avg,'all_bal':all_bal}
 		all_dict[region_key]['dpca_results'] = dpca_results
+
+all_dict['sort_dict'] = sort_dict
+np.save('dpca_results.npy',all_dict)
