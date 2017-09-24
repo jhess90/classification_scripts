@@ -346,7 +346,7 @@ for region_key,region_val in all_dict.iteritems():
 		plt.rcParams['xtick.labelsize'] = 8
 		plt.rcParams['ytick.labelsize'] = 8
 		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
-		plt.savefig('compmonents_%s_%s' %(region_key,comb_ind))
+		plt.savefig('component_%s_%s' %(region_key,comb_ind))
 		plt.clf()
 
 	
