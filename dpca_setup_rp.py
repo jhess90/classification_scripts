@@ -38,109 +38,136 @@ do_sig_analysis = False
 ###############################
 def sort_and_avg(fr_array,sort_dict):
 
-	S = len(sort_dict['s_stim'].keys())
+	#S = len(sort_dict['s_stim'].keys())
+	R = len(sort_dict['r_stim'].keys())
+	P= len(sort_dict['p_stim'].keys())	
 	Q = len(sort_dict['q_result'].keys())
 	K = np.shape(fr_array)[0]
 	N = np.shape(fr_array)[1]
 	T = np.shape(fr_array)[2]
 
-	#demean data
-	unit_fr_mean = np.squeeze(np.apply_over_axes(np.mean,fr_array,(0,2)))
-	demeaned_fr = np.zeros((K,N,T))
-	for i in range(N):
-		demeaned_fr[:,i,:] = fr_array[:,i,:] - unit_fr_mean[i]
+	count = 0
+	trial_comb = np.zeros((R*P*Q,K))
+	for r in range(R):
+		if r == 0:
+			r_trials = sort_dict['r_stim']['r0']
+		elif r == 1:
+			r_trials = sort_dict['r_stim']['r1']
+		elif r == 2:
+			r_trials = sort_dict['r_stim']['r2']
+		elif r == 3:
+			r_trials = sort_dict['r_stim']['r3']
+			
+		for p in range(P):
+			if p == 0:
+				p_trials = sort_dict['p_stim']['p0']
+			elif p == 1:
+				p_trials = sort_dict['p_stim']['p1']
+			elif p == 2:
+				p_trials = sort_dict['p_stim']['p2']
+			elif p == 3:
+				p_trials = sort_dict['p_stim']['p3']
 
-	fr_array = demeaned_fr
+			for q in range(Q):
+				if q == 0:
+					q_trials = sort_dict['q_result']['fail_trials']
+				elif q == 1:
+					q_trials = sort_dict['q_result']['succ_trials']
+
+				combined = ()
+				for k in range(K):
+					if k in r_trials and k in p_trials and k in q_trials:
+						combined = np.append(combined,k)
+
+				trial_comb[count,0:combined.size] = combined
+				count += 1
+				
+	min_trial_size = K
+	for i in range(np.shape(trial_comb)[0]):
+		temp = np.size(np.nonzero(trial_comb[i]))
+		if temp < min_trial_size:
+			min_trial_size = temp
+
+	bal_fr_shaped = np.zeros((min_trial_size,N,R,P,Q,T))
+	bal_ind = np.zeros((np.shape(trial_comb)[0],min_trial_size))
 	
-	#sq0 = r0p0, succ   sq1 = r0p0, fail
-	#sq2 = rxp0, succ   sq3 = rxp0, fail
-	#sq4 = r0px, succ   sq5 = r0px, fail
-	#sq6 = rxpx, succ   sq7 = rxpx, fail
+	for i in range(np.shape(trial_comb)[0]):
+		if np.size(np.nonzero(trial_comb[i])) > min_trial_size:
+			bal_ind[i,:] = np.random.choice(trial_comb[i][np.nonzero(trial_comb[i])],min_trial_size,replace=False)
+		else:
+			bal_ind[i,:] = trial_comb[i,:][np.nonzero(trial_comb[i,:])]
+
+
+	bal_fr_shaped[:,:,0,0,0,:] = fr_array[bal_ind[0,:].astype(int),:,:]
+	bal_fr_shaped[:,:,0,0,1,:] = fr_array[bal_ind[1,:].astype(int),:,:]
+	bal_fr_shaped[:,:,0,1,0,:] = fr_array[bal_ind[2,:].astype(int),:,:]
+	bal_fr_shaped[:,:,0,1,1,:] = fr_array[bal_ind[3,:].astype(int),:,:]
+	bal_fr_shaped[:,:,0,2,0,:] = fr_array[bal_ind[4,:].astype(int),:,:]
+	bal_fr_shaped[:,:,0,2,1,:] = fr_array[bal_ind[5,:].astype(int),:,:]
+	bal_fr_shaped[:,:,0,3,0,:] = fr_array[bal_ind[6,:].astype(int),:,:]
+	bal_fr_shaped[:,:,0,3,1,:] = fr_array[bal_ind[7,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,0,0,:] = fr_array[bal_ind[8,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,0,1,:] = fr_array[bal_ind[9,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,1,0,:] = fr_array[bal_ind[10,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,1,1,:] = fr_array[bal_ind[11,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,2,0,:] = fr_array[bal_ind[12,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,2,1,:] = fr_array[bal_ind[13,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,3,0,:] = fr_array[bal_ind[14,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,3,1,:] = fr_array[bal_ind[15,:].astype(int),:,:]
+	bal_fr_shaped[:,:,2,0,0,:] = fr_array[bal_ind[16,:].astype(int),:,:]
+	bal_fr_shaped[:,:,2,0,1,:] = fr_array[bal_ind[17,:].astype(int),:,:]
+	bal_fr_shaped[:,:,2,1,0,:] = fr_array[bal_ind[18,:].astype(int),:,:]
+	bal_fr_shaped[:,:,2,1,1,:] = fr_array[bal_ind[19,:].astype(int),:,:]
+	bal_fr_shaped[:,:,2,2,0,:] = fr_array[bal_ind[20,:].astype(int),:,:]
+	bal_fr_shaped[:,:,2,2,1,:] = fr_array[bal_ind[21,:].astype(int),:,:]
+	bal_fr_shaped[:,:,2,3,0,:] = fr_array[bal_ind[22,:].astype(int),:,:]
+	bal_fr_shaped[:,:,2,3,1,:] = fr_array[bal_ind[23,:].astype(int),:,:]
+	bal_fr_shaped[:,:,3,0,0,:] = fr_array[bal_ind[24,:].astype(int),:,:]
+	bal_fr_shaped[:,:,3,0,1,:] = fr_array[bal_ind[25,:].astype(int),:,:]
+	bal_fr_shaped[:,:,3,1,0,:] = fr_array[bal_ind[26,:].astype(int),:,:]
+	bal_fr_shaped[:,:,3,1,1,:] = fr_array[bal_ind[27,:].astype(int),:,:]
+	bal_fr_shaped[:,:,3,2,0,:] = fr_array[bal_ind[28,:].astype(int),:,:]
+	bal_fr_shaped[:,:,3,2,1,:] = fr_array[bal_ind[29,:].astype(int),:,:]
+	bal_fr_shaped[:,:,3,3,0,:] = fr_array[bal_ind[30,:].astype(int),:,:]
+	bal_fr_shaped[:,:,3,3,1,:] = fr_array[bal_ind[31,:].astype(int),:,:]
+
+	x_avg_shaped = np.mean(bal_fr_shaped,axis=0)
+	#fix below
+	#rps0 = r0p0s1
+	#rps1 = r0p0s0
+	#rps2 = r1p0s1
+	#rps3 = r1p0s0
+	#rps4 = r2p0s1
+	#rps5 = r2p0s0
+	#rps6 = r3p0s1
+	#rps7 = r3p0s0
+	#rps8 = r0p1s1
+	#rps9 = r0p1s0
+	#rps10 = r1p1s1
+	#rps11 = r1p1s0
+	#rps12 = r2p1s1
+	#rps13 = r2p1s0
+	#rps14 = r3p1s1
+	#rps15 = r3p1s0
+	#rps16 = r0p2s1
+	#rps17 = r0p2s0
+	#rps18 = r1p2s1
+	#rps19 = r1p2s0
+	#rps20 = r2p2s1
+	#rps21 = r2p2s0
+	#rps22 = r3p2s1
+	#rps23 = r3p2s0
+	#rps24 = r0p3s1
+	#rps25 = r0p3s0
+	#rps26 = r1p3s1
+	#rps27 = r1p3s0
+	#rps28 = r2p3s1
+	#rps29 = r2p3s0
+	#rps30 = r3p3s1
+	#rps31 = r3p3s0
+
 	
-	#TODO make general for more than S = 4
-	sq0 = sort_dict['s_stim']['r0p0'][np.in1d(sort_dict['s_stim']['r0p0'],sort_dict['q_result']['succ_trials'])]
-	sq1 = sort_dict['s_stim']['r0p0'][np.in1d(sort_dict['s_stim']['r0p0'],sort_dict['q_result']['fail_trials'])]
-	
-	sq2 = sort_dict['s_stim']['rxp0'][np.in1d(sort_dict['s_stim']['rxp0'],sort_dict['q_result']['succ_trials'])]
-	sq3 = sort_dict['s_stim']['rxp0'][np.in1d(sort_dict['s_stim']['rxp0'],sort_dict['q_result']['fail_trials'])]
-
-	sq4 = sort_dict['s_stim']['r0px'][np.in1d(sort_dict['s_stim']['r0px'],sort_dict['q_result']['succ_trials'])]
-	sq5 = sort_dict['s_stim']['r0px'][np.in1d(sort_dict['s_stim']['r0px'],sort_dict['q_result']['fail_trials'])]
-
-	sq6 = sort_dict['s_stim']['rxpx'][np.in1d(sort_dict['s_stim']['rxpx'],sort_dict['q_result']['succ_trials'])]
-	sq7 = sort_dict['s_stim']['rxpx'][np.in1d(sort_dict['s_stim']['rxpx'],sort_dict['q_result']['fail_trials'])]
-
-	######### deal w/ unbalanced data #######
-	fr_all_dict = {'comb0':fr_array[sq0,:,:],'comb1':fr_array[sq1,:,:],'comb2':fr_array[sq2,:,:],'comb3':fr_array[sq3,:,:],'comb4':fr_array[sq4,:,:],'comb5':fr_array[sq5,:,:],'comb6':fr_array[sq6,:,:],'comb7':fr_array[sq7,:,:]}
-	sq_dict = {'sq0':sq0,'sq1':sq1,'sq2':sq2,'sq3':sq3,'sq4':sq4,'sq5':sq5,'sq6':sq6,'sq7':sq7}
-
-	
-	min_trial_num = 1000
-	for i in range(8):
-		var_name = sq_dict['sq%s' %(i)]
-		if np.shape(fr_array[var_name,:,:])[0] < min_trial_num:
-			min_trial_num = np.shape(fr_array[var_name,:,:])[0]
-
-	bal_fr_array = np.zeros((8,min_trial_num,np.shape(fr_array[sq0,:,:])[1],np.shape(fr_array[sq0,:,:])[2]))
-	for i in range(8):
-		var_name = sq_dict['sq%s' %(i)]
-		comb_fr= fr_array[var_name,:,:]
-		idx = np.random.randint(np.shape(comb_fr)[0],size=min_trial_num)
-		bal_fr_array[i,:,:,:] = comb_fr[idx,:,:]
-
-		
-	sq0_avg = np.mean(fr_array[sq0,:,:],axis=0)
-	sq1_avg = np.mean(fr_array[sq1,:,:],axis=0)
-	sq2_avg = np.mean(fr_array[sq2,:,:],axis=0)
-	sq3_avg = np.mean(fr_array[sq3,:,:],axis=0)
-	sq4_avg = np.mean(fr_array[sq4,:,:],axis=0)
-	sq5_avg = np.mean(fr_array[sq5,:,:],axis=0)
-	sq6_avg = np.mean(fr_array[sq6,:,:],axis=0)
-	sq7_avg = np.mean(fr_array[sq7,:,:],axis=0)
-	
-	#xavg = avg across K trials for each of SQ conditions
-	x_avg = np.dstack((sq0_avg,sq1_avg,sq2_avg,sq3_avg,sq4_avg,sq5_avg,sq6_avg,sq7_avg))
-	x_avg = np.reshape(x_avg,(np.shape(x_avg)[0],np.shape(x_avg)[2],np.shape(x_avg)[1]))
-
-	#Reshape so x_avg shape = [N,stim,result,T]
-	#           bal_fr shape = [min_trial_num,N,stim,result,T]  
-	x_avg_shaped = np.zeros((N,4,2,T))
-	x_avg_shaped[:,0,0,:] = sq0_avg
-	x_avg_shaped[:,1,0,:] = sq2_avg
-	x_avg_shaped[:,2,0,:] = sq4_avg
-	x_avg_shaped[:,3,0,:] = sq6_avg
-	x_avg_shaped[:,0,1,:] = sq1_avg
-	x_avg_shaped[:,1,1,:] = sq3_avg
-	x_avg_shaped[:,2,1,:] = sq5_avg
-	x_avg_shaped[:,3,1,:] = sq7_avg
-
-	temp = bal_fr_array.reshape((8,min_trial_num,N,T))
-	bal_fr_shaped = np.zeros((min_trial_num,N,4,2,T))
-	bal_fr_shaped[:,:,0,0,:] = temp[0,:,:,:]
-	bal_fr_shaped[:,:,1,0,:] = temp[2,:,:,:]
-	bal_fr_shaped[:,:,2,0,:] = temp[4,:,:,:]
-	bal_fr_shaped[:,:,3,0,:] = temp[6,:,:,:]
-	bal_fr_shaped[:,:,0,1,:] = temp[1,:,:,:]
-	bal_fr_shaped[:,:,1,1,:] = temp[3,:,:,:]
-	bal_fr_shaped[:,:,2,1,:] = temp[5,:,:,:]
-	bal_fr_shaped[:,:,3,1,:] = temp[7,:,:,:]
-
-	pdb.set_trace()
 	return x_avg_shaped,bal_fr_shaped
-
-	
-def marginalization(x_avg):
-	
-
-
-
-
-	marg = []
-	return(marg)
-
-
-
-
 
 
 ###############################################
@@ -235,8 +262,6 @@ for i in range(len(filelist)):
 	count += np.shape(condensed)[0]
 	
 	
-
-	
 #For each region, 3D dict [trial x unit x binned data]
 
 all_dict['M1']['M1_fr_dict'] = {'bfr_cue':M1_bfr_cue_all,'aft_cue':M1_aft_cue_all,'bfr_result':M1_bfr_result_all,'aft_result':M1_aft_result_all}
@@ -255,30 +280,46 @@ condensed = new_condensed
 #stim = S
 #for now seperate into all-R, no-R, no-P, and all-P, so four combinations
 #TODO make work for multiple levels (16 combinations)
-r0p0 = []
-rxp0 = []
-r0px = []
-rxpx = []
+r0 = []
+r1 = []
+r2 = []
+r3 = []
+p0 = []
+p1 = []
+p2 = []
+p3 = []
+
 for i in range(np.shape(condensed)[0]):
-	if (condensed[i,3] == 0) and (condensed[i,4] == 0):
-		r0p0.append(i)
-	elif (condensed[i,3] > 0) and (condensed[i,4] ==0):
-		rxp0.append(i)
-	elif (condensed[i,3] == 0) and (condensed[i,4] > 0):
-		r0px.append(i)
-	elif (condensed[i,3] > 0) and (condensed[i,4] > 0):
-		rxpx.append(i)
+	if condensed[i,3] == 0:
+		r0.append(i)
+	elif condensed[i,3] == 1:
+		r1.append(i)
+	elif condensed[i,3] == 2:
+		r2.append(i)
+	elif condensed[i,3] == 3:
+		r3.append(i)
+	else:
+		pdb.set_trace()
+	if condensed[i,4] == 0:
+		p0.append(i)
+	elif condensed[i,4] == 1:
+		p1.append(i)
+	elif condensed[i,4] == 2:
+		p2.append(i)
+	elif condensed[i,4] == 3:
+		p3.append(i)
 	else:
 		pdb.set_trace()
 
-s_stim = {'r0p0':np.asarray(r0p0),'rxp0':np.asarray(rxp0),'r0px':np.asarray(r0px),'rxpx':np.asarray(rxpx)}
+r_stim = {'r0':r0,'r1':r1,'r2':r2,'r3':r3}
+p_stim = {'p0':p0,'p1':p1,'p2':p2,'p3':p3}
 		
 #result = Q
 succ_trials = np.squeeze(np.where(condensed[:,5] == 1))
 fail_trials = np.squeeze(np.where(condensed[:,5] == -1))
 q_result = {'succ_trials':np.asarray(succ_trials),'fail_trials':np.asarray(fail_trials)}
 
-sort_dict = {'q_result':q_result,'s_stim':s_stim,'condensed':condensed}
+sort_dict = {'q_result':q_result,'r_stim':r_stim,'p_stim':p_stim,'condensed':condensed}
 
 for region_key,region_val in all_dict.iteritems():
 	print 'running region: %s' %(region_key)
@@ -295,12 +336,12 @@ for region_key,region_val in all_dict.iteritems():
 	all_fr[:,:,40:60] = aft_result
 
 	all_avg,all_bal = sort_and_avg(all_fr,sort_dict)
-	[bal_cond,N,S,R,T] = np.shape(all_bal)
+	[bal_cond,N,R,P,D,T] = np.shape(all_bal)
 	
-        print 'N= %s, S= %s, R= %s, T= %s, bal_cond= %s' %(N,S,R,T,bal_cond)
+	print 'N= %s, R= %s, P= %s, D= %s, T= %s, bal_cond= %s' %(N,R,P,D,T,bal_cond)
 
 	######### from test ########
-	dpca = dPCA.dPCA(labels='sdt',regularizer='auto',n_components = 5)
+	dpca = dPCA.dPCA(labels='rpdt',regularizer='auto',n_components = 5)
 	dpca.protect = ['t']
 	Z = dpca.fit_transform(all_avg,all_bal)
 	explained_var = dpca.explained_variance_ratio_
@@ -348,6 +389,7 @@ for region_key,region_val in all_dict.iteritems():
 		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
 		plt.savefig('component_%s_%s' %(region_key,comb_ind))
 		plt.clf()
+
 
 		if do_sig_analysis:
 			sig_analysis = dpca.significance_analysis(all_avg,all_bal,full=True)
