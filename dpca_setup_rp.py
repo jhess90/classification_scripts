@@ -355,31 +355,89 @@ for region_key,region_val in all_dict.iteritems():
 	components_plot = 3
 	my_ticks = ['-10','0','10','-10','0','10','20']
 	my_ticks_num = [0,10,20,30,40,50,60]
-	labels = ['r0p0','rxp0','r0px','rxpx']
-	lines = []
+
+	labels = ['r0 succ','r1 succ','r2 succ','r3 succ','r0 fail','r1 fail','r2 fail','r3 fail']
+	colors = ['darkslategrey','darkgoldenrod','salmon','maroon','darkslategrey','darkgoldenrod','salmon','maroon']
+
+	print 'plotting'
+	
 	for comb_ind,comb_val in Z.iteritems():
 		ax = plt.gca()
 		for i in range(components_plot):
-			plt.subplot(2,components_plot,i+1)
-			for s in range(S):
-				line_name = 'line%s' %(s)
-				line = plt.plot(bins,Z[comb_ind][i,s,0,:],label=labels[s])
-				lines = np.append(lines,line)
+			plt.subplot(4,components_plot,i+1)
+
+			line0 = plt.plot(bins,Z[comb_ind][i,0,0,1,:],label=labels[0],color=colors[0])
+			line1 = plt.plot(bins,Z[comb_ind][i,1,0,1,:],label=labels[1],color=colors[1])
+			line2 = plt.plot(bins,Z[comb_ind][i,2,0,1,:],label=labels[2],color=colors[2])
+			line3 = plt.plot(bins,Z[comb_ind][i,3,0,1,:],label=labels[3],color=colors[3])
+
+			line4 = plt.plot(bins,Z[comb_ind][i,0,0,0,:],label=labels[4],color=colors[4],linestyle='--')
+			line5 = plt.plot(bins,Z[comb_ind][i,1,0,0,:],label=labels[5],color=colors[5],linestyle='--')
+			line6 = plt.plot(bins,Z[comb_ind][i,2,0,0,:],label=labels[6],color=colors[6],linestyle='--')
+			line7 = plt.plot(bins,Z[comb_ind][i,3,0,0,:],label=labels[7],color=colors[7],linestyle='--')
+			lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5,line6,line7)))
+			
 			plt.axvline(x=10,color='g',linestyle='--')
 			plt.axvline(x=30,color='k')
 			plt.axvline(x=40,color='b',linestyle='--')
-			plt.title('Component: %s, R: 0' %(i+1),fontsize='small')
+			plt.title('Component: %s, P=0' %(i+1),fontsize='small')
 			plt.xticks(my_ticks_num,my_ticks)
 
-			plt.subplot(2,components_plot,i+components_plot+1)
-			for s in range(S):
-				plt.plot(bins,Z[comb_ind][i,s,1,:],label=labels[s])
-				plt.xticks(my_ticks_num,my_ticks)
-				
+			plt.subplot(4,components_plot,i+1+components_plot)
+
+			line0 = plt.plot(bins,Z[comb_ind][i,0,1,1,:],label=labels[0],color=colors[0])
+			line1 = plt.plot(bins,Z[comb_ind][i,1,1,1,:],label=labels[1],color=colors[1])
+			line2 = plt.plot(bins,Z[comb_ind][i,2,1,1,:],label=labels[2],color=colors[2])
+			line3 = plt.plot(bins,Z[comb_ind][i,3,1,1,:],label=labels[3],color=colors[3])
+
+			line4 = plt.plot(bins,Z[comb_ind][i,0,1,0,:],label=labels[4],color=colors[4],linestyle='--')
+			line5 = plt.plot(bins,Z[comb_ind][i,1,1,0,:],label=labels[5],color=colors[5],linestyle='--')
+			line6 = plt.plot(bins,Z[comb_ind][i,2,1,0,:],label=labels[6],color=colors[6],linestyle='--')
+			line7 = plt.plot(bins,Z[comb_ind][i,3,1,0,:],label=labels[7],color=colors[7],linestyle='--')
+			
 			plt.axvline(x=10,color='g',linestyle='--')
 			plt.axvline(x=30,color='k')
 			plt.axvline(x=40,color='b',linestyle='--')
-			plt.title('Component: %s, R: 1' %(i+1),fontsize='small')
+			plt.title('Component: %s, P=1' %(i+1),fontsize='small')
+			plt.xticks(my_ticks_num,my_ticks)
+
+			plt.subplot(4,components_plot,i+1+components_plot*2)
+
+			line0 = plt.plot(bins,Z[comb_ind][i,0,2,1,:],label=labels[0],color=colors[0])
+			line1 = plt.plot(bins,Z[comb_ind][i,1,2,1,:],label=labels[1],color=colors[1])
+			line2 = plt.plot(bins,Z[comb_ind][i,2,2,1,:],label=labels[2],color=colors[2])
+			line3 = plt.plot(bins,Z[comb_ind][i,3,2,1,:],label=labels[3],color=colors[3])
+
+			line4 = plt.plot(bins,Z[comb_ind][i,0,2,0,:],label=labels[4],color=colors[4],linestyle='--')
+			line5 = plt.plot(bins,Z[comb_ind][i,1,2,0,:],label=labels[5],color=colors[5],linestyle='--')
+			line6 = plt.plot(bins,Z[comb_ind][i,2,2,0,:],label=labels[6],color=colors[6],linestyle='--')
+			line7 = plt.plot(bins,Z[comb_ind][i,3,2,0,:],label=labels[7],color=colors[7],linestyle='--')
+			
+			plt.axvline(x=10,color='g',linestyle='--')
+			plt.axvline(x=30,color='k')
+			plt.axvline(x=40,color='b',linestyle='--')
+			plt.title('Component: %s, P=2' %(i+1),fontsize='small')
+			plt.xticks(my_ticks_num,my_ticks)
+			
+			plt.subplot(4,components_plot,i+1+components_plot*3)
+
+			line0 = plt.plot(bins,Z[comb_ind][i,0,3,1,:],label=labels[0],color=colors[0])
+			line1 = plt.plot(bins,Z[comb_ind][i,1,3,1,:],label=labels[1],color=colors[1])
+			line2 = plt.plot(bins,Z[comb_ind][i,2,3,1,:],label=labels[2],color=colors[2])
+			line3 = plt.plot(bins,Z[comb_ind][i,3,3,1,:],label=labels[3],color=colors[3])
+
+			line4 = plt.plot(bins,Z[comb_ind][i,0,3,0,:],label=labels[4],color=colors[4],linestyle='--')
+			line5 = plt.plot(bins,Z[comb_ind][i,1,3,0,:],label=labels[5],color=colors[5],linestyle='--')
+			line6 = plt.plot(bins,Z[comb_ind][i,2,3,0,:],label=labels[6],color=colors[6],linestyle='--')
+			line7 = plt.plot(bins,Z[comb_ind][i,3,3,0,:],label=labels[7],color=colors[7],linestyle='--')
+			
+			plt.axvline(x=10,color='g',linestyle='--')
+			plt.axvline(x=30,color='k')
+			plt.axvline(x=40,color='b',linestyle='--')
+			plt.title('Component: %s, P=3' %(i+1),fontsize='small')
+			plt.xticks(my_ticks_num,my_ticks)
+
+
 
 		plt.figlegend(lines,labels,loc='right',ncol=1,fontsize='small')
 		plt.tight_layout(w_pad=0.1)
@@ -395,7 +453,12 @@ for region_key,region_val in all_dict.iteritems():
 			sig_analysis = dpca.significance_analysis(all_avg,all_bal,full=True)
 		transformed = dpca.transform(all_avg)
 
-		dpca_results = {'Z':Z,'explained_var':explained_var,'sig_analysis':sig_analysis,'transformed':transformed,'all_avg':all_avg,'all_bal':all_bal}
+		if do_sig_analysis:
+			dpca_results = {'Z':Z,'explained_var':explained_var,'sig_analysis':sig_analysis,'transformed':transformed,'all_avg':all_avg,'all_bal':all_bal}
+		else:
+			dpca_results = {'Z':Z,'explained_var':explained_var,'transformed':transformed,'all_avg':all_avg,'all_bal':all_bal}
+		
+			
 		all_dict[region_key]['dpca_results'] = dpca_results
 
 all_dict['sort_dict'] = sort_dict
