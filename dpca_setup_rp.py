@@ -255,7 +255,7 @@ for region_key,region_val in all_dict.iteritems():
 	bfr_result = all_dict[region_key][fr_dict_str]['bfr_result']
 	aft_result = all_dict[region_key][fr_dict_str]['aft_result']
 
-	all_fr = np.zeros((np.shape(bfr_cue)[0],np.shape(bfr_cue)[1],2(bfr_bins+aft_bins)))
+	all_fr = np.zeros((np.shape(bfr_cue)[0],np.shape(bfr_cue)[1],2*(bfr_bins+aft_bins)))
 
 	all_fr[:,:,0:bfr_bins] = bfr_cue
 	all_fr[:,:,bfr_bins:bfr_bins+aft_bins] = aft_cue

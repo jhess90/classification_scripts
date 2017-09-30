@@ -333,11 +333,11 @@ for region_key,region_val in all_dict.iteritems():
 	bfr_result = all_dict[region_key][fr_dict_str]['bfr_result']
 	aft_result = all_dict[region_key][fr_dict_str]['aft_result']
 
-	all_fr = np.zeros((np.shape(bfr_cue)[0],np.shape(bfr_cue)[1],2(bfr_bins+aft_bins)))
+	all_fr = np.zeros((np.shape(bfr_cue)[0],np.shape(bfr_cue)[1],2*(bfr_bins+aft_bins)))
 	all_fr[:,:,0:bfr_bins] = bfr_cue
 	all_fr[:,:,bfr_bins:bfr_bins+aft_bins] = aft_cue
 	all_fr[:,:,bfr_bins+aft_bins:2*bfr_bins+aft_bins] = bfr_result
-	all_fr[:,:,2*bfr_bins+aft_bins:2(bfr_bins+aft_bins)] = aft_result
+	all_fr[:,:,2*bfr_bins+aft_bins:2*(bfr_bins+aft_bins)] = aft_result
 
 	all_avg,all_bal = sort_and_avg(all_fr,sort_dict)
 	[bal_cond,N,R,P,D,T] = np.shape(all_bal)
