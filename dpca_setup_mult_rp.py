@@ -357,15 +357,11 @@ for region_key,region_val in all_dict.iteritems():
 
 	#PARAM
 	components_plot = 3
-	#my_ticks = ['-10','0','10','-10','0','10','20']
-	#my_ticks_num = [0,10,20,30,40,50,60]
 
 	my_ticks = ['-0.5','0','0.5','-0.5','0','0.5','1.0']
 	tot_bins = (bfr_bins+aft_bins)*2
 	my_ticks_num = np.arange(0,tot_bins*7/6,tot_bins/6)
 
-
-	
 	labels = ['r0 succ','r1 succ','r2 succ','r3 succ','r0 fail','r1 fail','r2 fail','r3 fail']
 	colors = ['darkslategrey','darkgoldenrod','salmon','maroon','darkslategrey','darkgoldenrod','salmon','maroon']
 
