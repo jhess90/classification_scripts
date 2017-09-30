@@ -23,9 +23,19 @@ import scipy.stats as stats
 #import dPCA_new as dPCA
 
 #######
+sd_bool = False
+multirp_bool = False
+binaryrp_bool = True
 
-data = np.load('dpca_results.npy')[()]
 
+#########
+if sd_bool:
+	data = np.load('dpca_results.npy')[()]
+elif multirp_bool:
+	data = np.load('dpca_results_multirp.npy')[()]
+elif binaryrp_bool:
+	data = np.load('dpca_results_binaryrp.npy')[()]
+	
 for region_key,region_val in data.iteritems():
 	if region_key == 'sort_dict':
 		continue

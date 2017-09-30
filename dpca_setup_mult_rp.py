@@ -198,7 +198,11 @@ for i in range(len(filelist)):
 	PmD_fr_dict = data['PmD_fr_dict']
 	condensed = data['condensed']
 
-	
+	params = data['params']
+
+	bfr_bins = int(params['time_before']*-1*1000/params['bin_size'])
+	aft_bins = int(params['time_after']*1000/params['bin_size'])
+
 	if np.shape(M1_fr_dict['bfr_cue'])[1] < min_unit_num[0]:
 		min_unit_num[0] = np.shape(M1_fr_dict['bfr_cue'])[1]
 	if np.shape(S1_fr_dict['bfr_cue'])[1] < min_unit_num[1]:
@@ -220,18 +224,18 @@ for i in range(len(filelist)):
 #TODO different windows, check all
 filenum = len(filelist)
 
-M1_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],10))
-M1_aft_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],20))
-M1_bfr_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],10))
-M1_aft_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],20))
-S1_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],10))
-S1_aft_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],20))
-S1_bfr_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],10))
-S1_aft_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],20))
-PmD_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],10))
-PmD_aft_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],20))
-PmD_bfr_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],10))
-PmD_aft_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],20))
+M1_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],bfr_bins))
+M1_aft_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],aft_bins))
+M1_bfr_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],bfr_bins))
+M1_aft_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],aft_bins))
+S1_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],bfr_bins))
+S1_aft_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],aft_bins))
+S1_bfr_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],bfr_bins))
+S1_aft_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],aft_bins))
+PmD_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],bfr_bins))
+PmD_aft_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],aft_bins))
+PmD_bfr_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],bfr_bins))
+PmD_aft_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],aft_bins))
 
 
 count = 0
@@ -329,11 +333,11 @@ for region_key,region_val in all_dict.iteritems():
 	bfr_result = all_dict[region_key][fr_dict_str]['bfr_result']
 	aft_result = all_dict[region_key][fr_dict_str]['aft_result']
 
-	all_fr = np.zeros((np.shape(bfr_cue)[0],np.shape(bfr_cue)[1],60))
-	all_fr[:,:,0:10] = bfr_cue
-	all_fr[:,:,10:30] = aft_cue
-	all_fr[:,:,30:40] = bfr_result
-	all_fr[:,:,40:60] = aft_result
+	all_fr = np.zeros((np.shape(bfr_cue)[0],np.shape(bfr_cue)[1],2(bfr_bins+aft_bins)))
+	all_fr[:,:,0:bfr_bins] = bfr_cue
+	all_fr[:,:,bfr_bins:bfr_bins+aft_bins] = aft_cue
+	all_fr[:,:,bfr_bins+aft_bins:2*bfr_bins+aft_bins] = bfr_result
+	all_fr[:,:,2*bfr_bins+aft_bins:2(bfr_bins+aft_bins)] = aft_result
 
 	all_avg,all_bal = sort_and_avg(all_fr,sort_dict)
 	[bal_cond,N,R,P,D,T] = np.shape(all_bal)
@@ -353,9 +357,15 @@ for region_key,region_val in all_dict.iteritems():
 
 	#PARAM
 	components_plot = 3
-	my_ticks = ['-10','0','10','-10','0','10','20']
-	my_ticks_num = [0,10,20,30,40,50,60]
+	#my_ticks = ['-10','0','10','-10','0','10','20']
+	#my_ticks_num = [0,10,20,30,40,50,60]
 
+	my_ticks = ['-0.5','0','0.5','-0.5','0','0.5','1.0']
+	tot_bins = (bfr_bins+aft_bins)*2
+	my_ticks_num = np.arange(0,tot_bins*7/6,tot_bins/6)
+
+
+	
 	labels = ['r0 succ','r1 succ','r2 succ','r3 succ','r0 fail','r1 fail','r2 fail','r3 fail']
 	colors = ['darkslategrey','darkgoldenrod','salmon','maroon','darkslategrey','darkgoldenrod','salmon','maroon']
 
@@ -377,9 +387,9 @@ for region_key,region_val in all_dict.iteritems():
 			line7 = plt.plot(bins,Z[comb_ind][i,3,0,0,:],label=labels[7],color=colors[7],linestyle='--')
 			lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5,line6,line7)))
 			
-			plt.axvline(x=10,color='g',linestyle='--')
-			plt.axvline(x=30,color='k')
-			plt.axvline(x=40,color='b',linestyle='--')
+			plt.axvline(x=bfr_bins,color='g',linestyle='--')
+			plt.axvline(x=bfr_bins+aft_bins,color='k')
+			plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
 			plt.title('Component: %s, P=0' %(i+1),fontsize='small')
 			plt.xticks(my_ticks_num,my_ticks)
 
@@ -395,9 +405,9 @@ for region_key,region_val in all_dict.iteritems():
 			line6 = plt.plot(bins,Z[comb_ind][i,2,1,0,:],label=labels[6],color=colors[6],linestyle='--')
 			line7 = plt.plot(bins,Z[comb_ind][i,3,1,0,:],label=labels[7],color=colors[7],linestyle='--')
 			
-			plt.axvline(x=10,color='g',linestyle='--')
-			plt.axvline(x=30,color='k')
-			plt.axvline(x=40,color='b',linestyle='--')
+			plt.axvline(x=bfr_bins,color='g',linestyle='--')
+			plt.axvline(x=bfr_bins+aft_bins,color='k')
+			plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
 			plt.title('Component: %s, P=1' %(i+1),fontsize='small')
 			plt.xticks(my_ticks_num,my_ticks)
 
@@ -413,9 +423,9 @@ for region_key,region_val in all_dict.iteritems():
 			line6 = plt.plot(bins,Z[comb_ind][i,2,2,0,:],label=labels[6],color=colors[6],linestyle='--')
 			line7 = plt.plot(bins,Z[comb_ind][i,3,2,0,:],label=labels[7],color=colors[7],linestyle='--')
 			
-			plt.axvline(x=10,color='g',linestyle='--')
-			plt.axvline(x=30,color='k')
-			plt.axvline(x=40,color='b',linestyle='--')
+			plt.axvline(x=bfr_bins,color='g',linestyle='--')
+			plt.axvline(x=bfr_bins+aft_bins,color='k')
+			plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
 			plt.title('Component: %s, P=2' %(i+1),fontsize='small')
 			plt.xticks(my_ticks_num,my_ticks)
 			
@@ -431,9 +441,9 @@ for region_key,region_val in all_dict.iteritems():
 			line6 = plt.plot(bins,Z[comb_ind][i,2,3,0,:],label=labels[6],color=colors[6],linestyle='--')
 			line7 = plt.plot(bins,Z[comb_ind][i,3,3,0,:],label=labels[7],color=colors[7],linestyle='--')
 			
-			plt.axvline(x=10,color='g',linestyle='--')
-			plt.axvline(x=30,color='k')
-			plt.axvline(x=40,color='b',linestyle='--')
+			plt.axvline(x=bfr_bins,color='g',linestyle='--')
+			plt.axvline(x=bfr_bins+aft_bins,color='k')
+			plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
 			plt.title('Component: %s, P=3' %(i+1),fontsize='small')
 			plt.xticks(my_ticks_num,my_ticks)
 
@@ -445,7 +455,7 @@ for region_key,region_val in all_dict.iteritems():
 		plt.rcParams['xtick.labelsize'] = 8
 		plt.rcParams['ytick.labelsize'] = 8
 		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
-		plt.savefig('component_%s_%s' %(region_key,comb_ind))
+		plt.savefig('component_multrp_%s_%s' %(region_key,comb_ind))
 		plt.clf()
 
 
@@ -462,4 +472,4 @@ for region_key,region_val in all_dict.iteritems():
 		all_dict[region_key]['dpca_results'] = dpca_results
 
 all_dict['sort_dict'] = sort_dict
-np.save('dpca_results.npy',all_dict)
+np.save('dpca_results_multrp.npy',all_dict)

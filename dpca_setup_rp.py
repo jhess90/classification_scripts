@@ -52,21 +52,13 @@ def sort_and_avg(fr_array,sort_dict):
 		if r == 0:
 			r_trials = sort_dict['r_stim']['r0']
 		elif r == 1:
-			r_trials = sort_dict['r_stim']['r1']
-		elif r == 2:
-			r_trials = sort_dict['r_stim']['r2']
-		elif r == 3:
-			r_trials = sort_dict['r_stim']['r3']
+			r_trials = sort_dict['r_stim']['rx']
 			
 		for p in range(P):
 			if p == 0:
 				p_trials = sort_dict['p_stim']['p0']
 			elif p == 1:
-				p_trials = sort_dict['p_stim']['p1']
-			elif p == 2:
-				p_trials = sort_dict['p_stim']['p2']
-			elif p == 3:
-				p_trials = sort_dict['p_stim']['p3']
+				p_trials = sort_dict['p_stim']['px']
 
 			for q in range(Q):
 				if q == 0:
@@ -102,70 +94,12 @@ def sort_and_avg(fr_array,sort_dict):
 	bal_fr_shaped[:,:,0,0,1,:] = fr_array[bal_ind[1,:].astype(int),:,:]
 	bal_fr_shaped[:,:,0,1,0,:] = fr_array[bal_ind[2,:].astype(int),:,:]
 	bal_fr_shaped[:,:,0,1,1,:] = fr_array[bal_ind[3,:].astype(int),:,:]
-	bal_fr_shaped[:,:,0,2,0,:] = fr_array[bal_ind[4,:].astype(int),:,:]
-	bal_fr_shaped[:,:,0,2,1,:] = fr_array[bal_ind[5,:].astype(int),:,:]
-	bal_fr_shaped[:,:,0,3,0,:] = fr_array[bal_ind[6,:].astype(int),:,:]
-	bal_fr_shaped[:,:,0,3,1,:] = fr_array[bal_ind[7,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,0,0,:] = fr_array[bal_ind[8,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,0,1,:] = fr_array[bal_ind[9,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,1,0,:] = fr_array[bal_ind[10,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,1,1,:] = fr_array[bal_ind[11,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,2,0,:] = fr_array[bal_ind[12,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,2,1,:] = fr_array[bal_ind[13,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,3,0,:] = fr_array[bal_ind[14,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,3,1,:] = fr_array[bal_ind[15,:].astype(int),:,:]
-	bal_fr_shaped[:,:,2,0,0,:] = fr_array[bal_ind[16,:].astype(int),:,:]
-	bal_fr_shaped[:,:,2,0,1,:] = fr_array[bal_ind[17,:].astype(int),:,:]
-	bal_fr_shaped[:,:,2,1,0,:] = fr_array[bal_ind[18,:].astype(int),:,:]
-	bal_fr_shaped[:,:,2,1,1,:] = fr_array[bal_ind[19,:].astype(int),:,:]
-	bal_fr_shaped[:,:,2,2,0,:] = fr_array[bal_ind[20,:].astype(int),:,:]
-	bal_fr_shaped[:,:,2,2,1,:] = fr_array[bal_ind[21,:].astype(int),:,:]
-	bal_fr_shaped[:,:,2,3,0,:] = fr_array[bal_ind[22,:].astype(int),:,:]
-	bal_fr_shaped[:,:,2,3,1,:] = fr_array[bal_ind[23,:].astype(int),:,:]
-	bal_fr_shaped[:,:,3,0,0,:] = fr_array[bal_ind[24,:].astype(int),:,:]
-	bal_fr_shaped[:,:,3,0,1,:] = fr_array[bal_ind[25,:].astype(int),:,:]
-	bal_fr_shaped[:,:,3,1,0,:] = fr_array[bal_ind[26,:].astype(int),:,:]
-	bal_fr_shaped[:,:,3,1,1,:] = fr_array[bal_ind[27,:].astype(int),:,:]
-	bal_fr_shaped[:,:,3,2,0,:] = fr_array[bal_ind[28,:].astype(int),:,:]
-	bal_fr_shaped[:,:,3,2,1,:] = fr_array[bal_ind[29,:].astype(int),:,:]
-	bal_fr_shaped[:,:,3,3,0,:] = fr_array[bal_ind[30,:].astype(int),:,:]
-	bal_fr_shaped[:,:,3,3,1,:] = fr_array[bal_ind[31,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,0,0,:] = fr_array[bal_ind[4,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,0,1,:] = fr_array[bal_ind[5,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,1,0,:] = fr_array[bal_ind[6,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,1,1,:] = fr_array[bal_ind[7,:].astype(int),:,:]
 
 	x_avg_shaped = np.mean(bal_fr_shaped,axis=0)
-	#fix below
-	#rps0 = r0p0s1
-	#rps1 = r0p0s0
-	#rps2 = r1p0s1
-	#rps3 = r1p0s0
-	#rps4 = r2p0s1
-	#rps5 = r2p0s0
-	#rps6 = r3p0s1
-	#rps7 = r3p0s0
-	#rps8 = r0p1s1
-	#rps9 = r0p1s0
-	#rps10 = r1p1s1
-	#rps11 = r1p1s0
-	#rps12 = r2p1s1
-	#rps13 = r2p1s0
-	#rps14 = r3p1s1
-	#rps15 = r3p1s0
-	#rps16 = r0p2s1
-	#rps17 = r0p2s0
-	#rps18 = r1p2s1
-	#rps19 = r1p2s0
-	#rps20 = r2p2s1
-	#rps21 = r2p2s0
-	#rps22 = r3p2s1
-	#rps23 = r3p2s0
-	#rps24 = r0p3s1
-	#rps25 = r0p3s0
-	#rps26 = r1p3s1
-	#rps27 = r1p3s0
-	#rps28 = r2p3s1
-	#rps29 = r2p3s0
-	#rps30 = r3p3s1
-	#rps31 = r3p3s0
-
 	
 	return x_avg_shaped,bal_fr_shaped
 
@@ -190,6 +124,8 @@ aft_cue_all = []
 bfr_result_all = []
 aft_result_all = []
 min_unit_num = [10000,1000,1000]
+
+#TODO make sure error thrown if different bin sizes, time before/after, etc
 for i in range(len(filelist)):
 	data = np.load(filelist[i])[()]
 
@@ -197,7 +133,10 @@ for i in range(len(filelist)):
 	S1_fr_dict = data['S1_fr_dict']
 	PmD_fr_dict = data['PmD_fr_dict']
 	condensed = data['condensed']
+	params = data['params']
 
+	bfr_bins = int(params['time_before']*-1*1000/params['bin_size'])
+	aft_bins = int(params['time_after']*1000/params['bin_size'])
 	
 	if np.shape(M1_fr_dict['bfr_cue'])[1] < min_unit_num[0]:
 		min_unit_num[0] = np.shape(M1_fr_dict['bfr_cue'])[1]
@@ -220,18 +159,18 @@ for i in range(len(filelist)):
 #TODO different windows, check all
 filenum = len(filelist)
 
-M1_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],10))
-M1_aft_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],20))
-M1_bfr_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],10))
-M1_aft_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],20))
-S1_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],10))
-S1_aft_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],20))
-S1_bfr_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],10))
-S1_aft_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],20))
-PmD_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],10))
-PmD_aft_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],20))
-PmD_bfr_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],10))
-PmD_aft_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],20))
+M1_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],bfr_bins))
+M1_aft_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],aft_bins))
+M1_bfr_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],bfr_bins))
+M1_aft_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[0],aft_bins))
+S1_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],bfr_bins))
+S1_aft_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],aft_bins))
+S1_bfr_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],bfr_bins))
+S1_aft_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[1],aft_bins))
+PmD_bfr_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],bfr_bins))
+PmD_aft_cue_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],aft_bins))
+PmD_bfr_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],bfr_bins))
+PmD_aft_result_all = np.zeros((np.shape(condensed_all)[0],filenum*min_unit_num[2],aft_bins))
 
 
 count = 0
@@ -279,40 +218,24 @@ condensed = new_condensed
 
 #stim = S
 #for now seperate into all-R, no-R, no-P, and all-P, so four combinations
-#TODO make work for multiple levels (16 combinations)
 r0 = []
-r1 = []
-r2 = []
-r3 = []
+rx = []
 p0 = []
-p1 = []
-p2 = []
-p3 = []
+px = []
 
 for i in range(np.shape(condensed)[0]):
 	if condensed[i,3] == 0:
 		r0.append(i)
-	elif condensed[i,3] == 1:
-		r1.append(i)
-	elif condensed[i,3] == 2:
-		r2.append(i)
-	elif condensed[i,3] == 3:
-		r3.append(i)
-	else:
-		pdb.set_trace()
+	elif condensed[i,3] > 0:
+		rx.append(i)
+
 	if condensed[i,4] == 0:
 		p0.append(i)
-	elif condensed[i,4] == 1:
-		p1.append(i)
-	elif condensed[i,4] == 2:
-		p2.append(i)
-	elif condensed[i,4] == 3:
-		p3.append(i)
-	else:
-		pdb.set_trace()
+	elif condensed[i,4] > 1:
+		px.append(i)
 
-r_stim = {'r0':r0,'r1':r1,'r2':r2,'r3':r3}
-p_stim = {'p0':p0,'p1':p1,'p2':p2,'p3':p3}
+r_stim = {'r0':r0,'rx':rx}
+p_stim = {'p0':p0,'px':px}
 		
 #result = Q
 succ_trials = np.squeeze(np.where(condensed[:,5] == 1))
@@ -320,6 +243,9 @@ fail_trials = np.squeeze(np.where(condensed[:,5] == -1))
 q_result = {'succ_trials':np.asarray(succ_trials),'fail_trials':np.asarray(fail_trials)}
 
 sort_dict = {'q_result':q_result,'r_stim':r_stim,'p_stim':p_stim,'condensed':condensed}
+
+
+
 
 for region_key,region_val in all_dict.iteritems():
 	print 'running region: %s' %(region_key)
@@ -329,113 +255,124 @@ for region_key,region_val in all_dict.iteritems():
 	bfr_result = all_dict[region_key][fr_dict_str]['bfr_result']
 	aft_result = all_dict[region_key][fr_dict_str]['aft_result']
 
-	all_fr = np.zeros((np.shape(bfr_cue)[0],np.shape(bfr_cue)[1],60))
-	all_fr[:,:,0:10] = bfr_cue
-	all_fr[:,:,10:30] = aft_cue
-	all_fr[:,:,30:40] = bfr_result
-	all_fr[:,:,40:60] = aft_result
+	all_fr = np.zeros((np.shape(bfr_cue)[0],np.shape(bfr_cue)[1],2(bfr_bins+aft_bins)))
 
+	all_fr[:,:,0:bfr_bins] = bfr_cue
+	all_fr[:,:,bfr_bins:bfr_bins+aft_bins] = aft_cue
+	all_fr[:,:,bfr_bins+aft_bins:2*bfr_bins+aft_bins] = bfr_result
+	all_fr[:,:,2*bfr_bins+aft_bins:2*bfr_bins+2*aft_bins] = aft_result
+
+
+	
+
+
+
+
+	
 	all_avg,all_bal = sort_and_avg(all_fr,sort_dict)
 	[bal_cond,N,R,P,D,T] = np.shape(all_bal)
 	
 	print 'N= %s, R= %s, P= %s, D= %s, T= %s, bal_cond= %s' %(N,R,P,D,T,bal_cond)
 
 	######### from test ########
-	dpca = dPCA.dPCA(labels='rpdt',regularizer='auto',n_components = 5)
+	dpca = dPCA.dPCA(labels='rpdt',regularizer='auto',n_components = 15)
 	dpca.protect = ['t']
 	Z = dpca.fit_transform(all_avg,all_bal)
 	explained_var = dpca.explained_variance_ratio_
 	
 	bins = np.arange(T)
 
-	# Z has keys ['sdt', 'd', 'st', 's', 't', 'dt', 'sd']
-	#each key of shape [n_components,S,R,T]
-
 	#PARAM
-	components_plot = 3
-	my_ticks = ['-10','0','10','-10','0','10','20']
-	my_ticks_num = [0,10,20,30,40,50,60]
-
-	labels = ['r0 succ','r1 succ','r2 succ','r3 succ','r0 fail','r1 fail','r2 fail','r3 fail']
-	colors = ['darkslategrey','darkgoldenrod','salmon','maroon','darkslategrey','darkgoldenrod','salmon','maroon']
+	components_plot = 4 #even for now
+	my_ticks = ['-0.5','0','0.5','-0.5','0','0.5','1.0']
+	
+	tot_bins = (bfr_bins+aft_bins)*2
+	my_ticks_num = np.arange(0,tot_bins*7/6,tot_bins/6)
+	
+	labels = ['r0p0 succ','rxp0 succ','r0px succ','rxpx succ','r0p0 fail','rxp0 fail','r0px fail','rxpx fail']
+	colors = ['black','green','maroon','blue','black','green','maroon','blue']
 
 	print 'plotting'
 	
 	for comb_ind,comb_val in Z.iteritems():
 		ax = plt.gca()
 		for i in range(components_plot):
-			plt.subplot(4,components_plot,i+1)
-
+			plt.subplot(components_plot/2,2,i+1)
+			#if i < components_plot/2:
+			#	plt.subplot(components_plot/2,2,i+1)
+			#else:
+			#	plt.subplot(components_plot/2,2,i+1+components_plot/2)
+							
 			line0 = plt.plot(bins,Z[comb_ind][i,0,0,1,:],label=labels[0],color=colors[0])
 			line1 = plt.plot(bins,Z[comb_ind][i,1,0,1,:],label=labels[1],color=colors[1])
-			line2 = plt.plot(bins,Z[comb_ind][i,2,0,1,:],label=labels[2],color=colors[2])
-			line3 = plt.plot(bins,Z[comb_ind][i,3,0,1,:],label=labels[3],color=colors[3])
+			line2 = plt.plot(bins,Z[comb_ind][i,0,1,1,:],label=labels[2],color=colors[2])
+			line3 = plt.plot(bins,Z[comb_ind][i,1,1,1,:],label=labels[3],color=colors[3])
 
-			line4 = plt.plot(bins,Z[comb_ind][i,0,0,0,:],label=labels[4],color=colors[4],linestyle='--')
-			line5 = plt.plot(bins,Z[comb_ind][i,1,0,0,:],label=labels[5],color=colors[5],linestyle='--')
-			line6 = plt.plot(bins,Z[comb_ind][i,2,0,0,:],label=labels[6],color=colors[6],linestyle='--')
-			line7 = plt.plot(bins,Z[comb_ind][i,3,0,0,:],label=labels[7],color=colors[7],linestyle='--')
+			line4 = plt.plot(bins,Z[comb_ind][i,0,0,0,:],label=labels[4],color=colors[4],linestyle=':')
+			line5 = plt.plot(bins,Z[comb_ind][i,1,0,0,:],label=labels[5],color=colors[5],linestyle=':')
+			line6 = plt.plot(bins,Z[comb_ind][i,0,1,0,:],label=labels[6],color=colors[6],linestyle=':')
+			line7 = plt.plot(bins,Z[comb_ind][i,1,1,0,:],label=labels[7],color=colors[7],linestyle=':')
 			lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5,line6,line7)))
 			
-			plt.axvline(x=10,color='g',linestyle='--')
-			plt.axvline(x=30,color='k')
-			plt.axvline(x=40,color='b',linestyle='--')
-			plt.title('Component: %s, P=0' %(i+1),fontsize='small')
+			plt.axvline(x=bfr_bins,color='g',linestyle='--')
+			plt.axvline(x=bfr_bins+aft_bins,color='k')
+			plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+			plt.title('Component: %s' %(i+1),fontsize='small')
 			plt.xticks(my_ticks_num,my_ticks)
 
-			plt.subplot(4,components_plot,i+1+components_plot)
+			#plt.subplot(4,components_plot,i+1+components_plot)
 
-			line0 = plt.plot(bins,Z[comb_ind][i,0,1,1,:],label=labels[0],color=colors[0])
-			line1 = plt.plot(bins,Z[comb_ind][i,1,1,1,:],label=labels[1],color=colors[1])
-			line2 = plt.plot(bins,Z[comb_ind][i,2,1,1,:],label=labels[2],color=colors[2])
-			line3 = plt.plot(bins,Z[comb_ind][i,3,1,1,:],label=labels[3],color=colors[3])
+			#line0 = plt.plot(bins,Z[comb_ind][i,0,1,1,:],label=labels[0],color=colors[0])
+			#line1 = plt.plot(bins,Z[comb_ind][i,1,1,1,:],label=labels[1],color=colors[1])
+			#line2 = plt.plot(bins,Z[comb_ind][i,2,1,1,:],label=labels[2],color=colors[2])
+			#line3 = plt.plot(bins,Z[comb_ind][i,3,1,1,:],label=labels[3],color=colors[3])
 
-			line4 = plt.plot(bins,Z[comb_ind][i,0,1,0,:],label=labels[4],color=colors[4],linestyle='--')
-			line5 = plt.plot(bins,Z[comb_ind][i,1,1,0,:],label=labels[5],color=colors[5],linestyle='--')
-			line6 = plt.plot(bins,Z[comb_ind][i,2,1,0,:],label=labels[6],color=colors[6],linestyle='--')
-			line7 = plt.plot(bins,Z[comb_ind][i,3,1,0,:],label=labels[7],color=colors[7],linestyle='--')
+			#line4 = plt.plot(bins,Z[comb_ind][i,0,1,0,:],label=labels[4],color=colors[4],linestyle='--')
+			#line5 = plt.plot(bins,Z[comb_ind][i,1,1,0,:],label=labels[5],color=colors[5],linestyle='--')
+			#line6 = plt.plot(bins,Z[comb_ind][i,2,1,0,:],label=labels[6],color=colors[6],linestyle='--')
+			#line7 = plt.plot(bins,Z[comb_ind][i,3,1,0,:],label=labels[7],color=colors[7],linestyle='--')
 			
-			plt.axvline(x=10,color='g',linestyle='--')
-			plt.axvline(x=30,color='k')
-			plt.axvline(x=40,color='b',linestyle='--')
-			plt.title('Component: %s, P=1' %(i+1),fontsize='small')
-			plt.xticks(my_ticks_num,my_ticks)
+			#plt.axvline(x=10,color='g',linestyle='--')
+			#plt.axvline(x=30,color='k')
+			#plt.axvline(x=40,color='b',linestyle='--')
+			#plt.title('Component: %s, P=1' %(i+1),fontsize='small')
+			#plt.xticks(my_ticks_num,my_ticks)
 
-			plt.subplot(4,components_plot,i+1+components_plot*2)
+			#plt.subplot(4,components_plot,i+1+components_plot*2)
 
-			line0 = plt.plot(bins,Z[comb_ind][i,0,2,1,:],label=labels[0],color=colors[0])
-			line1 = plt.plot(bins,Z[comb_ind][i,1,2,1,:],label=labels[1],color=colors[1])
-			line2 = plt.plot(bins,Z[comb_ind][i,2,2,1,:],label=labels[2],color=colors[2])
-			line3 = plt.plot(bins,Z[comb_ind][i,3,2,1,:],label=labels[3],color=colors[3])
+			#line0 = plt.plot(bins,Z[comb_ind][i,0,2,1,:],label=labels[0],color=colors[0])
+			#line1 = plt.plot(bins,Z[comb_ind][i,1,2,1,:],label=labels[1],color=colors[1])
+			#line2 = plt.plot(bins,Z[comb_ind][i,2,2,1,:],label=labels[2],color=colors[2])
+			#line3 = plt.plot(bins,Z[comb_ind][i,3,2,1,:],label=labels[3],color=colors[3])
 
-			line4 = plt.plot(bins,Z[comb_ind][i,0,2,0,:],label=labels[4],color=colors[4],linestyle='--')
-			line5 = plt.plot(bins,Z[comb_ind][i,1,2,0,:],label=labels[5],color=colors[5],linestyle='--')
-			line6 = plt.plot(bins,Z[comb_ind][i,2,2,0,:],label=labels[6],color=colors[6],linestyle='--')
-			line7 = plt.plot(bins,Z[comb_ind][i,3,2,0,:],label=labels[7],color=colors[7],linestyle='--')
+			#line4 = plt.plot(bins,Z[comb_ind][i,0,2,0,:],label=labels[4],color=colors[4],linestyle='--')
+			#line5 = plt.plot(bins,Z[comb_ind][i,1,2,0,:],label=labels[5],color=colors[5],linestyle='--')
+			#line6 = plt.plot(bins,Z[comb_ind][i,2,2,0,:],label=labels[6],color=colors[6],linestyle='--')
+			#line7 = plt.plot(bins,Z[comb_ind][i,3,2,0,:],label=labels[7],color=colors[7],linestyle='--')
 			
-			plt.axvline(x=10,color='g',linestyle='--')
-			plt.axvline(x=30,color='k')
-			plt.axvline(x=40,color='b',linestyle='--')
-			plt.title('Component: %s, P=2' %(i+1),fontsize='small')
-			plt.xticks(my_ticks_num,my_ticks)
+			#plt.axvline(x=10,color='g',linestyle='--')
+			#plt.axvline(x=30,color='k')
+			#plt.axvline(x=40,color='b',linestyle='--')
+			#plt.title('Component: %s, P=2' %(i+1),fontsize='small')
+			#plt.xticks(my_ticks_num,my_ticks)
 			
-			plt.subplot(4,components_plot,i+1+components_plot*3)
+			#plt.subplot(4,components_plot,i+1+components_plot*3)
 
-			line0 = plt.plot(bins,Z[comb_ind][i,0,3,1,:],label=labels[0],color=colors[0])
-			line1 = plt.plot(bins,Z[comb_ind][i,1,3,1,:],label=labels[1],color=colors[1])
-			line2 = plt.plot(bins,Z[comb_ind][i,2,3,1,:],label=labels[2],color=colors[2])
-			line3 = plt.plot(bins,Z[comb_ind][i,3,3,1,:],label=labels[3],color=colors[3])
+			#line0 = plt.plot(bins,Z[comb_ind][i,0,3,1,:],label=labels[0],color=colors[0])
+			#line1 = plt.plot(bins,Z[comb_ind][i,1,3,1,:],label=labels[1],color=colors[1])
+			#line2 = plt.plot(bins,Z[comb_ind][i,2,3,1,:],label=labels[2],color=colors[2])
+			#line3 = plt.plot(bins,Z[comb_ind][i,3,3,1,:],label=labels[3],color=colors[3])
 
-			line4 = plt.plot(bins,Z[comb_ind][i,0,3,0,:],label=labels[4],color=colors[4],linestyle='--')
-			line5 = plt.plot(bins,Z[comb_ind][i,1,3,0,:],label=labels[5],color=colors[5],linestyle='--')
-			line6 = plt.plot(bins,Z[comb_ind][i,2,3,0,:],label=labels[6],color=colors[6],linestyle='--')
-			line7 = plt.plot(bins,Z[comb_ind][i,3,3,0,:],label=labels[7],color=colors[7],linestyle='--')
+			#line4 = plt.plot(bins,Z[comb_ind][i,0,3,0,:],label=labels[4],color=colors[4],linestyle='--')
+			#line5 = plt.plot(bins,Z[comb_ind][i,1,3,0,:],label=labels[5],color=colors[5],linestyle='--')
+			#line6 = plt.plot(bins,Z[comb_ind][i,2,3,0,:],label=labels[6],color=colors[6],linestyle='--')
+			#line7 = plt.plot(bins,Z[comb_ind][i,3,3,0,:],label=labels[7],color=colors[7],linestyle='--')
 			
-			plt.axvline(x=10,color='g',linestyle='--')
-			plt.axvline(x=30,color='k')
-			plt.axvline(x=40,color='b',linestyle='--')
-			plt.title('Component: %s, P=3' %(i+1),fontsize='small')
-			plt.xticks(my_ticks_num,my_ticks)
+			#plt.axvline(x=10,color='g',linestyle='--')
+			#plt.axvline(x=30,color='k')
+			#plt.axvline(x=40,color='b',linestyle='--')
+			#plt.title('Component: %s, P=3' %(i+1),fontsize='small')
+			#plt.xticks(my_ticks_num,my_ticks)
 
 
 
@@ -445,7 +382,7 @@ for region_key,region_val in all_dict.iteritems():
 		plt.rcParams['xtick.labelsize'] = 8
 		plt.rcParams['ytick.labelsize'] = 8
 		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
-		plt.savefig('component_%s_%s' %(region_key,comb_ind))
+		plt.savefig('component_binaryrp_%s_%s' %(region_key,comb_ind))
 		plt.clf()
 
 
@@ -462,4 +399,4 @@ for region_key,region_val in all_dict.iteritems():
 		all_dict[region_key]['dpca_results'] = dpca_results
 
 all_dict['sort_dict'] = sort_dict
-np.save('dpca_results.npy',all_dict)
+np.save('dpca_results_binaryrp.npy',all_dict)

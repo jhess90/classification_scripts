@@ -18,12 +18,13 @@ import pandas as pd
 from matplotlib import cm
 import xlsxwriter
 import scipy.stats as stats
+from scipy import ndimage
 
 #######################
 #params to set ########
 #######################
 
-bin_size = 50 #in ms
+bin_size = 1 #in ms
 time_before = -0.5 #negative value
 time_after = 1.0
 baseline_time = -1.0 #negative value
@@ -33,6 +34,9 @@ plot_3d_bool = False
 mv_bool = True
 zscore = False
 abs_alphabeta = False
+
+gaussian_bool = True
+gauss_sigma = 50
 
 ts_filename = glob.glob('Extracted*_timestamps.mat')[0]
 extracted_filename = ts_filename[:-15] + '.mat'
@@ -69,8 +73,12 @@ def calc_firing_rates(hists,data_key,condensed):
         bin_size_sec = bin_size / 1000.0
 
         if zscore:
-                hists = stats.zscore(hists,axis=1)
+            hists = stats.zscore(hists,axis=1)
+        elif gaussian_bool:
+            hists = ndimage.filters.gaussian_filter1d(hists,gauss_sigma,axis=1)
 
+        #pdb.set_trace()
+            
         baseline_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*baseline_bins))
         bfr_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
         aft_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
@@ -280,7 +288,7 @@ baseline_bins = int(baseline_time / float(bin_size) * 1000) #neg
 
 print 'bin size: %s' %(bin_size)
 print 'time before: %s, time after: %s, baseline time: %s' %(time_before,time_after,baseline_time)
-print 'nlize: %s, sqrt: %s, zscore: %s' %(normalize_bool,sqrt_bool,zscore)
+print 'nlize: %s, sqrt: %s, zscore: %s, gaussian: %s' %(normalize_bool,sqrt_bool,zscore,gaussian_bool)
 
 #load files (from Extracted and timestamp files)
 print extracted_filename
@@ -428,7 +436,39 @@ for region_key,region_value in data_dict_all.iteritems():
         hists = data_dict_all[region_key]['hist_all']
         fr_dict = calc_firing_rates(hists,region_key,condensed)
         data_dict_all[region_key]['fr_dict'] = fr_dict
+
+        bfr_cue = fr_dict['bfr_cue_fr'][10,:,:]
+        aft_cue = fr_dict['aft_cue_fr'][10,:,:]
+        bfr_result = fr_dict['bfr_result_fr'][10,:,:]
+        aft_result = fr_dict['aft_result_fr'][10,:,:]
+
+        test_concat = np.append(bfr_cue,aft_cue,axis=1)
+        test_concat = np.append(test_concat,bfr_result,axis=1)
+        test_concat = np.append(test_concat,aft_result,axis=1)
         
+        ax = plt.gca()
+        plt.subplot(3,3,1)
+        plt.plot(test_concat[0,:])
+        plt.subplot(3,3,2)
+        plt.plot(test_concat[1,:])
+        plt.subplot(3,3,3)
+        plt.plot(test_concat[2,:])
+        plt.subplot(3,3,4)
+        plt.plot(test_concat[3,:])
+        plt.subplot(3,3,5)
+        plt.plot(test_concat[4,:])
+        plt.subplot(3,3,6)
+        plt.plot(test_concat[5,:])
+        plt.subplot(3,3,7)
+        plt.plot(test_concat[6,:])
+        plt.subplot(3,3,8)
+        plt.plot(test_concat[7,:])
+        plt.subplot(3,3,9)
+        plt.plot(test_concat[8,:])
+
+        plt.savefig('test_%s' %(region_key))
+        plt.clf()
+
 
 #print 'modeling'
 for region_key,region_value in data_dict_all.iteritems():
@@ -914,11 +954,50 @@ M1_fr_dict = {'bfr_cue':data_dict_all['M1_dicts']['fr_dict']['bfr_cue_fr'],'aft_
 S1_fr_dict = {'bfr_cue':data_dict_all['S1_dicts']['fr_dict']['bfr_cue_fr'],'aft_cue':data_dict_all['S1_dicts']['fr_dict']['aft_cue_fr'],'bfr_result':data_dict_all['S1_dicts']['fr_dict']['bfr_result_fr'],'aft_result':data_dict_all['S1_dicts']['fr_dict']['aft_result_fr']}
 PmD_fr_dict = {'bfr_cue':data_dict_all['PmD_dicts']['fr_dict']['bfr_cue_fr'],'aft_cue':data_dict_all['PmD_dicts']['fr_dict']['aft_cue_fr'],'bfr_result':data_dict_all['PmD_dicts']['fr_dict']['bfr_result_fr'],'aft_result':data_dict_all['PmD_dicts']['fr_dict']['aft_result_fr']}
 
-master_fr_dict = {'M1_fr_dict':M1_fr_dict,'S1_fr_dict':S1_fr_dict,'PmD_fr_dict':PmD_fr_dict,'condensed':condensed}
 
-np.save('master_fr_dict.npy',master_fr_dict)
-
-
+params = {'time_before':time_before,'time_after':time_after,'bin_size':bin_size,'baseline_time':baseline_time,'normalize_bool':normalize_bool,'sqrt_bool':sqrt_bool,'zscore_bool':zscore,'gaussian_bool':gaussian_bool,'gauss_sigma':gauss_sigma}
+master_fr_dict = {'M1_fr_dict':M1_fr_dict,'S1_fr_dict':S1_fr_dict,'PmD_fr_dict':PmD_fr_dict,'condensed':condensed,'params':params}
 
 
 
+if extracted_filename == 'Extracted_504_2017-02-08-10-36-11.mat':
+	np.save('master_fr_dict_5_8_1.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-02-08-11-02-03.mat':
+	np.save('master_fr_dict_5_8_2.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-02-09-11-50-03.mat':
+	np.save('master_fr_dict_5_9_1.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-02-09-12-15-57.mat':
+	np.save('master_fr_dict_5_9_2.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-02-14-12-09-21.mat':
+	np.save('master_fr_dict_5_14_1.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-02-14-12-35-41.mat':
+	np.save('master_fr_dict_5_14_2.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-02-14-13-01-34.mat':
+	np.save('master_fr_dict_5_14_3.npy',master_fr_dict)
+
+elif extracted_filename == 'Extracted_0059_2017-02-08-11-43-22.mat':
+	np.save('master_fr_dict_0_8_1.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_0059_2017-02-08-12-09-22.mat':
+	np.save('master_fr_dict_0_8_2.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_0059_2017-02-09-12-52-17.mat':
+	np.save('master_fr_dict_0_9_1.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_0059_2017-02-09-13-46-37.mat':
+	np.save('master_fr_dict_0_9_2.npy',master_fr_dict)
+
+else:
+	np.save('master_fr_dict.npy',master_fr_dict)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
