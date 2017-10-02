@@ -315,7 +315,7 @@ for region_key,region_val in all_dict.iteritems():
 
 		plt.figlegend(lines,labels,loc='right',ncol=1,fontsize='small')
 		plt.tight_layout(w_pad=0.1)
-		plt.subplots_adjust(top=0.9,right=0.85)
+		plt.subplots_adjust(top=0.9,right=0.8)
 		plt.rcParams['xtick.labelsize'] = 8
 		plt.rcParams['ytick.labelsize'] = 8
 		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
