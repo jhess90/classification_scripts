@@ -23,10 +23,10 @@ from scipy.ndimage.filters import gaussian_filter
 from sklearn.decomposition import PCA
 import dPCA_new as dPCA
 #beaver
-sys.path.append('/home/jack/workspace/sparray')
+#sys.path.append('/home/jack/workspace/sparray')
 #laptop
 #sys.path.append('/Users/jackhessburg/documents/lab/workspace/sparray')
-from sparray import sparray
+#from sparray import sparray
 
 #######################
 #params to set ########
@@ -73,7 +73,7 @@ def sort_and_avg(fr_array,sort_dict):
 				for k in range(K):
 					if k in r_trials and k in p_trials and k in q_trials:
 						combined = np.append(combined,k)
-                                pdb.set_trace()
+                                #pdb.set_trace()
 				trial_comb[count,0:combined.size] = combined
 				count += 1
 				
@@ -254,62 +254,58 @@ for region_key,region_val in all_dict.iteritems():
 	print 'running region: %s' %(region_key)
 	fr_dict_str = '%s_fr_dict' %(region_key)
 
-        medsize_bool = False
-        largesize_bool = False
+        #medsize_bool = False
+        #largesize_bool = False
         #not going to work
-        if np.shape(all_dict[region_key][fr_dict_str]['bfr_cue'])[0] > 10000:
-                medsize_bool = True
+        #if np.shape(all_dict[region_key][fr_dict_str]['bfr_cue'])[0] > 10000:
+        #        medsize_bool = True
 
-                bfr_cue = all_dict[region_key][fr_dict_str]['bfr_cue'][0:1000,:,:]
-                aft_cue = all_dict[region_key][fr_dict_str]['aft_cue'][0:1000,:,:]
-                bfr_result = all_dict[region_key][fr_dict_str]['bfr_result'][0:1000,:,:]
-                aft_result = all_dict[region_key][fr_dict_str]['aft_result'][0:1000,:,:]
+        #        bfr_cue = all_dict[region_key][fr_dict_str]['bfr_cue'][0:1000,:,:]
+        #        aft_cue = all_dict[region_key][fr_dict_str]['aft_cue'][0:1000,:,:]
+        #        bfr_result = all_dict[region_key][fr_dict_str]['bfr_result'][0:1000,:,:]
+        #        aft_result = all_dict[region_key][fr_dict_str]['aft_result'][0:1000,:,:]
                 
-                all_fr = np.zeros((1000,np.shape(bfr_cue)[1],2*(bfr_bins+aft_bins)))
+        #        all_fr = np.zeros((1000,np.shape(bfr_cue)[1],2*(bfr_bins+aft_bins)))
 
-                all_fr[:,:,0:bfr_bins] = bfr_cue
-                all_fr[:,:,bfr_bins:bfr_bins+aft_bins] = aft_cue
-                all_fr[:,:,bfr_bins+aft_bins:2*bfr_bins+aft_bins] = bfr_result
-                all_fr[:,:,2*bfr_bins+aft_bins:2*bfr_bins+2*aft_bins] = aft_result
+        #        all_fr[:,:,0:bfr_bins] = bfr_cue
+        #        all_fr[:,:,bfr_bins:bfr_bins+aft_bins] = aft_cue
+        #        all_fr[:,:,bfr_bins+aft_bins:2*bfr_bins+aft_bins] = bfr_result
+        #        all_fr[:,:,2*bfr_bins+aft_bins:2*bfr_bins+2*aft_bins] = aft_result
 
-
-                bfr_cue_2 = all_dict[region_key][fr_dict_str]['bfr_cue'][1000:,:,:]
-                aft_cue_2 = all_dict[region_key][fr_dict_str]['aft_cue'][1000:,:,:]
-                bfr_result_2 = all_dict[region_key][fr_dict_str]['bfr_result'][1000:,:,:]
-                aft_result_2 = all_dict[region_key][fr_dict_str]['aft_result'][1000:,:,:]
+        #        bfr_cue_2 = all_dict[region_key][fr_dict_str]['bfr_cue'][1000:,:,:]
+        #        aft_cue_2 = all_dict[region_key][fr_dict_str]['aft_cue'][1000:,:,:]
+        #        bfr_result_2 = all_dict[region_key][fr_dict_str]['bfr_result'][1000:,:,:]
+        #        aft_result_2 = all_dict[region_key][fr_dict_str]['aft_result'][1000:,:,:]
                 
-                all_fr_2 = np.zeros((np.shape(bfr_cue_2)[0],np.shape(bfr_cue_2)[1],2*(bfr_bins+aft_bins)))
+        #        all_fr_2 = np.zeros((np.shape(bfr_cue_2)[0],np.shape(bfr_cue_2)[1],2*(bfr_bins+aft_bins)))
 
-                all_fr_2[:,:,0:bfr_bins] = bfr_cue_2
-                all_fr_2[:,:,bfr_bins:bfr_bins+aft_bins] = aft_cue_2
-                all_fr_2[:,:,bfr_bins+aft_bins:2*bfr_bins+aft_bins] = bfr_result_2
-                all_fr_2[:,:,2*bfr_bins+aft_bins:2*bfr_bins+2*aft_bins] = aft_result_2
+        #        all_fr_2[:,:,0:bfr_bins] = bfr_cue_2
+        #        all_fr_2[:,:,bfr_bins:bfr_bins+aft_bins] = aft_cue_2
+        #        all_fr_2[:,:,bfr_bins+aft_bins:2*bfr_bins+aft_bins] = bfr_result_2
+        #        all_fr_2[:,:,2*bfr_bins+aft_bins:2*bfr_bins+2*aft_bins] = aft_result_2
 
-                pdb.set_trace()
+        #       pdb.set_trace()
 
-                all_avg,all_bal = sort_and_avg(all_fr,sort_dict)
-                [bal_cond,N,R,P,D,T] = np.shape(all_bal)
+        #      all_avg,all_bal = sort_and_avg(all_fr,sort_dict)
+        #      [bal_cond,N,R,P,D,T] = np.shape(all_bal)
                 
-                all_avg_2,all_bal_2 = sort_and_avg(all_fr_2,sort_dict)
-                [bal_cond_2,N_2,R,P,D,T] = np.shape(all_bal_2)
+        #        all_avg_2,all_bal_2 = sort_and_avg(all_fr_2,sort_dict)
+        #        [bal_cond_2,N_2,R,P,D,T] = np.shape(all_bal_2)
 
-
-        else:
-
-                bfr_cue = all_dict[region_key][fr_dict_str]['bfr_cue']
-                aft_cue = all_dict[region_key][fr_dict_str]['aft_cue']
-                bfr_result = all_dict[region_key][fr_dict_str]['bfr_result']
-                aft_result = all_dict[region_key][fr_dict_str]['aft_result']
-
-                all_fr = np.zeros((np.shape(bfr_cue)[0],np.shape(bfr_cue)[1],2*(bfr_bins+aft_bins)))
-
-                all_fr[:,:,0:bfr_bins] = bfr_cue
-                all_fr[:,:,bfr_bins:bfr_bins+aft_bins] = aft_cue
-                all_fr[:,:,bfr_bins+aft_bins:2*bfr_bins+aft_bins] = bfr_result
-                all_fr[:,:,2*bfr_bins+aft_bins:2*bfr_bins+2*aft_bins] = aft_result
-
-                all_avg,all_bal = sort_and_avg(all_fr,sort_dict)
-                [bal_cond,N,R,P,D,T] = np.shape(all_bal)
+        bfr_cue = np.float32(all_dict[region_key][fr_dict_str]['bfr_cue'])
+        aft_cue = np.float32(all_dict[region_key][fr_dict_str]['aft_cue'])
+        bfr_result = np.float32(all_dict[region_key][fr_dict_str]['bfr_result'])
+        aft_result = np.float32(all_dict[region_key][fr_dict_str]['aft_result'])
+        
+        all_fr = np.zeros((np.shape(bfr_cue)[0],np.shape(bfr_cue)[1],2*(bfr_bins+aft_bins)),dtype=np.float32)
+        
+        all_fr[:,:,0:bfr_bins] = bfr_cue
+        all_fr[:,:,bfr_bins:bfr_bins+aft_bins] = aft_cue
+        all_fr[:,:,bfr_bins+aft_bins:2*bfr_bins+aft_bins] = bfr_result
+        all_fr[:,:,2*bfr_bins+aft_bins:2*bfr_bins+2*aft_bins] = aft_result
+        
+        all_avg,all_bal = sort_and_avg(all_fr,sort_dict)
+        [bal_cond,N,R,P,D,T] = np.shape(all_bal)
 	
 	print 'N= %s, R= %s, P= %s, D= %s, T= %s, bal_cond= %s' %(N,R,P,D,T,bal_cond)
 
