@@ -36,7 +36,7 @@ zscore = False
 abs_alphabeta = False
 
 gaussian_bool = False
-gauss_sigma = 100
+gauss_sigma = 50
 
 ts_filename = glob.glob('Extracted*_timestamps.mat')[0]
 extracted_filename = ts_filename[:-15] + '.mat'
