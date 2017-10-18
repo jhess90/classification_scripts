@@ -2,7 +2,7 @@ library(openxlsx)
 library(ggplot2)
 library(reshape2)
 #source("~/dropbox/mult_rp_files/r_test/multiplot.R")
-source("~/Dropbox/mult_rp_files/r_test/multiplot.R")
+#source("~/Dropbox/mult_rp_files/r_test/multiplot.R")
 library(zoo)
 library(gplots)
 library(RColorBrewer)
@@ -18,7 +18,7 @@ library(reshape)
 #######
 
 avg_alphabeta_bool = FALSE
-all_alphabeta_bool = TRUE
+all_alphabeta_bool = FALSE
 
 if (avg_alphabeta_bool & all_alphabeta_bool){cat('ERROR both cant be true')}
 

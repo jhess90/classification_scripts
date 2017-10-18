@@ -321,7 +321,7 @@ for region_key,region_val in all_dict.iteritems():
 		plt.clf()
 
 		if do_sig_analysis:
-			sig_analysis = dpca.significance_analysis(all_avg,all_bal,full=True)
+			sig_analysis = dpca.significance_analysis(all_avg,all_bal,axis=True,full=True)
 		transformed = dpca.transform(all_avg)
 
 		if do_sig_analysis:
