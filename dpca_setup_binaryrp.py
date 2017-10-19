@@ -28,7 +28,7 @@ import dPCA_new as dPCA
 #params to set ########
 #######################
 
-do_sig_analysis = False
+do_sig_analysis = True
 
 
 
@@ -267,8 +267,10 @@ for region_key,region_val in all_dict.iteritems():
         [bal_cond,N,R,P,D,T] = np.shape(all_bal)
 	print 'N= %s, R= %s, P= %s, D= %s, T= %s, bal_cond= %s' %(N,R,P,D,T,bal_cond)
 
+        join_comb = {'dt':['d','dt'],'pt':['p','pt'],'pdt':['pd','pdt'],'rt':['r','rt'],'rpt':['rp','rpt'],'rdt':['rd','rdt'],'rpdt':['rpd','rpdt']}
+
 	######### from test ########
-	dpca = dPCA.dPCA(labels='rpdt',regularizer='auto',n_components = 15)
+	dpca = dPCA.dPCA(labels='rpdt',regularizer='auto',n_components = 15,join=join_comb)
 	dpca.protect = ['t']
 	Z = dpca.fit_transform(all_avg,all_bal)
         if not do_sig_analysis:
@@ -278,7 +280,7 @@ for region_key,region_val in all_dict.iteritems():
 	bins = np.arange(T)
 
 	#PARAM
-	components_plot = 4 #even for now
+	components_plot = 4 #even for now, number of subplots per plot (3 plots for now).
 	my_ticks = ['-0.5','0','0.5','-0.5','0','0.5','1.0']
 	
 	tot_bins = (bfr_bins+aft_bins)*2
@@ -286,10 +288,10 @@ for region_key,region_val in all_dict.iteritems():
 	
 	labels = ['r0p0 succ','rxp0 succ','r0px succ','rxpx succ','r0p0 fail','rxp0 fail','r0px fail','rxpx fail']
 	colors = ['black','green','maroon','blue','black','green','maroon','blue']
-
-	print 'plotting'
-	
+        
+        print 'plotting'
 	for comb_ind,comb_val in Z.iteritems():
+                #print 'running %s' %(comb_ind)
 		ax = plt.gca()
 		for i in range(components_plot):
 			plt.subplot(components_plot/2,2,i+1)
@@ -317,22 +319,114 @@ for region_key,region_val in all_dict.iteritems():
 		plt.rcParams['xtick.labelsize'] = 8
 		plt.rcParams['ytick.labelsize'] = 8
 		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
-		plt.savefig('component_binaryrp_%s_%s' %(region_key,comb_ind))
+		plt.savefig('component_binaryrp_%s_%s_1' %(region_key,comb_ind))
 		plt.clf()
 
-		if do_sig_analysis:
-			sig_analysis = dpca.significance_analysis(all_avg,all_bal,axis=True,full=True)
-		transformed = dpca.transform(all_avg)
+                #plot 2
+		for i in range(components_plot):
+			plt.subplot(components_plot/2,2,i+1)
+				
+			line0 = plt.plot(bins,Z[comb_ind][i+components_plot,0,0,1,:],label=labels[0],color=colors[0])
+			line1 = plt.plot(bins,Z[comb_ind][i+components_plot,1,0,1,:],label=labels[1],color=colors[1])
+			line2 = plt.plot(bins,Z[comb_ind][i+components_plot,0,1,1,:],label=labels[2],color=colors[2])
+			line3 = plt.plot(bins,Z[comb_ind][i+components_plot,1,1,1,:],label=labels[3],color=colors[3])
 
-		if do_sig_analysis:
-			dpca_results = {'Z':Z,'explained_var':explained_var,'sig_analysis':sig_analysis,'transformed':transformed,'all_avg':all_avg,'all_bal':all_bal}
-		else:
-			dpca_results = {'Z':Z,'explained_var':explained_var,'transformed':transformed,'all_avg':all_avg} #,'all_bal':all_bal} #too large now
+			line4 = plt.plot(bins,Z[comb_ind][i+components_plot,0,0,0,:],label=labels[4],color=colors[4],linestyle=':')
+			line5 = plt.plot(bins,Z[comb_ind][i+components_plot,1,0,0,:],label=labels[5],color=colors[5],linestyle=':')
+			line6 = plt.plot(bins,Z[comb_ind][i+components_plot,0,1,0,:],label=labels[6],color=colors[6],linestyle=':')
+			line7 = plt.plot(bins,Z[comb_ind][i+components_plot,1,1,0,:],label=labels[7],color=colors[7],linestyle=':')
+			lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5,line6,line7)))
+			
+			plt.axvline(x=bfr_bins,color='g',linestyle='--')
+			plt.axvline(x=bfr_bins+aft_bins,color='k')
+			plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+			plt.title('Component: %s' %(i+components_plot+1),fontsize='small')
+			plt.xticks(my_ticks_num,my_ticks)
+
+		plt.figlegend(lines,labels,loc='right',ncol=1,fontsize='small')
+		plt.tight_layout(w_pad=0.1)
+		plt.subplots_adjust(top=0.9,right=0.82)
+		plt.rcParams['xtick.labelsize'] = 8
+		plt.rcParams['ytick.labelsize'] = 8
+		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
+		plt.savefig('component_binaryrp_%s_%s_2' %(region_key,comb_ind))
+		plt.clf()
+
+                #plot 3
+		for i in range(components_plot):
+			plt.subplot(components_plot/2,2,i+1)
+				
+			line0 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,0,1,:],label=labels[0],color=colors[0])
+			line1 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,0,1,:],label=labels[1],color=colors[1])
+			line2 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,1,1,:],label=labels[2],color=colors[2])
+			line3 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,1,1,:],label=labels[3],color=colors[3])
+
+			line4 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,0,0,:],label=labels[4],color=colors[4],linestyle=':')
+			line5 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,0,0,:],label=labels[5],color=colors[5],linestyle=':')
+			line6 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,1,0,:],label=labels[6],color=colors[6],linestyle=':')
+			line7 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,1,0,:],label=labels[7],color=colors[7],linestyle=':')
+			lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5,line6,line7)))
+			
+			plt.axvline(x=bfr_bins,color='g',linestyle='--')
+			plt.axvline(x=bfr_bins+aft_bins,color='k')
+			plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+			plt.title('Component: %s' %(i+2*components_plot+1),fontsize='small')
+			plt.xticks(my_ticks_num,my_ticks)
+
+		plt.figlegend(lines,labels,loc='right',ncol=1,fontsize='small')
+		plt.tight_layout(w_pad=0.1)
+		plt.subplots_adjust(top=0.9,right=0.82)
+		plt.rcParams['xtick.labelsize'] = 8
+		plt.rcParams['ytick.labelsize'] = 8
+		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
+		plt.savefig('component_binaryrp_%s_%s_3' %(region_key,comb_ind))
+		plt.clf()
+
+                #plot 4
+		for i in range(components_plot-1):
+			plt.subplot(components_plot/2,2,i+1)
+				
+			line0 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,0,1,:],label=labels[0],color=colors[0])
+			line1 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,0,1,:],label=labels[1],color=colors[1])
+			line2 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,1,1,:],label=labels[2],color=colors[2])
+			line3 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,1,1,:],label=labels[3],color=colors[3])
+
+			line4 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,0,0,:],label=labels[4],color=colors[4],linestyle=':')
+			line5 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,0,0,:],label=labels[5],color=colors[5],linestyle=':')
+			line6 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,1,0,:],label=labels[6],color=colors[6],linestyle=':')
+			line7 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,1,0,:],label=labels[7],color=colors[7],linestyle=':')
+			lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5,line6,line7)))
+			
+			plt.axvline(x=bfr_bins,color='g',linestyle='--')
+			plt.axvline(x=bfr_bins+aft_bins,color='k')
+			plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+			plt.title('Component: %s' %(i+3*components_plot+1),fontsize='small')
+			plt.xticks(my_ticks_num,my_ticks)
+
+		plt.figlegend(lines,labels,loc='right',ncol=1,fontsize='small')
+		plt.tight_layout(w_pad=0.1)
+		plt.subplots_adjust(top=0.9,right=0.82)
+		plt.rcParams['xtick.labelsize'] = 8
+		plt.rcParams['ytick.labelsize'] = 8
+		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
+		plt.savefig('component_binaryrp_%s_%s_4' %(region_key,comb_ind))
+		plt.clf()
+
+
+        print 'analysis'
+        if do_sig_analysis:
+		sig_analysis = dpca.significance_analysis(all_avg,all_bal,n_shuffles=20,n_splits=20,axis=True,full=True)
+	transformed = dpca.transform(all_avg)
+
+	if do_sig_analysis:
+		dpca_results = {'Z':Z,'explained_var':explained_var,'sig_analysis':sig_analysis,'transformed':transformed,'all_avg':all_avg,'all_bal':all_bal}
+	else:
+		dpca_results = {'Z':Z,'explained_var':explained_var,'transformed':transformed,'all_avg':all_avg} #,'all_bal':all_bal} #too large now
 		
 			
-		#all_dict[region_key]['dpca_results'] = dpca_results
-                np.save('dpca_results_binaryrp_%s.npy' %(region_key),dpca_results)
-                all_dict[region_key] = {}
+	#all_dict[region_key]['dpca_results'] = dpca_results
+        np.save('dpca_results_binaryrp_%s.npy' %(region_key),dpca_results)
+        all_dict[region_key] = {}
 
 #all_dict['sort_dict'] = sort_dict
 #np.save('dpca_results_binaryrp.npy',all_dict)
