@@ -13,9 +13,9 @@ library(gridExtra)
 
 all_data <- read.xlsx('perc_variance.xlsx',sheet=1,colNames=T)
 
-PmD_total <- as.numeric(all_data$X17[17])
-S1_total <- as.numeric(all_data$X33[17])
-M1_total <- as.numeric(all_data$X49[17])
+PmD_total <- as.numeric(all_data$X17[10])
+S1_total <- as.numeric(all_data$X33[10])
+M1_total <- as.numeric(all_data$X49[10])
 
 total_percs <- c(M1_total,S1_total,PmD_total)
 names <- c('S1','M1','PmD')
