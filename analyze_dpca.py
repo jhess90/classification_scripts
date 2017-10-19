@@ -71,25 +71,25 @@ for region_key,region_val in data.iteritems():
         worksheet.write_row(8,i+1,explained_var['pdt'])
         worksheet.write_row(9,i+1,explained_var['rpdt'])
 	
-        worksheet.write(2,i+9,sum(explained_var['t']))
+        worksheet.write(2,i+16,sum(explained_var['t']))
         #worksheet.write(3,i+16,sum(explained_var['r']))
-        worksheet.write(3,i+9,sum(explained_var['rt']))
+        worksheet.write(3,i+16,sum(explained_var['rt']))
         #worksheet.write(5,i+16,sum(explained_var['rp']))
         #worksheet.write(6,i+16,sum(explained_var['rd']))
         #worksheet.write(7,i+16,sum(explained_var['p']))
-        worksheet.write(4,i+9,sum(explained_var['pt']))
+        worksheet.write(4,i+16,sum(explained_var['pt']))
         #worksheet.write(9,i+16,sum(explained_var['pd']))
         #worksheet.write(10,i+16,sum(explained_var['d']))
-        worksheet.write(5,i+9,sum(explained_var['dt']))
+        worksheet.write(5,i+16,sum(explained_var['dt']))
         #worksheet.write(12,i+16,sum(explained_var['rpd']))
-        worksheet.write(6,i+9,sum(explained_var['rpt']))
-        worksheet.write(7,i+9,sum(explained_var['rdt']))
-        worksheet.write(8,i+9,sum(explained_var['pdt']))
-        worksheet.write(9,i+9,sum(explained_var['rpdt']))
+        worksheet.write(6,i+16,sum(explained_var['rpt']))
+        worksheet.write(7,i+16,sum(explained_var['rdt']))
+        worksheet.write(8,i+16,sum(explained_var['pdt']))
+        worksheet.write(9,i+16,sum(explained_var['rpdt']))
         
-        worksheet.write(10,i+8,'total')
-        worksheet.write(10,i+9,total_var)
+        worksheet.write(10,i+15,'total')
+        worksheet.write(10,i+16,total_var)
         
-        i += 9
+        i += 16
 
 variance_workbook.close()
