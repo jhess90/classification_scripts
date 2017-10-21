@@ -93,3 +93,151 @@ for region_key,region_val in data.iteritems():
         i += 16
 
 variance_workbook.close()
+
+
+###plot significance analysis
+
+my_ticks = ['-0.5','0','0.5','-0.5','0','0.5','1.0']
+tot_bins = int(np.shape(data['M1']['sig_analysis'][0]['rt'])[1])
+bfr_bins = int(tot_bins / 6)
+aft_bins = bfr_bins * 2
+my_ticks_num = np.arange(0,tot_bins*7/6,tot_bins/6)
+
+
+for region_key,region_value in data.iteritems():
+        sig_data = region_value['sig_analysis']
+        sig_binary = sig_data[0]
+        bins = np.shape(sig_data[0]['rt'])[1]
+        time = np.arange(bins)
+
+        #plot 1
+        for comb_key,comb_val in sig_data[0].iteritems():
+                ax = plt.gca()
+                for component in range(4):
+                        plt.subplot(2,2,component+1)
+                        #plot shuffled
+                        temp = np.asarray(sig_data[2][comb_key])
+                        #for i in range(np.shape(sig_data[1][comb_key])[0]):
+                        for i in range(np.shape(sig_data[2][comb_key])[0]):
+                                plt.plot(time,temp[i,component,:],color='grey')
+                        for i in range(bins):
+                                if sig_binary[comb_key][component,i]:
+                                        plt.plot(i,0.95,'ko')
+                        #plot actual
+                        plt.plot(time,sig_data[1][comb_key][component,:])
+                        plt.ylim([0,1])
+
+                        plt.axvline(x=bfr_bins,color='g',linestyle='--')
+			plt.axvline(x=bfr_bins+aft_bins,color='k')
+			plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+			plt.title('Component: %s' %(component+1),fontsize='small')
+			plt.xticks(my_ticks_num,my_ticks)
+                        plt.xlabel('Time (s)',fontsize='small')
+                        plt.ylabel('Classification Accuracy',fontsize='small')
+
+                plt.tight_layout(w_pad=0.1)
+                plt.rcParams['xtick.labelsize'] = 8
+                plt.rcParams['ytick.labelsize'] = 8
+                plt.subplots_adjust(top=0.9)
+                plt.suptitle('Region: %s, combination: %s' %(region_key,comb_key))
+                plt.savefig('sigplt_%s_%s_1' %(region_key,comb_key))
+                plt.clf()
+        #plot 2
+        for comb_key,comb_val in sig_data[0].iteritems():
+                ax = plt.gca()
+                for component in range(4):
+                        plt.subplot(2,2,component+1)
+                        #plot shuffled
+                        temp = np.asarray(sig_data[2][comb_key])
+                        #for i in range(np.shape(sig_data[1][comb_key])[0]):
+                        for i in range(np.shape(sig_data[2][comb_key])[0]):
+                                plt.plot(time,temp[i,component+4,:],color='grey')
+                        for i in range(bins):
+                                if sig_binary[comb_key][component+4,i]:
+                                        plt.plot(i,0.95,'ko')
+                        #plot actual
+                        plt.plot(time,sig_data[1][comb_key][component+4,:])
+                        plt.ylim([0,1])
+
+                        plt.axvline(x=bfr_bins,color='g',linestyle='--')
+			plt.axvline(x=bfr_bins+aft_bins,color='k')
+			plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+			plt.title('Component: %s' %(component+5),fontsize='small')
+			plt.xticks(my_ticks_num,my_ticks)
+                        plt.xlabel('Time (s)',fontsize='small')
+                        plt.ylabel('Classification Accuracy',fontsize='small')
+
+                plt.tight_layout(w_pad=0.1)
+                plt.rcParams['xtick.labelsize'] = 8
+                plt.rcParams['ytick.labelsize'] = 8
+                plt.subplots_adjust(top=0.9)
+                plt.suptitle('Region: %s, combination: %s' %(region_key,comb_key))
+                plt.savefig('sigplt_%s_%s_2' %(region_key,comb_key))
+                plt.clf()
+
+        #plot 3
+        for comb_key,comb_val in sig_data[0].iteritems():
+                ax = plt.gca()
+                for component in range(4):
+                        plt.subplot(2,2,component+1)
+                        #plot shuffled
+                        temp = np.asarray(sig_data[2][comb_key])
+                        #for i in range(np.shape(sig_data[1][comb_key])[0]):
+                        for i in range(np.shape(sig_data[2][comb_key])[0]):
+                                plt.plot(time,temp[i,component+8,:],color='grey')
+                        for i in range(bins):
+                                if sig_binary[comb_key][component+8,i]:
+                                        plt.plot(i,0.95,'ko')
+                        #plot actual
+                        plt.plot(time,sig_data[1][comb_key][component+8,:])
+                        plt.ylim([0,1])
+
+                        plt.axvline(x=bfr_bins,color='g',linestyle='--')
+			plt.axvline(x=bfr_bins+aft_bins,color='k')
+			plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+			plt.title('Component: %s' %(component+9),fontsize='small')
+			plt.xticks(my_ticks_num,my_ticks)
+                        plt.xlabel('Time (s)',fontsize='small')
+                        plt.ylabel('Classification Accuracy',fontsize='small')
+
+                plt.tight_layout(w_pad=0.1)
+                plt.rcParams['xtick.labelsize'] = 8
+                plt.rcParams['ytick.labelsize'] = 8
+                plt.subplots_adjust(top=0.9)
+                plt.suptitle('Region: %s, combination: %s' %(region_key,comb_key))
+                plt.savefig('sigplt_%s_%s_3' %(region_key,comb_key))
+                plt.clf()
+
+        #plot 4
+        for comb_key,comb_val in sig_data[0].iteritems():
+                ax = plt.gca()
+                for component in range(3):
+                        plt.subplot(2,2,component+1)
+                        #plot shuffled
+                        temp = np.asarray(sig_data[2][comb_key])
+                        #for i in range(np.shape(sig_data[1][comb_key])[0]):
+                        for i in range(np.shape(sig_data[2][comb_key])[0]):
+                                plt.plot(time,temp[i,component+12,:],color='grey')
+                        for i in range(bins):
+                                if sig_binary[comb_key][component+12,i]:
+                                        plt.plot(i,0.95,'ko')
+                        #plot actual
+                        plt.plot(time,sig_data[1][comb_key][component+12,:])
+                        plt.ylim([0,1])
+
+                        plt.axvline(x=bfr_bins,color='g',linestyle='--')
+			plt.axvline(x=bfr_bins+aft_bins,color='k')
+			plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+			plt.title('Component: %s' %(component+13),fontsize='small')
+			plt.xticks(my_ticks_num,my_ticks)
+                        plt.xlabel('Time (s)',fontsize='small')
+                        plt.ylabel('Classification Accuracy',fontsize='small')
+
+                plt.tight_layout(w_pad=0.1)
+                plt.rcParams['xtick.labelsize'] = 8
+                plt.rcParams['ytick.labelsize'] = 8
+                plt.subplots_adjust(top=0.9)
+                plt.suptitle('Region: %s, combination: %s' %(region_key,comb_key))
+                plt.savefig('sigplt_%s_%s_4' %(region_key,comb_key))
+                plt.clf()
+

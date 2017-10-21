@@ -24,7 +24,7 @@ from scipy import ndimage
 #params to set ########
 #######################
 
-bin_size = 10 #in ms
+bin_size = 1 #in ms
 time_before = -0.5 #negative value
 time_after = 1.0
 baseline_time = -1.0 #negative value
@@ -35,8 +35,8 @@ mv_bool = True
 zscore = False
 abs_alphabeta = False
 
-gaussian_bool = True
-gauss_sigma = 30
+gaussian_bool = False
+gauss_sigma = 50
 
 ts_filename = glob.glob('Extracted*_timestamps.mat')[0]
 extracted_filename = ts_filename[:-15] + '.mat'
@@ -297,15 +297,15 @@ timestamps = sio.loadmat(ts_filename);
 
 #create matrix of trial-by-trial info
 trial_breakdown = timestamps['trial_breakdown']
-condensed = np.zeros((np.shape(trial_breakdown)[0],6))
+condensed = np.zeros((np.shape(trial_breakdown)[0],7))
 
-#col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum, 5 = catch_num
+#col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum, 5 = succ/fail, 6 = catch num
 condensed[:,0] = trial_breakdown[:,1]
 condensed[:,1] = trial_breakdown[:,2]
 condensed[:,2] = trial_breakdown[:,3]
 condensed[:,3] = trial_breakdown[:,5]
 condensed[:,4] = trial_breakdown[:,7]
-condensed[:,5] = trial_breakdown[:,10]
+condensed[:,6] = trial_breakdown[:,10]
 
 #delete end trials if not fully finished
 if condensed[-1,1] == condensed[-1,2] == 0:
@@ -313,13 +313,10 @@ if condensed[-1,1] == condensed[-1,2] == 0:
         condensed = new_condensed
 condensed = condensed[condensed[:,0] != 0]
 
-#remove trials with now succ or failure scene (not sure why, but saw in one)
-
+#remove trials with no succ or failure scene (not sure why, but saw in one)
 condensed = condensed[np.invert(np.logical_and(condensed[:,1] == 0, condensed[:,2] == 0))]
 
 
-#TODOD FOR NOW remove catch trials
-condensed = condensed[condensed[:,5] == 0]
 #col 5 all 0s now, replace with succ/fail vector: succ = 1, fail = -1
 condensed[condensed[:,1] != 0, 5] = 1
 condensed[condensed[:,2] != 0, 5] = -1

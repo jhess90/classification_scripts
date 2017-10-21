@@ -5,7 +5,7 @@ function extract_ts_val_test(filename)
 
 load (filename)
 
-%load('Extracted_0059_2017-02-09-13-46-37.mat');
+%load('Extracted_0059_2017-02-08-11-43-22.mat');
 
 %%%% strobe words %%%%
 % 0 = reset
