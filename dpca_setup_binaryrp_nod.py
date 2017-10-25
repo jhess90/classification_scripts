@@ -28,7 +28,7 @@ import dPCA_new as dPCA
 #params to set ########
 #######################
 
-do_sig_analysis = True
+do_sig_analysis = False
 
 
 
@@ -46,7 +46,7 @@ def sort_and_avg(fr_array,sort_dict):
 	T = np.shape(fr_array)[2]
 
 	count = 0
-	trial_comb = np.zeros((R*P*Q,K))
+	trial_comb = np.zeros((R*P,K))
 	for r in range(R):
 		if r == 0:
 			r_trials = sort_dict['r_stim']['r0']
@@ -59,19 +59,13 @@ def sort_and_avg(fr_array,sort_dict):
 			elif p == 1:
 				p_trials = sort_dict['p_stim']['px']
 
-			for q in range(Q):
-				if q == 0:
-					q_trials = sort_dict['q_result']['fail_trials']
-				elif q == 1:
-					q_trials = sort_dict['q_result']['succ_trials']
-
-				combined = ()
-				for k in range(K):
-					if k in r_trials and k in p_trials and k in q_trials:
-						combined = np.append(combined,k)
-                                #pdb.set_trace()
-				trial_comb[count,0:combined.size] = combined
-				count += 1
+			combined = ()
+			for k in range(K):
+				if k in r_trials and k in p_trials:
+					combined = np.append(combined,k)
+                        #pdb.set_trace()
+			trial_comb[count,0:combined.size] = combined
+			count += 1
 				
 	min_trial_size = K
 	for i in range(np.shape(trial_comb)[0]):
@@ -79,7 +73,7 @@ def sort_and_avg(fr_array,sort_dict):
 		if temp < min_trial_size:
 			min_trial_size = temp
 
-	bal_fr_shaped = np.zeros((min_trial_size,N,R,P,Q,T))
+	bal_fr_shaped = np.zeros((min_trial_size,N,R,P,T))
 	bal_ind = np.zeros((np.shape(trial_comb)[0],min_trial_size))
 	
 	for i in range(np.shape(trial_comb)[0]):
@@ -89,14 +83,10 @@ def sort_and_avg(fr_array,sort_dict):
 			bal_ind[i,:] = trial_comb[i,:][np.nonzero(trial_comb[i,:])]
 
 
-	bal_fr_shaped[:,:,0,0,0,:] = fr_array[bal_ind[0,:].astype(int),:,:]
-	bal_fr_shaped[:,:,0,0,1,:] = fr_array[bal_ind[1,:].astype(int),:,:]
-	bal_fr_shaped[:,:,0,1,0,:] = fr_array[bal_ind[2,:].astype(int),:,:]
-	bal_fr_shaped[:,:,0,1,1,:] = fr_array[bal_ind[3,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,0,0,:] = fr_array[bal_ind[4,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,0,1,:] = fr_array[bal_ind[5,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,1,0,:] = fr_array[bal_ind[6,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,1,1,:] = fr_array[bal_ind[7,:].astype(int),:,:]
+	bal_fr_shaped[:,:,0,0,:] = fr_array[bal_ind[0,:].astype(int),:,:]
+	bal_fr_shaped[:,:,0,1,:] = fr_array[bal_ind[1,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,0,:] = fr_array[bal_ind[2,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,1,:] = fr_array[bal_ind[3,:].astype(int),:,:]
 
 	x_avg_shaped = np.mean(bal_fr_shaped,axis=0)
 	
@@ -268,10 +258,10 @@ for region_key,region_val in all_dict.iteritems():
         
         all_avg,all_bal = sort_and_avg(all_fr,sort_dict)
         del all_fr
-        [bal_cond,N,R,P,D,T] = np.shape(all_bal)
-	print 'N= %s, R= %s, P= %s, D= %s, T= %s, bal_cond= %s' %(N,R,P,D,T,bal_cond)
+        [bal_cond,N,R,P,T] = np.shape(all_bal)
+	print 'N= %s, R= %s, P= %s, T= %s, bal_cond= %s' %(N,R,P,T,bal_cond)
 
-        join_comb = {'dt':['d','dt'],'pt':['p','pt'],'pdt':['pd','pdt'],'rt':['r','rt'],'rpt':['rp','rpt'],'rdt':['rd','rdt'],'rpdt':['rpd','rpdt']}
+        join_comb = {'pt':['p','pt'],'rt':['r','rt'],'rpt':['rp','rpt']}
 
 	######### from test ########
 	dpca = dPCA.dPCA(labels='rpdt',regularizer='auto',n_components = 15,join=join_comb)
@@ -290,8 +280,8 @@ for region_key,region_val in all_dict.iteritems():
 	tot_bins = (bfr_bins+aft_bins)*2
 	my_ticks_num = np.arange(0,tot_bins*7/6,tot_bins/6)
 	
-	labels = ['r0p0 succ','rxp0 succ','r0px succ','rxpx succ','r0p0 fail','rxp0 fail','r0px fail','rxpx fail']
-	colors = ['black','green','maroon','blue','black','green','maroon','blue']
+	labels = ['r0p0','rxp0','r0px','rxpx']
+	colors = ['black','green','maroon','blue']
         
         print 'plotting'
 	for comb_ind,comb_val in Z.iteritems():
@@ -300,16 +290,11 @@ for region_key,region_val in all_dict.iteritems():
 		for i in range(components_plot):
 			plt.subplot(components_plot/2,2,i+1)
 				
-			line0 = plt.plot(bins,Z[comb_ind][i,0,0,1,:],label=labels[0],color=colors[0])
-			line1 = plt.plot(bins,Z[comb_ind][i,1,0,1,:],label=labels[1],color=colors[1])
-			line2 = plt.plot(bins,Z[comb_ind][i,0,1,1,:],label=labels[2],color=colors[2])
-			line3 = plt.plot(bins,Z[comb_ind][i,1,1,1,:],label=labels[3],color=colors[3])
-
-			line4 = plt.plot(bins,Z[comb_ind][i,0,0,0,:],label=labels[4],color=colors[4],linestyle=':')
-			line5 = plt.plot(bins,Z[comb_ind][i,1,0,0,:],label=labels[5],color=colors[5],linestyle=':')
-			line6 = plt.plot(bins,Z[comb_ind][i,0,1,0,:],label=labels[6],color=colors[6],linestyle=':')
-			line7 = plt.plot(bins,Z[comb_ind][i,1,1,0,:],label=labels[7],color=colors[7],linestyle=':')
-			lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5,line6,line7)))
+			line0 = plt.plot(bins,Z[comb_ind][i,0,0,:],label=labels[0],color=colors[0])
+			line1 = plt.plot(bins,Z[comb_ind][i,1,0,:],label=labels[1],color=colors[1])
+			line3 = plt.plot(bins,Z[comb_ind][i,0,0,:],label=labels[2],color=colors[2])
+			line4 = plt.plot(bins,Z[comb_ind][i,1,0,:],label=labels[3],color=colors[3])
+			lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
 			
 			plt.axvline(x=bfr_bins,color='g',linestyle='--')
 			plt.axvline(x=bfr_bins+aft_bins,color='k')
@@ -323,23 +308,19 @@ for region_key,region_val in all_dict.iteritems():
 		plt.rcParams['xtick.labelsize'] = 8
 		plt.rcParams['ytick.labelsize'] = 8
 		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
-		plt.savefig('component_binaryrp_%s_%s_1' %(region_key,comb_ind))
+		plt.savefig('component_binaryrp_nod_%s_%s_1' %(region_key,comb_ind))
 		plt.clf()
 
                 #plot 2
+		ax = plt.gca()
 		for i in range(components_plot):
 			plt.subplot(components_plot/2,2,i+1)
 				
-			line0 = plt.plot(bins,Z[comb_ind][i+components_plot,0,0,1,:],label=labels[0],color=colors[0])
-			line1 = plt.plot(bins,Z[comb_ind][i+components_plot,1,0,1,:],label=labels[1],color=colors[1])
-			line2 = plt.plot(bins,Z[comb_ind][i+components_plot,0,1,1,:],label=labels[2],color=colors[2])
-			line3 = plt.plot(bins,Z[comb_ind][i+components_plot,1,1,1,:],label=labels[3],color=colors[3])
-
-			line4 = plt.plot(bins,Z[comb_ind][i+components_plot,0,0,0,:],label=labels[4],color=colors[4],linestyle=':')
-			line5 = plt.plot(bins,Z[comb_ind][i+components_plot,1,0,0,:],label=labels[5],color=colors[5],linestyle=':')
-			line6 = plt.plot(bins,Z[comb_ind][i+components_plot,0,1,0,:],label=labels[6],color=colors[6],linestyle=':')
-			line7 = plt.plot(bins,Z[comb_ind][i+components_plot,1,1,0,:],label=labels[7],color=colors[7],linestyle=':')
-			lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5,line6,line7)))
+			line0 = plt.plot(bins,Z[comb_ind][i+components_plot,0,0,:],label=labels[0],color=colors[0])
+			line1 = plt.plot(bins,Z[comb_ind][i+components_plot,1,0,:],label=labels[1],color=colors[1])
+			line3 = plt.plot(bins,Z[comb_ind][i+components_plot,0,0,:],label=labels[2],color=colors[2])
+			line4 = plt.plot(bins,Z[comb_ind][i+components_plot,1,0,:],label=labels[3],color=colors[3])
+			lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
 			
 			plt.axvline(x=bfr_bins,color='g',linestyle='--')
 			plt.axvline(x=bfr_bins+aft_bins,color='k')
@@ -353,23 +334,19 @@ for region_key,region_val in all_dict.iteritems():
 		plt.rcParams['xtick.labelsize'] = 8
 		plt.rcParams['ytick.labelsize'] = 8
 		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
-		plt.savefig('component_binaryrp_%s_%s_2' %(region_key,comb_ind))
+		plt.savefig('component_binaryrp_nod_%s_%s_2' %(region_key,comb_ind))
 		plt.clf()
-
+                
                 #plot 3
+		ax = plt.gca()
 		for i in range(components_plot):
 			plt.subplot(components_plot/2,2,i+1)
 				
-			line0 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,0,1,:],label=labels[0],color=colors[0])
-			line1 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,0,1,:],label=labels[1],color=colors[1])
-			line2 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,1,1,:],label=labels[2],color=colors[2])
-			line3 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,1,1,:],label=labels[3],color=colors[3])
-
-			line4 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,0,0,:],label=labels[4],color=colors[4],linestyle=':')
-			line5 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,0,0,:],label=labels[5],color=colors[5],linestyle=':')
-			line6 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,1,0,:],label=labels[6],color=colors[6],linestyle=':')
-			line7 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,1,0,:],label=labels[7],color=colors[7],linestyle=':')
-			lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5,line6,line7)))
+			line0 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,0,:],label=labels[0],color=colors[0])
+			line1 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,0,:],label=labels[1],color=colors[1])
+			line3 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,0,:],label=labels[2],color=colors[2])
+			line4 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,0,:],label=labels[3],color=colors[3])
+			lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
 			
 			plt.axvline(x=bfr_bins,color='g',linestyle='--')
 			plt.axvline(x=bfr_bins+aft_bins,color='k')
@@ -383,23 +360,19 @@ for region_key,region_val in all_dict.iteritems():
 		plt.rcParams['xtick.labelsize'] = 8
 		plt.rcParams['ytick.labelsize'] = 8
 		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
-		plt.savefig('component_binaryrp_%s_%s_3' %(region_key,comb_ind))
+		plt.savefig('component_binaryrp_nod_%s_%s_3' %(region_key,comb_ind))
 		plt.clf()
-
+                
                 #plot 4
+		ax = plt.gca()
 		for i in range(components_plot-1):
 			plt.subplot(components_plot/2,2,i+1)
 				
-			line0 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,0,1,:],label=labels[0],color=colors[0])
-			line1 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,0,1,:],label=labels[1],color=colors[1])
-			line2 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,1,1,:],label=labels[2],color=colors[2])
-			line3 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,1,1,:],label=labels[3],color=colors[3])
-
-			line4 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,0,0,:],label=labels[4],color=colors[4],linestyle=':')
-			line5 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,0,0,:],label=labels[5],color=colors[5],linestyle=':')
-			line6 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,1,0,:],label=labels[6],color=colors[6],linestyle=':')
-			line7 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,1,0,:],label=labels[7],color=colors[7],linestyle=':')
-			lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5,line6,line7)))
+			line0 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,0,:],label=labels[0],color=colors[0])
+			line1 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,0,:],label=labels[1],color=colors[1])
+			line3 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,0,:],label=labels[2],color=colors[2])
+			line4 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,0,:],label=labels[3],color=colors[3])
+			lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
 			
 			plt.axvline(x=bfr_bins,color='g',linestyle='--')
 			plt.axvline(x=bfr_bins+aft_bins,color='k')
@@ -413,8 +386,10 @@ for region_key,region_val in all_dict.iteritems():
 		plt.rcParams['xtick.labelsize'] = 8
 		plt.rcParams['ytick.labelsize'] = 8
 		plt.suptitle('Region %s, comb ind = %s' %(region_key,comb_ind))
-		plt.savefig('component_binaryrp_%s_%s_4' %(region_key,comb_ind))
+		plt.savefig('component_binaryrp_nod_%s_%s_4' %(region_key,comb_ind))
 		plt.clf()
+
+
 
 
         print 'analysis'
@@ -429,7 +404,7 @@ for region_key,region_val in all_dict.iteritems():
 		
 			
 	#all_dict[region_key]['dpca_results'] = dpca_results
-        np.save('dpca_results_binaryrp_%s.npy' %(region_key),dpca_results)
+        np.save('dpca_results_binaryrp_nod_%s.npy' %(region_key),dpca_results)
         all_dict[region_key] = {}
 
 #all_dict['sort_dict'] = sort_dict

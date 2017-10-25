@@ -24,7 +24,7 @@ from scipy import ndimage
 #params to set ########
 #######################
 
-bin_size = 1 #in ms
+bin_size = 10 #in ms
 time_before = -0.5 #negative value
 time_after = 1.0
 baseline_time = -1.0 #negative value
@@ -35,8 +35,8 @@ mv_bool = True
 zscore = False
 abs_alphabeta = False
 
-gaussian_bool = False
-gauss_sigma = 50
+gaussian_bool = True
+gauss_sigma = 30
 
 ts_filename = glob.glob('Extracted*_timestamps.mat')[0]
 extracted_filename = ts_filename[:-15] + '.mat'

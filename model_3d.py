@@ -984,6 +984,56 @@ elif extracted_filename == 'Extracted_0059_2017-02-09-12-52-17.mat':
 elif extracted_filename == 'Extracted_0059_2017-02-09-13-46-37.mat':
 	np.save('master_fr_dict_0_9_2.npy',master_fr_dict)
 
+
+elif extracted_filename == 'Extracted_0059_2017-03-09-13-47-33.mat':
+        np.save('master_fr_dict_0_9_1.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_0059_2017-03-09-14-12-52.mat':
+        np.save('master_fr_dict_0_9_2.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_0059_2017-03-09-14-36-42.mat':
+        np.save('master_fr_dict_0_9_3.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_0059_2017-03-10-13-38-52.mat':
+        np.save('master_fr_dict_0_10_1.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_0059_2017-03-10-13-54-44.mat':
+        np.save('master_fr_dict_0_10_2.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_0059_2017-03-10-14-21-33.mat':
+        np.save('master_fr_dict_0_10_3.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_0059_2017-03-13-14-26-36.mat':
+        np.save('master_fr_dict_0_13_1.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_0059_2017-03-13-14-54-09.mat':
+        np.save('master_fr_dict_0_13_2.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_0059_2017-03-13-15-24-14.mat':
+        np.save('master_fr_dict_0_13_3.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_0059_2017-03-14-14-15-04.mat':
+        np.save('master_fr_dict_0_14_1.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_0059_2017-03-14-14-51-42.mat':
+        np.save('master_fr_dict_0_14_2.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_0059_2017-03-14-15-17-37.mat':
+        np.save('master_fr_dict_0_14_3.npy',master_fr_dict)
+
+elif extracted_filename == 'Extracted_504_2017-03-09-12-38-12.mat':
+        np.save('master_fr_dict_5_9_1.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-03-09-13-01-02.mat':
+        np.save('master_fr_dict_5_9_2.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-03-10-12-21-53.mat':
+        np.save('master_fr_dict_5_10_1.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-03-10-12-32-43.mat':
+        np.save('master_fr_dict_5_10_2.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-03-10-12-56-45.mat':
+        np.save('master_fr_dict_5_10_3.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-03-13-12-50-41.mat':
+        np.save('master_fr_dict_5_13_1.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-03-13-13-16-32.mat':
+        np.save('master_fr_dict_5_13_2.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-03-13-13-42-37.mat':
+        np.save('master_fr_dict_5_13_3.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-03-14-12-43-43.mat':
+        np.save('master_fr_dict_5_14_1.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-03-14-13-09-46.mat':
+        np.save('master_fr_dict_5_14_2.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2017-03-14-13-36-38.mat':
+        np.save('master_fr_dict_5_14_3.npy',master_fr_dict)
+
+
 else:
 	np.save('master_fr_dict.npy',master_fr_dict)
 

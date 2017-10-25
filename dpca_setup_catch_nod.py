@@ -28,7 +28,7 @@ import dPCA_new as dPCA
 #params to set ########
 #######################
 
-do_sig_analysis = True
+do_sig_analysis = False
 
 
 
@@ -40,13 +40,14 @@ def sort_and_avg(fr_array,sort_dict):
 
 	R = len(sort_dict['r_stim'].keys())
 	P= len(sort_dict['p_stim'].keys())	
-	Q = len(sort_dict['q_result'].keys())
+	#Q = len(sort_dict['q_result'].keys())
+        C = len(sort_dict['catch_result'].keys())
 	K = np.shape(fr_array)[0]
 	N = np.shape(fr_array)[1]
 	T = np.shape(fr_array)[2]
 
 	count = 0
-	trial_comb = np.zeros((R*P*Q,K))
+	trial_comb = np.zeros((R*P*C,K))
 	for r in range(R):
 		if r == 0:
 			r_trials = sort_dict['r_stim']['r0']
@@ -59,27 +60,34 @@ def sort_and_avg(fr_array,sort_dict):
 			elif p == 1:
 				p_trials = sort_dict['p_stim']['px']
 
-			for q in range(Q):
-				if q == 0:
-					q_trials = sort_dict['q_result']['fail_trials']
-				elif q == 1:
-					q_trials = sort_dict['q_result']['succ_trials']
-
-				combined = ()
-				for k in range(K):
-					if k in r_trials and k in p_trials and k in q_trials:
-						combined = np.append(combined,k)
+                
+                        for c in range(C):
+                                if c == 0:
+                                        c_trials = sort_dict['catch_result']['catch_0']
+                                elif c == 1:
+                                        c_trials = sort_dict['catch_result']['catch_r']
+                                #elif c == 2:
+                                #        c_trials = sort_dict['catch_result']['catch_p']
+                                        
+                                combined = ()
+                                for k in range(K):
+                                        if k in r_trials and k in p_trials and c in c_trials:
+                                                combined = np.append(combined,k)
                                 #pdb.set_trace()
-				trial_comb[count,0:combined.size] = combined
-				count += 1
-				
+                                trial_comb[count,0:np.shape(combined)[0]] = combined
+                                count += 1
+
+        #pdb.set_trace()
 	min_trial_size = K
 	for i in range(np.shape(trial_comb)[0]):
 		temp = np.size(np.nonzero(trial_comb[i]))
 		if temp < min_trial_size:
 			min_trial_size = temp
 
-	bal_fr_shaped = np.zeros((min_trial_size,N,R,P,Q,T))
+        if min_trial_size == 0:
+                pdb.set_trace()
+
+	bal_fr_shaped = np.zeros((min_trial_size,N,R,P,C,T))
 	bal_ind = np.zeros((np.shape(trial_comb)[0],min_trial_size))
 	
 	for i in range(np.shape(trial_comb)[0]):
@@ -89,14 +97,22 @@ def sort_and_avg(fr_array,sort_dict):
 			bal_ind[i,:] = trial_comb[i,:][np.nonzero(trial_comb[i,:])]
 
 
-	bal_fr_shaped[:,:,0,0,0,:] = fr_array[bal_ind[0,:].astype(int),:,:]
-	bal_fr_shaped[:,:,0,0,1,:] = fr_array[bal_ind[1,:].astype(int),:,:]
-	bal_fr_shaped[:,:,0,1,0,:] = fr_array[bal_ind[2,:].astype(int),:,:]
-	bal_fr_shaped[:,:,0,1,1,:] = fr_array[bal_ind[3,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,0,0,:] = fr_array[bal_ind[4,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,0,1,:] = fr_array[bal_ind[5,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,1,0,:] = fr_array[bal_ind[6,:].astype(int),:,:]
-	bal_fr_shaped[:,:,1,1,1,:] = fr_array[bal_ind[7,:].astype(int),:,:]
+	#bal_fr_shaped[:,:,0,0,0,:] = fr_array[bal_ind[0,:].astype(int),:,:]
+	#bal_fr_shaped[:,:,0,0,1,:] = fr_array[bal_ind[1,:].astype(int),:,:]
+	#bal_fr_shaped[:,:,0,0,2,:] = fr_array[bal_ind[2,:].astype(int),:,:]
+	bal_fr_shaped[:,:,0,1,0,:] = fr_array[bal_ind[3,:].astype(int),:,:]
+	#bal_fr_shaped[:,:,0,1,1,:] = fr_array[bal_ind[4,:].astype(int),:,:]
+	bal_fr_shaped[:,:,0,1,2,:] = fr_array[bal_ind[5,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,0,0,:] = fr_array[bal_ind[6,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,0,1,:] = fr_array[bal_ind[7,:].astype(int),:,:]
+	#bal_fr_shaped[:,:,1,0,2,:] = fr_array[bal_ind[8,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,1,0,:] = fr_array[bal_ind[9,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,1,1,:] = fr_array[bal_ind[10,:].astype(int),:,:]
+	bal_fr_shaped[:,:,1,1,2,:] = fr_array[bal_ind[11,:].astype(int),:,:]
+
+
+
+        #pdb.set_trace()
 
 	x_avg_shaped = np.mean(bal_fr_shaped,axis=0)
 	
@@ -211,11 +227,11 @@ all_dict['PmD']['PmD_fr_dict'] = {'bfr_cue':PmD_bfr_cue_all,'aft_cue':PmD_aft_cu
 condensed = condensed_all
 
 #condensed: col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum, 5 = succ(1) / fail(-1), 6 = value, 7 = motivation
-new_condensed = np.zeros((np.shape(condensed)[0],8))
-new_condensed[:,0:6] = condensed
-new_condensed[:,6] = new_condensed[:,3] - new_condensed[:,4]
-new_condensed[:,7] = new_condensed[:,3] + new_condensed[:,4]
-condensed = new_condensed
+#new_condensed = np.zeros((np.shape(condensed)[0],8))
+#new_condensed[:,0:6] = condensed
+#new_condensed[:,6] = new_condensed[:,3] - new_condensed[:,4]
+#new_condensed[:,7] = new_condensed[:,3] + new_condensed[:,4]
+#condensed = new_condensed
 
 #stim = S
 #for now seperate into all-R, no-R, no-P, and all-P, so four combinations
@@ -243,14 +259,15 @@ succ_trials = np.squeeze(np.where(condensed[:,5] == 1))
 fail_trials = np.squeeze(np.where(condensed[:,5] == -1))
 q_result = {'succ_trials':np.asarray(succ_trials),'fail_trials':np.asarray(fail_trials)}
 
-sort_dict = {'q_result':q_result,'r_stim':r_stim,'p_stim':p_stim,'condensed':condensed}
+catch_0 = np.squeeze(np.where(condensed[:,6] == 0))
+catch_r = np.squeeze(np.where(condensed[:,6] == 1))
+catch_p = np.squeeze(np.where(condensed[:,6] == 2))
+catch_result = {'catch_0':catch_0,'catch_r':catch_r,'catch_p':catch_p}
+
+sort_dict = {'q_result':q_result,'r_stim':r_stim,'p_stim':p_stim,'catch_result':catch_result,'condensed':condensed}
+
 
 for region_key,region_val in all_dict.iteritems():
-        #if region_key == 'S1':
-        #        continue
-        #elif region_key == 'PmD':
-        #        continue
-
 	print 'running region: %s' %(region_key)
 	fr_dict_str = '%s_fr_dict' %(region_key)
 
