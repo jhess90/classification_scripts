@@ -245,6 +245,10 @@ q_result = {'succ_trials':np.asarray(succ_trials),'fail_trials':np.asarray(fail_
 
 sort_dict = {'q_result':q_result,'r_stim':r_stim,'p_stim':p_stim,'condensed':condensed}
 
+#only run certain regions
+#del all_dict['PmD']
+
+
 for region_key,region_val in all_dict.iteritems():
         #if region_key == 'S1':
         #        continue
