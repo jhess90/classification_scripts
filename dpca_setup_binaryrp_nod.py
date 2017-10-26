@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 
 #dPCA, based on Kobak et al 2016
@@ -264,7 +265,7 @@ for region_key,region_val in all_dict.iteritems():
         join_comb = {'pt':['p','pt'],'rt':['r','rt'],'rpt':['rp','rpt']}
 
 	######### from test ########
-	dpca = dPCA.dPCA(labels='rpdt',regularizer='auto',n_components = 15,join=join_comb)
+	dpca = dPCA.dPCA(labels='rpt',regularizer='auto',n_components = 15,join=join_comb)
 	dpca.protect = ['t']
 	Z = dpca.fit_transform(all_avg,all_bal)
         if not do_sig_analysis:
@@ -292,8 +293,8 @@ for region_key,region_val in all_dict.iteritems():
 				
 			line0 = plt.plot(bins,Z[comb_ind][i,0,0,:],label=labels[0],color=colors[0])
 			line1 = plt.plot(bins,Z[comb_ind][i,1,0,:],label=labels[1],color=colors[1])
-			line3 = plt.plot(bins,Z[comb_ind][i,0,0,:],label=labels[2],color=colors[2])
-			line4 = plt.plot(bins,Z[comb_ind][i,1,0,:],label=labels[3],color=colors[3])
+			line2 = plt.plot(bins,Z[comb_ind][i,0,1,:],label=labels[2],color=colors[2])
+			line3 = plt.plot(bins,Z[comb_ind][i,1,1,:],label=labels[3],color=colors[3])
 			lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
 			
 			plt.axvline(x=bfr_bins,color='g',linestyle='--')
@@ -318,8 +319,8 @@ for region_key,region_val in all_dict.iteritems():
 				
 			line0 = plt.plot(bins,Z[comb_ind][i+components_plot,0,0,:],label=labels[0],color=colors[0])
 			line1 = plt.plot(bins,Z[comb_ind][i+components_plot,1,0,:],label=labels[1],color=colors[1])
-			line3 = plt.plot(bins,Z[comb_ind][i+components_plot,0,0,:],label=labels[2],color=colors[2])
-			line4 = plt.plot(bins,Z[comb_ind][i+components_plot,1,0,:],label=labels[3],color=colors[3])
+			line2 = plt.plot(bins,Z[comb_ind][i+components_plot,0,1,:],label=labels[2],color=colors[2])
+			line3 = plt.plot(bins,Z[comb_ind][i+components_plot,1,1,:],label=labels[3],color=colors[3])
 			lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
 			
 			plt.axvline(x=bfr_bins,color='g',linestyle='--')
@@ -344,8 +345,8 @@ for region_key,region_val in all_dict.iteritems():
 				
 			line0 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,0,:],label=labels[0],color=colors[0])
 			line1 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,0,:],label=labels[1],color=colors[1])
-			line3 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,0,:],label=labels[2],color=colors[2])
-			line4 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,0,:],label=labels[3],color=colors[3])
+			line2 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,1,:],label=labels[2],color=colors[2])
+			line3 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,1,:],label=labels[3],color=colors[3])
 			lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
 			
 			plt.axvline(x=bfr_bins,color='g',linestyle='--')
@@ -370,8 +371,8 @@ for region_key,region_val in all_dict.iteritems():
 				
 			line0 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,0,:],label=labels[0],color=colors[0])
 			line1 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,0,:],label=labels[1],color=colors[1])
-			line3 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,0,:],label=labels[2],color=colors[2])
-			line4 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,0,:],label=labels[3],color=colors[3])
+			line2 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,1,:],label=labels[2],color=colors[2])
+			line3 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,1,:],label=labels[3],color=colors[3])
 			lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
 			
 			plt.axvline(x=bfr_bins,color='g',linestyle='--')
