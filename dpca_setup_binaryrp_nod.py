@@ -29,7 +29,7 @@ import dPCA_new as dPCA
 #params to set ########
 #######################
 
-do_sig_analysis = False
+do_sig_analysis = True
 
 
 
@@ -39,6 +39,8 @@ do_sig_analysis = False
 ###############################
 def sort_and_avg(fr_array,sort_dict):
 
+        fr_array = np.float32(fr_array)
+        
 	R = len(sort_dict['r_stim'].keys())
 	P= len(sort_dict['p_stim'].keys())	
 	Q = len(sort_dict['q_result'].keys())
@@ -74,6 +76,10 @@ def sort_and_avg(fr_array,sort_dict):
 		if temp < min_trial_size:
 			min_trial_size = temp
 
+        #creates memory error if too large
+        if min_trial_size > 300:
+                min_trial_size = 300
+                        
 	bal_fr_shaped = np.zeros((min_trial_size,N,R,P,T))
 	bal_ind = np.zeros((np.shape(trial_comb)[0],min_trial_size))
 	
@@ -259,6 +265,9 @@ for region_key,region_val in all_dict.iteritems():
         
         all_avg,all_bal = sort_and_avg(all_fr,sort_dict)
         del all_fr
+        #all_bal = np.float32(all_bal)
+        #all_avg = np.float32(all_avg)
+
         [bal_cond,N,R,P,T] = np.shape(all_bal)
 	print 'N= %s, R= %s, P= %s, T= %s, bal_cond= %s' %(N,R,P,T,bal_cond)
 
