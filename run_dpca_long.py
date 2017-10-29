@@ -8,14 +8,15 @@
 
 cd /home/jack/Dropbox/dpca/new/all_alt_cue/0059/nod/
 pwd
-python /home/jack/classification_scripts/dpca_setup_binaryrp_nod.py
-python /home/jack/classification_scripts/analyze_dpca_nod.py
+python /home/jack/workspace/classification_scripts/dpca_setup_binaryrp_nod.py
+python /home/jack/workspace/classification_scripts/analyze_dpca_nod.py
 
 cd /home/jack/Dropbox/dpca/new/all_alt_cue/504/nod/
 pwd
-python /home/jack/classification_scripts/dpca_setup_binaryrp_nod.py
-python /home/jack/classification_scripts/analyze_dpca_nod.py
+python /home/jack/workspace/classification_scripts/dpca_setup_binaryrp_nod.py
+python /home/jack/workspace/classification_scripts/analyze_dpca_nod.py
 
+"""
 cd /home/jack/Dropbox/dpca/new/uncued/gaus30_bin10/0059/nod/
 pwd
 python /home/jack/classification_scripts/dpca_setup_binaryrp_nod.py
@@ -52,7 +53,7 @@ pwd
 python /home/jack/classification_scripts/dpca_setup_binaryrp.py
 python /home/jack/classification_scripts/analyze_dpca.py
 
-
+"""
 
 exec bash
 
