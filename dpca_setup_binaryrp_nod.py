@@ -242,7 +242,7 @@ q_result = {'succ_trials':np.asarray(succ_trials),'fail_trials':np.asarray(fail_
 sort_dict = {'q_result':q_result,'r_stim':r_stim,'p_stim':p_stim,'condensed':condensed}
 
 #run only certain regions
-del all_dict['PmD']
+#del all_dict['PmD']
 
 
 for region_key,region_val in all_dict.iteritems():
@@ -417,7 +417,18 @@ for region_key,region_val in all_dict.iteritems():
 		
 			
 	#all_dict[region_key]['dpca_results'] = dpca_results
-        np.save('dpca_results_binaryrp_nod_%s.npy' %(region_key),dpca_results)
+        try:
+                np.save('dpca_results_binaryrp_nod_%s.npy' %(region_key),dpca_results)
+        except:
+                np.save('dpca_results_binaryrp_nod_%s_Z.npy' %(region_key),Z)
+                np.save('dpca_results_binaryrp_nod_%s_explained_var.npy' %(region_key),explained_var)
+                np.save('dpca_results_binaryrp_nod_%s_transformed.npy' %(region_key),transformed)
+                np.save('dpca_results_binaryrp_nod_%s_all_avg.npy' %(region_key),all_avg)
+                if do_sig_analysis:
+                        np.save('dpca_results_binaryrp_nod_%s_sig_analysis.npy' %(region_key),sig_analysis)
+                        np.save('dpca_results_binaryrp_nod_%s_all_bal.npy' %(region_key),all_bal)
+
+
         all_dict[region_key] = {}
 
 #all_dict['sort_dict'] = sort_dict

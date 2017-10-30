@@ -24,8 +24,14 @@ import matplotlib.pyplot as plt
 data={}
 data['M1'] = np.load('dpca_results_binaryrp_nod_M1.npy')[()]
 data['S1'] = np.load('dpca_results_binaryrp_nod_S1.npy')[()]
-data['PmD'] = np.load('dpca_results_binaryrp_nod_PmD.npy')[()]
-
+try:
+        data['PmD'] = np.load('dpca_results_binaryrp_nod_PmD.npy')[()]
+except:
+        explained_var = np.load('dpca_results_binaryrp_nod_PmD_explained_var.npy')[()]
+        sig_analysis = np.load('dpca_results_binaryrp_nod_PmD_sig_analysis.npy')[()]
+        data['PmD'] = {}
+        data['PmD']['explained_var'] = explained_var
+        data['PmD']['sig_analysis'] = sig_analysis
 
 variance_workbook = xlsxwriter.Workbook('perc_variance.xlsx',options={'nan_inf_to_errors':True})
 i=0

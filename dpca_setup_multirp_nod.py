@@ -28,7 +28,7 @@ import dPCA_new as dPCA
 #params to set ########
 #######################
 
-do_sig_analysis = False
+do_sig_analysis = True
 
 
 
