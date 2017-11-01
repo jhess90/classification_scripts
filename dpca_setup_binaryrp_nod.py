@@ -13,6 +13,10 @@ import sys
 import xlsxwriter
 import glob
 from scipy.optimize import curve_fit
+
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 import pandas as pd
@@ -22,6 +26,7 @@ import scipy.stats as stats
 from scipy.ndimage.filters import gaussian_filter
 from sklearn.decomposition import PCA
 import dPCA_new as dPCA
+
 
 
 #######################

@@ -6,6 +6,10 @@ import pdb
 import sys
 import xlsxwriter
 import glob
+
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 
 
