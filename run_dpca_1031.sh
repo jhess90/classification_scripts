@@ -1,13 +1,13 @@
 #!/bin/sh
 
-cd /home/jack/Dropbox/dpca/new/all_alt_cue/0059/nod/
-pwd
+#cd /home/jack/Dropbox/dpca/new/all_alt_cue/0059/nod/
+#pwd
 #python /home/jack/classification_scripts/dpca_setup_binaryrp_nod.py
 #python /home/jack/classification_scripts/analyze_dpca_nod.py
 #Rscript /home/jack/classification_scripts/dpca_plot_analysis_nod.R
 
-#cd /home/jack/Dropbox/dpca/new/all_alt_cue/0059/mv/
-#pwd
+cd /home/jack/Dropbox/dpca/new/all_alt_cue/0059/mv/
+pwd
 #python /home/jack/classification_scripts/dpca_setup_alt_multi_m.py
 #python /home/jack/classification_scripts/analyze_dpca_m.py
 #Rscript /home/jack/classification_scripts/dpca_plot_analysis_m.R
