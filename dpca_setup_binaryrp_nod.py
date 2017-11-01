@@ -243,7 +243,8 @@ sort_dict = {'q_result':q_result,'r_stim':r_stim,'p_stim':p_stim,'condensed':con
 
 #run only certain regions
 #del all_dict['PmD']
-
+del all_dict['M1']
+#del all_dict['S1']
 
 for region_key,region_val in all_dict.iteritems():
         #if region_key == 'S1':
