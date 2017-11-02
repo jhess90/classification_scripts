@@ -32,7 +32,7 @@ import dPCA_new as dPCA
 #params to set ########
 #######################
 
-do_sig_analysis = True
+do_sig_analysis = False
 run_motiv = False
 run_value = True
 
@@ -70,18 +70,13 @@ def sort_and_avg(fr_array,sort_dict):
                                 i_trials = sort_dict['index']['m2']
 
                 elif run_value:
-                        if i == 0:
+                        if i == 1:
                                 i_trials = sort_dict['index']['v_1']
-                        elif i == 1:
-                                i_trials = sort_dict['index']['v0']
                         elif i == 2:
+                                i_trials = sort_dict['index']['v0']
+                        elif i == 3:
                                 i_trials = sort_dict['index']['v1']
-                        else:
-                                pdb.set_trace()
-                else:
-                        pdb.set_trace()
-
-			        
+			
 
 		for q in range(Q):
 			if q == 0:
@@ -339,7 +334,7 @@ for region_key,region_val in all_dict.iteritems():
     elif run_value:
             labels = ['v_1_f','v_1_s','v0_f','v0_s','v1_f','v1_s']
 
-    colors = ['indigo','indigo','darkblue','darkblue','crimson','crimson']
+    colors = ['darkblue','darkblue','darkgreen','darkgreen','crimson','crimson']
     
     print 'plotting'
 
@@ -350,12 +345,12 @@ for region_key,region_val in all_dict.iteritems():
         for i in range(components_plot):
             plt.subplot(components_plot/2,2,i+1)
 
-            line0 = plt.plot(bins,Z[comb_ind][i,0,0,:],label=labels[0],color=colors[0])
-            line1 = plt.plot(bins,Z[comb_ind][i,0,1,:],label=labels[1],color=colors[1],linestyle='--')
-            line2 = plt.plot(bins,Z[comb_ind][i,1,0,:],label=labels[2],color=colors[2])
-            line3 = plt.plot(bins,Z[comb_ind][i,1,1,:],label=labels[3],color=colors[3],linestyle='--')
-            line4 = plt.plot(bins,Z[comb_ind][i,2,0,:],label=labels[4],color=colors[4])
-            line5 = plt.plot(bins,Z[comb_ind][i,2,1,:],label=labels[5],color=colors[5],linestyle='--')
+            line0 = plt.plot(bins,Z[comb_ind][i,0,0,:],label=labels[0],color=colors[0],linestyle='--')
+            line1 = plt.plot(bins,Z[comb_ind][i,0,1,:],label=labels[1],color=colors[1])
+            line2 = plt.plot(bins,Z[comb_ind][i,1,0,:],label=labels[2],color=colors[2],linestyle='--')
+            line3 = plt.plot(bins,Z[comb_ind][i,1,1,:],label=labels[3],color=colors[3])
+            line4 = plt.plot(bins,Z[comb_ind][i,2,0,:],label=labels[4],color=colors[4],linestyle='--')
+            line5 = plt.plot(bins,Z[comb_ind][i,2,1,:],label=labels[5],color=colors[5])
 
             lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5)))
             
@@ -386,12 +381,12 @@ for region_key,region_val in all_dict.iteritems():
         for i in range(components_plot):
             plt.subplot(components_plot/2,2,i+1)
 
-            line0 = plt.plot(bins,Z[comb_ind][i+1*components_plot,0,0,:],label=labels[0],color=colors[0])
-            line1 = plt.plot(bins,Z[comb_ind][i+1*components_plot,0,1,:],label=labels[1],color=colors[1],linestyle='--')
-            line2 = plt.plot(bins,Z[comb_ind][i+1*components_plot,1,0,:],label=labels[2],color=colors[2])
-            line3 = plt.plot(bins,Z[comb_ind][i+1*components_plot,1,1,:],label=labels[3],color=colors[3],linestyle='--')
-            line4 = plt.plot(bins,Z[comb_ind][i+1*components_plot,2,0,:],label=labels[4],color=colors[4])
-            line5 = plt.plot(bins,Z[comb_ind][i+1*components_plot,2,1,:],label=labels[5],color=colors[5],linestyle='--')
+            line0 = plt.plot(bins,Z[comb_ind][i+1*components_plot,0,0,:],label=labels[0],color=colors[0],linestyle='--')
+            line1 = plt.plot(bins,Z[comb_ind][i+1*components_plot,0,1,:],label=labels[1],color=colors[1])
+            line2 = plt.plot(bins,Z[comb_ind][i+1*components_plot,1,0,:],label=labels[2],color=colors[2],linestyle='--')
+            line3 = plt.plot(bins,Z[comb_ind][i+1*components_plot,1,1,:],label=labels[3],color=colors[3])
+            line4 = plt.plot(bins,Z[comb_ind][i+1*components_plot,2,0,:],label=labels[4],color=colors[4],linestyle='--')
+            line5 = plt.plot(bins,Z[comb_ind][i+1*components_plot,2,1,:],label=labels[5],color=colors[5])
             
             lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5)))
             
@@ -421,12 +416,12 @@ for region_key,region_val in all_dict.iteritems():
         for i in range(components_plot):
             plt.subplot(components_plot/2,2,i+1)
 
-            line0 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,0,:],label=labels[0],color=colors[0])
-            line1 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,1,:],label=labels[1],color=colors[1],linestyle='--')
-            line2 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,0,:],label=labels[2],color=colors[2])
-            line3 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,1,:],label=labels[3],color=colors[3],linestyle='--')
-            line4 = plt.plot(bins,Z[comb_ind][i+2*components_plot,2,0,:],label=labels[4],color=colors[4])
-            line5 = plt.plot(bins,Z[comb_ind][i+2*components_plot,2,1,:],label=labels[5],color=colors[5],linestyle='--')
+            line0 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,0,:],label=labels[0],color=colors[0],linestyle='--')
+            line1 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,1,:],label=labels[1],color=colors[1])
+            line2 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,0,:],label=labels[2],color=colors[2],linestyle='--')
+            line3 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,1,:],label=labels[3],color=colors[3])
+            line4 = plt.plot(bins,Z[comb_ind][i+2*components_plot,2,0,:],label=labels[4],color=colors[4],linestyle='--')
+            line5 = plt.plot(bins,Z[comb_ind][i+2*components_plot,2,1,:],label=labels[5],color=colors[5])
 
             lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5)))
             
@@ -456,12 +451,12 @@ for region_key,region_val in all_dict.iteritems():
         for i in range(components_plot-1):
             plt.subplot(components_plot/2,2,i+1)
 
-            line0 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,0,:],label=labels[0],color=colors[0])
-            line1 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,1,:],label=labels[1],color=colors[1],linestyle='--')
-            line2 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,0,:],label=labels[2],color=colors[2])
-            line3 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,1,:],label=labels[3],color=colors[3],linestyle='--')
-            line4 = plt.plot(bins,Z[comb_ind][i+3*components_plot,2,0,:],label=labels[4],color=colors[4])
-            line5 = plt.plot(bins,Z[comb_ind][i+3*components_plot,2,1,:],label=labels[5],color=colors[5],linestyle='--')
+            line0 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,0,:],label=labels[0],color=colors[0],linestyle='--')
+            line1 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,1,:],label=labels[1],color=colors[1])
+            line2 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,0,:],label=labels[2],color=colors[2],linestyle='--')
+            line3 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,1,:],label=labels[3],color=colors[3])
+            line4 = plt.plot(bins,Z[comb_ind][i+3*components_plot,2,0,:],label=labels[4],color=colors[4],linestyle='--')
+            line5 = plt.plot(bins,Z[comb_ind][i+3*components_plot,2,1,:],label=labels[5],color=colors[5])
             
             lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5)))
             
@@ -495,15 +490,6 @@ for region_key,region_val in all_dict.iteritems():
     else:
         dpca_results = {'Z':Z,'explained_var':explained_var,'transformed':transformed,'all_avg':all_avg} #,'all_bal':all_bal} #too large now
         
-
-    #if run_motiv:
-    #        np.save('dpca_results_multi_m_d_%s.npy' %(region_key),dpca_results)
-    #elif run_value:
-    #        np.save('dpca_results_multi_v_d_%s.npy' %(region_key),dpca_results)
-    #all_dict[region_key] = {}
-
-    #all_dict['sort_dict'] = sort_dict
-    #np.save('dpca_results_binaryrp.npy',all_dict)
 
     if run_motiv:
         try:

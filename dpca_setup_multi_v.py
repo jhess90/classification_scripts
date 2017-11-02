@@ -32,7 +32,7 @@ import dPCA_new as dPCA
 #params to set ########
 #######################
 
-do_sig_analysis = True
+do_sig_analysis = False
 run_motiv = False
 run_value = True
 
@@ -416,20 +416,20 @@ for region_key,region_val in all_dict.iteritems():
         for i in range(components_plot):
             plt.subplot(components_plot/2,2,i+1)
 
-            line0 = plt.plot(bins,Z[comb_ind][i,0,0,:],label=labels[0],color=colors[0])
-            line1 = plt.plot(bins,Z[comb_ind][i,0,1,:],label=labels[1],color=colors[1],linestyle='--')
-            line2 = plt.plot(bins,Z[comb_ind][i,1,0,:],label=labels[2],color=colors[2])
-            line3 = plt.plot(bins,Z[comb_ind][i,1,1,:],label=labels[3],color=colors[3],linestyle='--')
-            line4 = plt.plot(bins,Z[comb_ind][i,2,0,:],label=labels[4],color=colors[4])
-            line5 = plt.plot(bins,Z[comb_ind][i,2,1,:],label=labels[5],color=colors[5],linestyle='--')
-            line6 = plt.plot(bins,Z[comb_ind][i,3,0,:],label=labels[6],color=colors[6])
-            line7 = plt.plot(bins,Z[comb_ind][i,3,1,:],label=labels[7],color=colors[7],linestyle='--')
-            line8 = plt.plot(bins,Z[comb_ind][i,4,0,:],label=labels[8],color=colors[8])
-            line9 = plt.plot(bins,Z[comb_ind][i,4,1,:],label=labels[9],color=colors[9],linestyle='--')
-            line10 = plt.plot(bins,Z[comb_ind][i,5,0,:],label=labels[10],color=colors[10])
-            line11 = plt.plot(bins,Z[comb_ind][i,5,1,:],label=labels[11],color=colors[11],linestyle='--')
-            line12 = plt.plot(bins,Z[comb_ind][i,6,0,:],label=labels[12],color=colors[12])
-            line13 = plt.plot(bins,Z[comb_ind][i,6,1,:],label=labels[13],color=colors[13],linestyle='--')
+            line0 = plt.plot(bins,Z[comb_ind][i,0,0,:],label=labels[0],color=colors[0],linestyle='--')
+            line1 = plt.plot(bins,Z[comb_ind][i,0,1,:],label=labels[1],color=colors[1])
+            line2 = plt.plot(bins,Z[comb_ind][i,1,0,:],label=labels[2],color=colors[2],linestyle='--')
+            line3 = plt.plot(bins,Z[comb_ind][i,1,1,:],label=labels[3],color=colors[3])
+            line4 = plt.plot(bins,Z[comb_ind][i,2,0,:],label=labels[4],color=colors[4],linestyle='--')
+            line5 = plt.plot(bins,Z[comb_ind][i,2,1,:],label=labels[5],color=colors[5])
+            line6 = plt.plot(bins,Z[comb_ind][i,3,0,:],label=labels[6],color=colors[6],linestyle='--')
+            line7 = plt.plot(bins,Z[comb_ind][i,3,1,:],label=labels[7],color=colors[7])
+            line8 = plt.plot(bins,Z[comb_ind][i,4,0,:],label=labels[8],color=colors[8],linestyle='--')
+            line9 = plt.plot(bins,Z[comb_ind][i,4,1,:],label=labels[9],color=colors[9])
+            line10 = plt.plot(bins,Z[comb_ind][i,5,0,:],label=labels[10],color=colors[10],linestyle='--')
+            line11 = plt.plot(bins,Z[comb_ind][i,5,1,:],label=labels[11],color=colors[11])
+            line12 = plt.plot(bins,Z[comb_ind][i,6,0,:],label=labels[12],color=colors[12],linestyle='--')
+            line13 = plt.plot(bins,Z[comb_ind][i,6,1,:],label=labels[13],color=colors[13])
             
             lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5,line6,line7,line8,line9,line10,line11,line12,line13)))
             
@@ -460,20 +460,20 @@ for region_key,region_val in all_dict.iteritems():
         for i in range(components_plot):
             plt.subplot(components_plot/2,2,i+1)
 
-            line0 = plt.plot(bins,Z[comb_ind][i+1*components_plot,0,0,:],label=labels[0],color=colors[0])
-            line1 = plt.plot(bins,Z[comb_ind][i+1*components_plot,0,1,:],label=labels[1],color=colors[1],linestyle='--')
-            line2 = plt.plot(bins,Z[comb_ind][i+1*components_plot,1,0,:],label=labels[2],color=colors[2])
-            line3 = plt.plot(bins,Z[comb_ind][i+1*components_plot,1,1,:],label=labels[3],color=colors[3],linestyle='--')
-            line4 = plt.plot(bins,Z[comb_ind][i+1*components_plot,2,0,:],label=labels[4],color=colors[4])
-            line5 = plt.plot(bins,Z[comb_ind][i+1*components_plot,2,1,:],label=labels[5],color=colors[5],linestyle='--')
-            line6 = plt.plot(bins,Z[comb_ind][i+1*components_plot,3,0,:],label=labels[6],color=colors[6])
-            line7 = plt.plot(bins,Z[comb_ind][i+1*components_plot,3,1,:],label=labels[7],color=colors[7],linestyle='--')
-            line8 = plt.plot(bins,Z[comb_ind][i+1*components_plot,4,0,:],label=labels[8],color=colors[8])
-            line9 = plt.plot(bins,Z[comb_ind][i+1*components_plot,4,1,:],label=labels[9],color=colors[9],linestyle='--')
-            line10 = plt.plot(bins,Z[comb_ind][i+1*components_plot,5,0,:],label=labels[10],color=colors[10])
-            line11 = plt.plot(bins,Z[comb_ind][i+1*components_plot,5,1,:],label=labels[11],color=colors[11],linestyle='--')
-            line12 = plt.plot(bins,Z[comb_ind][i+1*components_plot,6,0,:],label=labels[12],color=colors[12])
-            line13 = plt.plot(bins,Z[comb_ind][i+1*components_plot,6,1,:],label=labels[13],color=colors[13],linestyle='--')
+            line0 = plt.plot(bins,Z[comb_ind][i+1*components_plot,0,0,:],label=labels[0],color=colors[0],linestyle='--')
+            line1 = plt.plot(bins,Z[comb_ind][i+1*components_plot,0,1,:],label=labels[1],color=colors[1])
+            line2 = plt.plot(bins,Z[comb_ind][i+1*components_plot,1,0,:],label=labels[2],color=colors[2],linestyle='--')
+            line3 = plt.plot(bins,Z[comb_ind][i+1*components_plot,1,1,:],label=labels[3],color=colors[3))
+            line4 = plt.plot(bins,Z[comb_ind][i+1*components_plot,2,0,:],label=labels[4],color=colors[4],linestyle='--')
+            line5 = plt.plot(bins,Z[comb_ind][i+1*components_plot,2,1,:],label=labels[5],color=colors[5])
+            line6 = plt.plot(bins,Z[comb_ind][i+1*components_plot,3,0,:],label=labels[6],color=colors[6],linestyle='--')
+            line7 = plt.plot(bins,Z[comb_ind][i+1*components_plot,3,1,:],label=labels[7],color=colors[7])
+            line8 = plt.plot(bins,Z[comb_ind][i+1*components_plot,4,0,:],label=labels[8],color=colors[8],linestyle='--')
+            line9 = plt.plot(bins,Z[comb_ind][i+1*components_plot,4,1,:],label=labels[9],color=colors[9])
+            line10 = plt.plot(bins,Z[comb_ind][i+1*components_plot,5,0,:],label=labels[10],color=colors[10],linestyle='--')
+            line11 = plt.plot(bins,Z[comb_ind][i+1*components_plot,5,1,:],label=labels[11],color=colors[11])
+            line12 = plt.plot(bins,Z[comb_ind][i+1*components_plot,6,0,:],label=labels[12],color=colors[12],linestyle='--')
+            line13 = plt.plot(bins,Z[comb_ind][i+1*components_plot,6,1,:],label=labels[13],color=colors[13])
             
             lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5,line6,line7,line8,line9,line10,line11,line12,line13)))
             
@@ -503,20 +503,20 @@ for region_key,region_val in all_dict.iteritems():
         for i in range(components_plot):
             plt.subplot(components_plot/2,2,i+1)
 
-            line0 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,0,:],label=labels[0],color=colors[0])
-            line1 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,1,:],label=labels[1],color=colors[1],linestyle='--')
-            line2 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,0,:],label=labels[2],color=colors[2])
-            line3 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,1,:],label=labels[3],color=colors[3],linestyle='--')
-            line4 = plt.plot(bins,Z[comb_ind][i+2*components_plot,2,0,:],label=labels[4],color=colors[4])
-            line5 = plt.plot(bins,Z[comb_ind][i+2*components_plot,2,1,:],label=labels[5],color=colors[5],linestyle='--')
-            line6 = plt.plot(bins,Z[comb_ind][i+2*components_plot,3,0,:],label=labels[6],color=colors[6])
-            line7 = plt.plot(bins,Z[comb_ind][i+2*components_plot,3,1,:],label=labels[7],color=colors[7],linestyle='--')
-            line8 = plt.plot(bins,Z[comb_ind][i+2*components_plot,4,0,:],label=labels[8],color=colors[8])
-            line9 = plt.plot(bins,Z[comb_ind][i+2*components_plot,4,1,:],label=labels[9],color=colors[9],linestyle='--')
-            line10 = plt.plot(bins,Z[comb_ind][i+2*components_plot,5,0,:],label=labels[10],color=colors[10])
-            line11 = plt.plot(bins,Z[comb_ind][i+2*components_plot,5,1,:],label=labels[11],color=colors[11],linestyle='--')
-            line12 = plt.plot(bins,Z[comb_ind][i+2*components_plot,6,0,:],label=labels[12],color=colors[12])
-            line13 = plt.plot(bins,Z[comb_ind][i+2*components_plot,6,1,:],label=labels[13],color=colors[13],linestyle='--')
+            line0 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,0,:],label=labels[0],color=colors[0],linestyle='--')
+            line1 = plt.plot(bins,Z[comb_ind][i+2*components_plot,0,1,:],label=labels[1],color=colors[1])
+            line2 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,0,:],label=labels[2],color=colors[2],linestyle='--')
+            line3 = plt.plot(bins,Z[comb_ind][i+2*components_plot,1,1,:],label=labels[3],color=colors[3])
+            line4 = plt.plot(bins,Z[comb_ind][i+2*components_plot,2,0,:],label=labels[4],color=colors[4],linestyle='--')
+            line5 = plt.plot(bins,Z[comb_ind][i+2*components_plot,2,1,:],label=labels[5],color=colors[5])
+            line6 = plt.plot(bins,Z[comb_ind][i+2*components_plot,3,0,:],label=labels[6],color=colors[6],linestyle='--')
+            line7 = plt.plot(bins,Z[comb_ind][i+2*components_plot,3,1,:],label=labels[7],color=colors[7])
+            line8 = plt.plot(bins,Z[comb_ind][i+2*components_plot,4,0,:],label=labels[8],color=colors[8],linestyle='--')
+            line9 = plt.plot(bins,Z[comb_ind][i+2*components_plot,4,1,:],label=labels[9],color=colors[9])
+            line10 = plt.plot(bins,Z[comb_ind][i+2*components_plot,5,0,:],label=labels[10],color=colors[10],linestyle='--')
+            line11 = plt.plot(bins,Z[comb_ind][i+2*components_plot,5,1,:],label=labels[11],color=colors[11])
+            line12 = plt.plot(bins,Z[comb_ind][i+2*components_plot,6,0,:],label=labels[12],color=colors[12],linestyle='--')
+            line13 = plt.plot(bins,Z[comb_ind][i+2*components_plot,6,1,:],label=labels[13],color=colors[13])
 
             lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5,line6,line7,line8,line9,line10,line11,line12,line13)))
             
@@ -546,20 +546,20 @@ for region_key,region_val in all_dict.iteritems():
         for i in range(components_plot-1):
             plt.subplot(components_plot/2,2,i+1)
 
-            line0 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,0,:],label=labels[0],color=colors[0])
-            line1 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,1,:],label=labels[1],color=colors[1],linestyle='--')
-            line2 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,0,:],label=labels[2],color=colors[2])
-            line3 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,1,:],label=labels[3],color=colors[3],linestyle='--')
-            line4 = plt.plot(bins,Z[comb_ind][i+3*components_plot,2,0,:],label=labels[4],color=colors[4])
-            line5 = plt.plot(bins,Z[comb_ind][i+3*components_plot,2,1,:],label=labels[5],color=colors[5],linestyle='--')
-            line6 = plt.plot(bins,Z[comb_ind][i+3*components_plot,3,0,:],label=labels[6],color=colors[6])
-            line7 = plt.plot(bins,Z[comb_ind][i+3*components_plot,3,1,:],label=labels[7],color=colors[7],linestyle='--')
-            line8 = plt.plot(bins,Z[comb_ind][i+3*components_plot,4,0,:],label=labels[8],color=colors[8])
-            line9 = plt.plot(bins,Z[comb_ind][i+3*components_plot,4,1,:],label=labels[9],color=colors[9],linestyle='--')
-            line10 = plt.plot(bins,Z[comb_ind][i+3*components_plot,5,0,:],label=labels[10],color=colors[10])
-            line11 = plt.plot(bins,Z[comb_ind][i+3*components_plot,5,1,:],label=labels[11],color=colors[11],linestyle='--')
-            line12 = plt.plot(bins,Z[comb_ind][i+3*components_plot,6,0,:],label=labels[12],color=colors[12])
-            line13 = plt.plot(bins,Z[comb_ind][i+3*components_plot,6,1,:],label=labels[13],color=colors[13],linestyle='--')
+            line0 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,0,:],label=labels[0],color=colors[0],linestyle='--')
+            line1 = plt.plot(bins,Z[comb_ind][i+3*components_plot,0,1,:],label=labels[1],color=colors[1])
+            line2 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,0,:],label=labels[2],color=colors[2],linestyle='--')
+            line3 = plt.plot(bins,Z[comb_ind][i+3*components_plot,1,1,:],label=labels[3],color=colors[3])
+            line4 = plt.plot(bins,Z[comb_ind][i+3*components_plot,2,0,:],label=labels[4],color=colors[4],linestyle='--')
+            line5 = plt.plot(bins,Z[comb_ind][i+3*components_plot,2,1,:],label=labels[5],color=colors[5])
+            line6 = plt.plot(bins,Z[comb_ind][i+3*components_plot,3,0,:],label=labels[6],color=colors[6],linestyle='--')
+            line7 = plt.plot(bins,Z[comb_ind][i+3*components_plot,3,1,:],label=labels[7],color=colors[7])
+            line8 = plt.plot(bins,Z[comb_ind][i+3*components_plot,4,0,:],label=labels[8],color=colors[8],linestyle='--')
+            line9 = plt.plot(bins,Z[comb_ind][i+3*components_plot,4,1,:],label=labels[9],color=colors[9])
+            line10 = plt.plot(bins,Z[comb_ind][i+3*components_plot,5,0,:],label=labels[10],color=colors[10],linestyle='--')
+            line11 = plt.plot(bins,Z[comb_ind][i+3*components_plot,5,1,:],label=labels[11],color=colors[11])
+            line12 = plt.plot(bins,Z[comb_ind][i+3*components_plot,6,0,:],label=labels[12],color=colors[12],linestyle='--')
+            line13 = plt.plot(bins,Z[comb_ind][i+3*components_plot,6,1,:],label=labels[13],color=colors[13])
             
             lines = np.squeeze(np.dstack((line0,line1,line2,line3,line4,line5,line6,line7,line8,line9,line10,line11,line12,line13)))
             
