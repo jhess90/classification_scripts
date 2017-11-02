@@ -54,7 +54,7 @@ M1_percs <- M1_var / M1_total
 percs.df <- data.frame(PmD_percs = PmD_percs,S1_percs=S1_percs,M1_percs=M1_percs,row.names = var_names)
 percs.melt <- melt(as.matrix(percs.df))
 
-png('explained_variance_variables_nod.png',width=8,height=6,units="in",res=500)
+png('explained_variance_variables.png',width=8,height=6,units="in",res=500)
 
 plt <- ggplot(percs.melt) + geom_bar(aes(x=Var1,y=value,fill=Var2),stat="identity",position="dodge") + labs(title="Explained Variance",y="Percentage",x="Variables",fill="Region")
 plt <- plt + scale_y_continuous(labels = scales::percent) #+ geom_text(aes(x=Var1,y=percs.melt$value + 0.025),label=scales::percent(percs.melt$value),position="dodge")
@@ -62,6 +62,6 @@ plt <- plt + scale_y_continuous(labels = scales::percent) #+ geom_text(aes(x=Var
 plot(plt)
 graphics.off()
 
-rm(list=ls())
+#rm(list=ls())
 
 
