@@ -6,25 +6,19 @@ import pdb
 import sys
 import xlsxwriter
 import glob
+
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 
-#######
-#sd_bool = False
-#multirp_bool = False
-#binaryrp_bool = True
 
-#########
-#if sd_bool:
-#	data = np.load('dpca_results.npy')[()]
-#elif multirp_bool:
-#	data = np.load('dpca_results_multirp.npy')[()]
-#elif binaryrp_bool:
-#	data = np.load('dpca_results_binaryrp.npy')[()]
+#####################
+
+print 'organizing explained variance'
 
 data={}
-#data['M1'] = np.load('dpca_results_binaryrp_nod_M1.npy')[()]
-data['S1'] = np.load('dpca_results_binaryrp_nod_S1.npy')[()]
-data['PmD'] = np.load('dpca_results_binaryrp_nod_PmD.npy')[()]
+
 try:
         data['M1'] = np.load('dpca_results_binaryrp_nod_M1.npy')[()]
 except:
@@ -33,6 +27,25 @@ except:
         data['M1'] = {}
         data['M1']['explained_var'] = explained_var
         data['M1']['sig_analysis'] = sig_analysis
+
+try:
+        data['S1'] = np.load('dpca_results_binaryrp_nod_S1.npy')[()]
+except:
+        explained_var = np.load('dpca_results_binaryrp_nod_S1_explained_var.npy')[()]
+        sig_analysis = np.load('dpca_results_binaryrp_nod_S1_sig_analysis.npy')[()]
+        data['S1'] = {}
+        data['S1']['explained_var'] = explained_var
+        data['S1']['sig_analysis'] = sig_analysis
+
+try:
+        data['PmD'] = np.load('dpca_results_binaryrp_nod_PmD.npy')[()]
+except:
+        explained_var = np.load('dpca_results_binaryrp_nod_PmD_explained_var.npy')[()]
+        sig_analysis = np.load('dpca_results_binaryrp_nod_PmD_sig_analysis.npy')[()]
+        data['PmD'] = {}
+        data['PmD']['explained_var'] = explained_var
+        data['PmD']['sig_analysis'] = sig_analysis
+
 
 variance_workbook = xlsxwriter.Workbook('perc_variance.xlsx',options={'nan_inf_to_errors':True})
 i=0
@@ -63,36 +76,14 @@ for region_key,region_val in data.iteritems():
         worksheet.write(0,i+1,region_key)
         worksheet.write_row(1,i+1,colnames)
         worksheet.write_row(2,i+1,explained_var['t'])
-        #worksheet.write_row(3,i+1,explained_var['r'])
         worksheet.write_row(3,i+1,explained_var['rt'])
-        #worksheet.write_row(5,i+1,explained_var['rp'])
-        #worksheet.write_row(6,i+1,explained_var['rd'])
-        #worksheet.write_row(7,i+1,explained_var['p'])
         worksheet.write_row(4,i+1,explained_var['pt'])
-        #worksheet.write_row(9,i+1,explained_var['pd'])
-        #worksheet.write_row(10,i+1,explained_var['d'])
-        #worksheet.write_row(5,i+1,explained_var['dt'])
-        #worksheet.write_row(12,i+1,explained_var['rpd'])
         worksheet.write_row(5,i+1,explained_var['rpt'])
-        #worksheet.write_row(7,i+1,explained_var['rdt'])
-        #worksheet.write_row(8,i+1,explained_var['pdt'])
-        #worksheet.write_row(9,i+1,explained_var['rpdt'])
 	
         worksheet.write(2,i+16,sum(explained_var['t']))
-        #worksheet.write(3,i+16,sum(explained_var['r']))
         worksheet.write(3,i+16,sum(explained_var['rt']))
-        #worksheet.write(5,i+16,sum(explained_var['rp']))
-        #worksheet.write(6,i+16,sum(explained_var['rd']))
-        #worksheet.write(7,i+16,sum(explained_var['p']))
         worksheet.write(4,i+16,sum(explained_var['pt']))
-        #worksheet.write(9,i+16,sum(explained_var['pd']))
-        #worksheet.write(10,i+16,sum(explained_var['d']))
-        #worksheet.write(5,i+16,sum(explained_var['dt']))
-        #worksheet.write(12,i+16,sum(explained_var['rpd']))
         worksheet.write(5,i+16,sum(explained_var['rpt']))
-        #worksheet.write(7,i+16,sum(explained_var['rdt']))
-        #worksheet.write(8,i+16,sum(explained_var['pdt']))
-        #worksheet.write(9,i+16,sum(explained_var['rpdt']))
         
         worksheet.write(6,i+15,'total')
         worksheet.write(6,i+16,total_var)
@@ -103,6 +94,7 @@ variance_workbook.close()
 
 
 ###plot significance analysis
+print 'plotting significance analysis'
 
 my_ticks = ['-0.5','0','0.5','-0.5','0','0.5','1.0']
 tot_bins = int(np.shape(data['M1']['sig_analysis'][0]['rt'])[1])

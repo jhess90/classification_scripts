@@ -13,6 +13,10 @@ import sys
 import xlsxwriter
 import glob
 from scipy.optimize import curve_fit
+
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 import pandas as pd

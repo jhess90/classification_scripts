@@ -13,6 +13,10 @@ import sys
 import xlsxwriter
 import glob
 from scipy.optimize import curve_fit
+
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 import pandas as pd
@@ -66,13 +70,18 @@ def sort_and_avg(fr_array,sort_dict):
                                 i_trials = sort_dict['index']['m2']
 
                 elif run_value:
-                        if i == 1:
+                        if i == 0:
                                 i_trials = sort_dict['index']['v_1']
-                        elif i == 2:
+                        elif i == 1:
                                 i_trials = sort_dict['index']['v0']
-                        elif i == 3:
+                        elif i == 2:
                                 i_trials = sort_dict['index']['v1']
-			
+                        else:
+                                pdb.set_trace()
+                else:
+                        pdb.set_trace()
+
+			        
 
 		for q in range(Q):
 			if q == 0:
@@ -487,11 +496,36 @@ for region_key,region_val in all_dict.iteritems():
         dpca_results = {'Z':Z,'explained_var':explained_var,'transformed':transformed,'all_avg':all_avg} #,'all_bal':all_bal} #too large now
         
 
-    if run_motiv:
-            np.save('dpca_results_multi_m_d_%s.npy' %(region_key),dpca_results)
-    elif run_value:
-            np.save('dpca_results_multi_v_d_%s.npy' %(region_key),dpca_results)
-    all_dict[region_key] = {}
+    #if run_motiv:
+    #        np.save('dpca_results_multi_m_d_%s.npy' %(region_key),dpca_results)
+    #elif run_value:
+    #        np.save('dpca_results_multi_v_d_%s.npy' %(region_key),dpca_results)
+    #all_dict[region_key] = {}
 
-#all_dict['sort_dict'] = sort_dict
-#np.save('dpca_results_binaryrp.npy',all_dict)
+    #all_dict['sort_dict'] = sort_dict
+    #np.save('dpca_results_binaryrp.npy',all_dict)
+
+    if run_motiv:
+        try:
+                np.save('dpca_results_multi_m_d_%s.npy' %(region_key),dpca_results)
+        except:
+                np.save('dpca_results_multi_m_d_%s_Z.npy' %(region_key),Z)
+                np.save('dpca_results_multi_m_d_%s_explained_var.npy' %(region_key),explained_var)
+                np.save('dpca_results_multi_m_d_%s_transformed.npy' %(region_key),transformed)
+                np.save('dpca_results_multi_m_d_%s_all_avg.npy' %(region_key),all_avg)
+                if do_sig_analysis:
+                        np.save('dpca_results_multi_m_d_%s_sig_analysis.npy' %(region_key),sig_analysis)
+                        np.save('dpca_results_multi_m_d_%s_all_bal.npy' %(region_key),all_bal)
+    elif run_value:
+        try:
+                np.save('dpca_results_multi_v_d_%s.npy' %(region_key),dpca_results)
+        except:
+                np.save('dpca_results_multi_v_d_%s_Z.npy' %(region_key),Z)
+                np.save('dpca_results_multi_v_d_%s_explained_var.npy' %(region_key),explained_var)
+                np.save('dpca_results_multi_v_d_%s_transformed.npy' %(region_key),transformed)
+                np.save('dpca_results_multi_v_d_%s_all_avg.npy' %(region_key),all_avg)
+                if do_sig_analysis:
+                        np.save('dpca_results_multi_v_d_%s_sig_analysis.npy' %(region_key),sig_analysis)
+                        np.save('dpca_results_multi_v_d_%s_all_bal.npy' %(region_key),all_bal)
+
+    all_dict[region_key] = {}

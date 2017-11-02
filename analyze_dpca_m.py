@@ -6,13 +6,49 @@ import pdb
 import sys
 import xlsxwriter
 import glob
+
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 
 
 data={}
-data['M1'] = np.load('dpca_results_multi_m_d_M1.npy')[()]
-data['S1'] = np.load('dpca_results_multi_m_d_S1.npy')[()]
-data['PmD'] = np.load('dpca_results_multi_m_d_PmD.npy')[()]
+#data['M1'] = np.load('dpca_results_multi_m_d_M1.npy')[()]
+#data['S1'] = np.load('dpca_results_multi_m_d_S1.npy')[()]
+#data['PmD'] = np.load('dpca_results_multi_m_d_PmD.npy')[()]
+
+try:
+        data['M1'] = np.load('dpca_results_multi_m_d_M1.npy')[()]
+except:
+        explained_var = np.load('dpca_results_multi_m_d_M1_explained_var.npy')[()]
+        sig_analysis = np.load('dpca_results_multi_m_d_M1_sig_analysis.npy')[()]
+        data['M1'] = {}
+        data['M1']['explained_var'] = explained_var
+        data['M1']['sig_analysis'] = sig_analysis
+
+try:
+        data['S1'] = np.load('dpca_results_multi_m_d_S1.npy')[()]
+except:
+        explained_var = np.load('dpca_results_multi_m_d_S1_explained_var.npy')[()]
+        sig_analysis = np.load('dpca_results_multi_m_d_S1_sig_analysis.npy')[()]
+        data['S1'] = {}
+        data['S1']['explained_var'] = explained_var
+        data['S1']['sig_analysis'] = sig_analysis
+
+try:
+        data['PmD'] = np.load('dpca_results_multi_m_d_PmD.npy')[()]
+except:
+        explained_var = np.load('dpca_results_multi_m_d_PmD_explained_var.npy')[()]
+        sig_analysis = np.load('dpca_results_multi_m_d_PmD_sig_analysis.npy')[()]
+        data['PmD'] = {}
+        data['PmD']['explained_var'] = explained_var
+        data['PmD']['sig_analysis'] = sig_analysis
+
+
+
+
+
 
 
 variance_workbook = xlsxwriter.Workbook('perc_variance_m.xlsx',options={'nan_inf_to_errors':True})
