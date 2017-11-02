@@ -510,7 +510,7 @@ for region_key,region_val in all_dict.iteritems():
                 if do_sig_analysis:
                         np.save('dpca_results_multi_m_d_%s_sig_analysis.npy' %(region_key),sig_analysis)
                         np.save('dpca_results_multi_m_d_%s_all_bal.npy' %(region_key),all_bal)
-    elif run_value
+    elif run_value:
         try:
                 np.save('dpca_results_multi_v_d_%s.npy' %(region_key),dpca_results)
         except:
