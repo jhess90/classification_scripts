@@ -18,7 +18,7 @@ library(reshape)
 
 #######
 
-avg_alphabeta_bool = FALSE
+avg_alphabeta_bool = TRUE
 all_alphabeta_bool = FALSE
 
 if (avg_alphabeta_bool & all_alphabeta_bool){cat('ERROR both cant be true')}
