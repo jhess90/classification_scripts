@@ -25,7 +25,7 @@ if (avg_alphabeta_bool & all_alphabeta_bool){cat('ERROR both cant be true')}
 
 #######
 
-#file_list <- c('sig_slopes_M1_dicts.xlsx','sig_slopes_S1_dicts.xlsx','sig_slopes_PmD_dicts.xlsx')
+file_list <- c('sig_slopes_M1_dicts.xlsx','sig_slopes_S1_dicts.xlsx','sig_slopes_PmD_dicts.xlsx')
 region_list <- c('M1','S1','PmD')
 
 
@@ -495,6 +495,9 @@ plot_newmv <- function(mv_array,region_key,type_key){
     
   graphics.off()
   
+  saveRDS(sig_slopes,paste(region_key,'_',type_key,'_sig_slopes.rds',sep=''))
+  saveRDS(all_slopes,paste(region_key,'_',type_key,'_all_slopes.rds',sep=''))
+  
   return_list <- list(val = val_list,mtv = mtv_list,perc_v = perc_val_sig,perc_m = perc_mtv_sig,sig_slopes=sig_slopes,all_slopes=all_slopes,alpha_list=alpha_list,beta_list=beta_list)
   return(return_list)
 }
@@ -892,6 +895,9 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
     bfr_result_list <- det_signs(all_bfr_result_alpha,all_bfr_result_beta)
     aft_result_list <- det_signs(all_aft_result_alpha,all_aft_result_beta)
     
+    #saveRDS(all_slopes,paste(region_key,'_',type_key,'_all_slopes.rds',sep=''))
+    
+    
     bfr_cue_vals <- c(bfr_cue_list$perc_both_pos,bfr_cue_list$perc_both_neg,bfr_cue_list$perc_alpha_pos,bfr_cue_list$perc_beta_pos)
     aft_cue_vals <- c(aft_cue_list$perc_both_pos,aft_cue_list$perc_both_neg,aft_cue_list$perc_alpha_pos,aft_cue_list$perc_beta_pos)
     bfr_result_vals <- c(bfr_result_list$perc_both_pos,bfr_result_list$perc_both_neg,bfr_result_list$perc_alpha_pos,bfr_result_list$perc_beta_pos)
@@ -931,6 +937,8 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
     df_all <- rbind(bfr_cue_df,aft_cue_df,bfr_result_df,aft_result_df)
     df_all <- df_all[which(df_all$perc > 0),]
     
+    save(df_all,bfr_cue_df,aft_cue_df,bfr_result_df,aft_result_df,bfr_cue_nums,aft_cue_nums,bfr_result_nums,aft_result_nums,bfr_cue_list,aft_cue_list,bfr_result_list,aft_result_list,file=paste('alphabeta_',region_list[region_index],'.RData'))
+    
     bar_plt <- ggplot() + geom_bar(aes(x=df_all$type,y=df_all$perc,fill=df_all$labs),data=df_all,stat="identity") 
     bar_plt <- bar_plt + labs(title=region_list[region_index],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
     bar_plt <- bar_plt + geom_text(aes(x=df_all$type,y=df_all$position,label=df_all$label),size=3,stat="identity")
@@ -940,6 +948,8 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
     
   }
 }
+
+save('all_r.RData')
 
 rm(list=ls())
 
