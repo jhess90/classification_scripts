@@ -18,7 +18,7 @@ library(reshape)
 
 #######
 
-avg_alphabeta_bool = FALSE
+avg_alphabeta_bool = TRUE
 all_alphabeta_bool = FALSE
 
 if (avg_alphabeta_bool & all_alphabeta_bool){cat('ERROR both cant be true')}
@@ -27,77 +27,6 @@ if (avg_alphabeta_bool & all_alphabeta_bool){cat('ERROR both cant be true')}
 
 #file_list <- c('sig_slopes_M1_dicts.xlsx','sig_slopes_S1_dicts.xlsx','sig_slopes_PmD_dicts.xlsx')
 region_list <- c('M1','S1','PmD')
-
-
-for (region_index in 1:length(file_list)){
-    
-  slopes_bfr_cue <- read.xlsx(file_list[region_index],sheet='slopes_bfr_cue_model',colNames=T)
-  slopes_aft_cue <- read.xlsx(file_list[region_index],sheet='slopes_aft_cue_model',colNames=T)
-  slopes_bfr_result <- read.xlsx(file_list[region_index],sheet='slopes_bfr_result_model',colNames=T)
-  slopes_aft_result <- read.xlsx(file_list[region_index],sheet='slopes_aft_result_model',colNames=T)
-
-  slopes_bfr_cue_sigall <- read.xlsx(file_list[region_index],sheet='sig_all_bfr_cue_model',colNames=T)
-  slopes_aft_cue_sigall <- read.xlsx(file_list[region_index],sheet='sig_all_aft_cue_model',colNames=T)
-  slopes_bfr_result_sigall <- read.xlsx(file_list[region_index],sheet='sig_all_bfr_result_model',colNames=T)
-  slopes_aft_result_sigall <- read.xlsx(file_list[region_index],sheet='sig_all_aft_result_model',colNames=T)
-  
-  avg_bfr_cue <- c(mean(abs(slopes_bfr_cue$alpha)),mean(abs(slopes_bfr_cue$beta)),mean(abs(slopes_bfr_cue_sigall$alpha)),mean(abs(slopes_bfr_cue_sigall$beta)))
-  avg_aft_cue <- c(mean(abs(slopes_aft_cue$alpha)),mean(abs(slopes_aft_cue$beta)),mean(abs(slopes_aft_cue_sigall$alpha)),mean(abs(slopes_aft_cue_sigall$beta)))
-  avg_bfr_result <- c(mean(abs(slopes_bfr_result$alpha)),mean(abs(slopes_bfr_result$beta)),mean(abs(slopes_bfr_result_sigall$alpha)),mean(abs(slopes_bfr_result_sigall$beta)))
-  avg_aft_result <- c(mean(abs(slopes_aft_result$alpha)),mean(abs(slopes_aft_result$beta)),mean(abs(slopes_aft_result_sigall$alpha)),mean(abs(slopes_aft_result_sigall$beta)))
-  
-  std_bfr_cue <- c(sd(abs(slopes_bfr_cue$alpha)),sd(abs(slopes_bfr_cue$beta)),sd(abs(slopes_bfr_cue_sigall$alpha)),sd(abs(slopes_bfr_cue_sigall$beta)))
-  std_aft_cue <- c(sd(abs(slopes_aft_cue$alpha)),sd(abs(slopes_aft_cue$beta)),sd(abs(slopes_aft_cue_sigall$alpha)),sd(abs(slopes_aft_cue_sigall$beta)))
-  std_bfr_result <- c(sd(abs(slopes_bfr_result$alpha)),sd(abs(slopes_bfr_result$beta)),sd(abs(slopes_bfr_result_sigall$alpha)),sd(abs(slopes_bfr_result_sigall$beta)))
-  std_aft_result <- c(sd(abs(slopes_aft_result$alpha)),sd(abs(slopes_aft_result$beta)),sd(abs(slopes_aft_result_sigall$alpha)),sd(abs(slopes_aft_result_sigall$beta)))
-  
-  key <- c('alpha','beta','alpha','beta')
-  cat <- c('one sig','one sig','both sig','both sig')
-  
-  df_bfr_cue <- data.frame(value= avg_bfr_cue,cat,key,std_bfr_cue)
-  df_aft_cue <- data.frame(value = avg_aft_cue,cat,key,std_aft_cue)
-  df_bfr_result <- data.frame(value = avg_bfr_result,cat,key,std_bfr_result)
-  df_aft_result <- data.frame(value = avg_aft_result,cat,key,std_aft_result)
-  
-  bfr_cue_plt <- ggplot(df_bfr_cue) + aes(x=cat,y=value,fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="before cue") + geom_errorbar(aes(ymin=df_bfr_cue$value + df_bfr_cue$std_bfr_cue,ymax=df_bfr_cue$value - df_bfr_cue$std_bfr_cue),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  aft_cue_plt <- ggplot(df_aft_cue) + aes(x=cat,y=value, fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="after cue") + geom_errorbar(aes(ymin=df_aft_cue$value + df_aft_cue$std_aft_cue,ymax=df_aft_cue$value - df_aft_cue$std_aft_cue),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  bfr_result_plt <- ggplot(df_bfr_result) + aes(x=cat,y=value, fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="before result") + geom_errorbar(aes(ymin=df_bfr_result$value + df_bfr_result$std_bfr_result,ymax=df_bfr_result$value - df_bfr_result$std_bfr_result),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  aft_result_plt <- ggplot(df_aft_result) + aes(x=cat,y=value, fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="after result") + geom_errorbar(aes(ymin=df_aft_result$value + df_aft_result$std_aft_result,ymax=df_aft_result$value - df_aft_result$std_aft_result),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  
-  png(paste(region_list[region_index],'_avg_abs_slopes.png',sep=""),width=8,height=6,units="in",res=500)
-  multiplot(bfr_cue_plt,aft_cue_plt,bfr_result_plt,aft_result_plt,cols=2)
-  
-  #dev.off()
-  graphics.off()
-  
-  ####################
-  avg_bfr_cue <- c(mean(slopes_bfr_cue$alpha),mean(slopes_bfr_cue$beta),mean(slopes_bfr_cue_sigall$alpha),mean(slopes_bfr_cue_sigall$beta))
-  avg_aft_cue <- c(mean(slopes_aft_cue$alpha),mean(slopes_aft_cue$beta),mean(slopes_aft_cue_sigall$alpha),mean(slopes_aft_cue_sigall$beta))
-  avg_bfr_result <- c(mean(slopes_bfr_result$alpha),mean(slopes_bfr_result$beta),mean(slopes_bfr_result_sigall$alpha),mean(slopes_bfr_result_sigall$beta))
-  avg_aft_result <- c(mean(slopes_aft_result$alpha),mean(slopes_aft_result$beta),mean(slopes_aft_result_sigall$alpha),mean(slopes_aft_result_sigall$beta))
-  
-  std_bfr_cue <- c(sd(slopes_bfr_cue$alpha),sd(slopes_bfr_cue$beta),sd(slopes_bfr_cue_sigall$alpha),sd(slopes_bfr_cue_sigall$beta))
-  std_aft_cue <- c(sd(slopes_aft_cue$alpha),sd(slopes_aft_cue$beta),sd(slopes_aft_cue_sigall$alpha),sd(slopes_aft_cue_sigall$beta))
-  std_bfr_result <- c(sd(slopes_bfr_result$alpha),sd(slopes_bfr_result$beta),sd(slopes_bfr_result_sigall$alpha),sd(slopes_bfr_result_sigall$beta))
-  std_aft_result <- c(sd(slopes_aft_result$alpha),sd(slopes_aft_result$beta),sd(slopes_aft_result_sigall$alpha),sd(slopes_aft_result_sigall$beta))
-  
-  df_bfr_cue <- data.frame(value= avg_bfr_cue,cat,key,std_bfr_cue)
-  df_aft_cue <- data.frame(value = avg_aft_cue,cat,key,std_aft_cue)
-  df_bfr_result <- data.frame(value = avg_bfr_result,cat,key,std_bfr_result)
-  df_aft_result <- data.frame(value = avg_aft_result,cat,key,std_aft_result)
-  
-  bfr_cue_plt <- ggplot(df_bfr_cue) + aes(x=cat,y=value,fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="before cue") + geom_errorbar(aes(ymin=df_bfr_cue$value + df_bfr_cue$std_bfr_cue,ymax=df_bfr_cue$value - df_bfr_cue$std_bfr_cue),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  aft_cue_plt <- ggplot(df_aft_cue) + aes(x=cat,y=value, fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="after cue") + geom_errorbar(aes(ymin=df_aft_cue$value + df_aft_cue$std_aft_cue,ymax=df_aft_cue$value - df_aft_cue$std_aft_cue),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  bfr_result_plt <- ggplot(df_bfr_result) + aes(x=cat,y=value, fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="before result") + geom_errorbar(aes(ymin=df_bfr_result$value + df_bfr_result$std_bfr_result,ymax=df_bfr_result$value - df_bfr_result$std_bfr_result),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  aft_result_plt <- ggplot(df_aft_result) + aes(x=cat,y=value, fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="after result") + geom_errorbar(aes(ymin=df_aft_result$value + df_aft_result$std_aft_result,ymax=df_aft_result$value - df_aft_result$std_aft_result),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  
-  png(paste(region_list[region_index],'_avg_slopes.png',sep=""),width=8,height=6,units="in",res=500)
-  multiplot(bfr_cue_plt,aft_cue_plt,bfr_result_plt,aft_result_plt,cols=2)
-  
-  #dev.off()
-  graphics.off()
-  
-}
 
 
 for (region_index in 1:length(region_list)){
@@ -389,6 +318,8 @@ for (region_index in 1:length(region_list)){
   
 }
 
+
+
 #####################
 plot_newmv <- function(mv_array,region_key,type_key){
   val_list <- vector("list",dim(mv_array)[1])
@@ -504,260 +435,7 @@ plot_newmv <- function(mv_array,region_key,type_key){
 
 
 type_list = c('bfr_cue','aft_cue','bfr_result','aft_result')
-for (region_index in 1:length(region_list)){
-  
-  if (all_alphabeta_bool){
-    npy_readin <- readMat(paste(region_list[region_index],'_dicts_bfr_cue_model_all_mv_array.mat',sep=""))
-    bfr_cue_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_index],'_dicts_aft_cue_model_all_mv_array.mat',sep=""))
-    aft_cue_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_index],'_dicts_bfr_result_model_all_mv_array.mat',sep=""))
-    bfr_result_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_index],'_dicts_aft_result_model_all_mv_array.mat',sep=""))
-    aft_result_mv_array <- npy_readin$mv.array
-  }else if(avg_alphabeta_bool){
-    npy_readin <- readMat(paste(region_list[region_index],'_dicts_bfr_cue_model_all_avg_mv_array.mat',sep=""))
-    bfr_cue_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_index],'_dicts_aft_cue_model_all_avg_mv_array.mat',sep=""))
-    aft_cue_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_index],'_dicts_bfr_result_model_all_avg_mv_array.mat',sep=""))
-    bfr_result_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_index],'_dicts_aft_result_model_all_avg_mv_array.mat',sep=""))
-    aft_result_mv_array <- npy_readin$mv.array
-  }else{
-    npy_readin <- readMat(paste(region_list[region_index],'_dicts_bfr_cue_model_mv_array.mat',sep=""))
-    bfr_cue_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_index],'_dicts_aft_cue_model_mv_array.mat',sep=""))
-    aft_cue_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_index],'_dicts_bfr_result_model_mv_array.mat',sep=""))
-    bfr_result_mv_array <- npy_readin$mv.array
-    npy_readin <- readMat(paste(region_list[region_index],'_dicts_aft_result_model_mv_array.mat',sep=""))
-    aft_result_mv_array <- npy_readin$mv.array
-  }
-  
-  bfr_cue_list <- plot_newmv(bfr_cue_mv_array,region_list[region_index],'bfr_cue')
-  aft_cue_list <- plot_newmv(aft_cue_mv_array,region_list[region_index],'aft_cue')
-  bfr_result_list <- plot_newmv(bfr_result_mv_array,region_list[region_index],'bfr_result')
-  aft_result_list <- plot_newmv(aft_result_mv_array,region_list[region_index],'aft_result')
-  
-  all_list <- list(bfr_cue_list = bfr_cue_list,aft_cue_list = aft_cue_list,bfr_result_list = bfr_result_list,aft_result_list = aft_result_list)
-  region_name <- paste(region_list[region_index],'_vals',sep="")
-  assign(region_name,all_list)
-    
-  bfr_cue_sig_pos_slope <- bfr_cue_list$sig_slopes[bfr_cue_list$sig_slopes$slopes > 0.1,]
-  bfr_cue_sig_neg_slope <- bfr_cue_list$sig_slopes[bfr_cue_list$sig_slopes$slopes < -0.1,]
-  temp <- bfr_cue_list$sig_slopes[bfr_cue_list$sig_slopes$slopes <= 0.1,]
-  bfr_cue_sig_zero_slope <- temp[temp$slopes >= -0.1,]
-  aft_cue_sig_pos_slope <- aft_cue_list$sig_slopes[aft_cue_list$sig_slopes$slopes > 0.1,]
-  aft_cue_sig_neg_slope <- aft_cue_list$sig_slopes[aft_cue_list$sig_slopes$slopes < -0.1,]
-  temp <- aft_cue_list$sig_slopes[aft_cue_list$sig_slopes$slopes <= 0.1,]
-  aft_cue_sig_zero_slope <- temp[temp$slopes >= -0.1,]
-  bfr_result_sig_pos_slope <- bfr_result_list$sig_slopes[bfr_result_list$sig_slopes$slopes > 0.1,]
-  bfr_result_sig_neg_slope <- bfr_result_list$sig_slopes[bfr_result_list$sig_slopes$slopes < -0.1,]
-  temp <- bfr_result_list$sig_slopes[bfr_result_list$sig_slopes$slopes <= 0.1,]
-  bfr_result_sig_zero_slope <- temp[temp$slopes >= -0.1,]
-  aft_result_sig_pos_slope <- aft_result_list$sig_slopes[aft_result_list$sig_slopes$slopes > 0.1,]
-  aft_result_sig_neg_slope <- aft_result_list$sig_slopes[aft_result_list$sig_slopes$slopes < -0.1,]
-  temp <- aft_result_list$sig_slopes[aft_result_list$sig_slopes$slopes <= 0.1,]
-  aft_result_sig_zero_slope <- temp[temp$slopes >= -0.1,]
-  
-  bfr_cue_all_pos_slope <- bfr_cue_list$all_slopes[bfr_cue_list$all_slopes$slopes > 0.1,]
-  bfr_cue_all_neg_slope <- bfr_cue_list$all_slopes[bfr_cue_list$all_slopes$slopes < -0.1,]
-  temp <- bfr_cue_list$all_slopes[bfr_cue_list$all_slopes$slopes <= 0.1,]
-  bfr_cue_all_zero_slope <- temp[temp$slopes >= -0.1,]
-  aft_cue_all_pos_slope <- aft_cue_list$all_slopes[aft_cue_list$all_slopes$slopes > 0.1,]
-  aft_cue_all_neg_slope <- aft_cue_list$all_slopes[aft_cue_list$all_slopes$slopes < -0.1,]
-  temp <- aft_cue_list$all_slopes[aft_cue_list$all_slopes$slopes <= 0.1,]
-  aft_cue_all_zero_slope <- temp[temp$slopes >= -0.1,]
-  bfr_result_all_pos_slope <- bfr_result_list$all_slopes[bfr_result_list$all_slopes$slopes > 0.1,]
-  bfr_result_all_neg_slope <- bfr_result_list$all_slopes[bfr_result_list$all_slopes$slopes < -0.1,]
-  temp <- bfr_result_list$all_slopes[bfr_result_list$all_slopes$slopes <= 0.1,]
-  bfr_result_all_zero_slope <- temp[temp$slopes >= -0.1,]
-  aft_result_all_pos_slope <- aft_result_list$all_slopes[aft_result_list$all_slopes$slopes > 0.1,]
-  aft_result_all_neg_slope <- aft_result_list$all_slopes[aft_result_list$all_slopes$slopes < -0.1,]
-  temp <- aft_result_list$all_slopes[aft_result_list$all_slopes$slopes <= 0.1,]
-  aft_result_all_zero_slope <- temp[temp$slopes >= -0.1,]
-  
-  bfr_cue_pos_val_sig_num <- dim(bfr_cue_sig_pos_slope[which(bfr_cue_sig_pos_slope$type=='val'),])[1]
-  bfr_cue_pos_mtv_sig_num <- dim(bfr_cue_sig_pos_slope[which(bfr_cue_sig_pos_slope$type=='mtv'),])[1]
-  bfr_cue_neg_val_sig_num <- dim(bfr_cue_sig_neg_slope[which(bfr_cue_sig_neg_slope$type=='val'),])[1]
-  bfr_cue_neg_mtv_sig_num <- dim(bfr_cue_sig_neg_slope[which(bfr_cue_sig_neg_slope$type=='mtv'),])[1]
-  bfr_cue_zero_val_sig_num <- dim(bfr_cue_sig_zero_slope[which(bfr_cue_sig_zero_slope$type=='val'),])[1]
-  bfr_cue_zero_mtv_sig_num <- dim(bfr_cue_sig_zero_slope[which(bfr_cue_sig_zero_slope$type=='mtv'),])[1]
-  bfr_cue_pos_val_all_num <- dim(bfr_cue_all_pos_slope[which(bfr_cue_all_pos_slope$type=='val'),])[1]
-  bfr_cue_pos_mtv_all_num <- dim(bfr_cue_all_pos_slope[which(bfr_cue_all_pos_slope$type=='mtv'),])[1]
-  bfr_cue_neg_val_all_num <- dim(bfr_cue_all_neg_slope[which(bfr_cue_all_neg_slope$type=='val'),])[1]
-  bfr_cue_neg_mtv_all_num <- dim(bfr_cue_all_neg_slope[which(bfr_cue_all_neg_slope$type=='mtv'),])[1]
-  bfr_cue_zero_val_all_num <- dim(bfr_cue_all_zero_slope[which(bfr_cue_all_zero_slope$type=='val'),])[1]
-  bfr_cue_zero_mtv_all_num <- dim(bfr_cue_all_zero_slope[which(bfr_cue_all_zero_slope$type=='mtv'),])[1]
-  
-  aft_cue_pos_val_sig_num <- dim(aft_cue_sig_pos_slope[which(aft_cue_sig_pos_slope$type=='val'),])[1]
-  aft_cue_pos_mtv_sig_num <- dim(aft_cue_sig_pos_slope[which(aft_cue_sig_pos_slope$type=='mtv'),])[1]
-  aft_cue_neg_val_sig_num <- dim(aft_cue_sig_neg_slope[which(aft_cue_sig_neg_slope$type=='val'),])[1]
-  aft_cue_neg_mtv_sig_num <- dim(aft_cue_sig_neg_slope[which(aft_cue_sig_neg_slope$type=='mtv'),])[1]
-  aft_cue_zero_val_sig_num <- dim(aft_cue_sig_zero_slope[which(aft_cue_sig_zero_slope$type=='val'),])[1]
-  aft_cue_zero_mtv_sig_num <- dim(aft_cue_sig_zero_slope[which(aft_cue_sig_zero_slope$type=='mtv'),])[1]
-  aft_cue_pos_val_all_num <- dim(aft_cue_all_pos_slope[which(aft_cue_all_pos_slope$type=='val'),])[1]
-  aft_cue_pos_mtv_all_num <- dim(aft_cue_all_pos_slope[which(aft_cue_all_pos_slope$type=='mtv'),])[1]
-  aft_cue_neg_val_all_num <- dim(aft_cue_all_neg_slope[which(aft_cue_all_neg_slope$type=='val'),])[1]
-  aft_cue_neg_mtv_all_num <- dim(aft_cue_all_neg_slope[which(aft_cue_all_neg_slope$type=='mtv'),])[1]
-  aft_cue_zero_val_all_num <- dim(aft_cue_all_zero_slope[which(aft_cue_all_zero_slope$type=='val'),])[1]
-  aft_cue_zero_mtv_all_num <- dim(aft_cue_all_zero_slope[which(aft_cue_all_zero_slope$type=='mtv'),])[1]
-  
-  bfr_result_pos_val_sig_num <- dim(bfr_result_sig_pos_slope[which(bfr_result_sig_pos_slope$type=='val'),])[1]
-  bfr_result_pos_mtv_sig_num <- dim(bfr_result_sig_pos_slope[which(bfr_result_sig_pos_slope$type=='mtv'),])[1]
-  bfr_result_neg_val_sig_num <- dim(bfr_result_sig_neg_slope[which(bfr_result_sig_neg_slope$type=='val'),])[1]
-  bfr_result_neg_mtv_sig_num <- dim(bfr_result_sig_neg_slope[which(bfr_result_sig_neg_slope$type=='mtv'),])[1]
-  bfr_result_zero_val_sig_num <- dim(bfr_result_sig_zero_slope[which(bfr_result_sig_zero_slope$type=='val'),])[1]
-  bfr_result_zero_mtv_sig_num <- dim(bfr_result_sig_zero_slope[which(bfr_result_sig_zero_slope$type=='mtv'),])[1]
-  bfr_result_pos_val_all_num <- dim(bfr_result_all_pos_slope[which(bfr_result_all_pos_slope$type=='val'),])[1]
-  bfr_result_pos_mtv_all_num <- dim(bfr_result_all_pos_slope[which(bfr_result_all_pos_slope$type=='mtv'),])[1]
-  bfr_result_neg_val_all_num <- dim(bfr_result_all_neg_slope[which(bfr_result_all_neg_slope$type=='val'),])[1]
-  bfr_result_neg_mtv_all_num <- dim(bfr_result_all_neg_slope[which(bfr_result_all_neg_slope$type=='mtv'),])[1]
-  bfr_result_zero_val_all_num <- dim(bfr_result_all_zero_slope[which(bfr_result_all_zero_slope$type=='val'),])[1]
-  bfr_result_zero_mtv_all_num <- dim(bfr_result_all_zero_slope[which(bfr_result_all_zero_slope$type=='mtv'),])[1]
-  
-  aft_result_pos_val_sig_num <- dim(aft_result_sig_pos_slope[which(aft_result_sig_pos_slope$type=='val'),])[1]
-  aft_result_pos_mtv_sig_num <- dim(aft_result_sig_pos_slope[which(aft_result_sig_pos_slope$type=='mtv'),])[1]
-  aft_result_neg_val_sig_num <- dim(aft_result_sig_neg_slope[which(aft_result_sig_neg_slope$type=='val'),])[1]
-  aft_result_neg_mtv_sig_num <- dim(aft_result_sig_neg_slope[which(aft_result_sig_neg_slope$type=='mtv'),])[1]
-  aft_result_zero_mtv_sig_num <- dim(aft_result_sig_zero_slope[which(aft_result_sig_zero_slope$type=='mtv'),])[1]
-  aft_result_zero_val_sig_num <- dim(aft_result_sig_zero_slope[which(aft_result_sig_zero_slope$type=='val'),])[1]
-  aft_result_pos_val_all_num <- dim(aft_result_all_pos_slope[which(aft_result_all_pos_slope$type=='val'),])[1]
-  aft_result_pos_mtv_all_num <- dim(aft_result_all_pos_slope[which(aft_result_all_pos_slope$type=='mtv'),])[1]
-  aft_result_neg_val_all_num <- dim(aft_result_all_neg_slope[which(aft_result_all_neg_slope$type=='val'),])[1]
-  aft_result_neg_mtv_all_num <- dim(aft_result_all_neg_slope[which(aft_result_all_neg_slope$type=='mtv'),])[1]
-  aft_result_zero_val_all_num <- dim(aft_result_all_zero_slope[which(aft_result_all_zero_slope$type=='val'),])[1]
-  aft_result_zero_mtv_all_num <- dim(aft_result_all_zero_slope[which(aft_result_all_zero_slope$type=='mtv'),])[1]
-  
-  bfr_cue_sig_val_units <- dim(bfr_cue_list$sig_slopes[which(bfr_cue_list$sig_slopes$type=='val'),])[1]
-  bfr_cue_sig_mtv_units <- dim(bfr_cue_list$sig_slopes[which(bfr_cue_list$sig_slopes$type=='mtv'),])[1]
-  aft_cue_sig_val_units <- dim(aft_cue_list$sig_slopes[which(aft_cue_list$sig_slopes$type=='val'),])[1]
-  aft_cue_sig_mtv_units <- dim(aft_cue_list$sig_slopes[which(aft_cue_list$sig_slopes$type=='mtv'),])[1]
-  bfr_result_sig_val_units <- dim(bfr_result_list$sig_slopes[which(bfr_result_list$sig_slopes$type=='val'),])[1]
-  bfr_result_sig_mtv_units <- dim(bfr_result_list$sig_slopes[which(bfr_result_list$sig_slopes$type=='mtv'),])[1]
-  aft_result_sig_val_units <- dim(aft_result_list$sig_slopes[which(aft_result_list$sig_slopes$type=='val'),])[1]
-  aft_result_sig_mtv_units <- dim(aft_result_list$sig_slopes[which(aft_result_list$sig_slopes$type=='mtv'),])[1]
-  
-  bfr_cue_all_val_units <- dim(bfr_cue_list$all_slopes[which(bfr_cue_list$all_slopes$type=='val'),])[1]
-  bfr_cue_all_mtv_units <- dim(bfr_cue_list$all_slopes[which(bfr_cue_list$all_slopes$type=='mtv'),])[1]
-  aft_cue_all_val_units <- dim(aft_cue_list$all_slopes[which(aft_cue_list$all_slopes$type=='val'),])[1]
-  aft_cue_all_mtv_units <- dim(aft_cue_list$all_slopes[which(aft_cue_list$all_slopes$type=='mtv'),])[1]
-  bfr_result_all_val_units <- dim(bfr_result_list$all_slopes[which(bfr_result_list$all_slopes$type=='val'),])[1]
-  bfr_result_all_mtv_units <- dim(bfr_result_list$all_slopes[which(bfr_result_list$all_slopes$type=='mtv'),])[1]
-  aft_result_all_val_units <- dim(aft_result_list$all_slopes[which(aft_result_list$all_slopes$type=='val'),])[1]
-  aft_result_all_mtv_units <- dim(aft_result_list$all_slopes[which(aft_result_list$all_slopes$type=='mtv'),])[1]
-  
-  labs <- c('pos','neg','zero')
-  bfr_cue_val_sig <- c(bfr_cue_pos_val_sig_num,bfr_cue_pos_val_sig_num/bfr_cue_sig_val_units,bfr_cue_neg_val_sig_num,bfr_cue_neg_val_sig_num/bfr_cue_sig_val_units,bfr_cue_zero_val_sig_num,bfr_cue_zero_val_sig_num/bfr_cue_sig_val_units)
-  bfr_cue_mtv_sig <- c(bfr_cue_pos_mtv_sig_num,bfr_cue_pos_mtv_sig_num/bfr_cue_sig_mtv_units,bfr_cue_neg_mtv_sig_num,bfr_cue_neg_mtv_sig_num/bfr_cue_sig_mtv_units,bfr_cue_zero_mtv_sig_num,bfr_cue_zero_mtv_sig_num/bfr_cue_sig_mtv_units)
-  aft_cue_val_sig <- c(aft_cue_pos_val_sig_num,aft_cue_pos_val_sig_num/aft_cue_sig_val_units,aft_cue_neg_val_sig_num,aft_cue_neg_val_sig_num/aft_cue_sig_val_units,aft_cue_zero_val_sig_num,aft_cue_zero_val_sig_num/aft_cue_sig_val_units)
-  aft_cue_mtv_sig <- c(aft_cue_pos_mtv_sig_num,aft_cue_pos_mtv_sig_num/aft_cue_sig_mtv_units,aft_cue_neg_mtv_sig_num,aft_cue_neg_mtv_sig_num/aft_cue_sig_mtv_units,aft_cue_zero_mtv_sig_num,aft_cue_zero_mtv_sig_num/aft_cue_sig_mtv_units)
-  bfr_result_val_sig <- c(bfr_result_pos_val_sig_num,bfr_result_pos_val_sig_num/bfr_result_sig_val_units,bfr_result_neg_val_sig_num,bfr_result_neg_val_sig_num/bfr_result_sig_val_units,bfr_result_zero_val_sig_num,bfr_result_zero_val_sig_num/bfr_result_sig_val_units)
-  bfr_result_mtv_sig <- c(bfr_result_pos_mtv_sig_num,bfr_result_pos_mtv_sig_num/bfr_result_sig_mtv_units,bfr_result_neg_mtv_sig_num,bfr_result_neg_mtv_sig_num/bfr_result_sig_mtv_units,bfr_result_zero_mtv_sig_num,bfr_result_zero_mtv_sig_num/bfr_result_sig_mtv_units)
-  aft_result_val_sig <- c(aft_result_pos_val_sig_num,aft_result_pos_val_sig_num/aft_result_sig_val_units,aft_result_neg_val_sig_num,aft_result_neg_val_sig_num/aft_result_sig_val_units,aft_result_zero_val_sig_num,aft_result_zero_val_sig_num/aft_result_sig_val_units)
-  aft_result_mtv_sig <- c(aft_result_pos_mtv_sig_num,aft_result_pos_mtv_sig_num/aft_result_sig_mtv_units,aft_result_neg_mtv_sig_num,aft_result_neg_mtv_sig_num/aft_result_sig_mtv_units,aft_result_zero_mtv_sig_num,aft_result_zero_mtv_sig_num/aft_result_sig_mtv_units)
-  
-  bfr_cue_val_all <- c(bfr_cue_pos_val_all_num,bfr_cue_pos_val_all_num/bfr_cue_all_val_units,bfr_cue_neg_val_all_num,bfr_cue_neg_val_all_num/bfr_cue_all_val_units,bfr_cue_zero_val_all_num,bfr_cue_zero_val_all_num/bfr_cue_all_val_units)
-  bfr_cue_mtv_all <- c(bfr_cue_pos_mtv_all_num,bfr_cue_pos_mtv_all_num/bfr_cue_all_mtv_units,bfr_cue_neg_mtv_all_num,bfr_cue_neg_mtv_all_num/bfr_cue_all_mtv_units,bfr_cue_zero_mtv_all_num,bfr_cue_zero_mtv_all_num/bfr_cue_all_mtv_units)
-  aft_cue_val_all <- c(aft_cue_pos_val_all_num,aft_cue_pos_val_all_num/aft_cue_all_val_units,aft_cue_neg_val_all_num,aft_cue_neg_val_all_num/aft_cue_all_val_units,aft_cue_zero_val_all_num,aft_cue_zero_val_all_num/aft_cue_all_val_units)
-  aft_cue_mtv_all <- c(aft_cue_pos_mtv_all_num,aft_cue_pos_mtv_all_num/aft_cue_all_mtv_units,aft_cue_neg_mtv_all_num,aft_cue_neg_mtv_all_num/aft_cue_all_mtv_units,aft_cue_zero_mtv_all_num,aft_cue_zero_mtv_all_num/aft_cue_all_mtv_units)
-  bfr_result_val_all <- c(bfr_result_pos_val_all_num,bfr_result_pos_val_all_num/bfr_result_all_val_units,bfr_result_neg_val_all_num,bfr_result_neg_val_all_num/bfr_result_all_val_units,bfr_result_zero_val_all_num,bfr_result_zero_val_all_num/bfr_result_all_val_units)
-  bfr_result_mtv_all <- c(bfr_result_pos_mtv_all_num,bfr_result_pos_mtv_all_num/bfr_result_all_mtv_units,bfr_result_neg_mtv_all_num,bfr_result_neg_mtv_all_num/bfr_result_all_mtv_units,bfr_result_zero_mtv_all_num,bfr_result_zero_mtv_all_num/bfr_result_all_mtv_units)
-  aft_result_val_all <- c(aft_result_pos_val_all_num,aft_result_pos_val_all_num/aft_result_all_val_units,aft_result_neg_val_all_num,aft_result_neg_val_all_num/aft_result_all_val_units,aft_result_zero_val_all_num,aft_result_zero_val_all_num/aft_result_all_val_units)
-  aft_result_mtv_all <- c(aft_result_pos_mtv_all_num,aft_result_pos_mtv_all_num/aft_result_all_mtv_units,aft_result_neg_mtv_all_num,aft_result_neg_mtv_all_num/aft_result_all_mtv_units,aft_result_zero_mtv_all_num,aft_result_zero_mtv_all_num/aft_result_all_mtv_units)
-  
-  bfr_cue_val_sig <- data.frame(perc=bfr_cue_val_sig[c(2,4,6)],num=bfr_cue_val_sig[c(1,3,5)],labs,window='bfr_cue',type='value')
-  bfr_cue_mtv_sig <- data.frame(perc=bfr_cue_mtv_sig[c(2,4,6)],num=bfr_cue_mtv_sig[c(1,3,5)],labs,window='bfr_cue',type='motivation')
-  aft_cue_val_sig <- data.frame(perc=aft_cue_val_sig[c(2,4,6)],num=aft_cue_val_sig[c(1,3,5)],labs,window='aft_cue',type='value')
-  aft_cue_mtv_sig <- data.frame(perc=aft_cue_mtv_sig[c(2,4,6)],num=aft_cue_mtv_sig[c(1,3,5)],labs,window='aft_cue',type='motivation')
-  bfr_result_val_sig <- data.frame(perc=bfr_result_val_sig[c(2,4,6)],num=bfr_result_val_sig[c(1,3,5)],labs,window='bfr_result',type='value')
-  bfr_result_mtv_sig <- data.frame(perc=bfr_result_mtv_sig[c(2,4,6)],num=bfr_result_mtv_sig[c(1,3,5)],labs,window='bfr_result',type='motivation')
-  aft_result_val_sig <- data.frame(perc=aft_result_val_sig[c(2,4,6)],num=aft_result_val_sig[c(1,3,5)],labs,window='aft_result',type='value')
-  aft_result_mtv_sig <- data.frame(perc=aft_result_mtv_sig[c(2,4,6)],num=aft_result_mtv_sig[c(1,3,5)],labs,window='aft_result',type='motivation')
-  
-  bfr_cue_val_all <- data.frame(perc=bfr_cue_val_all[c(2,4,6)],num=bfr_cue_val_all[c(1,3,5)],labs,window='bfr_cue',type='value')
-  bfr_cue_mtv_all <- data.frame(perc=bfr_cue_mtv_all[c(2,4,6)],num=bfr_cue_mtv_all[c(1,3,5)],labs,window='bfr_cue',type='motivation')
-  aft_cue_val_all <- data.frame(perc=aft_cue_val_all[c(2,4,6)],num=aft_cue_val_all[c(1,3,5)],labs,window='aft_cue',type='value')
-  aft_cue_mtv_all <- data.frame(perc=aft_cue_mtv_all[c(2,4,6)],num=aft_cue_mtv_all[c(1,3,5)],labs,window='aft_cue',type='motivation')
-  bfr_result_val_all <- data.frame(perc=bfr_result_val_all[c(2,4,6)],num=bfr_result_val_all[c(1,3,5)],labs,window='bfr_result',type='value')
-  bfr_result_mtv_all <- data.frame(perc=bfr_result_mtv_all[c(2,4,6)],num=bfr_result_mtv_all[c(1,3,5)],labs,window='bfr_result',type='motivation')
-  aft_result_val_all <- data.frame(perc=aft_result_val_all[c(2,4,6)],num=aft_result_val_all[c(1,3,5)],labs,window='aft_result',type='value')
-  aft_result_mtv_all <- data.frame(perc=aft_result_mtv_all[c(2,4,6)],num=aft_result_mtv_all[c(1,3,5)],labs,window='aft_result',type='motivation')
-  
-  bfr_cue_val_sig <- bfr_cue_val_sig[rev(order(bfr_cue_val_sig$labs)),]
-  bfr_cue_mtv_sig <- bfr_cue_mtv_sig[rev(order(bfr_cue_mtv_sig$labs)),]
-  aft_cue_val_sig <- aft_cue_val_sig[rev(order(aft_cue_val_sig$labs)),]
-  aft_cue_mtv_sig <- aft_cue_mtv_sig[rev(order(aft_cue_mtv_sig$labs)),]
-  bfr_result_val_sig <- bfr_result_val_sig[rev(order(bfr_result_val_sig$labs)),]
-  bfr_result_mtv_sig <- bfr_result_mtv_sig[rev(order(bfr_result_mtv_sig$labs)),]
-  aft_result_val_sig <- aft_result_val_sig[rev(order(aft_result_val_sig$labs)),]
-  aft_result_mtv_sig <- aft_result_mtv_sig[rev(order(aft_result_mtv_sig$labs)),]
-  
-  bfr_cue_val_all <- bfr_cue_val_all[rev(order(bfr_cue_val_all$labs)),]
-  bfr_cue_mtv_all <- bfr_cue_mtv_all[rev(order(bfr_cue_mtv_all$labs)),]
-  aft_cue_val_all <- aft_cue_val_all[rev(order(aft_cue_val_all$labs)),]
-  aft_cue_mtv_all <- aft_cue_mtv_all[rev(order(aft_cue_mtv_all$labs)),]
-  bfr_result_val_all <- bfr_result_val_all[rev(order(bfr_result_val_all$labs)),]
-  bfr_result_mtv_all <- bfr_result_mtv_all[rev(order(bfr_result_mtv_all$labs)),]
-  aft_result_val_all <- aft_result_val_all[rev(order(aft_result_val_all$labs)),]
-  aft_result_mtv_all <- aft_result_mtv_all[rev(order(aft_result_mtv_all$labs)),]
-  
-  bfr_cue_val_sig <- ddply(bfr_cue_val_sig,.(window),transform,position=(cumsum(bfr_cue_val_sig$perc)-0.5*bfr_cue_val_sig$perc))
-  bfr_cue_mtv_sig <- ddply(bfr_cue_mtv_sig,.(window),transform,position=(cumsum(bfr_cue_mtv_sig$perc)-0.5*bfr_cue_mtv_sig$perc))
-  aft_cue_val_sig <- ddply(aft_cue_val_sig,.(window),transform,position=(cumsum(aft_cue_val_sig$perc)-0.5*aft_cue_val_sig$perc))
-  aft_cue_mtv_sig <- ddply(aft_cue_mtv_sig,.(window),transform,position=(cumsum(aft_cue_mtv_sig$perc)-0.5*aft_cue_mtv_sig$perc))
-  bfr_result_val_sig <- ddply(bfr_result_val_sig,.(window),transform,position=(cumsum(bfr_result_val_sig$perc)-0.5*bfr_result_val_sig$perc))
-  bfr_result_mtv_sig <- ddply(bfr_result_mtv_sig,.(window),transform,position=(cumsum(bfr_result_mtv_sig$perc)-0.5*bfr_result_mtv_sig$perc))
-  aft_result_val_sig <- ddply(aft_result_val_sig,.(window),transform,position=(cumsum(aft_result_val_sig$perc)-0.5*aft_result_val_sig$perc))
-  aft_result_mtv_sig <- ddply(aft_result_mtv_sig,.(window),transform,position=(cumsum(aft_result_mtv_sig$perc)-0.5*aft_result_mtv_sig$perc))
-  
-  bfr_cue_val_all <- ddply(bfr_cue_val_all,.(window),transform,position=(cumsum(bfr_cue_val_all$perc)-0.5*bfr_cue_val_all$perc))
-  bfr_cue_mtv_all <- ddply(bfr_cue_mtv_all,.(window),transform,position=(cumsum(bfr_cue_mtv_all$perc)-0.5*bfr_cue_mtv_all$perc))
-  aft_cue_val_all <- ddply(aft_cue_val_all,.(window),transform,position=(cumsum(aft_cue_val_all$perc)-0.5*aft_cue_val_all$perc))
-  aft_cue_mtv_all <- ddply(aft_cue_mtv_all,.(window),transform,position=(cumsum(aft_cue_mtv_all$perc)-0.5*aft_cue_mtv_all$perc))
-  bfr_result_val_all <- ddply(bfr_result_val_all,.(window),transform,position=(cumsum(bfr_result_val_all$perc)-0.5*bfr_result_val_all$perc))
-  bfr_result_mtv_all <- ddply(bfr_result_mtv_all,.(window),transform,position=(cumsum(bfr_result_mtv_all$perc)-0.5*bfr_result_mtv_all$perc))
-  aft_result_val_all <- ddply(aft_result_val_all,.(window),transform,position=(cumsum(aft_result_val_all$perc)-0.5*aft_result_val_all$perc))
-  aft_result_mtv_all <- ddply(aft_result_mtv_all,.(window),transform,position=(cumsum(aft_result_mtv_all$perc)-0.5*aft_result_mtv_all$perc))
-  
-  val_sig <- rbind(bfr_cue_val_sig,aft_cue_val_sig,bfr_result_val_sig,aft_result_val_sig)
-  mtv_sig <- rbind(bfr_cue_mtv_sig,aft_cue_mtv_sig,bfr_result_mtv_sig,aft_result_mtv_sig)
-  val_all <- rbind(bfr_cue_val_all,aft_cue_val_all,bfr_result_val_all,aft_result_val_all)
-  mtv_all <- rbind(bfr_cue_mtv_all,aft_cue_mtv_all,bfr_result_mtv_all,aft_result_mtv_all)
-  
-  val_sig <- val_sig[which(val_sig$perc > 0),]
-  mtv_sig <- mtv_sig[which(mtv_sig$perc > 0),]
-  val_all <- val_all[which(val_all$perc > 0),]
-  mtv_all <- mtv_all[which(mtv_all$perc > 0),]
 
-  val_sig <- ddply(val_sig,.(type),transform,label=paste(scales::percent(val_sig$perc),' n=',val_sig$num,sep=""))
-  mtv_sig <- ddply(mtv_sig,.(type),transform,label=paste(scales::percent(mtv_sig$perc),' n=',mtv_sig$num,sep=""))
-  val_all <- ddply(val_all,.(type),transform,label=paste(scales::percent(val_all$perc),' n=',val_all$num,sep=""))
-  mtv_all <- ddply(mtv_all,.(type),transform,label=paste(scales::percent(mtv_all$perc),' n=',mtv_all$num,sep=""))
-  
-  if(all_alphabeta_bool){png(paste('linreg_all_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
-  }else if (avg_alphabeta_bool){png(paste('linreg_avg_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
-  }else{png(paste('linreg_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)}
-  
-  val_sig_plt <- ggplot() + geom_bar(aes(x=val_sig$window,y=val_sig$perc,fill=val_sig$labs),data=val_sig,stat="identity")
-  val_sig_plt <- val_sig_plt + labs(title='Value, sig',fill="",x="Time Window",y="percentage") + scale_fill_manual(values=c("lightblue","seagreen","slateblue"))
-  val_sig_plt <- val_sig_plt + geom_text(aes(x=val_sig$window,y=val_sig$position,label=val_sig$label),size=2,stat="identity") + theme(axis.text=element_text(size=8),axis.title=element_text(size=10),title=element_text(size=10))
-  val_all_plt <- ggplot() + geom_bar(aes(x=val_all$window,y=val_all$perc,fill=val_all$labs),data=val_all,stat="identity")
-  val_all_plt <- val_all_plt + labs(title='Value, all',fill="",x="Time Window",y="percentage") + scale_fill_manual(values=c("lightblue","seagreen","slateblue"))
-  val_all_plt <- val_all_plt + geom_text(aes(x=val_all$window,y=val_all$position,label=val_all$label),size=2,stat="identity") + theme(axis.text=element_text(size=8),axis.title=element_text(size=10),title=element_text(size=10))
-  
-  mtv_sig_plt <- ggplot() + geom_bar(aes(x=mtv_sig$window,y=mtv_sig$perc,fill=mtv_sig$labs),data=mtv_sig,stat="identity")
-  mtv_sig_plt <- mtv_sig_plt + labs(title='Motivation, sig',fill="",x="Time Window",y="percentage") + scale_fill_manual(values=c("lightblue","seagreen","slateblue"))
-  mtv_sig_plt <- mtv_sig_plt + geom_text(aes(x=mtv_sig$window,y=mtv_sig$position,label=mtv_sig$label),size=2,stat="identity") + theme(axis.text=element_text(size=8),axis.title=element_text(size=10),title=element_text(size=10))
-  mtv_all_plt <- ggplot() + geom_bar(aes(x=mtv_all$window,y=mtv_all$perc,fill=mtv_all$labs),data=mtv_all,stat="identity")
-  mtv_all_plt <- mtv_all_plt + labs(title='Motivation, all',fill="",x="Time Window",y="percentage") + scale_fill_manual(values=c("lightblue","seagreen","slateblue"))
-  mtv_all_plt <- mtv_all_plt + geom_text(aes(x=mtv_all$window,y=mtv_all$position,label=mtv_all$label),size=2,stat="identity") + theme(axis.text=element_text(size=8),axis.title=element_text(size=10),title=element_text(size=10))
-  
-  multiplot(val_sig_plt,val_all_plt,mtv_sig_plt,mtv_all_plt,cols=2)
-  graphics.off()
-  
-}
   
 #all_lists <- list(M1_vals,S1_vals,PmD_vals)
 
@@ -795,18 +473,18 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
   #plot signs bar plot (all)
   
   for (region_index in 1:length(region_list)){
-    if (region_list[region_index] == 'M1'){region_vals <- M1_vals
-    }else if (region_list[region_index] == 'S1'){region_vals <- S1_vals
-    }else if (region_list[region_index] == 'PmD'){region_vals <- PmD_vals}
+    #if (region_list[region_index] == 'M1'){region_vals <- M1_vals
+    #}else if (region_list[region_index] == 'S1'){region_vals <- S1_vals
+    #}else if (region_list[region_index] == 'PmD'){region_vals <- PmD_vals}
     
-    all_bfr_cue_alpha <- region_vals$bfr_cue_list$alpha_list
-    all_bfr_cue_beta <- region_vals$bfr_cue_list$beta_list
-    all_aft_cue_alpha <- region_vals$aft_cue_list$alpha_list
-    all_aft_cue_beta <- region_vals$aft_cue_list$beta_list
-    all_bfr_result_alpha <- region_vals$bfr_result_list$alpha_list
-    all_bfr_result_beta <- region_vals$bfr_result_list$beta_list
-    all_aft_result_alpha <- region_vals$aft_result_list$alpha_list
-    all_aft_result_beta <- region_vals$aft_result_list$beta_list
+    #all_bfr_cue_alpha <- region_vals$bfr_cue_list$alpha_list
+    #all_bfr_cue_beta <- region_vals$bfr_cue_list$beta_list
+    #all_aft_cue_alpha <- region_vals$aft_cue_list$alpha_list
+    #all_aft_cue_beta <- region_vals$aft_cue_list$beta_list
+    #all_bfr_result_alpha <- region_vals$bfr_result_list$alpha_list
+    #all_bfr_result_beta <- region_vals$bfr_result_list$beta_list
+    #all_aft_result_alpha <- region_vals$aft_result_list$alpha_list
+    #all_aft_result_beta <- region_vals$aft_result_list$beta_list
     
     #all_avg_alpha <- (all_bfr_cue_alpha + all_aft_cue_alpha + all_bfr_result_alpha + all_aft_result_alpha) / 4
     #all_avg_beta <- (all_bfr_cue_beta + all_aft_cue_beta + all_bfr_result_beta + all_aft_result_beta) / 4
