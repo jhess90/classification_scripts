@@ -316,6 +316,11 @@ for region_key,region_val in all_dict.iteritems():
     dpca = dPCA.dPCA(labels='idt',regularizer='auto',n_components = 15,join=join_comb)
     dpca.protect = ['t']
     Z = dpca.fit_transform(all_avg,all_bal)
+
+    inv_transform_dict = {}
+    for comb_key,comb_val in Z.iteritems():
+            inv_transform_dict[comb_key]  = dpca.inverse_transform(Z[comb_key],comb_key)
+
     if not do_sig_analysis:
         del all_bal
     explained_var = dpca.explained_variance_ratio_  
@@ -335,7 +340,22 @@ for region_key,region_val in all_dict.iteritems():
             labels = ['v_1_f','v_1_s','v0_f','v0_s','v1_f','v1_s']
 
     colors = ['darkblue','darkblue','darkgreen','darkgreen','crimson','crimson']
-    
+
+    ###########################
+
+    ax = plt.gca()
+    plt.plot(bins,inv_transform_dict['idt'][0,0,0,:])
+    plt.plot(bins,inv_transform_dict['idt'][0,0,1,:])
+    plt.plot(bins,inv_transform_dict['idt'][0,1,0,:])
+    plt.plot(bins,inv_transform_dict['idt'][0,1,1,:])
+
+    plt.savefig('test')
+
+
+
+    pdb.set_trace()
+
+    ###########################
     print 'plotting'
 
     #plot 1
@@ -486,9 +506,9 @@ for region_key,region_val in all_dict.iteritems():
     transformed = dpca.transform(all_avg)
 
     if do_sig_analysis:
-        dpca_results = {'Z':Z,'explained_var':explained_var,'sig_analysis':sig_analysis,'transformed':transformed,'all_avg':all_avg,'all_bal':all_bal}
+        dpca_results = {'Z':Z,'explained_var':explained_var,'sig_analysis':sig_analysis,'transformed':transformed,'all_avg':all_avg,'all_bal':all_bal,'inv_transform_dict':inv_transform_dict}
     else:
-        dpca_results = {'Z':Z,'explained_var':explained_var,'transformed':transformed,'all_avg':all_avg} #,'all_bal':all_bal} #too large now
+        dpca_results = {'Z':Z,'explained_var':explained_var,'transformed':transformed,'all_avg':all_avg,'inv_transform_dict':inv_transform_dict} #,'all_bal':all_bal} #too large now
         
 
     if run_motiv:

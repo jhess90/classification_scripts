@@ -463,7 +463,7 @@ for region_key,region_val in all_dict.iteritems():
             line0 = plt.plot(bins,Z[comb_ind][i+1*components_plot,0,0,:],label=labels[0],color=colors[0],linestyle='--')
             line1 = plt.plot(bins,Z[comb_ind][i+1*components_plot,0,1,:],label=labels[1],color=colors[1])
             line2 = plt.plot(bins,Z[comb_ind][i+1*components_plot,1,0,:],label=labels[2],color=colors[2],linestyle='--')
-            line3 = plt.plot(bins,Z[comb_ind][i+1*components_plot,1,1,:],label=labels[3],color=colors[3))
+            line3 = plt.plot(bins,Z[comb_ind][i+1*components_plot,1,1,:],label=labels[3],color=colors[3])
             line4 = plt.plot(bins,Z[comb_ind][i+1*components_plot,2,0,:],label=labels[4],color=colors[4],linestyle='--')
             line5 = plt.plot(bins,Z[comb_ind][i+1*components_plot,2,1,:],label=labels[5],color=colors[5])
             line6 = plt.plot(bins,Z[comb_ind][i+1*components_plot,3,0,:],label=labels[6],color=colors[6],linestyle='--')

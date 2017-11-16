@@ -70,11 +70,11 @@ def sort_and_avg(fr_array,sort_dict):
                                 i_trials = sort_dict['index']['m2']
 
                 elif run_value:
-                        if i == 1:
+                        if i == 0:
                                 i_trials = sort_dict['index']['v_1']
-                        elif i == 2:
+                        elif i == 1:
                                 i_trials = sort_dict['index']['v0']
-                        elif i == 3:
+                        elif i == 2:
                                 i_trials = sort_dict['index']['v1']
 			
 
