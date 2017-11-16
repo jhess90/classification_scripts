@@ -382,7 +382,7 @@ for (region_index in 1:length(region_list)){
   
   bar_plt <- ggplot() + geom_bar(aes(x=df_all$type,y=df_all$perc,fill=df_all$labs),data=df_all,stat="identity") 
   bar_plt <- bar_plt + labs(title=region_list[region_index],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
-  bar_plt <- bar_plt + geom_text(aes(x=df_all$type,y=df_all$position,label=df_all$label),size=3,stat="identity")
+  bar_plt <- bar_plt + geom_text(aes(x=df_all$type,y=df_all$position,label=df_all$label),size=4,stat="identity")
   
   plot(bar_plt)
   graphics.off()
@@ -420,6 +420,8 @@ plot_newmv <- function(mv_array,region_key,type_key){
     #TODO fix, doesn't quite work
     val_lm <- tidy(lm(fr~x_val,data=df_val))
     mtv_lm <- tidy(lm(fr~x_mtv,data=df_mtv))
+  
+    #cat(mtv_lm$estimate[2],'\n')
     
     #will this (or the other complete cases) affect outcomes? see what's causing
     val_lm <- val_lm[complete.cases(val_lm$p.value),]
@@ -947,6 +949,6 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
 
 save.image('all_r_all.RData')
 
-rm(list=ls())
+#rm(list=ls())
 
  

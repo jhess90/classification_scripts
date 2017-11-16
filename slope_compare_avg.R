@@ -271,7 +271,7 @@ for (region_index in 1:length(region_list)){
   
   bar_plt <- ggplot() + geom_bar(aes(x=df_all$type,y=df_all$perc,fill=df_all$labs),data=df_all,stat="identity") 
   bar_plt <- bar_plt + labs(title=region_list[region_index],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
-  bar_plt <- bar_plt + geom_text(aes(x=df_all$type,y=df_all$position,label=df_all$label),size=3,stat="identity")
+  bar_plt <- bar_plt + geom_text(aes(x=df_all$type,y=df_all$position,label=df_all$label),size=3.5,stat="identity")
   
   plot(bar_plt)
   graphics.off()
@@ -382,7 +382,7 @@ for (region_index in 1:length(region_list)){
   
   bar_plt <- ggplot() + geom_bar(aes(x=df_all$type,y=df_all$perc,fill=df_all$labs),data=df_all,stat="identity") 
   bar_plt <- bar_plt + labs(title=region_list[region_index],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
-  bar_plt <- bar_plt + geom_text(aes(x=df_all$type,y=df_all$position,label=df_all$label),size=3,stat="identity")
+  bar_plt <- bar_plt + geom_text(aes(x=df_all$type,y=df_all$position,label=df_all$label),size=4,stat="identity")
   
   plot(bar_plt)
   graphics.off()
@@ -420,6 +420,8 @@ plot_newmv <- function(mv_array,region_key,type_key){
     #TODO fix, doesn't quite work
     val_lm <- tidy(lm(fr~x_val,data=df_val))
     mtv_lm <- tidy(lm(fr~x_mtv,data=df_mtv))
+    
+    #cat(mtv_lm$estimate[2],'\n')
     
     #will this (or the other complete cases) affect outcomes? see what's causing
     val_lm <- val_lm[complete.cases(val_lm$p.value),]
@@ -482,7 +484,6 @@ plot_newmv <- function(mv_array,region_key,type_key){
   if (all_alphabeta_bool){png(paste('slope_hist_all_',region_key,'_',type_key,'.png',sep=""),width=8,height=6,units="in",res=500)
   }else if (avg_alphabeta_bool){png(paste('slope_hist_avg_',region_key,'_',type_key,'.png',sep=""),width=8,height=6,units="in",res=500)
   }else{png(paste('slope_hist_',region_key,'_',type_key,'.png',sep=""),width=8,height=6,units="in",res=500)}
-  
   
   
   sig_plt <- ggplot(sig_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)

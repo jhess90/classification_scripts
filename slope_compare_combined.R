@@ -19,7 +19,7 @@ library(reshape)
 #######
 
 avg_alphabeta_bool = FALSE
-all_alphabeta_bool = FALSE
+all_alphabeta_bool = TRUE
 
 if (avg_alphabeta_bool & all_alphabeta_bool){cat('ERROR both cant be true')}
 
@@ -397,7 +397,6 @@ plot_newmv <- function(mv_array,region_key,type_key){
   if (is.null(sig_mtv_slopes)){sig_mtv_slopes=NA}
   if (is.null(all_val_slopes)){all_val_slopes=NA}
   if (is.null(all_mtv_slopes)){all_mtv_slopes=NA}
-  
   sig_val_slopes.df <- data.frame(slopes=sig_val_slopes,type='val')
   sig_mtv_slopes.df <- data.frame(slopes=sig_mtv_slopes,type='mtv')
   
