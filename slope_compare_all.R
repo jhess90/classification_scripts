@@ -19,7 +19,7 @@ library(reshape)
 #######
 
 avg_alphabeta_bool = FALSE
-all_alphabeta_bool = FALSE
+all_alphabeta_bool = TRUE
 
 if (avg_alphabeta_bool & all_alphabeta_bool){cat('ERROR both cant be true')}
 
@@ -484,7 +484,6 @@ plot_newmv <- function(mv_array,region_key,type_key){
   }else{png(paste('slope_hist_',region_key,'_',type_key,'.png',sep=""),width=8,height=6,units="in",res=500)}
   
   
-  
   sig_plt <- ggplot(sig_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
   sig_plt <- sig_plt + labs(title=paste(region_key,type_key,'significant')) #+ xlim(-1.0,1.0)
 
@@ -495,8 +494,8 @@ plot_newmv <- function(mv_array,region_key,type_key){
     
   graphics.off()
   
-  saveRDS(sig_slopes,paste(region_key,'_',type_key,'_sig_slopes.rds',sep=''))
-  saveRDS(all_slopes,paste(region_key,'_',type_key,'_all_slopes.rds',sep=''))
+  saveRDS(sig_slopes,paste(region_key,'_',type_key,'_sig_slopes_all.rds',sep=''))
+  saveRDS(all_slopes,paste(region_key,'_',type_key,'_all_slopes_all.rds',sep=''))
   
   return_list <- list(val = val_list,mtv = mtv_list,perc_v = perc_val_sig,perc_m = perc_mtv_sig,sig_slopes=sig_slopes,all_slopes=all_slopes,alpha_list=alpha_list,beta_list=beta_list)
   return(return_list)
@@ -895,9 +894,6 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
     bfr_result_list <- det_signs(all_bfr_result_alpha,all_bfr_result_beta)
     aft_result_list <- det_signs(all_aft_result_alpha,all_aft_result_beta)
     
-    #saveRDS(all_slopes,paste(region_key,'_',type_key,'_all_slopes.rds',sep=''))
-    
-    
     bfr_cue_vals <- c(bfr_cue_list$perc_both_pos,bfr_cue_list$perc_both_neg,bfr_cue_list$perc_alpha_pos,bfr_cue_list$perc_beta_pos)
     aft_cue_vals <- c(aft_cue_list$perc_both_pos,aft_cue_list$perc_both_neg,aft_cue_list$perc_alpha_pos,aft_cue_list$perc_beta_pos)
     bfr_result_vals <- c(bfr_result_list$perc_both_pos,bfr_result_list$perc_both_neg,bfr_result_list$perc_alpha_pos,bfr_result_list$perc_beta_pos)
@@ -937,7 +933,7 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
     df_all <- rbind(bfr_cue_df,aft_cue_df,bfr_result_df,aft_result_df)
     df_all <- df_all[which(df_all$perc > 0),]
     
-    save(df_all,bfr_cue_df,aft_cue_df,bfr_result_df,aft_result_df,bfr_cue_nums,aft_cue_nums,bfr_result_nums,aft_result_nums,bfr_cue_list,aft_cue_list,bfr_result_list,aft_result_list,file=paste('alphabeta_',region_list[region_index],'.RData'))
+    save(df_all,bfr_cue_df,aft_cue_df,bfr_result_df,aft_result_df,bfr_cue_nums,aft_cue_nums,bfr_result_nums,aft_result_nums,bfr_cue_list,aft_cue_list,bfr_result_list,aft_result_list,file=paste('alphabeta_',region_list[region_index],'_all.RData',sep=""))
     
     bar_plt <- ggplot() + geom_bar(aes(x=df_all$type,y=df_all$perc,fill=df_all$labs),data=df_all,stat="identity") 
     bar_plt <- bar_plt + labs(title=region_list[region_index],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
@@ -949,7 +945,7 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
   }
 }
 
-save.image('all_r.RData')
+save.image('all_r_all.RData')
 
 rm(list=ls())
 

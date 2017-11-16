@@ -25,79 +25,8 @@ if (avg_alphabeta_bool & all_alphabeta_bool){cat('ERROR both cant be true')}
 
 #######
 
-file_list <- c('sig_slopes_M1_dicts.xlsx','sig_slopes_S1_dicts.xlsx','sig_slopes_PmD_dicts.xlsx')
+#file_list <- c('sig_slopes_M1_dicts.xlsx','sig_slopes_S1_dicts.xlsx','sig_slopes_PmD_dicts.xlsx')
 region_list <- c('M1','S1','PmD')
-
-
-for (region_index in 1:length(file_list)){
-    
-  slopes_bfr_cue <- read.xlsx(file_list[region_index],sheet='slopes_bfr_cue_model',colNames=T)
-  slopes_aft_cue <- read.xlsx(file_list[region_index],sheet='slopes_aft_cue_model',colNames=T)
-  slopes_bfr_result <- read.xlsx(file_list[region_index],sheet='slopes_bfr_result_model',colNames=T)
-  slopes_aft_result <- read.xlsx(file_list[region_index],sheet='slopes_aft_result_model',colNames=T)
-
-  slopes_bfr_cue_sigall <- read.xlsx(file_list[region_index],sheet='sig_all_bfr_cue_model',colNames=T)
-  slopes_aft_cue_sigall <- read.xlsx(file_list[region_index],sheet='sig_all_aft_cue_model',colNames=T)
-  slopes_bfr_result_sigall <- read.xlsx(file_list[region_index],sheet='sig_all_bfr_result_model',colNames=T)
-  slopes_aft_result_sigall <- read.xlsx(file_list[region_index],sheet='sig_all_aft_result_model',colNames=T)
-  
-  avg_bfr_cue <- c(mean(abs(slopes_bfr_cue$alpha)),mean(abs(slopes_bfr_cue$beta)),mean(abs(slopes_bfr_cue_sigall$alpha)),mean(abs(slopes_bfr_cue_sigall$beta)))
-  avg_aft_cue <- c(mean(abs(slopes_aft_cue$alpha)),mean(abs(slopes_aft_cue$beta)),mean(abs(slopes_aft_cue_sigall$alpha)),mean(abs(slopes_aft_cue_sigall$beta)))
-  avg_bfr_result <- c(mean(abs(slopes_bfr_result$alpha)),mean(abs(slopes_bfr_result$beta)),mean(abs(slopes_bfr_result_sigall$alpha)),mean(abs(slopes_bfr_result_sigall$beta)))
-  avg_aft_result <- c(mean(abs(slopes_aft_result$alpha)),mean(abs(slopes_aft_result$beta)),mean(abs(slopes_aft_result_sigall$alpha)),mean(abs(slopes_aft_result_sigall$beta)))
-  
-  std_bfr_cue <- c(sd(abs(slopes_bfr_cue$alpha)),sd(abs(slopes_bfr_cue$beta)),sd(abs(slopes_bfr_cue_sigall$alpha)),sd(abs(slopes_bfr_cue_sigall$beta)))
-  std_aft_cue <- c(sd(abs(slopes_aft_cue$alpha)),sd(abs(slopes_aft_cue$beta)),sd(abs(slopes_aft_cue_sigall$alpha)),sd(abs(slopes_aft_cue_sigall$beta)))
-  std_bfr_result <- c(sd(abs(slopes_bfr_result$alpha)),sd(abs(slopes_bfr_result$beta)),sd(abs(slopes_bfr_result_sigall$alpha)),sd(abs(slopes_bfr_result_sigall$beta)))
-  std_aft_result <- c(sd(abs(slopes_aft_result$alpha)),sd(abs(slopes_aft_result$beta)),sd(abs(slopes_aft_result_sigall$alpha)),sd(abs(slopes_aft_result_sigall$beta)))
-  
-  key <- c('alpha','beta','alpha','beta')
-  cat <- c('one sig','one sig','both sig','both sig')
-  
-  df_bfr_cue <- data.frame(value= avg_bfr_cue,cat,key,std_bfr_cue)
-  df_aft_cue <- data.frame(value = avg_aft_cue,cat,key,std_aft_cue)
-  df_bfr_result <- data.frame(value = avg_bfr_result,cat,key,std_bfr_result)
-  df_aft_result <- data.frame(value = avg_aft_result,cat,key,std_aft_result)
-  
-  bfr_cue_plt <- ggplot(df_bfr_cue) + aes(x=cat,y=value,fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="before cue") + geom_errorbar(aes(ymin=df_bfr_cue$value + df_bfr_cue$std_bfr_cue,ymax=df_bfr_cue$value - df_bfr_cue$std_bfr_cue),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  aft_cue_plt <- ggplot(df_aft_cue) + aes(x=cat,y=value, fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="after cue") + geom_errorbar(aes(ymin=df_aft_cue$value + df_aft_cue$std_aft_cue,ymax=df_aft_cue$value - df_aft_cue$std_aft_cue),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  bfr_result_plt <- ggplot(df_bfr_result) + aes(x=cat,y=value, fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="before result") + geom_errorbar(aes(ymin=df_bfr_result$value + df_bfr_result$std_bfr_result,ymax=df_bfr_result$value - df_bfr_result$std_bfr_result),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  aft_result_plt <- ggplot(df_aft_result) + aes(x=cat,y=value, fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="after result") + geom_errorbar(aes(ymin=df_aft_result$value + df_aft_result$std_aft_result,ymax=df_aft_result$value - df_aft_result$std_aft_result),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  
-  png(paste(region_list[region_index],'_avg_abs_slopes.png',sep=""),width=8,height=6,units="in",res=500)
-  multiplot(bfr_cue_plt,aft_cue_plt,bfr_result_plt,aft_result_plt,cols=2)
-  
-  #dev.off()
-  graphics.off()
-  
-  ####################
-  avg_bfr_cue <- c(mean(slopes_bfr_cue$alpha),mean(slopes_bfr_cue$beta),mean(slopes_bfr_cue_sigall$alpha),mean(slopes_bfr_cue_sigall$beta))
-  avg_aft_cue <- c(mean(slopes_aft_cue$alpha),mean(slopes_aft_cue$beta),mean(slopes_aft_cue_sigall$alpha),mean(slopes_aft_cue_sigall$beta))
-  avg_bfr_result <- c(mean(slopes_bfr_result$alpha),mean(slopes_bfr_result$beta),mean(slopes_bfr_result_sigall$alpha),mean(slopes_bfr_result_sigall$beta))
-  avg_aft_result <- c(mean(slopes_aft_result$alpha),mean(slopes_aft_result$beta),mean(slopes_aft_result_sigall$alpha),mean(slopes_aft_result_sigall$beta))
-  
-  std_bfr_cue <- c(sd(slopes_bfr_cue$alpha),sd(slopes_bfr_cue$beta),sd(slopes_bfr_cue_sigall$alpha),sd(slopes_bfr_cue_sigall$beta))
-  std_aft_cue <- c(sd(slopes_aft_cue$alpha),sd(slopes_aft_cue$beta),sd(slopes_aft_cue_sigall$alpha),sd(slopes_aft_cue_sigall$beta))
-  std_bfr_result <- c(sd(slopes_bfr_result$alpha),sd(slopes_bfr_result$beta),sd(slopes_bfr_result_sigall$alpha),sd(slopes_bfr_result_sigall$beta))
-  std_aft_result <- c(sd(slopes_aft_result$alpha),sd(slopes_aft_result$beta),sd(slopes_aft_result_sigall$alpha),sd(slopes_aft_result_sigall$beta))
-  
-  df_bfr_cue <- data.frame(value= avg_bfr_cue,cat,key,std_bfr_cue)
-  df_aft_cue <- data.frame(value = avg_aft_cue,cat,key,std_aft_cue)
-  df_bfr_result <- data.frame(value = avg_bfr_result,cat,key,std_bfr_result)
-  df_aft_result <- data.frame(value = avg_aft_result,cat,key,std_aft_result)
-  
-  bfr_cue_plt <- ggplot(df_bfr_cue) + aes(x=cat,y=value,fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="before cue") + geom_errorbar(aes(ymin=df_bfr_cue$value + df_bfr_cue$std_bfr_cue,ymax=df_bfr_cue$value - df_bfr_cue$std_bfr_cue),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  aft_cue_plt <- ggplot(df_aft_cue) + aes(x=cat,y=value, fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="after cue") + geom_errorbar(aes(ymin=df_aft_cue$value + df_aft_cue$std_aft_cue,ymax=df_aft_cue$value - df_aft_cue$std_aft_cue),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  bfr_result_plt <- ggplot(df_bfr_result) + aes(x=cat,y=value, fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="before result") + geom_errorbar(aes(ymin=df_bfr_result$value + df_bfr_result$std_bfr_result,ymax=df_bfr_result$value - df_bfr_result$std_bfr_result),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  aft_result_plt <- ggplot(df_aft_result) + aes(x=cat,y=value, fill = key)+ geom_bar(stat="identity",position="dodge",na.rm=T) + labs(title="after result") + geom_errorbar(aes(ymin=df_aft_result$value + df_aft_result$std_aft_result,ymax=df_aft_result$value - df_aft_result$std_aft_result),stat="identity",width=0.25,position=position_dodge(0.9),color="gray40",na.rm=T)
-  
-  png(paste(region_list[region_index],'_avg_slopes.png',sep=""),width=8,height=6,units="in",res=500)
-  multiplot(bfr_cue_plt,aft_cue_plt,bfr_result_plt,aft_result_plt,cols=2)
-  
-  #dev.off()
-  graphics.off()
-  
-}
 
 
 for (region_index in 1:length(region_list)){
@@ -389,6 +318,8 @@ for (region_index in 1:length(region_list)){
   
 }
 
+
+
 #####################
 plot_newmv <- function(mv_array,region_key,type_key){
   val_list <- vector("list",dim(mv_array)[1])
@@ -415,7 +346,7 @@ plot_newmv <- function(mv_array,region_key,type_key){
     df_mtv <- data.frame(x_mtv,fr)
     
     val_plt <- ggplot(df_val,aes(x_val,fr)) + geom_point(shape=1) + geom_smooth(method=lm) + labs(title=paste(region_key,type_key),x="Value",y="Normalized Firing Rate")
-    mtv_plt <- ggplot(df_mtv,aes(x_mtv,fr)) + geom_point(shape=1) + geom_smooth(method=lm)+ labs(title=paste(region_key,type_key),x="Motivation",y="Normalized Firing Rate")
+    mtv_plt <- ggplot(df_mtv,aes(x_mtv,fr)) + geom_point(shape=1) + geom_smooth(method=lm) + labs(title=paste(region_key,type_key),x="Motivation",y="Normalized Firing Rate")
     
     #TODO fix, doesn't quite work
     val_lm <- tidy(lm(fr~x_val,data=df_val))
@@ -494,9 +425,6 @@ plot_newmv <- function(mv_array,region_key,type_key){
   multiplot(sig_plt,all_plt,cols=1)
     
   graphics.off()
-  
-  saveRDS(sig_slopes,paste(region_key,'_',type_key,'_sig_slopes.rds',sep=''))
-  saveRDS(all_slopes,paste(region_key,'_',type_key,'_all_slopes.rds',sep=''))
   
   return_list <- list(val = val_list,mtv = mtv_list,perc_v = perc_val_sig,perc_m = perc_mtv_sig,sig_slopes=sig_slopes,all_slopes=all_slopes,alpha_list=alpha_list,beta_list=beta_list)
   return(return_list)
@@ -895,9 +823,6 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
     bfr_result_list <- det_signs(all_bfr_result_alpha,all_bfr_result_beta)
     aft_result_list <- det_signs(all_aft_result_alpha,all_aft_result_beta)
     
-    #saveRDS(all_slopes,paste(region_key,'_',type_key,'_all_slopes.rds',sep=''))
-    
-    
     bfr_cue_vals <- c(bfr_cue_list$perc_both_pos,bfr_cue_list$perc_both_neg,bfr_cue_list$perc_alpha_pos,bfr_cue_list$perc_beta_pos)
     aft_cue_vals <- c(aft_cue_list$perc_both_pos,aft_cue_list$perc_both_neg,aft_cue_list$perc_alpha_pos,aft_cue_list$perc_beta_pos)
     bfr_result_vals <- c(bfr_result_list$perc_both_pos,bfr_result_list$perc_both_neg,bfr_result_list$perc_alpha_pos,bfr_result_list$perc_beta_pos)
@@ -937,8 +862,6 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
     df_all <- rbind(bfr_cue_df,aft_cue_df,bfr_result_df,aft_result_df)
     df_all <- df_all[which(df_all$perc > 0),]
     
-    save(df_all,bfr_cue_df,aft_cue_df,bfr_result_df,aft_result_df,bfr_cue_nums,aft_cue_nums,bfr_result_nums,aft_result_nums,bfr_cue_list,aft_cue_list,bfr_result_list,aft_result_list,file=paste('alphabeta_',region_list[region_index],'.RData'))
-    
     bar_plt <- ggplot() + geom_bar(aes(x=df_all$type,y=df_all$perc,fill=df_all$labs),data=df_all,stat="identity") 
     bar_plt <- bar_plt + labs(title=region_list[region_index],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
     bar_plt <- bar_plt + geom_text(aes(x=df_all$type,y=df_all$position,label=df_all$label),size=3,stat="identity")
@@ -948,8 +871,6 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
     
   }
 }
-
-save.image('all_r.RData')
 
 rm(list=ls())
 
