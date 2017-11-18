@@ -24,6 +24,9 @@ from scipy import ndimage
 #params to set ########
 #######################
 
+zscore_bool = False
+gaussian_bool = True
+
 
 
 
@@ -33,11 +36,29 @@ from scipy import ndimage
 ###############################
 ### functions #################
 ###############################
-def smooth_data(spike_vals,
+def hist_and_smooth_data(spike_vals):
+
+
+	
 
 
 
 
+
+
+
+
+	
+	return()
+
+
+
+def run_corr(binned_data):
+
+
+
+
+	return()
 
 
 
@@ -166,7 +187,11 @@ PmD_spikes = PmD_spikes[0,0:PmD_limit];
 spike_dict = {'M1':M1_spikes,'S1':S1_spikes,'PmD':PmD_spikes}
 
 for spike_key,spike_val in spike_dict.iteritems():
-    smooth_data(spike_val)
+	#hist and smooth first in a func (make bool for type of smooth)
+	#then run corr func
+	binned_data = hist_and_smooth_data(spike_val)
+
+	corr_data = run_correlation(binned_data)
     
 
 
