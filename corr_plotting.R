@@ -17,7 +17,7 @@ library(R.matlab)
 #### Params #####
 #################
 
-units_to_plot <- 3
+units_to_plot <- 5
 region_list <- c('M1','S1','PmD')
 
 
@@ -79,7 +79,7 @@ for (region_index in 1:length(region_list)){
   png(paste('corr_tb_r_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
   
   plt <- ggplot(test,aes(x=r_values,y=avg,color=type)) #+ geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1,position=pd) 
-  plt <- plt +  geom_line(aes(linetype=type)) + geom_point() + scale_linetype_manual(name="Unit Key",values=c("top_cue"="solid","btm_cue"="dotted","top_res"="solid","btm_res"="dotted")) + scale_colour_manual(name="Unit Key",values=c("top_cue"="maroon","btm_cue"="maroon","top_res"="slateblue","btm_res"="slateblue"))
+  plt <- plt +  geom_line(aes(linetype=type)) + geom_point() + scale_linetype_manual(name="Unit Key",values=c("top_cue"="solid","btm_cue"="dotted","top_res"="solid","btm_res"="dotted")) + scale_colour_manual(name="Unit Key",values=c("top_cue"="coral4","btm_cue"="coral4","top_res"="slateblue","btm_res"="slateblue"))
   plt <- plt + labs(title="Reward",x="Reward",y="Firing rate") 
   plot(plt)
   graphics.off()
@@ -113,7 +113,7 @@ for (region_index in 1:length(region_list)){
   png(paste('corr_tb_p_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
   
   plt <- ggplot(test,aes(x=p_values,y=avg,color=type)) #+ geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1,position=pd) 
-  plt <- plt +  geom_line(aes(linetype=type)) + geom_point() + scale_linetype_manual(name="Unit Key",values=c("top_cue"="solid","btm_cue"="dotted","top_res"="solid","btm_res"="dotted")) + scale_colour_manual(name="Unit Key",values=c("top_cue"="maroon","btm_cue"="maroon","top_res"="slateblue","btm_res"="slateblue"))
+  plt <- plt +  geom_line(aes(linetype=type)) + geom_point() + scale_linetype_manual(name="Unit Key",values=c("top_cue"="solid","btm_cue"="dotted","top_res"="solid","btm_res"="dotted")) + scale_colour_manual(name="Unit Key",values=c("top_cue"="coral4","btm_cue"="coral4","top_res"="slateblue","btm_res"="slateblue"))
   plt <- plt + labs(title="Punishment",x="Punishment",y="Firing rate") 
   plot(plt)
   graphics.off()
@@ -147,7 +147,7 @@ for (region_index in 1:length(region_list)){
   png(paste('corr_tb_res_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
   
   plt <- ggplot(test,aes(x=res_values,y=avg,color=type)) #+ geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1,position=pd) 
-  plt <- plt +  geom_line(aes(linetype=type)) + geom_point() + scale_linetype_manual(name="Unit Key",values=c("top_cue"="solid","btm_cue"="dotted","top_res"="solid","btm_res"="dotted")) + scale_colour_manual(name="Unit Key",values=c("top_cue"="maroon","btm_cue"="maroon","top_res"="slateblue","btm_res"="slateblue"))
+  plt <- plt +  geom_line(aes(linetype=type)) + geom_point() + scale_linetype_manual(name="Unit Key",values=c("top_cue"="solid","btm_cue"="dotted","top_res"="solid","btm_res"="dotted")) + scale_colour_manual(name="Unit Key",values=c("top_cue"="coral4","btm_cue"="coral4","top_res"="slateblue","btm_res"="slateblue"))
   plt <- plt + labs(title="Result",x="0: Failure, 1: Success",y="Firing rate") 
   plot(plt)
   graphics.off()
@@ -183,7 +183,7 @@ for (region_index in 1:length(region_list)){
   png(paste('corr_tb_v_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
 
   plt <- ggplot(test,aes(x=v_values,y=avg,color=type)) #+ geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1,position=pd) 
-  plt <- plt +  geom_line(aes(linetype=type)) + geom_point() + scale_linetype_manual(name="Unit Key",values=c("top_cue"="solid","btm_cue"="dotted","top_res"="solid","btm_res"="dotted")) + scale_colour_manual(name="Unit Key",values=c("top_cue"="maroon","btm_cue"="maroon","top_res"="slateblue","btm_res"="slateblue"))
+  plt <- plt +  geom_line(aes(linetype=type)) + geom_point() + scale_linetype_manual(name="Unit Key",values=c("top_cue"="solid","btm_cue"="dotted","top_res"="solid","btm_res"="dotted")) + scale_colour_manual(name="Unit Key",values=c("top_cue"="coral4","btm_cue"="coral4","top_res"="slateblue","btm_res"="slateblue"))
   plt <- plt + labs(title="Value",x="Value",y="Firing rate") 
   plot(plt)
   graphics.off()
@@ -217,7 +217,7 @@ for (region_index in 1:length(region_list)){
   png(paste('corr_tb_m_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
   
   plt <- ggplot(test,aes(x=m_values,y=avg,color=type)) #+ geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1,position=pd) 
-  plt <- plt +  geom_line(aes(linetype=type)) + geom_point() + scale_linetype_manual(name="Unit Key",values=c("top_cue"="solid","btm_cue"="dotted","top_res"="solid","btm_res"="dotted")) + scale_colour_manual(name="Unit Key",values=c("top_cue"="maroon","btm_cue"="maroon","top_res"="slateblue","btm_res"="slateblue"))
+  plt <- plt +  geom_line(aes(linetype=type)) + geom_point() + scale_linetype_manual(name="Unit Key",values=c("top_cue"="solid","btm_cue"="dotted","top_res"="solid","btm_res"="dotted")) + scale_colour_manual(name="Unit Key",values=c("top_cue"="coral4","btm_cue"="coral4","top_res"="slateblue","btm_res"="slateblue"))
   plt <- plt + labs(title="Motivation",x="Motivation",y="Firing rate") 
   plot(plt)
   graphics.off()
@@ -239,6 +239,201 @@ for (region_index in 1:length(region_list)){
   mtv_corr_order <- readin$order.dict[,,1]$mtv.corr.order
   res_corr_order <- readin$order.dict[,,1]$res.corr.order
   condensed <- readin$order.dict[,,1]$condensed
+  
+  r0_cue_total_t <- c()
+  r1_cue_total_t <- c()
+  r2_cue_total_t <- c()
+  r3_cue_total_t <- c()
+  r0_res_total_t <- c()
+  r1_res_total_t <- c()
+  r2_res_total_t <- c()
+  r3_res_total_t <- c()
+  r0_res_succ_total_t <- c()
+  r1_res_succ_total_t <- c()
+  r2_res_succ_total_t <- c()
+  r3_res_succ_total_t <- c()
+  r0_res_fail_total_t <- c()
+  r1_res_fail_total_t <- c()
+  r2_res_fail_total_t <- c()
+  r3_res_fail_total_t <- c()
+  
+  p0_cue_total_t <- c()
+  p1_cue_total_t <- c()
+  p2_cue_total_t <- c()
+  p3_cue_total_t <- c()
+  p0_res_total_t <- c()
+  p1_res_total_t <- c()
+  p2_res_total_t <- c()
+  p3_res_total_t <- c()
+  p0_res_succ_total_t <- c()
+  p1_res_succ_total_t <- c()
+  p2_res_succ_total_t <- c()
+  p3_res_succ_total_t <- c()
+  p0_res_fail_total_t <- c()
+  p1_res_fail_total_t <- c()
+  p2_res_fail_total_t <- c()
+  p3_res_fail_total_t <- c()
+  
+  res0_cue_total_t <- c()
+  res1_cue_total_t <- c()
+  res0_res_total_t <- c()
+  res1_res_total_t <- c()
+
+  v_3_cue_total_t <- c()
+  v_2_cue_total_t <- c()
+  v_1_cue_total_t <- c()
+  v0_cue_total_t <- c()
+  v1_cue_total_t <- c()
+  v2_cue_total_t <- c()
+  v3_cue_total_t <- c()
+  v_3_res_total_t <- c()
+  v_2_res_total_t <- c()
+  v_1_res_total_t <- c()
+  v0_res_total_t <- c()
+  v1_res_total_t <- c()
+  v2_res_total_t <- c()
+  v3_res_total_t <- c()
+  v_3_res_succ_total_t <- c()
+  v_2_res_succ_total_t <- c()
+  v_1_res_succ_total_t <- c()
+  v0_res_succ_total_t <- c()
+  v1_res_succ_total_t <- c()
+  v2_res_succ_total_t <- c()
+  v3_res_succ_total_t <- c()
+  v_3_res_fail_total_t <- c()
+  v_2_res_fail_total_t <- c()
+  v_1_res_fail_total_t <- c()
+  v0_res_fail_total_t <- c()
+  v1_res_fail_total_t <- c()
+  v2_res_fail_total_t <- c()
+  v3_res_fail_total_t <- c()
+  
+  m0_cue_total_t <- c()
+  m1_cue_total_t <- c()
+  m2_cue_total_t <- c()
+  m3_cue_total_t <- c()
+  m4_cue_total_t <- c()
+  m5_cue_total_t <- c()
+  m6_cue_total_t <- c()
+  m0_res_total_t <- c()
+  m1_res_total_t <- c()
+  m2_res_total_t <- c()
+  m3_res_total_t <- c()
+  m4_res_total_t <- c()
+  m5_res_total_t <- c()
+  m6_res_total_t <- c()
+  m0_res_succ_total_t <- c()
+  m1_res_succ_total_t <- c()
+  m2_res_succ_total_t <- c()
+  m3_res_succ_total_t <- c()
+  m4_res_succ_total_t <- c()
+  m5_res_succ_total_t <- c()
+  m6_res_succ_total_t <- c()
+  m0_res_fail_total_t <- c()
+  m1_res_fail_total_t <- c()
+  m2_res_fail_total_t <- c()
+  m3_res_fail_total_t <- c()
+  m4_res_fail_total_t <- c()
+  m5_res_fail_total_t <- c()
+  m6_res_fail_total_t <- c()
+  
+  r0_cue_total_b <- c()
+  r1_cue_total_b <- c()
+  r2_cue_total_b <- c()
+  r3_cue_total_b <- c()
+  r0_res_total_b <- c()
+  r1_res_total_b <- c()
+  r2_res_total_b <- c()
+  r3_res_total_b <- c()
+  r0_res_succ_total_b <- c()
+  r1_res_succ_total_b <- c()
+  r2_res_succ_total_b <- c()
+  r3_res_succ_total_b <- c()
+  r0_res_fail_total_b <- c()
+  r1_res_fail_total_b <- c()
+  r2_res_fail_total_b <- c()
+  r3_res_fail_total_b <- c()
+  
+  p0_cue_total_b <- c()
+  p1_cue_total_b <- c()
+  p2_cue_total_b <- c()
+  p3_cue_total_b <- c()
+  p0_res_total_b <- c()
+  p1_res_total_b <- c()
+  p2_res_total_b <- c()
+  p3_res_total_b <- c()
+  p0_res_succ_total_b <- c()
+  p1_res_succ_total_b <- c()
+  p2_res_succ_total_b <- c()
+  p3_res_succ_total_b <- c()
+  p0_res_fail_total_b <- c()
+  p1_res_fail_total_b <- c()
+  p2_res_fail_total_b <- c()
+  p3_res_fail_total_b <- c()
+  
+  res0_cue_total_b <- c()
+  res1_cue_total_b <- c()
+  res0_res_total_b <- c()
+  res1_res_total_b <- c()
+
+  v_3_cue_total_b <- c()
+  v_2_cue_total_b <- c()
+  v_1_cue_total_b <- c()
+  v0_cue_total_b <- c()
+  v1_cue_total_b <- c()
+  v2_cue_total_b <- c()
+  v3_cue_total_b <- c()
+  v_3_res_total_b <- c()
+  v_2_res_total_b <- c()
+  v_1_res_total_b <- c()
+  v0_res_total_b <- c()
+  v1_res_total_b <- c()
+  v2_res_total_b <- c()
+  v3_res_total_b <- c()
+  v_3_res_succ_total_b <- c()
+  v_2_res_succ_total_b <- c()
+  v_1_res_succ_total_b <- c()
+  v0_res_succ_total_b <- c()
+  v1_res_succ_total_b <- c()
+  v2_res_succ_total_b <- c()
+  v3_res_succ_total_b <- c()
+  v_3_res_fail_total_b <- c()
+  v_2_res_fail_total_b <- c()
+  v_1_res_fail_total_b <- c()
+  v0_res_fail_total_b <- c()
+  v1_res_fail_total_b <- c()
+  v2_res_fail_total_b <- c()
+  v3_res_fail_total_b <- c()
+  
+  m0_cue_total_b <- c()
+  m1_cue_total_b <- c()
+  m2_cue_total_b <- c()
+  m3_cue_total_b <- c()
+  m4_cue_total_b <- c()
+  m5_cue_total_b <- c()
+  m6_cue_total_b <- c()
+  m0_res_total_b <- c()
+  m1_res_total_b <- c()
+  m2_res_total_b <- c()
+  m3_res_total_b <- c()
+  m4_res_total_b <- c()
+  m5_res_total_b <- c()
+  m6_res_total_b <- c()
+  m0_res_succ_total_b <- c()
+  m1_res_succ_total_b <- c()
+  m2_res_succ_total_b <- c()
+  m3_res_succ_total_b <- c()
+  m4_res_succ_total_b <- c()
+  m5_res_succ_total_b <- c()
+  m6_res_succ_total_b <- c()
+  m0_res_fail_total_b <- c()
+  m1_res_fail_total_b <- c()
+  m2_res_fail_total_b <- c()
+  m3_res_fail_total_b <- c()
+  m4_res_fail_total_b <- c()
+  m5_res_fail_total_b <- c()
+  m6_res_fail_total_b <- c()
+  
   
   #plot top units
   #i-1 b/ python indexing
@@ -263,14 +458,14 @@ for (region_index in 1:length(region_list)){
     r2_res <- res_avg[r_unit_ind,][which(condensed[,4]==2)]
     r3_res <- res_avg[r_unit_ind,][which(condensed[,4]==3)]
     
-    r0_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==0) & which(condensed[,6]==1)]
-    r1_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==1) & which(condensed[,6]==1)]
-    r2_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==2) & which(condensed[,6]==1)]
-    r3_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==3) & which(condensed[,6]==1)]
-    r0_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==0) & which(condensed[,6]==0)]
-    r1_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==1) & which(condensed[,6]==0)]
-    r2_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==2) & which(condensed[,6]==0)]
-    r3_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==3) & which(condensed[,6]==0)]
+    r0_res_succ <- res_avg[r_unit_ind,][which(condensed[,4]==0 & condensed[,6]==1)]
+    r1_res_succ <- res_avg[r_unit_ind,][which(condensed[,4]==1 & condensed[,6]==1)]
+    r2_res_succ <- res_avg[r_unit_ind,][which(condensed[,4]==2 & condensed[,6]==1)]
+    r3_res_succ <- res_avg[r_unit_ind,][which(condensed[,4]==3 & condensed[,6]==1)]
+    r0_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==0 & condensed[,6]==0)]
+    r1_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==1 & condensed[,6]==0)]
+    r2_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==2 & condensed[,6]==0)]
+    r3_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==3 & condensed[,6]==0)]
         
     p0_cue <- cue_avg[p_unit_ind,][which(condensed[,5]==0)]
     p1_cue <- cue_avg[p_unit_ind,][which(condensed[,5]==1)]
@@ -280,6 +475,15 @@ for (region_index in 1:length(region_list)){
     p1_res <- res_avg[p_unit_ind,][which(condensed[,5]==1)]
     p2_res <- res_avg[p_unit_ind,][which(condensed[,5]==2)]
     p3_res <- res_avg[p_unit_ind,][which(condensed[,5]==3)]
+    
+    p0_res_succ <- res_avg[p_unit_ind,][which(condensed[,5]==0 & condensed[,6]==1)]
+    p1_res_succ <- res_avg[p_unit_ind,][which(condensed[,5]==1 & condensed[,6]==1)]
+    p2_res_succ <- res_avg[p_unit_ind,][which(condensed[,5]==2 & condensed[,6]==1)]
+    p3_res_succ <- res_avg[p_unit_ind,][which(condensed[,5]==3 & condensed[,6]==1)]
+    p0_res_fail <- res_avg[p_unit_ind,][which(condensed[,5]==0 & condensed[,6]==0)]
+    p1_res_fail <- res_avg[p_unit_ind,][which(condensed[,5]==1 & condensed[,6]==0)]
+    p2_res_fail <- res_avg[p_unit_ind,][which(condensed[,5]==2 & condensed[,6]==0)]
+    p3_res_fail <- res_avg[p_unit_ind,][which(condensed[,5]==3 & condensed[,6]==0)]
     
     res0_cue <- cue_avg[res_unit_ind,][which(condensed[,6]==0)]
     res1_cue <- cue_avg[res_unit_ind,][which(condensed[,6]==1)]
@@ -301,6 +505,21 @@ for (region_index in 1:length(region_list)){
     v2_res <- res_avg[val_unit_ind,][which(condensed[,7]==2)]
     v3_res <- res_avg[val_unit_ind,][which(condensed[,7]==3)]    
     
+    v_3_res_succ <- res_avg[val_unit_ind,][which(condensed[,7]==-3 & condensed[,6]==1)]
+    v_2_res_succ <- res_avg[val_unit_ind,][which(condensed[,7]==-2 & condensed[,6]==1)]
+    v_1_res_succ <- res_avg[val_unit_ind,][which(condensed[,7]== 1 & condensed[,6]==1)]
+    v0_res_succ <- res_avg[val_unit_ind,][which(condensed[,7]==0 & condensed[,6]==1)]
+    v1_res_succ <- res_avg[val_unit_ind,][which(condensed[,7]==1 & condensed[,6]==1)]
+    v2_res_succ <- res_avg[val_unit_ind,][which(condensed[,7]==2 & condensed[,6]==1)]
+    v3_res_succ <- res_avg[val_unit_ind,][which(condensed[,7]==3 & condensed[,6]==1)] 
+    v_3_res_fail <- res_avg[val_unit_ind,][which(condensed[,7]==-3 & condensed[,6]==0)]
+    v_2_res_fail <- res_avg[val_unit_ind,][which(condensed[,7]==-2 & condensed[,6]==0)]
+    v_1_res_fail <- res_avg[val_unit_ind,][which(condensed[,7]== 1 & condensed[,6]==0)]
+    v0_res_fail <- res_avg[val_unit_ind,][which(condensed[,7]==0 & condensed[,6]==0)]
+    v1_res_fail <- res_avg[val_unit_ind,][which(condensed[,7]==1 & condensed[,6]==0)]
+    v2_res_fail <- res_avg[val_unit_ind,][which(condensed[,7]==2 & condensed[,6]==0)]
+    v3_res_fail <- res_avg[val_unit_ind,][which(condensed[,7]==3 & condensed[,6]==0)] 
+    
     m0_cue <- cue_avg[mtv_unit_ind,][which(condensed[,8]==0)]
     m1_cue <- cue_avg[mtv_unit_ind,][which(condensed[,8]==1)]
     m2_cue <- cue_avg[mtv_unit_ind,][which(condensed[,8]==2)]
@@ -316,6 +535,119 @@ for (region_index in 1:length(region_list)){
     m5_res <- res_avg[mtv_unit_ind,][which(condensed[,8]==5)]
     m6_res <- res_avg[mtv_unit_ind,][which(condensed[,8]==6)] 
     
+    m0_res_succ <- res_avg[mtv_unit_ind,][which(condensed[,8]==0 & condensed[,6]==1)]
+    m1_res_succ <- res_avg[mtv_unit_ind,][which(condensed[,8]==1 & condensed[,6]==1)]
+    m2_res_succ <- res_avg[mtv_unit_ind,][which(condensed[,8]==2 & condensed[,6]==1)]
+    m3_res_succ <- res_avg[mtv_unit_ind,][which(condensed[,8]==3 & condensed[,6]==1)]
+    m4_res_succ <- res_avg[mtv_unit_ind,][which(condensed[,8]==4 & condensed[,6]==1)]
+    m5_res_succ <- res_avg[mtv_unit_ind,][which(condensed[,8]==5 & condensed[,6]==1)]
+    m6_res_succ <- res_avg[mtv_unit_ind,][which(condensed[,8]==6 & condensed[,6]==1)] 
+    m0_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==0 & condensed[,6]==0)]
+    m1_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==1 & condensed[,6]==0)]
+    m2_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==2 & condensed[,6]==0)]
+    m3_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==3 & condensed[,6]==0)]
+    m4_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==4 & condensed[,6]==0)]
+    m5_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==5 & condensed[,6]==0)]
+    m6_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==6 & condensed[,6]==0)] 
+    
+    ##########
+    r0_cue_total_t <- c(r0_cue_total_t,r0_cue)
+    r1_cue_total_t <- c(r1_cue_total_t,r1_cue)
+    r2_cue_total_t <- c(r2_cue_total_t,r2_cue)
+    r3_cue_total_t <- c(r3_cue_total_t,r3_cue)
+    r0_res_total_t <- c(r0_res_total_t,r0_res)
+    r1_res_total_t <- c(r1_res_total_t,r1_res)
+    r2_res_total_t <- c(r2_res_total_t,r2_res)
+    r3_res_total_t <- c(r3_res_total_t,r3_res)
+    r0_res_succ_total_t <- c(r0_res_succ_total_t,r0_res_succ)
+    r1_res_succ_total_t <- c(r1_res_succ_total_t,r1_res_succ)
+    r2_res_succ_total_t <- c(r2_res_succ_total_t,r2_res_succ)
+    r3_res_succ_total_t <- c(r3_res_succ_total_t,r3_res_succ)
+    r0_res_fail_total_t <- c(r0_res_fail_total_t,r0_res_fail)
+    r1_res_fail_total_t <- c(r1_res_fail_total_t,r1_res_fail)
+    r2_res_fail_total_t <- c(r2_res_fail_total_t,r2_res_fail)
+    r3_res_fail_total_t <- c(r3_res_fail_total_t,r3_res_fail)
+    
+    p0_cue_total_t <- c(p0_cue_total_t,p0_cue)
+    p1_cue_total_t <- c(p1_cue_total_t,p1_cue)
+    p2_cue_total_t <- c(p2_cue_total_t,p2_cue)
+    p3_cue_total_t <- c(p3_cue_total_t,p3_cue)
+    p0_res_total_t <- c(p0_res_total_t,p0_res)
+    p1_res_total_t <- c(p1_res_total_t,p1_res)
+    p2_res_total_t <- c(p2_res_total_t,p2_res)
+    p3_res_total_t <- c(p3_res_total_t,p3_res)
+    p0_res_succ_total_t <- c(p0_res_succ_total_t,p0_res_succ)
+    p1_res_succ_total_t <- c(p1_res_succ_total_t,p1_res_succ)
+    p2_res_succ_total_t <- c(p2_res_succ_total_t,p2_res_succ)
+    p3_res_succ_total_t <- c(p3_res_succ_total_t,p3_res_succ)
+    p0_res_fail_total_t <- c(p0_res_fail_total_t,p0_res_fail)
+    p1_res_fail_total_t <- c(p1_res_fail_total_t,p1_res_fail)
+    p2_res_fail_total_t <- c(p2_res_fail_total_t,p2_res_fail)
+    p3_res_fail_total_t <- c(p3_res_fail_total_t,p3_res_fail)
+    
+    res0_cue_total_t <- c(res0_cue_total_t,res0_cue)
+    res1_cue_total_t <- c(res1_cue_total_t,res1_cue)
+    res0_res_total_t <- c(res0_res_total_t,res0_res)
+    res1_res_total_t <- c(res1_res_total_t,res1_res)
+
+    v_3_cue_total_t <- c(v_3_cue_total_t,v_3_cue)
+    v_2_cue_total_t <- c(v_2_cue_total_t,v_2_cue)
+    v_1_cue_total_t <- c(v_1_cue_total_t,v_1_cue)
+    v0_cue_total_t <- c(v0_cue_total_t,v0_cue)
+    v1_cue_total_t <- c(v1_cue_total_t,v1_cue)
+    v2_cue_total_t <- c(v2_cue_total_t,v2_cue)
+    v3_cue_total_t <- c(v3_cue_total_t,v3_cue)
+    v_3_res_total_t <- c(v_3_res_total_t,v_3_res)
+    v_2_res_total_t <- c(v_2_res_total_t,v_2_res)
+    v_1_res_total_t <- c(v_1_res_total_t,v_1_res)
+    v0_res_total_t <- c(v0_res_total_t,v0_res)
+    v1_res_total_t <- c(v1_res_total_t,v1_res)
+    v2_res_total_t <- c(v2_res_total_t,v2_res)
+    v3_res_total_t <- c(v3_res_total_t,v3_res)
+    v_3_res_succ_total_t <- c(v_3_res_succ_total_t,v_3_res_succ)
+    v_2_res_succ_total_t <- c(v_2_res_succ_total_t,v_2_res_succ)
+    v_1_res_succ_total_t <- c(v_1_res_succ_total_t,v_1_res_succ)
+    v0_res_succ_total_t <- c(v0_res_succ_total_t,v0_res_succ)
+    v1_res_succ_total_t <- c(v1_res_succ_total_t,v1_res_succ)
+    v2_res_succ_total_t <- c(v2_res_succ_total_t,v2_res_succ)
+    v3_res_succ_total_t <- c(v3_res_succ_total_t,v3_res_succ)
+    v_3_res_fail_total_t <- c(v_3_res_fail_total_t,v_3_res_fail)
+    v_2_res_fail_total_t <- c(v_2_res_fail_total_t,v_2_res_fail)
+    v_1_res_fail_total_t <- c(v_1_res_fail_total_t,v_1_res_fail)
+    v0_res_fail_total_t <- c(v0_res_fail_total_t,v0_res_fail)
+    v1_res_fail_total_t <- c(v1_res_fail_total_t,v1_res_fail)
+    v2_res_fail_total_t <- c(v2_res_fail_total_t,v2_res_fail)
+    v3_res_fail_total_t <- c(v3_res_fail_total_t,v3_res_fail)
+
+    m0_cue_total_t <- c(m0_cue_total_t,m0_cue)
+    m1_cue_total_t <- c(m1_cue_total_t,m1_cue)
+    m2_cue_total_t <- c(m2_cue_total_t,m2_cue)
+    m3_cue_total_t <- c(m3_cue_total_t,m3_cue)
+    m4_cue_total_t <- c(m4_cue_total_t,m4_cue)
+    m5_cue_total_t <- c(m5_cue_total_t,m5_cue)
+    m6_cue_total_t <- c(m6_cue_total_t,m6_cue)
+    m0_res_total_t <- c(m0_res_total_t,m0_res)
+    m1_res_total_t <- c(m1_res_total_t,m1_res)
+    m2_res_total_t <- c(m2_res_total_t,m2_res)
+    m3_res_total_t <- c(m3_res_total_t,m3_res)
+    m4_res_total_t <- c(m4_res_total_t,m4_res)
+    m5_res_total_t <- c(m5_res_total_t,m5_res)
+    m6_res_total_t <- c(m6_res_total_t,m6_res)
+    m0_res_succ_total_t <- c(m0_res_succ_total_t,m0_res_succ)
+    m1_res_succ_total_t <- c(m1_res_succ_total_t,m1_res_succ)
+    m2_res_succ_total_t <- c(m2_res_succ_total_t,m2_res_succ)
+    m3_res_succ_total_t <- c(m3_res_succ_total_t,m3_res_succ)
+    m4_res_succ_total_t <- c(m4_res_succ_total_t,m4_res_succ)
+    m5_res_succ_total_t <- c(m5_res_succ_total_t,m5_res_succ)
+    m6_res_succ_total_t <- c(m6_res_succ_total_t,m6_res_succ)
+    m0_res_fail_total_t <- c(m0_res_fail_total_t,m0_res_fail)
+    m1_res_fail_total_t <- c(m1_res_fail_total_t,m1_res_fail)
+    m2_res_fail_total_t <- c(m2_res_fail_total_t,m2_res_fail)
+    m3_res_fail_total_t <- c(m3_res_fail_total_t,m3_res_fail)
+    m4_res_fail_total_t <- c(m4_res_fail_total_t,m4_res_fail)
+    m5_res_fail_total_t <- c(m5_res_fail_total_t,m5_res_fail)
+    m6_res_fail_total_t <- c(m6_res_fail_total_t,m6_res_fail)
+
     ##########
     png(paste('corr_r_t',i,'_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
     
@@ -326,9 +658,27 @@ for (region_index in 1:length(region_list)){
     std_melt <- melt(rstds,id="r_values",variable.name='type',value.name='std')
     
     test <- merge(std_melt,avg_melt,row.names='r_values')
+    test[is.na(test)] <- 0
     
     plt <- ggplot(test,aes(x=r_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
-    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("r_cue"="maroon","r_res"="slateblue"))
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("r_cue"="coral4","r_res"="slateblue"))
+    plt <- plt + labs(title=paste('Reward: T',i,' corr, Unit ',r_unit_ind,sep=""),x="Reward Number",y="Firing rate") 
+    plot(plt)
+    graphics.off()
+    ##
+    png(paste('corr_r_sf_t',i,'_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+    
+    ravgs <- data.frame(r_values=c(0,1,2,3),r_cue = c(mean(r0_cue),mean(r1_cue),mean(r2_cue),mean(r3_cue)),r_res_succ = c(mean(r0_res_succ),mean(r1_res_succ),mean(r2_res_succ),mean(r3_res_succ)),r_res_fail = c(mean(r0_res_fail),mean(r1_res_fail),mean(r2_res_fail),mean(r3_res_fail)))
+    rstds <- data.frame(r_values=c(0,1,2,3),r_cue=c(sd(r0_cue),sd(r1_cue),sd(r2_cue),sd(r3_cue)),r_res_succ=c(sd(r0_res_succ),sd(r1_res_succ),sd(r2_res_succ),sd(r3_res_succ)),r_res_fail=c(sd(r0_res_fail),sd(r1_res_fail),sd(r2_res_fail),sd(r3_res_fail)))
+    
+    avg_melt <- melt(ravgs,id="r_values",variable.name='type',value.name='avg')
+    std_melt <- melt(rstds,id="r_values",variable.name='type',value.name='std')
+    
+    test <- merge(std_melt,avg_melt,row.names='r_values')
+    test[is.na(test)] <- 0
+    
+    plt <- ggplot(test,aes(x=r_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("r_cue"="darkorchid4","r_res_succ"="forestgreen","r_res_fail"="darkred"))
     plt <- plt + labs(title=paste('Reward: T',i,' corr, Unit ',r_unit_ind,sep=""),x="Reward Number",y="Firing rate") 
     plot(plt)
     graphics.off()
@@ -343,9 +693,28 @@ for (region_index in 1:length(region_list)){
     std_melt <- melt(pstds,id="p_values",variable.name='type',value.name='std')
     
     test <- merge(std_melt,avg_melt,row.names='p_values')
+    test[is.na(test)] <- 0
     
     plt <- ggplot(test,aes(x=p_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
-    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("p_cue"="maroon","p_res"="slateblue"))
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("p_cue"="coral4","p_res"="slateblue"))
+    plt <- plt + labs(title=paste('Punishment: T',i,' corr, Unit ',p_unit_ind,sep=""),x="Punishment Number",y="Firing rate") 
+    plot(plt)
+    graphics.off()
+    
+    #
+    png(paste('corr_p_sf_t',i,'_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+    
+    pavgs <- data.frame(p_values=c(0,1,2,3),p_cue=c(mean(p0_cue),mean(p1_cue),mean(p2_cue),mean(p3_cue)),p_res_succ = c(mean(p0_res_succ),mean(p1_res_succ),mean(p2_res_succ),mean(p3_res_succ)),p_res_fail = c(mean(p0_res_fail),mean(p1_res_fail),mean(p2_res_fail),mean(p3_res_fail)))
+    pstds <- data.frame(p_values=c(0,1,2,3),p_cue=c(sd(p0_cue),sd(p1_cue),sd(p2_cue),sd(p3_cue)),p_res_succ=c(sd(p0_res_succ),sd(p1_res_succ),sd(p2_res_succ),sd(p3_res_succ)),p_res_fail=c(sd(p0_res_fail),sd(p1_res_fail),sd(p2_res_fail),sd(p3_res_fail)))
+    
+    avg_melt <- melt(pavgs,id="p_values",variable.name='type',value.name='avg')
+    std_melt <- melt(pstds,id="p_values",variable.name='type',value.name='std')
+    
+    test <- merge(std_melt,avg_melt,row.names='p_values')
+    test[is.na(test)] <- 0
+    
+    plt <- ggplot(test,aes(x=p_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("p_cue"="darkorchid4","p_res_succ"="forestgreen","p_res_fail"="darkred"))
     plt <- plt + labs(title=paste('Punishment: T',i,' corr, Unit ',p_unit_ind,sep=""),x="Punishment Number",y="Firing rate") 
     plot(plt)
     graphics.off()
@@ -360,9 +729,10 @@ for (region_index in 1:length(region_list)){
     std_melt <- melt(resstds,id="res_values",variable.name='type',value.name='std')
     
     test <- merge(std_melt,avg_melt,row.names='res_values')
+    test[is.na(test)] <- 0
     
     plt <- ggplot(test,aes(x=res_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
-    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("res_cue"="maroon","res_res"="slateblue"))
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("res_cue"="coral4","res_res"="slateblue"))
     plt <- plt + labs(title=paste('Result: T',i,' corr, Unit ',res_unit_ind,sep=""),x="0: fail, 1: Succ",y="Firing rate") 
     plot(plt)
     graphics.off()
@@ -377,9 +747,28 @@ for (region_index in 1:length(region_list)){
     std_melt <- melt(vstds,id="v_values",variable.name='type',value.name='std')
     
     test <- merge(std_melt,avg_melt,row.names='v_values')
+    test[is.na(test)] <- 0
     
     plt <- ggplot(test,aes(x=v_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
-    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("v_cue"="maroon","v_res"="slateblue"))
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("v_cue"="coral4","v_res"="slateblue"))
+    plt <- plt + labs(title=paste('Value: T',i,' corr, Unit ',val_unit_ind,sep=""),x="Value",y="Firing rate") 
+    plot(plt)
+    graphics.off()
+    
+    #
+    png(paste('corr_v_sf_t',i,'_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+    
+    vavgs <- data.frame(v_values=c(-3,-2,-1,0,1,2,3),v_cue = c(mean(v_3_cue),mean(v_2_cue),mean(v_1_cue),mean(v0_cue),mean(v1_cue),mean(v2_cue),mean(v3_cue)),v_res_succ = c(mean(v_3_res_succ),mean(v_2_res_succ),mean(v_1_res_succ),mean(v0_res_succ),mean(v1_res_succ),mean(v2_res_succ),mean(v3_res_succ)),v_res_fail = c(mean(v_3_res_fail),mean(v_2_res_fail),mean(v_1_res_fail),mean(v0_res_fail),mean(v1_res_fail),mean(v2_res_fail),mean(v3_res_fail)))
+    vstds <- data.frame(v_values=c(-3,-2,-1,0,1,2,3),v_cue=c(sd(v_3_cue),sd(v_2_cue),sd(v_1_cue),sd(v0_cue),sd(v1_cue),sd(v2_cue),sd(v3_cue)),v_res_succ=c(sd(v_3_res_succ),sd(v_2_res_succ),sd(v_1_res_succ),sd(v0_res_succ),sd(v1_res_succ),sd(v2_res_succ),sd(v3_res_succ)),v_res_fail=c(sd(v_3_res_fail),sd(v_2_res_fail),sd(v_1_res_fail),sd(v0_res_fail),sd(v1_res_fail),sd(v2_res_fail),sd(v3_res_fail)))
+    
+    avg_melt <- melt(vavgs,id="v_values",variable.name='type',value.name='avg')
+    std_melt <- melt(vstds,id="v_values",variable.name='type',value.name='std')
+    
+    test <- merge(std_melt,avg_melt,row.names='v_values')
+    test[is.na(test)] <- 0
+    
+    plt <- ggplot(test,aes(x=v_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("v_cue"="darkorchid4","v_res_succ"="forestgreen","v_res_fail"="darkred"))
     plt <- plt + labs(title=paste('Value: T',i,' corr, Unit ',val_unit_ind,sep=""),x="Value",y="Firing rate") 
     plot(plt)
     graphics.off()
@@ -387,19 +776,39 @@ for (region_index in 1:length(region_list)){
     ##########
     png(paste('corr_m_t',i,'_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
     
-    mavgs <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue = c(mean(m0_cue),mean(m1_cue),mean(m2_cue),mean(m3_cue),mean(m4_cue),mean(m5_cue),mean(v3_cue)),m_res = c(mean(m0_res),mean(m1_res),mean(m2_res),mean(m3_res),mean(m4_res),mean(m5_res),mean(v3_res)))
-    mstds <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue=c(sd(m0_cue),sd(m1_cue),sd(m2_cue),sd(m3_cue),sd(m4_cue),sd(m5_cue),sd(v3_cue)),m_res=c(sd(m0_res),sd(m1_res),sd(m2_res),sd(m3_res),sd(m4_res),sd(m5_res),sd(v3_res)))
+    mavgs <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue = c(mean(m0_cue),mean(m1_cue),mean(m2_cue),mean(m3_cue),mean(m4_cue),mean(m5_cue),mean(m6_cue)),m_res = c(mean(m0_res),mean(m1_res),mean(m2_res),mean(m3_res),mean(m4_res),mean(m5_res),mean(m6_res)))
+    mstds <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue=c(sd(m0_cue),sd(m1_cue),sd(m2_cue),sd(m3_cue),sd(m4_cue),sd(m5_cue),sd(m6_cue)),m_res=c(sd(m0_res),sd(m1_res),sd(m2_res),sd(m3_res),sd(m4_res),sd(m5_res),sd(m6_res)))
     
     avg_melt <- melt(mavgs,id="m_values",variable.name='type',value.name='avg')
     std_melt <- melt(mstds,id="m_values",variable.name='type',value.name='std')
     
     test <- merge(std_melt,avg_melt,row.names='m_values')
+    test[is.na(test)] <- 0
     
     plt <- ggplot(test,aes(x=m_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
-    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("m_cue"="maroon","m_res"="slateblue"))
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("m_cue"="coral4","m_res"="slateblue"))
     plt <- plt + labs(title=paste('Motivation: T',i,' corr, Unit ',mtv_unit_ind,sep=""),x="Motivation",y="Firing rate") 
     plot(plt)
     graphics.off()  
+    
+    #
+    png(paste('corr_m_sf_t',i,'_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+    
+    mavgs <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue = c(mean(m0_cue),mean(m1_cue),mean(m2_cue),mean(m3_cue),mean(m4_cue),mean(m5_cue),mean(m6_cue)),m_res_succ = c(mean(m0_res_succ),mean(m1_res_succ),mean(m2_res_succ),mean(m3_res_succ),mean(m4_res_succ),mean(m5_res_succ),mean(m6_res_succ)),m_res_fail = c(mean(m0_res_fail),mean(m1_res_fail),mean(m2_res_fail),mean(m3_res_fail),mean(m4_res_fail),mean(m5_res_fail),mean(m6_res_fail)))
+    mstds <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue=c(sd(m0_cue),sd(m1_cue),sd(m2_cue),sd(m3_cue),sd(m4_cue),sd(m5_cue),sd(m6_cue)),m_res_succ=c(sd(m0_res_succ),sd(m1_res_succ),sd(m2_res_succ),sd(m3_res_succ),sd(m4_res),sd(m5_res_succ),sd(m6_res_succ)),m_res_fail=c(sd(m0_res_fail),sd(m1_res_fail),sd(m2_res_fail),sd(m3_res_fail),sd(m4_res),sd(m5_res_fail),sd(m6_res_fail)))
+    
+    avg_melt <- melt(mavgs,id="m_values",variable.name='type',value.name='avg')
+    std_melt <- melt(mstds,id="m_values",variable.name='type',value.name='std')
+    
+    test <- merge(std_melt,avg_melt,row.names='m_values')
+    test[is.na(test)] <- 0
+    
+    plt <- ggplot(test,aes(x=m_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("m_cue"="darkorchid4","m_res_succ"="forestgreen","m_res_fail"="darkred"))
+    plt <- plt + labs(title=paste('Motivation: T',i,' corr, Unit ',mtv_unit_ind,sep=""),x="Motivation",y="Firing rate") 
+    plot(plt)
+    graphics.off()  
+    
   }
   
   #plot bottom units
@@ -424,6 +833,15 @@ for (region_index in 1:length(region_list)){
     r2_res <- res_avg[r_unit_ind,][which(condensed[,4]==2)]
     r3_res <- res_avg[r_unit_ind,][which(condensed[,4]==3)]
     
+    r0_res_succ <- res_avg[r_unit_ind,][which(condensed[,4]==0 & condensed[,6]==1)]
+    r1_res_succ <- res_avg[r_unit_ind,][which(condensed[,4]==1 & condensed[,6]==1)]
+    r2_res_succ <- res_avg[r_unit_ind,][which(condensed[,4]==2 & condensed[,6]==1)]
+    r3_res_succ <- res_avg[r_unit_ind,][which(condensed[,4]==3 & condensed[,6]==1)]
+    r0_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==0 & condensed[,6]==0)]
+    r1_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==1 & condensed[,6]==0)]
+    r2_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==2 & condensed[,6]==0)]
+    r3_res_fail <- res_avg[r_unit_ind,][which(condensed[,4]==3 & condensed[,6]==0)]
+    
     p0_cue <- cue_avg[p_unit_ind,][which(condensed[,5]==0)]
     p1_cue <- cue_avg[p_unit_ind,][which(condensed[,5]==1)]
     p2_cue <- cue_avg[p_unit_ind,][which(condensed[,5]==2)]
@@ -432,6 +850,15 @@ for (region_index in 1:length(region_list)){
     p1_res <- res_avg[p_unit_ind,][which(condensed[,5]==1)]
     p2_res <- res_avg[p_unit_ind,][which(condensed[,5]==2)]
     p3_res <- res_avg[p_unit_ind,][which(condensed[,5]==3)]
+    
+    p0_res_succ <- res_avg[p_unit_ind,][which(condensed[,5]==0 & condensed[,6]==1)]
+    p1_res_succ <- res_avg[p_unit_ind,][which(condensed[,5]==1 & condensed[,6]==1)]
+    p2_res_succ <- res_avg[p_unit_ind,][which(condensed[,5]==2 & condensed[,6]==1)]
+    p3_res_succ <- res_avg[p_unit_ind,][which(condensed[,5]==3 & condensed[,6]==1)]
+    p0_res_fail <- res_avg[p_unit_ind,][which(condensed[,5]==0 & condensed[,6]==0)]
+    p1_res_fail <- res_avg[p_unit_ind,][which(condensed[,5]==1 & condensed[,6]==0)]
+    p2_res_fail <- res_avg[p_unit_ind,][which(condensed[,5]==2 & condensed[,6]==0)]
+    p3_res_fail <- res_avg[p_unit_ind,][which(condensed[,5]==3 & condensed[,6]==0)]
     
     res0_cue <- cue_avg[res_unit_ind,][which(condensed[,6]==0)]
     res1_cue <- cue_avg[res_unit_ind,][which(condensed[,6]==1)]
@@ -453,6 +880,21 @@ for (region_index in 1:length(region_list)){
     v2_res <- res_avg[val_unit_ind,][which(condensed[,7]==2)]
     v3_res <- res_avg[val_unit_ind,][which(condensed[,7]==3)]    
     
+    v_3_res_succ <- res_avg[val_unit_ind,][which(condensed[,7]==-3 & condensed[,6]==1)]
+    v_2_res_succ <- res_avg[val_unit_ind,][which(condensed[,7]==-2 & condensed[,6]==1)]
+    v_1_res_succ <- res_avg[val_unit_ind,][which(condensed[,7]== 1 & condensed[,6]==1)]
+    v0_res_succ <- res_avg[val_unit_ind,][which(condensed[,7]==0 & condensed[,6]==1)]
+    v1_res_succ <- res_avg[val_unit_ind,][which(condensed[,7]==1 & condensed[,6]==1)]
+    v2_res_succ <- res_avg[val_unit_ind,][which(condensed[,7]==2 & condensed[,6]==1)]
+    v3_res_succ <- res_avg[val_unit_ind,][which(condensed[,7]==3 & condensed[,6]==1)] 
+    v_3_res_fail <- res_avg[val_unit_ind,][which(condensed[,7]==-3 & condensed[,6]==0)]
+    v_2_res_fail <- res_avg[val_unit_ind,][which(condensed[,7]==-2 & condensed[,6]==0)]
+    v_1_res_fail <- res_avg[val_unit_ind,][which(condensed[,7]== 1 & condensed[,6]==0)]
+    v0_res_fail <- res_avg[val_unit_ind,][which(condensed[,7]==0 & condensed[,6]==0)]
+    v1_res_fail <- res_avg[val_unit_ind,][which(condensed[,7]==1 & condensed[,6]==0)]
+    v2_res_fail <- res_avg[val_unit_ind,][which(condensed[,7]==2 & condensed[,6]==0)]
+    v3_res_fail <- res_avg[val_unit_ind,][which(condensed[,7]==3 & condensed[,6]==0)] 
+    
     m0_cue <- cue_avg[mtv_unit_ind,][which(condensed[,8]==0)]
     m1_cue <- cue_avg[mtv_unit_ind,][which(condensed[,8]==1)]
     m2_cue <- cue_avg[mtv_unit_ind,][which(condensed[,8]==2)]
@@ -468,6 +910,121 @@ for (region_index in 1:length(region_list)){
     m5_res <- res_avg[mtv_unit_ind,][which(condensed[,8]==5)]
     m6_res <- res_avg[mtv_unit_ind,][which(condensed[,8]==6)] 
     
+    m0_res_succ <- res_avg[mtv_unit_ind,][which(condensed[,8]==0 & condensed[,6]==1)]
+    m1_res_succ <- res_avg[mtv_unit_ind,][which(condensed[,8]==1 & condensed[,6]==1)]
+    m2_res_succ <- res_avg[mtv_unit_ind,][which(condensed[,8]==2 & condensed[,6]==1)]
+    m3_res_succ <- res_avg[mtv_unit_ind,][which(condensed[,8]==3 & condensed[,6]==1)]
+    m4_res_succ <- res_avg[mtv_unit_ind,][which(condensed[,8]==4 & condensed[,6]==1)]
+    m5_res_succ <- res_avg[mtv_unit_ind,][which(condensed[,8]==5 & condensed[,6]==1)]
+    m6_res_succ <- res_avg[mtv_unit_ind,][which(condensed[,8]==6 & condensed[,6]==1)] 
+    m0_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==0 & condensed[,6]==0)]
+    m1_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==1 & condensed[,6]==0)]
+    m2_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==2 & condensed[,6]==0)]
+    m3_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==3 & condensed[,6]==0)]
+    m4_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==4 & condensed[,6]==0)]
+    m5_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==5 & condensed[,6]==0)]
+    m6_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==6 & condensed[,6]==0)] 
+    
+    #######
+    r0_cue_total_b <- c(r0_cue_total_b,r0_cue)
+    r1_cue_total_b <- c(r1_cue_total_b,r1_cue)
+    r2_cue_total_b <- c(r2_cue_total_b,r2_cue)
+    r3_cue_total_b <- c(r3_cue_total_b,r3_cue)
+    r0_res_total_b <- c(r0_res_total_b,r0_res)
+    r1_res_total_b <- c(r1_res_total_b,r1_res)
+    r2_res_total_b <- c(r2_res_total_b,r2_res)
+    r3_res_total_b <- c(r3_res_total_b,r3_res)
+    r0_res_succ_total_b <- c(r0_res_succ_total_b,r0_res_succ)
+    r1_res_succ_total_b <- c(r1_res_succ_total_b,r1_res_succ)
+    r2_res_succ_total_b <- c(r2_res_succ_total_b,r2_res_succ)
+    r3_res_succ_total_b <- c(r3_res_succ_total_b,r3_res_succ)
+    r0_res_fail_total_b <- c(r0_res_fail_total_b,r0_res_fail)
+    r1_res_fail_total_b <- c(r1_res_fail_total_b,r1_res_fail)
+    r2_res_fail_total_b <- c(r2_res_fail_total_b,r2_res_fail)
+    r3_res_fail_total_b <- c(r3_res_fail_total_b,r3_res_fail)
+    
+    p0_cue_total_b <- c(p0_cue_total_b,p0_cue)
+    p1_cue_total_b <- c(p1_cue_total_b,p1_cue)
+    p2_cue_total_b <- c(p2_cue_total_b,p2_cue)
+    p3_cue_total_b <- c(p3_cue_total_b,p3_cue)
+    p0_res_total_b <- c(p0_res_total_b,p0_res)
+    p1_res_total_b <- c(p1_res_total_b,p1_res)
+    p2_res_total_b <- c(p2_res_total_b,p2_res)
+    p3_res_total_b <- c(p3_res_total_b,p3_res)
+    p0_res_succ_total_b <- c(p0_res_succ_total_b,p0_res_succ)
+    p1_res_succ_total_b <- c(p1_res_succ_total_b,p1_res_succ)
+    p2_res_succ_total_b <- c(p2_res_succ_total_b,p2_res_succ)
+    p3_res_succ_total_b <- c(p3_res_succ_total_b,p3_res_succ)
+    p0_res_fail_total_b <- c(p0_res_fail_total_b,p0_res_fail)
+    p1_res_fail_total_b <- c(p1_res_fail_total_b,p1_res_fail)
+    p2_res_fail_total_b <- c(p2_res_fail_total_b,p2_res_fail)
+    p3_res_fail_total_b <- c(p3_res_fail_total_b,p3_res_fail)
+    
+    res0_cue_total_b <- c(res0_cue_total_b,res0_cue)
+    res1_cue_total_b <- c(res1_cue_total_b,res1_cue)
+    res0_res_total_b <- c(res0_res_total_b,res0_res)
+    res1_res_total_b <- c(res1_res_total_b,res1_res)
+
+    v_3_cue_total_b <- c(v_3_cue_total_b,v_3_cue)
+    v_2_cue_total_b <- c(v_2_cue_total_b,v_2_cue)
+    v_1_cue_total_b <- c(v_1_cue_total_b,v_1_cue)
+    v0_cue_total_b <- c(v0_cue_total_b,v0_cue)
+    v1_cue_total_b <- c(v1_cue_total_b,v1_cue)
+    v2_cue_total_b <- c(v2_cue_total_b,v2_cue)
+    v3_cue_total_b <- c(v3_cue_total_b,v3_cue)
+    v_3_res_total_b <- c(v_3_res_total_b,v_3_res)
+    v_2_res_total_b <- c(v_2_res_total_b,v_2_res)
+    v_1_res_total_b <- c(v_1_res_total_b,v_1_res)
+    v0_res_total_b <- c(v0_res_total_b,v0_res)
+    v1_res_total_b <- c(v1_res_total_b,v1_res)
+    v2_res_total_b <- c(v2_res_total_b,v2_res)
+    v3_res_total_b <- c(v3_res_total_b,v3_res)
+    v_3_res_succ_total_b <- c(v_3_res_succ_total_b,v_3_res_succ)
+    v_2_res_succ_total_b <- c(v_2_res_succ_total_b,v_2_res_succ)
+    v_1_res_succ_total_b <- c(v_1_res_succ_total_b,v_1_res_succ)
+    v0_res_succ_total_b <- c(v0_res_succ_total_b,v0_res_succ)
+    v1_res_succ_total_b <- c(v1_res_succ_total_b,v1_res_succ)
+    v2_res_succ_total_b <- c(v2_res_succ_total_b,v2_res_succ)
+    v3_res_succ_total_b <- c(v3_res_succ_total_b,v3_res_succ)
+    v_3_res_fail_total_b <- c(v_3_res_fail_total_b,v_3_res_fail)
+    v_2_res_fail_total_b <- c(v_2_res_fail_total_b,v_2_res_fail)
+    v_1_res_fail_total_b <- c(v_1_res_fail_total_b,v_1_res_fail)
+    v0_res_fail_total_b <- c(v0_res_fail_total_b,v0_res_fail)
+    v1_res_fail_total_b <- c(v1_res_fail_total_b,v1_res_fail)
+    v2_res_fail_total_b <- c(v2_res_fail_total_b,v2_res_fail)
+    v3_res_fail_total_b <- c(v3_res_fail_total_b,v3_res_fail)
+    
+    m0_cue_total_b <- c(m0_cue_total_b,m0_cue)
+    m1_cue_total_b <- c(m1_cue_total_b,m1_cue)
+    m2_cue_total_b <- c(m2_cue_total_b,m2_cue)
+    m3_cue_total_b <- c(m3_cue_total_b,m3_cue)
+    m4_cue_total_b <- c(m4_cue_total_b,m4_cue)
+    m5_cue_total_b <- c(m5_cue_total_b,m5_cue)
+    m6_cue_total_b <- c(m6_cue_total_b,m6_cue)
+    m0_res_total_b <- c(m0_res_total_b,m0_res)
+    m1_res_total_b <- c(m1_res_total_b,m1_res)
+    m2_res_total_b <- c(m2_res_total_b,m2_res)
+    m3_res_total_b <- c(m3_res_total_b,m3_res)
+    m4_res_total_b <- c(m4_res_total_b,m4_res)
+    m5_res_total_b <- c(m5_res_total_b,m5_res)
+    m6_res_total_b <- c(m6_res_total_b,m6_res)
+    m0_res_succ_total_b <- c(m0_res_succ_total_b,m0_res_succ)
+    m1_res_succ_total_b <- c(m1_res_succ_total_b,m1_res_succ)
+    m2_res_succ_total_b <- c(m2_res_succ_total_b,m2_res_succ)
+    m3_res_succ_total_b <- c(m3_res_succ_total_b,m3_res_succ)
+    m4_res_succ_total_b <- c(m4_res_succ_total_b,m4_res_succ)
+    m5_res_succ_total_b <- c(m5_res_succ_total_b,m5_res_succ)
+    m6_res_succ_total_b <- c(m6_res_succ_total_b,m6_res_succ)
+    m0_res_fail_total_b <- c(m0_res_fail_total_b,m0_res_fail)
+    m1_res_fail_total_b <- c(m1_res_fail_total_b,m1_res_fail)
+    m2_res_fail_total_b <- c(m2_res_fail_total_b,m2_res_fail)
+    m3_res_fail_total_b <- c(m3_res_fail_total_b,m3_res_fail)
+    m4_res_fail_total_b <- c(m4_res_fail_total_b,m4_res_fail)
+    m5_res_fail_total_b <- c(m5_res_fail_total_b,m5_res_fail)
+    m6_res_fail_total_b <- c(m6_res_fail_total_b,m6_res_fail)
+    
+    
+    
     ##########
     png(paste('corr_r_b',i,'_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
     
@@ -478,9 +1035,28 @@ for (region_index in 1:length(region_list)){
     std_melt <- melt(rstds,id="r_values",variable.name='type',value.name='std')
     
     test <- merge(std_melt,avg_melt,row.names='r_values')
+    test[is.na(test)] <- 0
     
     plt <- ggplot(test,aes(x=r_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
-    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("r_cue"="maroon","r_res"="slateblue"))
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("r_cue"="coral4","r_res"="slateblue"))
+    plt <- plt + labs(title=paste('Reward: B',i,' corr, Unit ',r_unit_ind,sep=""),x="Reward Number",y="Firing rate") 
+    plot(plt)
+    graphics.off()
+    
+    ##
+    png(paste('corr_r_sf_b',i,'_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+    
+    ravgs <- data.frame(r_values=c(0,1,2,3),r_cue = c(mean(r0_cue),mean(r1_cue),mean(r2_cue),mean(r3_cue)),r_res_succ = c(mean(r0_res_succ),mean(r1_res_succ),mean(r2_res_succ),mean(r3_res_succ)),r_res_fail = c(mean(r0_res_fail),mean(r1_res_fail),mean(r2_res_fail),mean(r3_res_fail)))
+    rstds <- data.frame(r_values=c(0,1,2,3),r_cue=c(sd(r0_cue),sd(r1_cue),sd(r2_cue),sd(r3_cue)),r_res_succ=c(sd(r0_res_succ),sd(r1_res_succ),sd(r2_res_succ),sd(r3_res_succ)),r_res_fail=c(sd(r0_res_fail),sd(r1_res_fail),sd(r2_res_fail),sd(r3_res_fail)))
+    
+    avg_melt <- melt(ravgs,id="r_values",variable.name='type',value.name='avg')
+    std_melt <- melt(rstds,id="r_values",variable.name='type',value.name='std')
+    
+    test <- merge(std_melt,avg_melt,row.names='r_values')
+    test[is.na(test)] <- 0
+    
+    plt <- ggplot(test,aes(x=r_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("r_cue"="darkorchid4","r_res_succ"="forestgreen","r_res_fail"="darkred"))
     plt <- plt + labs(title=paste('Reward: B',i,' corr, Unit ',r_unit_ind,sep=""),x="Reward Number",y="Firing rate") 
     plot(plt)
     graphics.off()
@@ -495,9 +1071,28 @@ for (region_index in 1:length(region_list)){
     std_melt <- melt(pstds,id="p_values",variable.name='type',value.name='std')
     
     test <- merge(std_melt,avg_melt,row.names='p_values')
+    test[is.na(test)] <- 0
     
     plt <- ggplot(test,aes(x=p_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
-    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("p_cue"="maroon","p_res"="slateblue"))
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("p_cue"="coral4","p_res"="slateblue"))
+    plt <- plt + labs(title=paste('Punishment: B',i,' corr, Unit ',p_unit_ind,sep=""),x="Punishment Number",y="Firing rate") 
+    plot(plt)
+    graphics.off()
+    
+    #
+    png(paste('corr_p_sf_b',i,'_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+    
+    pavgs <- data.frame(p_values=c(0,1,2,3),p_cue=c(mean(p0_cue),mean(p1_cue),mean(p2_cue),mean(p3_cue)),p_res_succ = c(mean(p0_res_succ),mean(p1_res_succ),mean(p2_res_succ),mean(p3_res_succ)),p_res_fail = c(mean(p0_res_fail),mean(p1_res_fail),mean(p2_res_fail),mean(p3_res_fail)))
+    pstds <- data.frame(p_values=c(0,1,2,3),p_cue=c(sd(p0_cue),sd(p1_cue),sd(p2_cue),sd(p3_cue)),p_res_succ=c(sd(p0_res_succ),sd(p1_res_succ),sd(p2_res_succ),sd(p3_res_succ)),p_res_fail=c(sd(p0_res_fail),sd(p1_res_fail),sd(p2_res_fail),sd(p3_res_fail)))
+    
+    avg_melt <- melt(pavgs,id="p_values",variable.name='type',value.name='avg')
+    std_melt <- melt(pstds,id="p_values",variable.name='type',value.name='std')
+    
+    test <- merge(std_melt,avg_melt,row.names='p_values')
+    test[is.na(test)] <- 0
+    
+    plt <- ggplot(test,aes(x=p_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("p_cue"="darkorchid4","p_res_succ"="forestgreen","p_res_fail"="darkred"))
     plt <- plt + labs(title=paste('Punishment: B',i,' corr, Unit ',p_unit_ind,sep=""),x="Punishment Number",y="Firing rate") 
     plot(plt)
     graphics.off()
@@ -512,9 +1107,10 @@ for (region_index in 1:length(region_list)){
     std_melt <- melt(resstds,id="res_values",variable.name='type',value.name='std')
     
     test <- merge(std_melt,avg_melt,row.names='res_values')
+    test[is.na(test)] <- 0
     
     plt <- ggplot(test,aes(x=res_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
-    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("res_cue"="maroon","res_res"="slateblue"))
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("res_cue"="coral4","res_res"="slateblue"))
     plt <- plt + labs(title=paste('Result: B',i,' corr, Unit ',res_unit_ind,sep=""),x="0: fail, 1: Succ",y="Firing rate") 
     plot(plt)
     graphics.off()
@@ -529,30 +1125,396 @@ for (region_index in 1:length(region_list)){
     std_melt <- melt(vstds,id="v_values",variable.name='type',value.name='std')
     
     test <- merge(std_melt,avg_melt,row.names='v_values')
+    test[is.na(test)] <- 0
     
     plt <- ggplot(test,aes(x=v_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
-    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("v_cue"="maroon","v_res"="slateblue"))
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("v_cue"="coral4","v_res"="slateblue"))
+    plt <- plt + labs(title=paste('Value: B',i,' corr, Unit ',val_unit_ind,sep=""),x="Value",y="Firing rate") 
+    plot(plt)
+    graphics.off()
+    #
+    png(paste('corr_v_sf_b',i,'_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+    
+    vavgs <- data.frame(v_values=c(-3,-2,-1,0,1,2,3),v_cue = c(mean(v_3_cue),mean(v_2_cue),mean(v_1_cue),mean(v0_cue),mean(v1_cue),mean(v2_cue),mean(v3_cue)),v_res_succ = c(mean(v_3_res_succ),mean(v_2_res_succ),mean(v_1_res_succ),mean(v0_res_succ),mean(v1_res_succ),mean(v2_res_succ),mean(v3_res_succ)),v_res_fail = c(mean(v_3_res_fail),mean(v_2_res_fail),mean(v_1_res_fail),mean(v0_res_fail),mean(v1_res_fail),mean(v2_res_fail),mean(v3_res_fail)))
+    vstds <- data.frame(v_values=c(-3,-2,-1,0,1,2,3),v_cue=c(sd(v_3_cue),sd(v_2_cue),sd(v_1_cue),sd(v0_cue),sd(v1_cue),sd(v2_cue),sd(v3_cue)),v_res_succ=c(sd(v_3_res_succ),sd(v_2_res_succ),sd(v_1_res_succ),sd(v0_res_succ),sd(v1_res_succ),sd(v2_res_succ),sd(v3_res_succ)),v_res_fail=c(sd(v_3_res_fail),sd(v_2_res_fail),sd(v_1_res_fail),sd(v0_res_fail),sd(v1_res_fail),sd(v2_res_fail),sd(v3_res_fail)))
+    
+    avg_melt <- melt(vavgs,id="v_values",variable.name='type',value.name='avg')
+    std_melt <- melt(vstds,id="v_values",variable.name='type',value.name='std')
+    
+    test <- merge(std_melt,avg_melt,row.names='v_values')
+    test[is.na(test)] <- 0
+    
+    plt <- ggplot(test,aes(x=v_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("v_cue"="darkorchid4","v_res_succ"="forestgreen","v_res_fail"="darkred"))
     plt <- plt + labs(title=paste('Value: B',i,' corr, Unit ',val_unit_ind,sep=""),x="Value",y="Firing rate") 
     plot(plt)
     graphics.off()
     
+    
     ##########
     png(paste('corr_m_b',i,'_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
     
-    mavgs <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue = c(mean(m0_cue),mean(m1_cue),mean(m2_cue),mean(m3_cue),mean(m4_cue),mean(m5_cue),mean(v3_cue)),m_res = c(mean(m0_res),mean(m1_res),mean(m2_res),mean(m3_res),mean(m4_res),mean(m5_res),mean(v3_res)))
-    mstds <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue=c(sd(m0_cue),sd(m1_cue),sd(m2_cue),sd(m3_cue),sd(m4_cue),sd(m5_cue),sd(v3_cue)),m_res=c(sd(m0_res),sd(m1_res),sd(m2_res),sd(m3_res),sd(m4_res),sd(m5_res),sd(v3_res)))
+    mavgs <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue = c(mean(m0_cue),mean(m1_cue),mean(m2_cue),mean(m3_cue),mean(m4_cue),mean(m5_cue),mean(m6_cue)),m_res = c(mean(m0_res),mean(m1_res),mean(m2_res),mean(m3_res),mean(m4_res),mean(m5_res),mean(m6_res)))
+    mstds <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue=c(sd(m0_cue),sd(m1_cue),sd(m2_cue),sd(m3_cue),sd(m4_cue),sd(m5_cue),sd(m6_cue)),m_res=c(sd(m0_res),sd(m1_res),sd(m2_res),sd(m3_res),sd(m4_res),sd(m5_res),sd(m6_res)))
     
     avg_melt <- melt(mavgs,id="m_values",variable.name='type',value.name='avg')
     std_melt <- melt(mstds,id="m_values",variable.name='type',value.name='std')
     
     test <- merge(std_melt,avg_melt,row.names='m_values')
+    test[is.na(test)] <- 0
     
     plt <- ggplot(test,aes(x=m_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
-    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("m_cue"="maroon","m_res"="slateblue"))
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("m_cue"="coral4","m_res"="slateblue"))
+    plt <- plt + labs(title=paste('Motivation: B',i,' corr, Unit ',mtv_unit_ind,sep=""),x="Motivation",y="Firing rate") 
+    plot(plt)
+    graphics.off()  
+    
+    #
+    png(paste('corr_m_sf_b',i,'_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+    
+    mavgs <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue = c(mean(m0_cue),mean(m1_cue),mean(m2_cue),mean(m3_cue),mean(m4_cue),mean(m5_cue),mean(m6_cue)),m_res_succ = c(mean(m0_res_succ),mean(m1_res_succ),mean(m2_res_succ),mean(m3_res_succ),mean(m4_res_succ),mean(m5_res_succ),mean(m6_res_succ)),m_res_fail = c(mean(m0_res_fail),mean(m1_res_fail),mean(m2_res_fail),mean(m3_res_fail),mean(m4_res_fail),mean(m5_res_fail),mean(m6_res_fail)))
+    mstds <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue=c(sd(m0_cue),sd(m1_cue),sd(m2_cue),sd(m3_cue),sd(m4_cue),sd(m5_cue),sd(m6_cue)),m_res_succ=c(sd(m0_res_succ),sd(m1_res_succ),sd(m2_res_succ),sd(m3_res_succ),sd(m4_res),sd(m5_res_succ),sd(m6_res_succ)),m_res_fail=c(sd(m0_res_fail),sd(m1_res_fail),sd(m2_res_fail),sd(m3_res_fail),sd(m4_res),sd(m5_res_fail),sd(m6_res_fail)))
+    
+    avg_melt <- melt(mavgs,id="m_values",variable.name='type',value.name='avg')
+    std_melt <- melt(mstds,id="m_values",variable.name='type',value.name='std')
+    
+    test <- merge(std_melt,avg_melt,row.names='m_values')
+    test[is.na(test)] <- 0
+    
+    plt <- ggplot(test,aes(x=m_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("m_cue"="darkorchid4","m_res_succ"="forestgreen","m_res_fail"="darkred"))
     plt <- plt + labs(title=paste('Motivation: B',i,' corr, Unit ',mtv_unit_ind,sep=""),x="Motivation",y="Firing rate") 
     plot(plt)
     graphics.off()  
   }
+  
+  ######################
+  ######################  
+  ######################
+  
+  
+  #plot avg over these units
+  png(paste('corr_r_t_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  ravgs <- data.frame(r_values=c(0,1,2,3),r_cue = c(mean(r0_cue_total_t),mean(r1_cue_total_t),mean(r2_cue_total_t),mean(r3_cue_total_t)),r_res_total_t = c(mean(r0_res_total_t),mean(r1_res_total_t),mean(r2_res_total_t),mean(r3_res_total_t)))
+  rstds <- data.frame(r_values=c(0,1,2,3),r_cue_total_t=c(sd(r0_cue_total_t),sd(r1_cue_total_t),sd(r2_cue_total_t),sd(r3_cue_total_t)),r_res_total_t=c(sd(r0_res_total_t),sd(r1_res_total_t),sd(r2_res_total_t),sd(r3_res_total_t)))
+  
+  avg_melt <- melt(ravgs,id="r_values",variable.name='type',value.name='avg')
+  std_melt <- melt(rstds,id="r_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='r_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=r_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("r_cue_total_t"="coral4","r_res_total_t"="slateblue"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Reward Top Corr Total'),x="Reward Number",y="Firing rate") 
+  plot(plt)
+  graphics.off()
+  ##
+  png(paste('corr_r_sf_t_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  ravgs <- data.frame(r_values=c(0,1,2,3),r_cue_total_t = c(mean(r0_cue_total_t),mean(r1_cue_total_t),mean(r2_cue_total_t),mean(r3_cue_total_t)),r_res_succ_total_t = c(mean(r0_res_succ_total_t),mean(r1_res_succ_total_t),mean(r2_res_succ_total_t),mean(r3_res_succ_total_t)),r_res_fail_total_t = c(mean(r0_res_fail_total_t),mean(r1_res_fail_total_t),mean(r2_res_fail_total_t),mean(r3_res_fail_total_t)))
+  rstds <- data.frame(r_values=c(0,1,2,3),r_cue_total_t=c(sd(r0_cue_total_t),sd(r1_cue_total_t),sd(r2_cue_total_t),sd(r3_cue_total_t)),r_res_succ_total_t=c(sd(r0_res_succ_total_t),sd(r1_res_succ_total_t),sd(r2_res_succ_total_t),sd(r3_res_succ_total_t)),r_res_fail_total_t=c(sd(r0_res_fail_total_t),sd(r1_res_fail_total_t),sd(r2_res_fail_total_t),sd(r3_res_fail_total_t)))
+  
+  avg_melt <- melt(ravgs,id="r_values",variable.name='type',value.name='avg')
+  std_melt <- melt(rstds,id="r_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='r_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=r_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("r_cue_total_t"="darkorchid4","r_res_succ_total_t"="forestgreen","r_res_fail_total_t"="darkred"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Reward Top Corr Total'),x="Reward Number",y="Firing rate") 
+  plot(plt)
+  graphics.off()
+  
+  #############
+  png(paste('corr_p_t_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  pavgs <- data.frame(p_values=c(0,1,2,3),p_cue_total_t=c(mean(p0_cue_total_t),mean(p1_cue_total_t),mean(p2_cue_total_t),mean(p3_cue_total_t)),p_res = c(mean(p0_res_total_t),mean(p1_res_total_t),mean(p2_res_total_t),mean(p3_res_total_t)))
+  pstds <- data.frame(p_values=c(0,1,2,3),p_cue_total_t=c(sd(p0_cue_total_t),sd(p1_cue_total_t),sd(p2_cue_total_t),sd(p3_cue_total_t)),p_res=c(sd(p0_res_total_t),sd(p1_res_total_t),sd(p2_res_total_t),sd(p3_res_total_t)))
+  
+  avg_melt <- melt(pavgs,id="p_values",variable.name='type',value.name='avg')
+  std_melt <- melt(pstds,id="p_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='p_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=p_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("p_cue_total_t"="coral4","p_res"="slateblue"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Punishment Top Corr Total'),x="Punishment Number",y="Firing rate") 
+  plot(plt)
+  graphics.off()
+  
+  #
+  png(paste('corr_p_sf_t_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  pavgs <- data.frame(p_values=c(0,1,2,3),p_cue_total_t=c(mean(p0_cue_total_t),mean(p1_cue_total_t),mean(p2_cue_total_t),mean(p3_cue_total_t)),p_res_succ_total_t = c(mean(p0_res_succ_total_t),mean(p1_res_succ_total_t),mean(p2_res_succ_total_t),mean(p3_res_succ_total_t)),p_res_fail_total_t = c(mean(p0_res_fail_total_t),mean(p1_res_fail_total_t),mean(p2_res_fail_total_t),mean(p3_res_fail_total_t)))
+  pstds <- data.frame(p_values=c(0,1,2,3),p_cue_total_t=c(sd(p0_cue_total_t),sd(p1_cue_total_t),sd(p2_cue_total_t),sd(p3_cue_total_t)),p_res_succ_total_t=c(sd(p0_res_succ_total_t),sd(p1_res_succ_total_t),sd(p2_res_succ_total_t),sd(p3_res_succ_total_t)),p_res_fail_total_t=c(sd(p0_res_fail_total_t),sd(p1_res_fail_total_t),sd(p2_res_fail_total_t),sd(p3_res_fail_total_t)))
+  
+  avg_melt <- melt(pavgs,id="p_values",variable.name='type',value.name='avg')
+  std_melt <- melt(pstds,id="p_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='p_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=p_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("p_cue_total_t"="darkorchid4","p_res_succ_total_t"="forestgreen","p_res_fail_total_t"="darkred"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Punishment Top Corr Total'),x="Punishment Number",y="Firing rate") 
+  plot(plt)
+  graphics.off()
+  
+  ##########
+  png(paste('corr_res_t_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  resavgs <- data.frame(res_values=c(0,1),res_cue_total_t = c(mean(res0_cue_total_t),mean(res1_cue_total_t)),res_res = c(mean(res0_res_total_t),mean(res1_res_total_t)))
+  resstds <- data.frame(res_values=c(0,1),res_cue_total_t=c(sd(res0_cue_total_t),sd(res1_cue_total_t)),res_res=c(sd(res0_res_total_t),sd(res1_res_total_t)))
+  
+  avg_melt <- melt(resavgs,id="res_values",variable.name='type',value.name='avg')
+  std_melt <- melt(resstds,id="res_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='res_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=res_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("res_cue_total_t"="coral4","res_res"="slateblue"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Result Top Corr Total'),x="0: fail, 1: Succ",y="Firing rate") 
+  plot(plt)
+  graphics.off()
+  
+  ##########
+  png(paste('corr_v_t_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  vavgs <- data.frame(v_values=c(-3,-2,-1,0,1,2,3),v_cue_total_t = c(mean(v_3_cue_total_t),mean(v_2_cue_total_t),mean(v_1_cue_total_t),mean(v0_cue_total_t),mean(v1_cue_total_t),mean(v2_cue_total_t),mean(v3_cue_total_t)),v_res = c(mean(v_3_res_total_t),mean(v_2_res_total_t),mean(v_1_res_total_t),mean(v0_res_total_t),mean(v1_res_total_t),mean(v2_res_total_t),mean(v3_res_total_t)))
+  vstds <- data.frame(v_values=c(-3,-2,-1,0,1,2,3),v_cue_total_t=c(sd(v_3_cue_total_t),sd(v_2_cue_total_t),sd(v_1_cue_total_t),sd(v0_cue_total_t),sd(v1_cue_total_t),sd(v2_cue_total_t),sd(v3_cue_total_t)),v_res=c(sd(v_3_res_total_t),sd(v_2_res_total_t),sd(v_1_res_total_t),sd(v0_res_total_t),sd(v1_res_total_t),sd(v2_res_total_t),sd(v3_res_total_t)))
+  
+  avg_melt <- melt(vavgs,id="v_values",variable.name='type',value.name='avg')
+  std_melt <- melt(vstds,id="v_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='v_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=v_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("v_cue_total_t"="coral4","v_res"="slateblue"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Value Top Corr Total'),x="Value",y="Firing rate") 
+  plot(plt)
+  graphics.off()
+  
+  #
+  png(paste('corr_v_sf_t_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  vavgs <- data.frame(v_values=c(-3,-2,-1,0,1,2,3),v_cue_total_t = c(mean(v_3_cue_total_t),mean(v_2_cue_total_t),mean(v_1_cue_total_t),mean(v0_cue_total_t),mean(v1_cue_total_t),mean(v2_cue_total_t),mean(v3_cue_total_t)),v_res_succ_total_t = c(mean(v_3_res_succ_total_t),mean(v_2_res_succ_total_t),mean(v_1_res_succ_total_t),mean(v0_res_succ_total_t),mean(v1_res_succ_total_t),mean(v2_res_succ_total_t),mean(v3_res_succ_total_t)),v_res_fail_total_t = c(mean(v_3_res_fail_total_t),mean(v_2_res_fail_total_t),mean(v_1_res_fail_total_t),mean(v0_res_fail_total_t),mean(v1_res_fail_total_t),mean(v2_res_fail_total_t),mean(v3_res_fail_total_t)))
+  vstds <- data.frame(v_values=c(-3,-2,-1,0,1,2,3),v_cue_total_t=c(sd(v_3_cue_total_t),sd(v_2_cue_total_t),sd(v_1_cue_total_t),sd(v0_cue_total_t),sd(v1_cue_total_t),sd(v2_cue_total_t),sd(v3_cue_total_t)),v_res_succ_total_t=c(sd(v_3_res_succ_total_t),sd(v_2_res_succ_total_t),sd(v_1_res_succ_total_t),sd(v0_res_succ_total_t),sd(v1_res_succ_total_t),sd(v2_res_succ_total_t),sd(v3_res_succ_total_t)),v_res_fail_total_t=c(sd(v_3_res_fail_total_t),sd(v_2_res_fail_total_t),sd(v_1_res_fail_total_t),sd(v0_res_fail_total_t),sd(v1_res_fail_total_t),sd(v2_res_fail_total_t),sd(v3_res_fail_total_t)))
+  
+  avg_melt <- melt(vavgs,id="v_values",variable.name='type',value.name='avg')
+  std_melt <- melt(vstds,id="v_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='v_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=v_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("v_cue_total_t"="darkorchid4","v_res_succ_total_t"="forestgreen","v_res_fail_total_t"="darkred"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Value Top Corr Total'),x="Value",y="Firing rate") 
+  plot(plt)
+  graphics.off()
+  
+  ##########
+  png(paste('corr_m_t_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  mavgs <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue_total_t = c(mean(m0_cue_total_t),mean(m1_cue_total_t),mean(m2_cue_total_t),mean(m3_cue_total_t),mean(m4_cue_total_t),mean(m5_cue_total_t),mean(m6_cue_total_t)),m_res = c(mean(m0_res_total_t),mean(m1_res_total_t),mean(m2_res_total_t),mean(m3_res_total_t),mean(m4_res_total_t),mean(m5_res_total_t),mean(m6_res_total_t)))
+  mstds <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue_total_t=c(sd(m0_cue_total_t),sd(m1_cue_total_t),sd(m2_cue_total_t),sd(m3_cue_total_t),sd(m4_cue_total_t),sd(m5_cue_total_t),sd(m6_cue_total_t)),m_res=c(sd(m0_res_total_t),sd(m1_res_total_t),sd(m2_res_total_t),sd(m3_res_total_t),sd(m4_res_total_t),sd(m5_res_total_t),sd(m6_res_total_t)))
+  
+  avg_melt <- melt(mavgs,id="m_values",variable.name='type',value.name='avg')
+  std_melt <- melt(mstds,id="m_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='m_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=m_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("m_cue_total_t"="coral4","m_res"="slateblue"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Motivation Top Corr Total'),x="Motivation",y="Firing rate") 
+  plot(plt)
+  graphics.off()  
+  
+  #
+  png(paste('corr_m_sf_t_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  mavgs <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue_total_t = c(mean(m0_cue_total_t),mean(m1_cue_total_t),mean(m2_cue_total_t),mean(m3_cue_total_t),mean(m4_cue_total_t),mean(m5_cue_total_t),mean(m6_cue_total_t)),m_res_succ_total_t = c(mean(m0_res_succ_total_t),mean(m1_res_succ_total_t),mean(m2_res_succ_total_t),mean(m3_res_succ_total_t),mean(m4_res_succ_total_t),mean(m5_res_succ_total_t),mean(m6_res_succ_total_t)),m_res_fail_total_t = c(mean(m0_res_fail_total_t),mean(m1_res_fail_total_t),mean(m2_res_fail_total_t),mean(m3_res_fail_total_t),mean(m4_res_fail_total_t),mean(m5_res_fail_total_t),mean(m6_res_fail_total_t)))
+  mstds <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue_total_t=c(sd(m0_cue_total_t),sd(m1_cue_total_t),sd(m2_cue_total_t),sd(m3_cue_total_t),sd(m4_cue_total_t),sd(m5_cue_total_t),sd(m6_cue_total_t)),m_res_succ_total_t=c(sd(m0_res_succ_total_t),sd(m1_res_succ_total_t),sd(m2_res_succ_total_t),sd(m3_res_succ_total_t),sd(m4_res_total_t),sd(m5_res_succ_total_t),sd(m6_res_succ_total_t)),m_res_fail_total_t=c(sd(m0_res_fail_total_t),sd(m1_res_fail_total_t),sd(m2_res_fail_total_t),sd(m3_res_fail_total_t),sd(m4_res_total_t),sd(m5_res_fail_total_t),sd(m6_res_fail_total_t)))
+  
+  avg_melt <- melt(mavgs,id="m_values",variable.name='type',value.name='avg')
+  std_melt <- melt(mstds,id="m_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='m_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=m_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("m_cue_total_t"="darkorchid4","m_res_succ_total_t"="forestgreen","m_res_fail_total_t"="darkred"))
+  plt <- plt + labs(region_list[region_index],'Motivation Top Corr Total'),x="Motivation",y="Firing rate") 
+  plot(plt)
+  graphics.off()
+  
+  ##### btm
+  png(paste('corr_r_b_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  ravgs <- data.frame(r_values=c(0,1,2,3),r_cue_total_b = c(mean(r0_cue_total_b),mean(r1_cue_total_b),mean(r2_cue_total_b),mean(r3_cue_total_b)),r_res = c(mean(r0_res_total_b),mean(r1_res_total_b),mean(r2_res_total_b),mean(r3_res_total_b)))
+  rstds <- data.frame(r_values=c(0,1,2,3),r_cue_total_b=c(sd(r0_cue_total_b),sd(r1_cue_total_b),sd(r2_cue_total_b),sd(r3_cue_total_b)),r_res=c(sd(r0_res_total_b),sd(r1_res_total_b),sd(r2_res_total_b),sd(r3_res_total_b)))
+  
+  avg_melt <- melt(ravgs,id="r_values",variable.name='type',value.name='avg')
+  std_melt <- melt(rstds,id="r_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='r_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=r_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("r_cue_total_b"="coral4","r_res"="slateblue"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Reward Bottom Corr Total'),x="Reward Number",y="Firing rate") 
+  plot(plt)
+  graphics.off()
+  
+  ##
+  png(paste('corr_r_sf_b_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  ravgs <- data.frame(r_values=c(0,1,2,3),r_cue_total_b = c(mean(r0_cue_total_b),mean(r1_cue_total_b),mean(r2_cue_total_b),mean(r3_cue_total_b)),r_res_succ_total_b = c(mean(r0_res_succ_total_b),mean(r1_res_succ_total_b),mean(r2_res_succ_total_b),mean(r3_res_succ_total_b)),r_res_fail_total_b = c(mean(r0_res_fail_total_b),mean(r1_res_fail_total_b),mean(r2_res_fail_total_b),mean(r3_res_fail_total_b)))
+  rstds <- data.frame(r_values=c(0,1,2,3),r_cue_total_b=c(sd(r0_cue_total_b),sd(r1_cue_total_b),sd(r2_cue_total_b),sd(r3_cue_total_b)),r_res_succ_total_b=c(sd(r0_res_succ_total_b),sd(r1_res_succ_total_b),sd(r2_res_succ_total_b),sd(r3_res_succ_total_b)),r_res_fail_total_b=c(sd(r0_res_fail_total_b),sd(r1_res_fail_total_b),sd(r2_res_fail_total_b),sd(r3_res_fail_total_b)))
+  
+  avg_melt <- melt(ravgs,id="r_values",variable.name='type',value.name='avg')
+  std_melt <- melt(rstds,id="r_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='r_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=r_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("r_cue_total_b"="darkorchid4","r_res_succ_total_b"="forestgreen","r_res_fail_total_b"="darkred"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Punishment Bottom Corr Total'),x="Reward Number",y="Firing rate") 
+  plot(plt)
+  graphics.off()
+  
+  #############
+  png(paste('corr_p_b_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  pavgs <- data.frame(p_values=c(0,1,2,3),p_cue_total_b=c(mean(p0_cue_total_b),mean(p1_cue_total_b),mean(p2_cue_total_b),mean(p3_cue_total_b)),p_res = c(mean(p0_res_total_b),mean(p1_res_total_b),mean(p2_res_total_b),mean(p3_res_total_b)))
+  pstds <- data.frame(p_values=c(0,1,2,3),p_cue_total_b=c(sd(p0_cue_total_b),sd(p1_cue_total_b),sd(p2_cue_total_b),sd(p3_cue_total_b)),p_res=c(sd(p0_res_total_b),sd(p1_res_total_b),sd(p2_res_total_b),sd(p3_res_total_b)))
+  
+  avg_melt <- melt(pavgs,id="p_values",variable.name='type',value.name='avg')
+  std_melt <- melt(pstds,id="p_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='p_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=p_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("p_cue_total_b"="coral4","p_res"="slateblue"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Punishment Bottom Corr Total'),x="Punishment Number",y="Firing rate") 
+  plot(plt)
+  graphics.off()
+  
+  #
+  png(paste('corr_p_sf_b_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  pavgs <- data.frame(p_values=c(0,1,2,3),p_cue_total_b=c(mean(p0_cue_total_b),mean(p1_cue_total_b),mean(p2_cue_total_b),mean(p3_cue_total_b)),p_res_succ_total_b = c(mean(p0_res_succ_total_b),mean(p1_res_succ_total_b),mean(p2_res_succ_total_b),mean(p3_res_succ_total_b)),p_res_fail_total_b = c(mean(p0_res_fail_total_b),mean(p1_res_fail_total_b),mean(p2_res_fail_total_b),mean(p3_res_fail_total_b)))
+  pstds <- data.frame(p_values=c(0,1,2,3),p_cue_total_b=c(sd(p0_cue_total_b),sd(p1_cue_total_b),sd(p2_cue_total_b),sd(p3_cue_total_b)),p_res_succ_total_b=c(sd(p0_res_succ_total_b),sd(p1_res_succ_total_b),sd(p2_res_succ_total_b),sd(p3_res_succ_total_b)),p_res_fail_total_b=c(sd(p0_res_fail_total_b),sd(p1_res_fail_total_b),sd(p2_res_fail_total_b),sd(p3_res_fail_total_b)))
+  
+  avg_melt <- melt(pavgs,id="p_values",variable.name='type',value.name='avg')
+  std_melt <- melt(pstds,id="p_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='p_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=p_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("p_cue_total_b"="darkorchid4","p_res_succ_total_b"="forestgreen","p_res_fail_total_b"="darkred"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Punishment Bottom Corr Total'),x="Punishment Number",y="Firing rate") 
+  plot(plt)
+  graphics.off()
+  
+  ##########
+  png(paste('corr_res_b_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  resavgs <- data.frame(res_values=c(0,1),res_cue_total_b = c(mean(res0_cue_total_b),mean(res1_cue_total_b)),res_res = c(mean(res0_res_total_b),mean(res1_res_total_b)))
+  resstds <- data.frame(res_values=c(0,1),res_cue_total_b=c(sd(res0_cue_total_b),sd(res1_cue_total_b)),res_res=c(sd(res0_res_total_b),sd(res1_res_total_b)))
+  
+  avg_melt <- melt(resavgs,id="res_values",variable.name='type',value.name='avg')
+  std_melt <- melt(resstds,id="res_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='res_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=res_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("res_cue_total_b"="coral4","res_res"="slateblue"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Result Bottom Corr Total'),x="0: fail, 1: Succ",y="Firing rate") 
+  plot(plt)
+  graphics.off()
+  
+  ##########
+  png(paste('corr_v_b_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  vavgs <- data.frame(v_values=c(-3,-2,-1,0,1,2,3),v_cue_total_b = c(mean(v_3_cue_total_b),mean(v_2_cue_total_b),mean(v_1_cue_total_b),mean(v0_cue_total_b),mean(v1_cue_total_b),mean(v2_cue_total_b),mean(v3_cue_total_b)),v_res = c(mean(v_3_res_total_b),mean(v_2_res_total_b),mean(v_1_res_total_b),mean(v0_res_total_b),mean(v1_res_total_b),mean(v2_res_total_b),mean(v3_res_total_b)))
+  vstds <- data.frame(v_values=c(-3,-2,-1,0,1,2,3),v_cue_total_b=c(sd(v_3_cue_total_b),sd(v_2_cue_total_b),sd(v_1_cue_total_b),sd(v0_cue_total_b),sd(v1_cue_total_b),sd(v2_cue_total_b),sd(v3_cue_total_b)),v_res=c(sd(v_3_res_total_b),sd(v_2_res_total_b),sd(v_1_res_total_b),sd(v0_res_total_b),sd(v1_res_total_b),sd(v2_res_total_b),sd(v3_res_total_b)))
+  
+  avg_melt <- melt(vavgs,id="v_values",variable.name='type',value.name='avg')
+  std_melt <- melt(vstds,id="v_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='v_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=v_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("v_cue_total_b"="coral4","v_res"="slateblue"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Value Bottom Corr Total'),x="Value",y="Firing rate") 
+  plot(plt)
+  graphics.off()
+  #
+  png(paste('corr_v_sf_b_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  vavgs <- data.frame(v_values=c(-3,-2,-1,0,1,2,3),v_cue_total_b = c(mean(v_3_cue_total_b),mean(v_2_cue_total_b),mean(v_1_cue_total_b),mean(v0_cue_total_b),mean(v1_cue_total_b),mean(v2_cue_total_b),mean(v3_cue_total_b)),v_res_succ_total_b = c(mean(v_3_res_succ_total_b),mean(v_2_res_succ_total_b),mean(v_1_res_succ_total_b),mean(v0_res_succ_total_b),mean(v1_res_succ_total_b),mean(v2_res_succ_total_b),mean(v3_res_succ_total_b)),v_res_fail_total_b = c(mean(v_3_res_fail_total_b),mean(v_2_res_fail_total_b),mean(v_1_res_fail_total_b),mean(v0_res_fail_total_b),mean(v1_res_fail_total_b),mean(v2_res_fail_total_b),mean(v3_res_fail_total_b)))
+  vstds <- data.frame(v_values=c(-3,-2,-1,0,1,2,3),v_cue_total_b=c(sd(v_3_cue_total_b),sd(v_2_cue_total_b),sd(v_1_cue_total_b),sd(v0_cue_total_b),sd(v1_cue_total_b),sd(v2_cue_total_b),sd(v3_cue_total_b)),v_res_succ_total_b=c(sd(v_3_res_succ_total_b),sd(v_2_res_succ_total_b),sd(v_1_res_succ_total_b),sd(v0_res_succ_total_b),sd(v1_res_succ_total_b),sd(v2_res_succ_total_b),sd(v3_res_succ_total_b)),v_res_fail_total_b=c(sd(v_3_res_fail_total_b),sd(v_2_res_fail_total_b),sd(v_1_res_fail_total_b),sd(v0_res_fail_total_b),sd(v1_res_fail_total_b),sd(v2_res_fail_total_b),sd(v3_res_fail_total_b)))
+  
+  avg_melt <- melt(vavgs,id="v_values",variable.name='type',value.name='avg')
+  std_melt <- melt(vstds,id="v_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='v_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=v_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("v_cue_total_b"="darkorchid4","v_res_succ_total_b"="forestgreen","v_res_fail_total_b"="darkred"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Value Bottom Corr Total'),x="Value",y="Firing rate") 
+  plot(plt)
+  graphics.off()
+  
+  
+  ##########
+  png(paste('corr_m_b_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  mavgs <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue_total_b = c(mean(m0_cue_total_b),mean(m1_cue_total_b),mean(m2_cue_total_b),mean(m3_cue_total_b),mean(m4_cue_total_b),mean(m5_cue_total_b),mean(m6_cue_total_b)),m_res = c(mean(m0_res_total_b),mean(m1_res_total_b),mean(m2_res_total_b),mean(m3_res_total_b),mean(m4_res_total_b),mean(m5_res_total_b),mean(m6_res_total_b)))
+  mstds <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue_total_b=c(sd(m0_cue_total_b),sd(m1_cue_total_b),sd(m2_cue_total_b),sd(m3_cue_total_b),sd(m4_cue_total_b),sd(m5_cue_total_b),sd(m6_cue_total_b)),m_res=c(sd(m0_res_total_b),sd(m1_res_total_b),sd(m2_res_total_b),sd(m3_res_total_b),sd(m4_res_total_b),sd(m5_res_total_b),sd(m6_res_total_b)))
+  
+  avg_melt <- melt(mavgs,id="m_values",variable.name='type',value.name='avg')
+  std_melt <- melt(mstds,id="m_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='m_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=m_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("m_cue_total_b"="coral4","m_res"="slateblue"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Motivation Bottom Corr Total'),x="Motivation",y="Firing rate") 
+  plot(plt)
+  graphics.off()  
+  
+  #
+  png(paste('corr_m_sf_b_total_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  mavgs <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue_total_b = c(mean(m0_cue_total_b),mean(m1_cue_total_b),mean(m2_cue_total_b),mean(m3_cue_total_b),mean(m4_cue_total_b),mean(m5_cue_total_b),mean(m6_cue_total_b)),m_res_succ_total_b = c(mean(m0_res_succ_total_b),mean(m1_res_succ_total_b),mean(m2_res_succ_total_b),mean(m3_res_succ_total_b),mean(m4_res_succ_total_b),mean(m5_res_succ_total_b),mean(m6_res_succ_total_b)),m_res_fail_total_b = c(mean(m0_res_fail_total_b),mean(m1_res_fail_total_b),mean(m2_res_fail_total_b),mean(m3_res_fail_total_b),mean(m4_res_fail_total_b),mean(m5_res_fail_total_b),mean(m6_res_fail_total_b)))
+  mstds <- data.frame(m_values=c(0,1,2,3,4,5,6),m_cue_total_b=c(sd(m0_cue_total_b),sd(m1_cue_total_b),sd(m2_cue_total_b),sd(m3_cue_total_b),sd(m4_cue_total_b),sd(m5_cue_total_b),sd(m6_cue_total_b)),m_res_succ_total_b=c(sd(m0_res_succ_total_b),sd(m1_res_succ_total_b),sd(m2_res_succ_total_b),sd(m3_res_succ_total_b),sd(m4_res),sd(m5_res_succ_total_b),sd(m6_res_succ_total_b)),m_res_fail_total_b=c(sd(m0_res_fail_total_b),sd(m1_res_fail_total_b),sd(m2_res_fail_total_b),sd(m3_res_fail_total_b),sd(m4_res),sd(m5_res_fail_total_b),sd(m6_res_fail_total_b)))
+  
+  avg_melt <- melt(mavgs,id="m_values",variable.name='type',value.name='avg')
+  std_melt <- melt(mstds,id="m_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='m_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(test,aes(x=m_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
+  plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("m_cue_total_b"="darkorchid4","m_res_succ_total_b"="forestgreen","m_res_fail_total_b"="darkred"))
+  plt <- plt + labs(title=paste(region_list[region_index],'Motivation Bottom Corr Total'),x="Motivation",y="Firing rate") 
+  plot(plt)
+  graphics.off()
   
   
   
