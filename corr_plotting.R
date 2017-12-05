@@ -3,7 +3,8 @@ library(ggplot2)
 library(reshape2)
 #source("~/dropbox/mult_rp_files/r_test/multiplot.R")
 #source("~/Dropbox/mult_rp_files/r_test/multiplot.R")
-source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
+#source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
+source("~/workspace/classification_scripts/multiplot.R")
 library(zoo)
 library(gplots)
 library(RColorBrewer)
@@ -22,6 +23,7 @@ region_list <- c('M1','S1','PmD')
 
 
 for (region_index in 1:length(region_list)){
+  cat('plotting ',region_list[region_index],'\n')
   
   #corr hists
   readin <- readMat(paste('corr_output_',region_list[region_index],'.mat',sep=""))

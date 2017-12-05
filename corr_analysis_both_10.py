@@ -1083,8 +1083,12 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 cue_avg[unit_num,i] = np.mean(cue_temp)
                 res_avg[unit_num,i] = np.mean(res_temp)
 
-                cue_peaks[unit_num,i] = np.max(cue_temp)
-                res_peaks[unit_num,i] = np.max(res_temp)
+                try:
+                        cue_peaks[unit_num,i] = np.max(cue_temp)
+                        res_peaks[unit_num,i] = np.max(res_temp)
+                except:
+                        #pdb.set_trace()
+                        pass
 
         fr_all_dict = {'cue_avg':cue_avg,'res_avg':res_avg,'cue_peaks':cue_peaks,'res_peaks':res_peaks}
 
