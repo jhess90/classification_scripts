@@ -26,7 +26,7 @@ from scipy import ndimage
 
 bin_size = 10 #in ms
 
-zscore_bool = False
+zscore_bool = True
 gaussian_bool = True
 gauss_sigma = 30 #in ms
 

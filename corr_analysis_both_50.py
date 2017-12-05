@@ -24,9 +24,9 @@ from scipy import ndimage
 #params to set ########
 #######################
 
-bin_size = 10 #in ms
+bin_size = 50 #in ms
 
-zscore_bool = False
+zscore_bool = True
 gaussian_bool = True
 gauss_sigma = 30 #in ms
 
@@ -58,7 +58,9 @@ def hist_and_smooth_data(spike_data):
                 hist_bins[i,0:len(bins)] = bins
 
         if zscore_bool and gaussian_bool:
-                print 'ERROR: dont do two smoothing types at once'
+                smoothed = stats.zscore(hist_data,axis=1)
+                smoothed = ndimage.filters.gaussian_filter1d(smoothed,gauss_sigma,axis=1)
+			
         elif zscore_bool:
                 smoothed = stats.zscore(hist_data,axis=1)
         elif gaussian_bool:
