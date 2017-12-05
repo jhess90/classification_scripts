@@ -1350,7 +1350,7 @@ for (region_index in 1:length(region_list)){
   
   plt <- ggplot(test,aes(x=m_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
   plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("m_cue_total_t"="darkorchid4","m_res_succ_total_t"="forestgreen","m_res_fail_total_t"="darkred"))
-  plt <- plt + labs(region_list[region_index],'Motivation Top Corr Total'),x="Motivation",y="Firing rate") 
+  plt <- plt + labs(paste(region_list[region_index],'Motivation Top Corr Total'),x="Motivation",y="Firing rate") 
   plot(plt)
   graphics.off()
   
