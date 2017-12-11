@@ -197,7 +197,7 @@ for (region_index in 1:length(region_list)){
   all_avgs <- lapply(m_avgs,mean)
   all_stds <- lapply(m_avgs,sd)
   
-  v_values <- c(0,1,2,3,4,5,6)
+  m_values <- c(0,1,2,3,4,5,6)
   top_avg_cue <- c(all_avgs[[1]],all_avgs[[3]],all_avgs[[5]],all_avgs[[7]],all_avgs[[9]],all_avgs[[11]],all_avgs[[13]])
   btm_avg_cue <- c(all_avgs[[15]],all_avgs[[17]],all_avgs[[19]],all_avgs[[21]],all_avgs[[23]],all_avgs[[25]],all_avgs[[27]])
   top_avg_res <- c(all_avgs[[2]],all_avgs[[4]],all_avgs[[6]],all_avgs[[8]],all_avgs[[10]],all_avgs[[12]],all_avgs[[14]])
@@ -210,7 +210,7 @@ for (region_index in 1:length(region_list)){
   top_std_res <- c(all_stds[[2]],all_stds[[4]],all_stds[[6]],all_stds[[8]],all_stds[[10]],all_stds[[12]],all_stds[[14]])
   btm_std_res <- c(all_stds[[16]],all_stds[[18]],all_stds[[20]],all_stds[[22]],all_stds[[24]],all_stds[[26]],all_stds[[28]])
   
-  m_stds <- data.frame(m_values=v_values,top_cue=top_std_cue,btm_cue=btm_std_cue,top_res=top_std_res,btm_res=btm_std_res)
+  m_stds <- data.frame(m_values=m_values,top_cue=top_std_cue,btm_cue=btm_std_cue,top_res=top_std_res,btm_res=btm_std_res)
   
   avg_melt <- melt(m_avgs,id="m_values",variable.name='type',value.name='avg')
   std_melt <- melt(m_stds,id="m_values",variable.name='type',value.name='std')
