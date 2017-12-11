@@ -195,9 +195,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 r0_binned = np.append(r0_binned,corr_input[condensed[r0[i].astype(int),8].astype(int):condensed[r0[i].astype(int)+1,8].astype(int),0,top_unit_ind])
                         
                                 top_cue_temp = corr_input[condensed[r0[i],8].astype(int):condensed[r0[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[r0[i],9].astype(int)-bfr_res_bins:condensed[r0[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_r0_cue_avg = np.append(top_r0_cue_avg,np.mean(top_cue_temp))
                                 top_r0_res_avg = np.append(top_r0_res_avg,np.mean(top_res_temp))
@@ -206,9 +206,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_r0_res = np.append(top_r0_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[r0[i],8].astype(int):condensed[r0[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[r0[i],9].astype(int)-bfr_res_bins:condensed[r0[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_r0_cue_avg = np.append(btm_r0_cue_avg,np.mean(btm_cue_temp))
                                 btm_r0_res_avg = np.append(btm_r0_res_avg,np.mean(btm_res_temp))
@@ -221,9 +221,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 r1_binned = np.append(r1_binned,corr_input[condensed[r1[i],8].astype(int):condensed[r1[i]+1,8].astype(int),0,top_unit_ind])
                                 
                                 top_cue_temp = corr_input[condensed[r1[i],8].astype(int):condensed[r1[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[r1[i],9].astype(int)-bfr_res_bins:condensed[r1[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
 
                                 top_r1_cue_avg = np.append(top_r1_cue_avg,np.mean(top_cue_temp))
                                 top_r1_res_avg = np.append(top_r1_res_avg,np.mean(top_res_temp))
@@ -232,9 +232,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_r1_res = np.append(top_r1_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[r1[i],8].astype(int):condensed[r1[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[r1[i],9].astype(int)-bfr_res_bins:condensed[r1[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
 
                                 btm_r1_cue_avg = np.append(btm_r1_cue_avg,np.mean(btm_cue_temp))
                                 btm_r1_res_avg = np.append(btm_r1_res_avg,np.mean(btm_res_temp))
@@ -247,9 +247,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 r2_binned = np.append(r2_binned,corr_input[condensed[r2[i],8].astype(int):condensed[r2[i]+1,8].astype(int),0,top_unit_ind])
 
                                 top_cue_temp = corr_input[condensed[r2[i],8].astype(int):condensed[r2[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[r2[i],9].astype(int)-bfr_res_bins:condensed[r2[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                         
                                 top_r2_cue_avg = np.append(top_r2_cue_avg,np.mean(top_cue_temp))
                                 top_r2_res_avg = np.append(top_r2_res_avg,np.mean(top_res_temp))
@@ -258,9 +258,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_r2_res = np.append(top_r2_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[r2[i],8].astype(int):condensed[r2[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[r2[i],9].astype(int)-bfr_res_bins:condensed[r2[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
 
                                 btm_r2_cue_avg = np.append(btm_r2_cue_avg,np.mean(btm_cue_temp))
                                 btm_r2_res_avg = np.append(btm_r2_res_avg,np.mean(btm_res_temp))
@@ -273,9 +273,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 r3_binned = np.append(r3_binned,corr_input[condensed[r3[i],8].astype(int):condensed[r3[i]+1,8].astype(int),0,top_unit_ind])
 
                                 top_cue_temp = corr_input[condensed[r3[i],8].astype(int):condensed[r3[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[r3[i],9].astype(int)-bfr_res_bins:condensed[r3[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
 
                                 top_r3_cue_avg = np.append(top_r3_cue_avg,np.mean(top_cue_temp))
                                 top_r3_res_avg = np.append(top_r3_res_avg,np.mean(top_res_temp))
@@ -284,16 +284,16 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_r3_res = np.append(top_r3_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[r3[i],8].astype(int):condensed[r3[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[r3[i],9].astype(int)-bfr_res_bins:condensed[r3[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                         
                                 btm_r3_cue_avg = np.append(btm_r3_cue_avg,np.mean(btm_cue_temp))
                                 btm_r3_res_avg = np.append(btm_r3_res_avg,np.mean(btm_res_temp))
 
                                 btm_r3_cue = np.append(btm_r3_cue,btm_cue_temp)
                                 btm_r3_res = np.append(btm_r3_res,btm_res_temp)
-
+                                
 
         rlist = [r0_binned, r1_binned, r2_binned, r3_binned]
         top_r_cue_list = [top_r0_cue, top_r1_cue, top_r2_cue, top_r3_cue]
@@ -301,7 +301,7 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
         btm_r_cue_list = [btm_r0_cue, btm_r1_cue, btm_r2_cue, btm_r3_cue]
         btm_r_res_list = [btm_r0_res, btm_r1_res, btm_r2_res, btm_r3_res]
 
-        
+        #pdb.set_trace()
         r_avgs = [top_r0_cue_avg,top_r0_res_avg,top_r1_cue_avg,top_r1_res_avg,top_r2_cue_avg,top_r2_res_avg,top_r3_cue_avg,top_r3_res_avg,btm_r0_cue_avg,btm_r0_res_avg,btm_r1_cue_avg,btm_r1_res_avg,btm_r2_cue_avg,btm_r2_res_avg,btm_r3_cue_avg,btm_r3_res_avg]
         
         sio.savemat('r_avgs_%s' %(region_key),{'r_avgs':r_avgs},format='5')
@@ -366,9 +366,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(p0)):
                         if p0[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[p0[i],8].astype(int):condensed[p0[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[p0[i],9].astype(int)-bfr_res_bins:condensed[p0[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_p0_cue_avg = np.append(top_p0_cue_avg,np.mean(top_cue_temp))
                                 top_p0_res_avg = np.append(top_p0_res_avg,np.mean(top_res_temp))
@@ -377,9 +377,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_p0_res = np.append(top_p0_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[p0[i],8].astype(int):condensed[p0[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[p0[i],9].astype(int)-bfr_res_bins:condensed[p0[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_p0_cue_avg = np.append(btm_p0_cue_avg,np.mean(btm_cue_temp))
                                 btm_p0_res_avg = np.append(btm_p0_res_avg,np.mean(btm_res_temp))
@@ -390,9 +390,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(p1)):
                         if p1[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[p1[i],8].astype(int):condensed[p1[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[p1[i],9].astype(int)-bfr_res_bins:condensed[p1[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
 
                                 top_p1_cue_avg = np.append(top_p1_cue_avg,np.mean(top_cue_temp))
                                 top_p1_res_avg = np.append(top_p1_res_avg,np.mean(top_res_temp))
@@ -401,9 +401,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_p1_res = np.append(top_p1_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[p1[i],8].astype(int):condensed[p1[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[p1[i],9].astype(int)-bfr_res_bins:condensed[p1[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
 
                                 btm_p1_cue_avg = np.append(btm_p1_cue_avg,np.mean(btm_cue_temp))
                                 btm_p1_res_avg = np.append(btm_p1_res_avg,np.mean(btm_res_temp))
@@ -414,9 +414,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(p2)):
                         if p2[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[p2[i],8].astype(int):condensed[p2[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[p2[i],9].astype(int)-bfr_res_bins:condensed[p2[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                         
                                 top_p2_cue_avg = np.append(top_p2_cue_avg,np.mean(top_cue_temp))
                                 top_p2_res_avg = np.append(top_p2_res_avg,np.mean(top_res_temp))
@@ -425,9 +425,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_p2_res = np.append(top_p2_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[p2[i],8].astype(int):condensed[p2[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[p2[i],9].astype(int)-bfr_res_bins:condensed[p2[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
 
                                 btm_p2_cue_avg = np.append(btm_p2_cue_avg,np.mean(btm_cue_temp))
                                 btm_p2_res_avg = np.append(btm_p2_res_avg,np.mean(btm_res_temp))
@@ -437,9 +437,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
 
                 for i in range(len(p3)):
                                 top_cue_temp = corr_input[condensed[p3[i],8].astype(int):condensed[p3[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[p3[i],9].astype(int)-bfr_res_bins:condensed[p3[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
 
                                 top_p3_cue_avg = np.append(top_p3_cue_avg,np.mean(top_cue_temp))
                                 top_p3_res_avg = np.append(top_p3_res_avg,np.mean(top_res_temp))
@@ -448,9 +448,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_p3_res = np.append(top_p3_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[p3[i],8].astype(int):condensed[p3[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[p3[i],9].astype(int)-bfr_res_bins:condensed[p3[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                         
                                 btm_p3_cue_avg = np.append(btm_p3_cue_avg,np.mean(btm_cue_temp))
                                 btm_p3_res_avg = np.append(btm_p3_res_avg,np.mean(btm_res_temp))
@@ -545,9 +545,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(v_3)):
                         if v_3[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[v_3[i],8].astype(int):condensed[v_3[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[v_3[i],9].astype(int)-bfr_res_bins:condensed[v_3[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_v_3_cue_avg = np.append(top_v_3_cue_avg,np.mean(top_cue_temp))
                                 top_v_3_res_avg = np.append(top_v_3_res_avg,np.mean(top_res_temp))
@@ -556,9 +556,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_v_3_res = np.append(top_v_3_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[v_3[i],8].astype(int):condensed[v_3[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[v_3[i],9].astype(int)-bfr_res_bins:condensed[v_3[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_v_3_cue_avg = np.append(btm_v_3_cue_avg,np.mean(btm_cue_temp))
                                 btm_v_3_res_avg = np.append(btm_v_3_res_avg,np.mean(btm_res_temp))
@@ -569,9 +569,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(v_2)):
                         if v_2[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[v_2[i],8].astype(int):condensed[v_2[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[v_2[i],9].astype(int)-bfr_res_bins:condensed[v_2[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_v_2_cue_avg = np.append(top_v_2_cue_avg,np.mean(top_cue_temp))
                                 top_v_2_res_avg = np.append(top_v_2_res_avg,np.mean(top_res_temp))
@@ -580,9 +580,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_v_2_res = np.append(top_v_2_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[v_2[i],8].astype(int):condensed[v_2[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[v_2[i],9].astype(int)-bfr_res_bins:condensed[v_2[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_v_2_cue_avg = np.append(btm_v_2_cue_avg,np.mean(btm_cue_temp))
                                 btm_v_2_res_avg = np.append(btm_v_2_res_avg,np.mean(btm_res_temp))
@@ -593,9 +593,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(v_1)):
                         if v_1[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[v_1[i],8].astype(int):condensed[v_1[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[v_1[i],9].astype(int)-bfr_res_bins:condensed[v_1[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_v_1_cue_avg = np.append(top_v_1_cue_avg,np.mean(top_cue_temp))
                                 top_v_1_res_avg = np.append(top_v_1_res_avg,np.mean(top_res_temp))
@@ -604,9 +604,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_v_1_res = np.append(top_v_1_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[v_1[i],8].astype(int):condensed[v_1[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[v_1[i],9].astype(int)-bfr_res_bins:condensed[v_1[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_v_1_cue_avg = np.append(btm_v_1_cue_avg,np.mean(btm_cue_temp))
                                 btm_v_1_res_avg = np.append(btm_v_1_res_avg,np.mean(btm_res_temp))
@@ -617,9 +617,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(v0)):				
                         if v0[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[v0[i],8].astype(int):condensed[v0[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[v0[i],9].astype(int)-bfr_res_bins:condensed[v0[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_v0_cue_avg = np.append(top_v0_cue_avg,np.mean(top_cue_temp))
                                 top_v0_res_avg = np.append(top_v0_res_avg,np.mean(top_res_temp))
@@ -628,9 +628,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_v0_res = np.append(top_v0_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[v0[i],8].astype(int):condensed[v0[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[v0[i],9].astype(int)-bfr_res_bins:condensed[v0[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_v0_cue_avg = np.append(btm_v0_cue_avg,np.mean(btm_cue_temp))
                                 btm_v0_res_avg = np.append(btm_v0_res_avg,np.mean(btm_res_temp))
@@ -641,9 +641,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(v1)):
                         if v1[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[v1[i],8].astype(int):condensed[v1[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[v1[i],9].astype(int)-bfr_res_bins:condensed[v1[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_v1_cue_avg = np.append(top_v1_cue_avg,np.mean(top_cue_temp))
                                 top_v1_res_avg = np.append(top_v1_res_avg,np.mean(top_res_temp))
@@ -652,9 +652,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_v1_res = np.append(top_v1_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[v1[i],8].astype(int):condensed[v1[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[v1[i],9].astype(int)-bfr_res_bins:condensed[v1[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_v1_cue_avg = np.append(btm_v1_cue_avg,np.mean(btm_cue_temp))
                                 btm_v1_res_avg = np.append(btm_v1_res_avg,np.mean(btm_res_temp))
@@ -665,9 +665,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(v2)):
                         if v2[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[v2[i],8].astype(int):condensed[v2[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[v2[i],9].astype(int)-bfr_res_bins:condensed[v2[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_v2_cue_avg = np.append(top_v2_cue_avg,np.mean(top_cue_temp))
                                 top_v2_res_avg = np.append(top_v2_res_avg,np.mean(top_res_temp))
@@ -676,9 +676,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_v2_res = np.append(top_v2_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[v2[i],8].astype(int):condensed[v2[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[v2[i],9].astype(int)-bfr_res_bins:condensed[v2[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_v2_cue_avg = np.append(btm_v2_cue_avg,np.mean(btm_cue_temp))
                                 btm_v2_res_avg = np.append(btm_v2_res_avg,np.mean(btm_res_temp))
@@ -689,9 +689,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(v3)):
                         if v3[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[v3[i],8].astype(int):condensed[v3[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[v3[i],9].astype(int)-bfr_res_bins:condensed[v3[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_v3_cue_avg = np.append(top_v3_cue_avg,np.mean(top_cue_temp))
                                 top_v3_res_avg = np.append(top_v3_res_avg,np.mean(top_res_temp))
@@ -700,9 +700,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_v3_res = np.append(top_v3_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[v3[i],8].astype(int):condensed[v3[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[v3[i],9].astype(int)-bfr_res_bins:condensed[v3[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_v3_cue_avg = np.append(btm_v3_cue_avg,np.mean(btm_cue_temp))
                                 btm_v3_res_avg = np.append(btm_v3_res_avg,np.mean(btm_res_temp))
@@ -796,9 +796,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(m0)):
                         if m0[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[m0[i],8].astype(int):condensed[m0[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[m0[i],9].astype(int)-bfr_res_bins:condensed[m0[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_m0_cue_avg = np.append(top_m0_cue_avg,np.mean(top_cue_temp))
                                 top_m0_res_avg = np.append(top_m0_res_avg,np.mean(top_res_temp))
@@ -807,9 +807,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_m0_res = np.append(top_m0_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[m0[i],8].astype(int):condensed[m0[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[m0[i],9].astype(int)-bfr_res_bins:condensed[m0[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_m0_cue_avg = np.append(btm_m0_cue_avg,np.mean(btm_cue_temp))
                                 btm_m0_res_avg = np.append(btm_m0_res_avg,np.mean(btm_res_temp))
@@ -820,9 +820,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(m1)):
                         if m1[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[m1[i],8].astype(int):condensed[m1[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[m1[i],9].astype(int)-bfr_res_bins:condensed[m1[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_m1_cue_avg = np.append(top_m1_cue_avg,np.mean(top_cue_temp))
                                 top_m1_res_avg = np.append(top_m1_res_avg,np.mean(top_res_temp))
@@ -831,9 +831,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_m1_res = np.append(top_m1_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[m1[i],8].astype(int):condensed[m1[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[m1[i],9].astype(int)-bfr_res_bins:condensed[m1[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_m1_cue_avg = np.append(btm_m1_cue_avg,np.mean(btm_cue_temp))
                                 btm_m1_res_avg = np.append(btm_m1_res_avg,np.mean(btm_res_temp))
@@ -844,9 +844,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(m2)):
                         if m2[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[m2[i],8].astype(int):condensed[m2[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[m2[i],9].astype(int)-bfr_res_bins:condensed[m2[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_m2_cue_avg = np.append(top_m2_cue_avg,np.mean(top_cue_temp))
                                 top_m2_res_avg = np.append(top_m2_res_avg,np.mean(top_res_temp))
@@ -855,9 +855,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_m2_res = np.append(top_m2_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[m2[i],8].astype(int):condensed[m2[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[m2[i],9].astype(int)-bfr_res_bins:condensed[m2[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_m2_cue_avg = np.append(btm_m2_cue_avg,np.mean(btm_cue_temp))
                                 btm_m2_res_avg = np.append(btm_m2_res_avg,np.mean(btm_res_temp))
@@ -868,9 +868,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(m3)):
                         if m3[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[m3[i],8].astype(int):condensed[m3[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[m3[i],9].astype(int)-bfr_res_bins:condensed[m3[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_m3_cue_avg = np.append(top_m3_cue_avg,np.mean(top_cue_temp))
                                 top_m3_res_avg = np.append(top_m3_res_avg,np.mean(top_res_temp))
@@ -879,9 +879,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_m3_res = np.append(top_m3_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[m3[i],8].astype(int):condensed[m3[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[m3[i],9].astype(int)-bfr_res_bins:condensed[m3[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_m3_cue_avg = np.append(btm_m3_cue_avg,np.mean(btm_cue_temp))
                                 btm_m3_res_avg = np.append(btm_m3_res_avg,np.mean(btm_res_temp))
@@ -892,9 +892,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(m4)):
                         if m4[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[m4[i],8].astype(int):condensed[m4[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[m4[i],9].astype(int)-bfr_res_bins:condensed[m4[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_m4_cue_avg = np.append(top_m4_cue_avg,np.mean(top_cue_temp))
                                 top_m4_res_avg = np.append(top_m4_res_avg,np.mean(top_res_temp))
@@ -903,9 +903,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_m4_res = np.append(top_m4_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[m4[i],8].astype(int):condensed[m4[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[m4[i],9].astype(int)-bfr_res_bins:condensed[m4[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_m4_cue_avg = np.append(btm_m4_cue_avg,np.mean(btm_cue_temp))
                                 btm_m4_res_avg = np.append(btm_m4_res_avg,np.mean(btm_res_temp))
@@ -916,9 +916,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(m5)):
                         if m5[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[m5[i],8].astype(int):condensed[m5[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[m5[i],9].astype(int)-bfr_res_bins:condensed[m5[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_m5_cue_avg = np.append(top_m5_cue_avg,np.mean(top_cue_temp))
                                 top_m5_res_avg = np.append(top_m5_res_avg,np.mean(top_res_temp))
@@ -927,9 +927,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_m5_res = np.append(top_m5_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[m5[i],8].astype(int):condensed[m5[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[m5[i],9].astype(int)-bfr_res_bins:condensed[m5[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_m5_cue_avg = np.append(btm_m5_cue_avg,np.mean(btm_cue_temp))
                                 btm_m5_res_avg = np.append(btm_m5_res_avg,np.mean(btm_res_temp))
@@ -940,9 +940,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(m6)):
                         if m6[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[m6[i],8].astype(int):condensed[m6[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[m6[i],9].astype(int)-bfr_res_bins:condensed[m6[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_m6_cue_avg = np.append(top_m6_cue_avg,np.mean(top_cue_temp))
                                 top_m6_res_avg = np.append(top_m6_res_avg,np.mean(top_res_temp))
@@ -951,9 +951,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_m6_res = np.append(top_m6_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[m6[i],8].astype(int):condensed[m6[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[m6[i],9].astype(int)-bfr_res_bins:condensed[m6[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_m6_cue_avg = np.append(btm_m6_cue_avg,np.mean(btm_cue_temp))
                                 btm_m6_res_avg = np.append(btm_m6_res_avg,np.mean(btm_res_temp))
@@ -1003,9 +1003,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(res0)):
                         if res0[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[res0[i],8].astype(int):condensed[res0[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[res0[i],9].astype(int)-bfr_res_bins:condensed[res0[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
                                 
                                 top_res0_cue_avg = np.append(top_res0_cue_avg,np.mean(top_cue_temp))
                                 top_res0_res_avg = np.append(top_res0_res_avg,np.mean(top_res_temp))
@@ -1014,9 +1014,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_res0_res = np.append(top_res0_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[res0[i],8].astype(int):condensed[res0[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[res0[i],9].astype(int)-bfr_res_bins:condensed[res0[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
                                 
                                 btm_res0_cue_avg = np.append(btm_res0_cue_avg,np.mean(btm_cue_temp))
                                 btm_res0_res_avg = np.append(btm_res0_res_avg,np.mean(btm_res_temp))
@@ -1027,9 +1027,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 for i in range(len(res1)):
                         if res1[i] != np.shape(condensed)[0]-1:
                                 top_cue_temp = corr_input[condensed[res1[i],8].astype(int):condensed[res1[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
-                                top_cue_temp = top_cue_temp /float(bin_size) * 1000 
+                                #top_cue_temp = top_cue_temp /float(bin_size) * 1000 
                                 top_res_temp = corr_input[condensed[res1[i],9].astype(int)-bfr_res_bins:condensed[res1[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
-                                top_res_temp = top_res_temp / float(bin_size) * 1000
+                                #top_res_temp = top_res_temp / float(bin_size) * 1000
 
                                 top_res1_cue_avg = np.append(top_res1_cue_avg,np.mean(top_cue_temp))
                                 top_res1_res_avg = np.append(top_res1_res_avg,np.mean(top_res_temp))
@@ -1038,9 +1038,9 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                                 top_res1_res = np.append(top_res1_res,top_res_temp)
 
                                 btm_cue_temp = corr_input[condensed[res1[i],8].astype(int):condensed[res1[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
-                                btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
+                                #btm_cue_temp = btm_cue_temp /float(bin_size) * 1000 
                                 btm_res_temp = corr_input[condensed[res1[i],9].astype(int)-bfr_res_bins:condensed[res1[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
-                                btm_res_temp = btm_res_temp / float(bin_size) * 1000
+                                #btm_res_temp = btm_res_temp / float(bin_size) * 1000
 
                                 btm_res1_cue_avg = np.append(btm_res1_cue_avg,np.mean(btm_cue_temp))
                                 btm_res1_res_avg = np.append(btm_res1_res_avg,np.mean(btm_res_temp))
@@ -1073,10 +1073,10 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
         for unit_num in range(np.shape(corr_input)[2]):
             for i in range(np.shape(condensed)[0]):
                 cue_temp = corr_input[condensed[i,8].astype(int):condensed[i,8].astype(int)+aft_cue_bins,0,unit_num]
-                cue_temp = cue_temp / float(bin_size) * 1000
+                #cue_temp = cue_temp / float(bin_size) * 1000
 
                 res_temp = corr_input[condensed[i,9].astype(int):condensed[i,9].astype(int)+aft_cue_bins,0,unit_num]
-                res_temp = res_temp / float(bin_size) * 1000
+                #res_temp = res_temp / float(bin_size) * 1000
                 
                 cue_avg[unit_num,i] = np.mean(cue_temp)
                 res_avg[unit_num,i] = np.mean(res_temp)
