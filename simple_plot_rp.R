@@ -24,12 +24,9 @@ time <- seq(from=-0.35,to=1.0,by=0.05)
 for(region_index in 1:length(region_list)){
   cat("\nplotting region:",region_list[region_index])
   
-  filename <- paste('simple_output_',region_list[region_index],'.mat',sep="")
-  
-  readin <- readMat(readMat())
-  
-  
   readin <- readMat(paste('simple_output_',region_list[region_index],'.mat',sep=""))
+  
+  
   
   
   
