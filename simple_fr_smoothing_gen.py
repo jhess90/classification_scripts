@@ -90,8 +90,8 @@ def run_breakdown(binned_data,condensed,region_key):
 			all_cue_fr[unit_num,i,:] = cue_temp
 			all_res_fr[unit_num,i,:] = res_temp
 
-
-	return_dict = {'all_cue_fr':all_cue_fr,'all_res_fr':all_res_fr,'condensed':condensed}
+        params = {'bfr_cue':bfr_cue_time,'aft_cue':aft_cue_time,'bfr_result':bfr_result_time,'aft_result':aft_result_time,'bin_size':bin_size}
+	return_dict = {'all_cue_fr':all_cue_fr,'all_res_fr':all_res_fr,'condensed':condensed,'params':params}
 	sio.savemat('simple_output_%s' %(region_key),{'return_dict':return_dict},format='5')
 	
 	return(return_dict)

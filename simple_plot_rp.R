@@ -2,7 +2,7 @@ library(openxlsx)
 library(ggplot2)
 library(reshape2)
 #source("~/dropbox/mult_rp_files/r_test/multiplot.R")
-source("~/Dropbox/mult_rp_files/r_test/multiplot.R")
+#source("~/Dropbox/mult_rp_files/r_test/multiplot.R")
 library(zoo)
 library(gplots)
 library(RColorBrewer)
@@ -10,12 +10,17 @@ library(abind)
 library(gridGraphics)
 library(grid)
 library(gridExtra)
+library(R.matlab)
 
 saveAsPng <- T
 
 #file_list <- c('simple_output')
 region_list <- c('M1','S1','PmD')
-time <- seq(from=-0.35,to=1.0,by=0.05)
+
+
+
+
+
 
 
 #########
@@ -26,125 +31,72 @@ for(region_index in 1:length(region_list)){
   
   readin <- readMat(paste('simple_output_',region_list[region_index],'.mat',sep=""))
   
+  all_cue_fr <- readin$return.dict[,,1]$all.cue.fr
+  all_res_fr <- readin$return.dict[,,1]$all.res.fr
+  condensed <- readin$return.dict[,,1]$condensed
+  bin_size <- readin$return.dict[,,1]$params[,,1]$bin.size[,]
+  
+  #TODO make for diff bfr and aft times
+  time <- seq(from=-0.5,to=(1.0-bin_size/1000),by=bin_size/1000)
+  
+  r0 <- which(condensed[,4] == 0)
+  r1 <- which(condensed[,4] == 1)
+  r2 <- which(condensed[,4] == 2)
+  r3 <- which(condensed[,4] == 3)
+  
+  p0 <- which(condensed[,5] == 0)
+  p1 <- which(condensed[,5] == 1)
+  p2 <- which(condensed[,5] == 2)
+  p3 <- which(condensed[,5] == 3)
+  
+  v_3 <- which(condensed[,7] == -3)
+  v_2 <- which(condensed[,7] == -2)
+  v_1 <- which(condensed[,7] == -1)
+  v0 <- which(condensed[,7] == 0)
+  v1 <- which(condensed[,7] == 1)
+  v2 <- which(condensed[,7] == 2)
+  v3 <- which(condensed[,7] == 3)
+  
+  m0 <- which(condensed[,8] == 0)
+  m1 <- which(condensed[,8] == 1)
+  m2 <- which(condensed[,8] == 2)
+  m3 <- which(condensed[,8] == 3)
+  m4 <- which(condensed[,8] == 4)
+  m5 <- which(condensed[,8] == 5)
+  m6 <- which(condensed[,8] == 6)
+  
+  res0 <- which(condensed[,6] == 0)
+  res1 <- which(condensed[,6] == 1)
+  
+  #which(r0 %in% res0)
+  
+  for (unit_num in 1:length(dim(all_cue_fr[1]))){
+    rp_vals <- c(0,1,2,3)
+    
+    r_cue_avgs <- list(colMeans(all_cue_fr[unit_num,r0,]),colMeans(all_cue_fr[unit_num,r1,]),colMeans(all_cue_fr[unit_num,r2,]),colMeans(all_cue_fr[unit_num,r3,]))
+    r_res_avgs <- list(colMeans(all_res_fr[unit_num,r0,]),colMeans(all_res_fr[unit_num,r1,]),colMeans(all_res_fr[unit_num,r2,]),colMeans(all_res_fr[unit_num,r3,]))
+    
+        
+    #r_avgs <- data.frame(r_vals=rp_vals,time=time,r_cue=r_cue_avgs,r_res=r_res_avgs)
+    
+    
+    r_cue_avgs <- data.frame(time=time,r0=colMeans(all_cue_fr[unit_num,r0,]),r1=colMeans(all_cue_fr[unit_num,r1,]),r2=colMeans(all_cue_fr[unit_num,r2,]),r3=colMeans(all_cue_fr[unit_num,r3,]))
+    r_res_avgs <- data.frame(time=time,r0=colMeans(all_res_fr[unit_num,r0,]),r1=colMeans(all_res_fr[unit_num,r1,]),r2=colMeans(all_res_fr[unit_num,r2,]),r3=colMeans(all_res_fr[unit_num,r3,]))
+    
+    
+    r_cue_avgs.m <- melt(r_cue_avgs,id.vars="time",variable_name="r_level")
+    plt_cue <- ggplot(r_cue_avgs.m,aes(time,r_level)) + geom_line(aes(colour=r_level))
+    plt_cue <- plt_cue + scale_color_brewer(palette="RdYlGn")
+
+    
+    plt_val_all_cue <- ggplot(df_val_all_cue, aes(time,value)) + geom_line(aes(colour=vals),size=1.5)
+    plt_val_all_cue <- plt_val_all_cue + scale_color_brewer(palette="RdYlGn") +labs(title=paste(region_list[region_index],"unit",j,"cue all value"),y="normalized firing rate", x="time(s)") + geom_vline(xintercept=0)
+    
+  }
   
   
   
   
-  
-  
-  wb <- loadWorkbook(filename)
-  num_sheets <- length(sheets(wb))
-  
-  total_array_name <- paste(region_list[region_index],"_unit_info",sep="")
-  total_array <- array(NA,dim=c(28,32,num_sheets))
-  
-  r0_succ_cue_name <- paste(region_list[region_index],"_r0_succ_cue_all",sep="")
-  r1_succ_cue_name <- paste(region_list[region_index],"_r1_succ_cue_all",sep="")
-  r2_succ_cue_name <- paste(region_list[region_index],"_r2_succ_cue_all",sep="")
-  r3_succ_cue_name <- paste(region_list[region_index],"_r3_succ_cue_all",sep="")
-  r0_succ_result_name <- paste(region_list[region_index],"_r0_succ_result_all",sep="")
-  r1_succ_result_name <- paste(region_list[region_index],"_r1_succ_result_all",sep="")
-  r2_succ_result_name <- paste(region_list[region_index],"_r2_succ_result_all",sep="")
-  r3_succ_result_name <- paste(region_list[region_index],"_r3_succ_result_all",sep="")
-  r0_fail_cue_name <- paste(region_list[region_index],"_r0_fail_cue_all",sep="")
-  r1_fail_cue_name <- paste(region_list[region_index],"_r1_fail_cue_all",sep="")
-  r2_fail_cue_name <- paste(region_list[region_index],"_r2_fail_cue_all",sep="")
-  r3_fail_cue_name <- paste(region_list[region_index],"_r3_fail_cue_all",sep="")
-  r0_fail_result_name <- paste(region_list[region_index],"_r0_fail_result_all",sep="")
-  r1_fail_result_name <- paste(region_list[region_index],"_r1_fail_result_all",sep="")
-  r2_fail_result_name <- paste(region_list[region_index],"_r2_fail_result_all",sep="")
-  r3_fail_result_name <- paste(region_list[region_index],"_r3_fail_result_all",sep="")
-  
-  p0_succ_cue_name <- paste(region_list[region_index],"_p0_succ_cue_all",sep="")
-  p1_succ_cue_name <- paste(region_list[region_index],"_p1_succ_cue_all",sep="")
-  p2_succ_cue_name <- paste(region_list[region_index],"_p2_succ_cue_all",sep="")
-  p3_succ_cue_name <- paste(region_list[region_index],"_p3_succ_cue_all",sep="")
-  p0_succ_result_name <- paste(region_list[region_index],"_p0_succ_result_all",sep="")
-  p1_succ_result_name <- paste(region_list[region_index],"_p1_succ_result_all",sep="")
-  p2_succ_result_name <- paste(region_list[region_index],"_p2_succ_result_all",sep="")
-  p3_succ_result_name <- paste(region_list[region_index],"_p3_succ_result_all",sep="")
-  p0_fail_cue_name <- paste(region_list[region_index],"_p0_fail_cue_all",sep="")
-  p1_fail_cue_name <- paste(region_list[region_index],"_p1_fail_cue_all",sep="")
-  p2_fail_cue_name <- paste(region_list[region_index],"_p2_fail_cue_all",sep="")
-  p3_fail_cue_name <- paste(region_list[region_index],"_p3_fail_cue_all",sep="")
-  p0_fail_result_name <- paste(region_list[region_index],"_p0_fail_result_all",sep="")
-  p1_fail_result_name <- paste(region_list[region_index],"_p1_fail_result_all",sep="")
-  p2_fail_result_name <- paste(region_list[region_index],"_p2_fail_result_all",sep="")
-  p3_fail_result_name <- paste(region_list[region_index],"_p3_fail_result_all",sep="")
-  
-  all_r_succ_cue_name <- paste(region_list[region_index],"_all_r_succ_cue",sep="")
-  all_r_fail_cue_name <- paste(region_list[region_index],"_all_r_fail_cue",sep="")
-  all_r_succ_result_name <- paste(region_list[region_index],"_all_r_succ_result",sep="")
-  all_r_fail_result_name <- paste(region_list[region_index],"_all_r_fail_result",sep="")
-  
-  all_p_succ_cue_name <- paste(region_list[region_index],"_all_p_succ_cue",sep="")
-  all_p_fail_cue_name <- paste(region_list[region_index],"_all_p_fail_cue",sep="")
-  all_p_succ_result_name <- paste(region_list[region_index],"_all_p_succ_result",sep="")
-  all_p_fail_result_name <- paste(region_list[region_index],"_all_p_fail_result",sep="")
-  
-  no_r_succ_cue_name <- paste(region_list[region_index],"_no_r_succ_cue",sep="")
-  no_r_fail_cue_name <- paste(region_list[region_index],"_no_r_fail_cue",sep="")
-  no_r_succ_result_name <- paste(region_list[region_index],"_no_r_succ_result",sep="")
-  no_r_fail_result_name <- paste(region_list[region_index],"_no_r_fail_result",sep="")
-  
-  no_p_succ_cue_name <- paste(region_list[region_index],"_no_p_succ_cue",sep="")
-  no_p_fail_cue_name <- paste(region_list[region_index],"_no_p_fail_cue",sep="")
-  no_p_succ_result_name <- paste(region_list[region_index],"_no_p_succ_result",sep="")
-  no_p_fail_result_name <- paste(region_list[region_index],"_no_p_fail_result",sep="")
-  
-  r0_succ_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  r1_succ_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  r2_succ_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  r3_succ_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  r0_succ_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  r1_succ_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  r2_succ_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  r3_succ_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  r0_fail_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  r1_fail_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  r2_fail_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  r3_fail_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  r0_fail_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  r1_fail_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  r2_fail_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  r3_fail_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  
-  p0_succ_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  p1_succ_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  p2_succ_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  p3_succ_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  p0_succ_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  p1_succ_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  p2_succ_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  p3_succ_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  p0_fail_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  p1_fail_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  p2_fail_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  p3_fail_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  p0_fail_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  p1_fail_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  p2_fail_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  p3_fail_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  
-  all_r_succ_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  all_r_fail_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  all_r_succ_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  all_r_fail_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  
-  all_p_succ_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  all_p_fail_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  all_p_succ_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  all_p_fail_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  
-  no_r_succ_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  no_r_fail_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  no_r_succ_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  no_r_fail_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  
-  no_p_succ_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  no_p_fail_cue_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  no_p_succ_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
-  no_p_fail_result_matrix <- matrix(NA,nrow=num_sheets,ncol=28,dimnames=list(1:num_sheets,time))
   
   for (j in 1:num_sheets){
     #cat('plotting unit', j,"\n")
