@@ -74,6 +74,8 @@ def hist_and_smooth_data(spike_data):
         return(return_dict)
         
 def run_breakdown(binned_data,condensed,region_key):
+        last_ind = 0
+        trim_bool = False
 
 	bfr_cue_bins = int(bfr_cue_time * 1000/bin_size)
 	aft_cue_bins = int(aft_cue_time * 1000/bin_size)
@@ -85,10 +87,23 @@ def run_breakdown(binned_data,condensed,region_key):
 	
 	for unit_num in range(np.shape(binned_data)[0]):
 		for i in range(np.shape(condensed)[0]):
-			cue_temp = binned_data[unit_num,condensed[i,8]-bfr_cue_bins : condensed[i,8]+aft_cue_bins]
-			res_temp = binned_data[unit_num,condensed[i,9]-bfr_res_bins : condensed[i,9]+aft_res_bins]
-			all_cue_fr[unit_num,i,:] = cue_temp
-			all_res_fr[unit_num,i,:] = res_temp
+                        try:
+                                cue_temp = binned_data[unit_num,condensed[i,8]-bfr_cue_bins : condensed[i,8]+aft_cue_bins]
+                                res_temp = binned_data[unit_num,condensed[i,9]-bfr_res_bins : condensed[i,9]+aft_res_bins]
+                                all_cue_fr[unit_num,i,:] = cue_temp
+                                all_res_fr[unit_num,i,:] = res_temp
+                        except:
+                                if np.shape(condensed)[0] - i > 3:
+                                        pdb.set_trace()
+                                else:
+                                        last_ind = i
+                                        trim_bool = True
+                                        break
+        if trim_bool:
+                all_cue_fr = all_cue_fr[:,0:last_ind,:]
+                all_res_fr = all_res_fr[:,0:last_ind,:]
+                
+                condensed = condensed[0:last_ind,:]
 
         params = {'bfr_cue':bfr_cue_time,'aft_cue':aft_cue_time,'bfr_result':bfr_result_time,'aft_result':aft_result_time,'bin_size':bin_size}
 	return_dict = {'all_cue_fr':all_cue_fr,'all_res_fr':all_res_fr,'condensed':condensed,'params':params}
@@ -235,10 +250,9 @@ for key,value in data_dict.iteritems():
         for i in range(len(spike_dict[key])):
                 spike_data.append(spike_dict[key][i]['ts'][0,0][0])
 
-        print 'binning and smoothing'
+        #print 'binning and smoothing'
         binned_data = hist_and_smooth_data(spike_data)
        
-        print 'correlation analysis'
         if gaussian_bool or zscore_bool:
                 output = run_breakdown(binned_data['smoothed'],condensed,key)
         else:

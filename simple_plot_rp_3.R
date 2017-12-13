@@ -20,11 +20,6 @@ saveAsPng <- T
 region_list <- c('M1','S1','PmD')
 
 
-
-
-
-
-
 #########
 
 
@@ -187,9 +182,6 @@ for(region_index in 1:length(region_list)){
   }
 }
 
-
-
-
 # save.image(file="rearranged_data.RData")
-#rm(list=ls())
+rm(list=ls())
 
