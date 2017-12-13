@@ -37,7 +37,7 @@ for(region_index in 1:length(region_list)){
   all_res_fr <- readin$return.dict[,,1]$all.res.fr
   condensed <- readin$return.dict[,,1]$condensed
   bin_size <- readin$return.dict[,,1]$params[,,1]$bin.size[,]
-  rp_vals <- c(0,1,2,3)
+  rp_vals <- c(0,3)
   
   
   #TODO make for diff bfr and aft times
@@ -46,58 +46,42 @@ for(region_index in 1:length(region_list)){
   time <- seq(from=-0.5+2*bin_size/1000,to=(1.0-3*bin_size/1000),by=bin_size/1000)
   
   r0 <- which(condensed[,4] == 0)
-  r1 <- which(condensed[,4] == 1)
-  r2 <- which(condensed[,4] == 2)
   r3 <- which(condensed[,4] == 3)
   
   p0 <- which(condensed[,5] == 0)
-  p1 <- which(condensed[,5] == 1)
-  p2 <- which(condensed[,5] == 2)
   p3 <- which(condensed[,5] == 3)
   
   v_3 <- which(condensed[,7] == -3)
-  v_2 <- which(condensed[,7] == -2)
-  v_1 <- which(condensed[,7] == -1)
   v0 <- which(condensed[,7] == 0)
-  v1 <- which(condensed[,7] == 1)
-  v2 <- which(condensed[,7] == 2)
   v3 <- which(condensed[,7] == 3)
   
   m0 <- which(condensed[,8] == 0)
-  m1 <- which(condensed[,8] == 1)
-  m2 <- which(condensed[,8] == 2)
   m3 <- which(condensed[,8] == 3)
-  m4 <- which(condensed[,8] == 4)
-  m5 <- which(condensed[,8] == 5)
   m6 <- which(condensed[,8] == 6)
   
   res0 <- which(condensed[,6] == 0)
   res1 <- which(condensed[,6] == 1)
   
-  r0_fail <- which(res0 %in% r0)
-  r1_fail <- which(res0 %in% r1)
-  r2_fail <- which(res0 %in% r2)
-  r3_fail <- which(res0 %in% r3)
-  r0_succ <- which(res1 %in% r0)
-  r1_succ <- which(res1 %in% r1)
-  r2_succ <- which(res1 %in% r2)
-  r3_succ <- which(res1 %in% r3)
+  #r0_fail <- which(res0 %in% r0)
+  #r3_fail <- which(res0 %in% r3)
+  #r0_succ <- which(res1 %in% r0)
+  #r3_succ <- which(res1 %in% r3)
   
   for (unit_num in 1:dim(all_cue_fr)[1]){
-  
+    
     ## reward
     png(paste(region_list[region_index],"_r_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
     
-    r_cue_avgs <- data.frame(time=time,r0=rollmean(colMeans(all_cue_fr[unit_num,r0,]),5),r1=rollmean(colMeans(all_cue_fr[unit_num,r1,]),5),r2=rollmean(colMeans(all_cue_fr[unit_num,r2,]),5),r3=rollmean(colMeans(all_cue_fr[unit_num,r3,]),5))
-    r_res_avgs <- data.frame(time=time,r0=rollmean(colMeans(all_res_fr[unit_num,r0,]),5),r1=rollmean(colMeans(all_res_fr[unit_num,r1,]),5),r2=rollmean(colMeans(all_res_fr[unit_num,r2,]),5),r3=rollmean(colMeans(all_res_fr[unit_num,r3,]),5))
+    r_cue_avgs <- data.frame(time=time,r0=rollmean(colMeans(all_cue_fr[unit_num,r0,]),5),r3=rollmean(colMeans(all_cue_fr[unit_num,r3,]),5))
+    r_res_avgs <- data.frame(time=time,r0=rollmean(colMeans(all_res_fr[unit_num,r0,]),5),r3=rollmean(colMeans(all_res_fr[unit_num,r3,]),5))
     
     r_cue_avgs.m <- melt(r_cue_avgs,id.vars="time",variable="r_level")
     plt_cue <- ggplot(r_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=r_level),size=1) + theme_classic()
-    plt_cue <- plt_cue + scale_colour_manual(values=c("goldenrod","palegreen3","seagreen","darkgreen")) + labs(title=paste("Reward: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Reward Level") + geom_vline(xintercept=0)
-
+    plt_cue <- plt_cue + scale_colour_manual(values=c("goldenrod","darkgreen")) + labs(title=paste("Reward: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Reward Level") + geom_vline(xintercept=0)
+    
     r_res_avgs.m <- melt(r_res_avgs,id.vars="time",variable="r_level")
     plt_res <- ggplot(r_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=r_level),size=1) + theme_classic()
-    plt_res <- plt_res + scale_colour_manual(values=c("goldenrod","palegreen3","seagreen","darkgreen")) + labs(title="Result",y="z-score", x="Time(s)",colour="Reward Level") + geom_vline(xintercept=0)
+    plt_res <- plt_res + scale_colour_manual(values=c("goldenrod","darkgreen")) + labs(title="Result",y="z-score", x="Time(s)",colour="Reward Level") + geom_vline(xintercept=0)
     
     multiplot(plt_cue,plt_res)
     graphics.off()
@@ -105,16 +89,16 @@ for(region_index in 1:length(region_list)){
     ## punishment
     png(paste(region_list[region_index],"_p_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
     
-    p_cue_avgs <- data.frame(time=time,p0=rollmean(colMeans(all_cue_fr[unit_num,p0,]),5),p1=rollmean(colMeans(all_cue_fr[unit_num,p1,]),5),p2=rollmean(colMeans(all_cue_fr[unit_num,p2,]),5),p3=rollmean(colMeans(all_cue_fr[unit_num,p3,]),5))
-    p_res_avgs <- data.frame(time=time,p0=rollmean(colMeans(all_res_fr[unit_num,p0,]),5),p1=rollmean(colMeans(all_res_fr[unit_num,p1,]),5),p2=rollmean(colMeans(all_res_fr[unit_num,p2,]),5),p3=rollmean(colMeans(all_res_fr[unit_num,p3,]),5))
+    p_cue_avgs <- data.frame(time=time,p0=rollmean(colMeans(all_cue_fr[unit_num,p0,]),5),p3=rollmean(colMeans(all_cue_fr[unit_num,p3,]),5))
+    p_res_avgs <- data.frame(time=time,p0=rollmean(colMeans(all_res_fr[unit_num,p0,]),5),p3=rollmean(colMeans(all_res_fr[unit_num,p3,]),5))
     
     p_cue_avgs.m <- melt(p_cue_avgs,id.vars="time",variable="p_level")
     plt_cue <- ggplot(p_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=p_level),size=1) + theme_classic()
-    plt_cue <- plt_cue + scale_colour_manual(values=c("goldenrod","coral","firebrick1","red2")) + labs(title=paste("Punishment: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Punishment Level") + geom_vline(xintercept=0)
+    plt_cue <- plt_cue + scale_colour_manual(values=c("goldenrod","red2")) + labs(title=paste("Punishment: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Punishment Level") + geom_vline(xintercept=0)
     
     p_res_avgs.m <- melt(p_res_avgs,id.vars="time",variable="p_level")
     plt_res <- ggplot(p_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=p_level),size=1) + theme_classic()
-    plt_res <- plt_res + scale_colour_manual(values=c("goldenrod","coral","firebrick1","red2")) + labs(title="Result",y="z-score", x="Time(s)",colour="Punishment Level") + geom_vline(xintercept=0)
+    plt_res <- plt_res + scale_colour_manual(values=c("goldenrod","red2")) + labs(title="Result",y="z-score", x="Time(s)",colour="Punishment Level") + geom_vline(xintercept=0)
     
     multiplot(plt_cue,plt_res)
     graphics.off()
@@ -122,16 +106,16 @@ for(region_index in 1:length(region_list)){
     ## value
     png(paste(region_list[region_index],"_v_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
     
-    v_cue_avgs <- data.frame(time=time,v_3=rollmean(colMeans(all_cue_fr[unit_num,v_3,]),5),v_2=rollmean(colMeans(all_cue_fr[unit_num,v_2,]),5),v_1=rollmean(colMeans(all_cue_fr[unit_num,v_1,]),5),v0=rollmean(colMeans(all_cue_fr[unit_num,v0,]),5),v1=rollmean(colMeans(all_cue_fr[unit_num,v1,]),5),v2=rollmean(colMeans(all_cue_fr[unit_num,v2,]),5),v3=rollmean(colMeans(all_cue_fr[unit_num,v3,]),5))
-    v_res_avgs <- data.frame(time=time,v_3=rollmean(colMeans(all_res_fr[unit_num,v_3,]),5),v_2=rollmean(colMeans(all_res_fr[unit_num,v_2,]),5),v_1=rollmean(colMeans(all_res_fr[unit_num,v_1,]),5),v0=rollmean(colMeans(all_res_fr[unit_num,v0,]),5),v1=rollmean(colMeans(all_res_fr[unit_num,v1,]),5),v2=rollmean(colMeans(all_res_fr[unit_num,v2,]),5),v3=rollmean(colMeans(all_res_fr[unit_num,v3,]),5))
+    v_cue_avgs <- data.frame(time=time,v_3=rollmean(colMeans(all_cue_fr[unit_num,v_3,]),5),v0=rollmean(colMeans(all_cue_fr[unit_num,v0,]),5),v3=rollmean(colMeans(all_cue_fr[unit_num,v3,]),5))
+    v_res_avgs <- data.frame(time=time,v_3=rollmean(colMeans(all_res_fr[unit_num,v_3,]),5),v0=rollmean(colMeans(all_res_fr[unit_num,v0,]),5),v3=rollmean(colMeans(all_res_fr[unit_num,v3,]),5))
     
     v_cue_avgs.m <- melt(v_cue_avgs,id.vars="time",variable="v_level")
     plt_cue <- ggplot(v_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=v_level),size=1) + theme_classic()
-    plt_cue <- plt_cue + scale_color_brewer(palette="BrBG") +labs(title=paste("Value: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0)
+    plt_cue <- plt_cue +  scale_colour_manual(values=c("saddlebrown","goldenrod","turquoise4")) + labs(title=paste("Value: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0)
     
     v_res_avgs.m <- melt(v_res_avgs,id.vars="time",variable="v_level")
     plt_res <- ggplot(v_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=v_level),size=1) + theme_classic()
-    plt_res <- plt_res + scale_color_brewer(palette="BrBG") +labs(title="Result",y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0)
+    plt_res <- plt_res +  scale_colour_manual(values=c("saddlebrown","goldenrod","turquoise4")) + labs(title="Result",y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0)
     
     multiplot(plt_cue,plt_res)
     graphics.off()
@@ -139,16 +123,17 @@ for(region_index in 1:length(region_list)){
     ## motivation
     png(paste(region_list[region_index],"_m_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
     
-    m_cue_avgs <- data.frame(time=time,m0=rollmean(colMeans(all_cue_fr[unit_num,m0,]),5),m1=rollmean(colMeans(all_cue_fr[unit_num,m1,]),5),m2=rollmean(colMeans(all_cue_fr[unit_num,m2,]),5),m3=rollmean(colMeans(all_cue_fr[unit_num,m3,]),5),m4=rollmean(colMeans(all_cue_fr[unit_num,m4,]),5),m5=rollmean(colMeans(all_cue_fr[unit_num,m5,]),5),m6=rollmean(colMeans(all_cue_fr[unit_num,m6,]),5))
-    m_res_avgs <- data.frame(time=time,m0=rollmean(colMeans(all_res_fr[unit_num,m0,]),5),m1=rollmean(colMeans(all_res_fr[unit_num,m1,]),5),m2=rollmean(colMeans(all_res_fr[unit_num,m2,]),5),m3=rollmean(colMeans(all_res_fr[unit_num,m3,]),5),m4=rollmean(colMeans(all_res_fr[unit_num,m4,]),5),m5=rollmean(colMeans(all_res_fr[unit_num,m5,]),5),m6=rollmean(colMeans(all_res_fr[unit_num,m6,]),5))
+    m_cue_avgs <- data.frame(time=time,m0=rollmean(colMeans(all_cue_fr[unit_num,m0,]),5),m3=rollmean(colMeans(all_cue_fr[unit_num,m3,]),5),m6=rollmean(colMeans(all_cue_fr[unit_num,m6,]),5))
+    m_res_avgs <- data.frame(time=time,m0=rollmean(colMeans(all_res_fr[unit_num,m0,]),5),m3=rollmean(colMeans(all_res_fr[unit_num,m3,]),5),m6=rollmean(colMeans(all_res_fr[unit_num,m6,]),5))
     
     m_cue_avgs.m <- melt(m_cue_avgs,id.vars="time",variable="m_level")
     plt_cue <- ggplot(m_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=m_level),size=1) + theme_classic()
-    plt_cue <- plt_cue + scale_color_brewer(palette="GnBu") +labs(title=paste("Motivation: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0)
+    plt_cue <- plt_cue + scale_colour_manual(values=c("darkslategray2","aquamarine4","darkslateblue")) + labs(title=paste("Motivation: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0)
     
     m_res_avgs.m <- melt(m_res_avgs,id.vars="time",variable="m_level")
     plt_res <- ggplot(m_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=m_level),size=1) + theme_classic()
-    plt_res <- plt_res + scale_color_brewer(palette="GnBu") +labs(title="Result",y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0)
+    plt_res <- plt_res + scale_colour_manual(values=c("darkslategray2","aquamarine4","darkslateblue")) + labs(title="Result",y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0)
+    
     
     multiplot(plt_cue,plt_res)
     graphics.off()
@@ -184,10 +169,10 @@ for(region_index in 1:length(region_list)){
     
     #r_res_succ_avgs <- data.frame(time=time,r0_succ=rollmean(colMeans(all_res_fr[unit_num,r0_succ,]),5),r1_succ=rollmean(colMeans(all_res_fr[unit_num,r1_succ,]),5),r2_succ=rollmean(colMeans(all_res_fr[unit_num,r2_succ,]),5),r3_succ=rollmean(colMeans(all_res_fr[unit_num,r3_succ,]),5))
     #r_res_fail_avgs <- data.frame(time=time,r0_fail=r0_fail_avg,r1_fail=r1_fail_avg,r2_fail=r2_fail_avg,r3_fail=r3_fail_avg)
-  
+    
     #r_res_succ_avgs <- data.frame(time=time,r0=rollmean(colMeans(all_res_fr[unit_num,r0_succ,]),5),r1=rollmean(colMeans(all_res_fr[unit_num,r1_succ,]),5),r2=rollmean(colMeans(all_res_fr[unit_num,r2_succ,]),5),r3=rollmean(colMeans(all_res_fr[unit_num,r3_succ,]),5))
     #r_res_fail_avgs <- data.frame(time=time,r0=r0_fail_avg,r1=r1_fail_avg,r2=r2_fail_avg,r3=r3_fail_avg)
-  
+    
     #r_res_succ_avgs.m <- melt(r_res_succ_avgs,id.vars="time",variable="r_level")
     #r_res_fail_avgs.m <- melt(r_res_fail_avgs,id.vars="time",variable="r_level")
     
@@ -198,7 +183,7 @@ for(region_index in 1:length(region_list)){
     #plot(plt_res)
     #multiplot(plt_cue,plt_res)
     
-  
+    
   }
 }
 
