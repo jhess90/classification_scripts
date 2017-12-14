@@ -156,6 +156,10 @@ condensed = condensed[condensed[:,0] != 0]
 #remove trials with now succ or failure scene (not sure why, but saw in one)
 condensed = condensed[np.invert(np.logical_and(condensed[:,1] == 0, condensed[:,2] == 0))]
 
+#TODO if have both succ and punishment scene (look into why would occur, saw once)
+condensed = condensed[np.invert(np.logical_and(condensed[:,1] != 0, condensed[:,2] != 0 ))]
+
+
 #TODOD FOR NOW remove catch trials
 condensed = condensed[condensed[:,5] == 0]
 #col 5 all 0s now, replace with succ/fail vector: succ = 1, fail = 0
