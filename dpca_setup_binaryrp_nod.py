@@ -33,7 +33,8 @@ import dPCA_new as dPCA
 #params to set ########
 #######################
 
-do_sig_analysis = True
+do_sig_analysis = False
+inv_plot_bool = True
 
 
 
@@ -286,6 +287,11 @@ for region_key,region_val in all_dict.iteritems():
 	dpca = dPCA.dPCA(labels='rpt',regularizer='auto',n_components = 15,join=join_comb)
 	dpca.protect = ['t']
 	Z = dpca.fit_transform(all_avg,all_bal)
+        
+        inv_transform_dict = {}
+        for comb_key,comb_val in Z.iteritems():
+                inv_transform_dict[comb_key]  = dpca.inverse_transform(Z[comb_key],comb_key)
+
         if not do_sig_analysis:
                 del all_bal
 	explained_var = dpca.explained_variance_ratio_	
@@ -302,6 +308,362 @@ for region_key,region_val in all_dict.iteritems():
 	labels = ['r0p0','rxp0','r0px','rxpx']
 	colors = ['black','green','maroon','blue']
         
+
+        ###########################
+        if inv_plot_bool:
+            
+            print 'inverse plotting'
+            for unit_num in range(np.shape(inv_transform_dict['t'])[0]):
+                    ax = plt.gca()
+                    plt.subplot(2,1,2)
+                    line0 = plt.plot(bins,inv_transform_dict['t'][unit_num,0,0,:],label=labels[0],color=colors[0])
+                    line1 = plt.plot(bins,inv_transform_dict['t'][unit_num,1,0,:],label=labels[1],color=colors[1])
+                    line2 = plt.plot(bins,inv_transform_dict['t'][unit_num,0,1,:],label=labels[2],color=colors[2])
+                    line3 = plt.plot(bins,inv_transform_dict['t'][unit_num,1,1,:],label=labels[3],color=colors[3])
+                    
+                    lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
+
+                    plt.axvline(x=bfr_bins,color='g',linestyle='--')
+                    plt.axvline(x=bfr_bins+aft_bins,color='k')
+                    plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+                    plt.xticks(my_ticks_num,my_ticks)
+                    
+                    plt.figlegend(lines,labels,loc='lower right',ncol=1,fontsize='small')
+                    plt.rcParams['xtick.labelsize'] = 8
+                    plt.rcParams['ytick.labelsize'] = 8
+
+                    #
+                    ax = plt.gca()
+                    plt.subplot(2,1,1)
+                    all_label = ['all']
+                    line0 = plt.plot(bins,np.mean(inv_transform_dict['t'],axis=(1,2))[unit_num,:],label=all_label[0],color='k')
+
+                    lines = line0
+
+                    plt.axvline(x=bfr_bins,color='g',linestyle='--')
+                    plt.axvline(x=bfr_bins+aft_bins,color='k')
+                    plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+                    plt.suptitle('Unit: %s t' %(unit_num),fontsize='small')
+                    plt.xticks(my_ticks_num,my_ticks)
+                    
+                    plt.figlegend(lines,all_label,loc='upper right',ncol=1,fontsize='small')
+                    plt.tight_layout(w_pad=0.1)
+                    plt.subplots_adjust(top=0.9,right=0.82)
+                    plt.rcParams['xtick.labelsize'] = 8
+                    plt.rcParams['ytick.labelsize'] = 8
+
+                    plt.savefig('%s_t_%s' %(region_key,unit_num))
+                    plt.clf()
+
+                    #####
+                    ax = plt.gca()
+                    plt.subplot(2,1,2)
+                    line0 = plt.plot(bins,inv_transform_dict['rt'][unit_num,0,0,:],label=labels[0],color=colors[0])
+                    line1 = plt.plot(bins,inv_transform_dict['rt'][unit_num,1,0,:],label=labels[1],color=colors[1])
+                    line2 = plt.plot(bins,inv_transform_dict['rt'][unit_num,0,1,:],label=labels[2],color=colors[2])
+                    line3 = plt.plot(bins,inv_transform_dict['rt'][unit_num,1,1,:],label=labels[3],color=colors[3])
+                    
+                    lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
+
+                    plt.axvline(x=bfr_bins,color='g',linestyle='--')
+                    plt.axvline(x=bfr_bins+aft_bins,color='k')
+                    plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+                    plt.xticks(my_ticks_num,my_ticks)
+                    
+                    plt.figlegend(lines,labels,loc='lower right',ncol=1,fontsize='small')
+                    plt.rcParams['xtick.labelsize'] = 8
+                    plt.rcParams['ytick.labelsize'] = 8
+
+                    #
+                    ax = plt.gca()
+                    plt.subplot(2,1,1)
+                    rt_labels = ['r0','rx']
+                    line0 = plt.plot(bins,np.mean(inv_transform_dict['rt'],axis=(2))[unit_num,0,:],label=rt_labels[0],color=colors[0])
+                    line1 = plt.plot(bins,np.mean(inv_transform_dict['rt'],axis=(2))[unit_num,1,:],label=rt_labels[1],color=colors[1])
+
+                    lines = np.squeeze(np.dstack((line0,line1)))
+
+                    plt.axvline(x=bfr_bins,color='g',linestyle='--')
+                    plt.axvline(x=bfr_bins+aft_bins,color='k')
+                    plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+                    plt.suptitle('Unit: %s rt' %(unit_num),fontsize='small')
+                    plt.xticks(my_ticks_num,my_ticks)
+                    
+                    plt.figlegend(lines,rt_labels,loc='upper right',ncol=1,fontsize='small')
+                    plt.tight_layout(w_pad=0.1)
+                    plt.subplots_adjust(top=0.9,right=0.82)
+                    plt.rcParams['xtick.labelsize'] = 8
+                    plt.rcParams['ytick.labelsize'] = 8
+
+                    plt.savefig('%s_rt_%s' %(region_key,unit_num))
+                    plt.clf()
+
+                    #####
+                    ax = plt.gca()
+                    plt.subplot(2,1,2)
+                    line0 = plt.plot(bins,inv_transform_dict['pt'][unit_num,0,0,:],label=labels[0],color=colors[0])
+                    line1 = plt.plot(bins,inv_transform_dict['pt'][unit_num,1,0,:],label=labels[1],color=colors[1])
+                    line2 = plt.plot(bins,inv_transform_dict['pt'][unit_num,0,1,:],label=labels[2],color=colors[2])
+                    line3 = plt.plot(bins,inv_transform_dict['pt'][unit_num,1,1,:],label=labels[3],color=colors[3])
+                    
+                    lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
+
+                    plt.axvline(x=bfr_bins,color='g',linestyle='--')
+                    plt.axvline(x=bfr_bins+aft_bins,color='k')
+                    plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+                    plt.xticks(my_ticks_num,my_ticks)
+                    
+                    plt.figlegend(lines,labels,loc='lower right',ncol=1,fontsize='small')
+                    plt.rcParams['xtick.labelsize'] = 8
+                    plt.rcParams['ytick.labelsize'] = 8
+
+                    #
+                    ax = plt.gca()
+                    plt.subplot(2,1,1)
+                    p_labels = ['p0','px']
+                    line0 = plt.plot(bins,np.mean(inv_transform_dict['pt'],axis=(1))[unit_num,0,:],label=p_labels[0],color=colors[0])
+                    line1 = plt.plot(bins,np.mean(inv_transform_dict['pt'],axis=(1))[unit_num,1,:],label=p_labels[1],color=colors[2])
+
+                    lines = np.squeeze(np.dstack((line0,line1)))
+
+                    plt.axvline(x=bfr_bins,color='g',linestyle='--')
+                    plt.axvline(x=bfr_bins+aft_bins,color='k')
+                    plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+                    plt.suptitle('Unit: %s pt' %(unit_num),fontsize='small')
+                    plt.xticks(my_ticks_num,my_ticks)
+                    
+                    plt.figlegend(lines,p_labels,loc='upper right',ncol=1,fontsize='small')
+                    plt.tight_layout(w_pad=0.1)
+                    plt.subplots_adjust(top=0.9,right=0.82)
+                    plt.rcParams['xtick.labelsize'] = 8
+                    plt.rcParams['ytick.labelsize'] = 8
+
+                    plt.savefig('%s_pt_%s' %(region_key,unit_num))
+                    plt.clf()
+
+
+                    #####
+                    ax = plt.gca()
+                    plt.subplot(2,1,2)
+                    line0 = plt.plot(bins,inv_transform_dict['rpt'][unit_num,0,0,:],label=labels[0],color=colors[0])
+                    line1 = plt.plot(bins,inv_transform_dict['rpt'][unit_num,1,0,:],label=labels[1],color=colors[1])
+                    line2 = plt.plot(bins,inv_transform_dict['rpt'][unit_num,0,1,:],label=labels[2],color=colors[2])
+                    line3 = plt.plot(bins,inv_transform_dict['rpt'][unit_num,1,1,:],label=labels[3],color=colors[3])
+                    
+                    lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
+
+                    plt.axvline(x=bfr_bins,color='g',linestyle='--')
+                    plt.axvline(x=bfr_bins+aft_bins,color='k')
+                    plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+                    plt.xticks(my_ticks_num,my_ticks)
+                    
+                    plt.figlegend(lines,labels,loc='lower right',ncol=1,fontsize='small')
+                    plt.rcParams['xtick.labelsize'] = 8
+                    plt.rcParams['ytick.labelsize'] = 8
+
+                    #
+                    ax = plt.gca()
+                    plt.subplot(2,1,1)
+                    rp_labels = ['comb']
+                    line0 = plt.plot(bins,np.mean(inv_transform_dict['rpt'],axis=(1,2))[unit_num,:],label=rp_labels[0],color=colors[0])
+
+                    lines = line0
+
+                    plt.axvline(x=bfr_bins,color='g',linestyle='--')
+                    plt.axvline(x=bfr_bins+aft_bins,color='k')
+                    plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+                    plt.suptitle('Unit: %s rpt' %(unit_num),fontsize='small')
+                    plt.xticks(my_ticks_num,my_ticks)
+                    
+                    plt.figlegend(lines,rp_labels,loc='upper right',ncol=1,fontsize='small')
+                    plt.tight_layout(w_pad=0.1)
+                    plt.subplots_adjust(top=0.9,right=0.82)
+                    plt.rcParams['xtick.labelsize'] = 8
+                    plt.rcParams['ytick.labelsize'] = 8
+
+                    plt.savefig('%s_rpt_%s' %(region_key,unit_num))
+                    plt.clf()
+
+
+
+        #avg over all units
+        ax = plt.gca()
+        plt.subplot(2,1,2)
+        line0 = plt.plot(bins,np.mean(inv_transform_dict['t'][0,0,:],axis=0),label=labels[0],color=colors[0])
+        line1 = plt.plot(bins,np.mean(inv_transform_dict['t'][1,0,:],axis=0),label=labels[1],color=colors[1])
+        line2 = plt.plot(bins,np.mean(inv_transform_dict['t'][0,1,:],axis=0),label=labels[2],color=colors[2])
+        line3 = plt.plot(bins,np.mean(inv_transform_dict['t'][1,1,:],axis=0),label=labels[3],color=colors[3])
+        
+        lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
+        
+        plt.axvline(x=bfr_bins,color='g',linestyle='--')
+        plt.axvline(x=bfr_bins+aft_bins,color='k')
+        plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+        plt.xticks(my_ticks_num,my_ticks)
+        
+        plt.figlegend(lines,labels,loc='lower right',ncol=1,fontsize='small')
+        plt.rcParams['xtick.labelsize'] = 8
+        plt.rcParams['ytick.labelsize'] = 8
+        
+        #
+        ax = plt.gca()
+        plt.subplot(2,1,1)
+        all_label = ['all']
+        line0 = plt.plot(bins,np.mean(inv_transform_dict['t'],axis=(0,1,2)),label=all_label[0],color='k')
+        
+        lines = line0
+        
+        plt.axvline(x=bfr_bins,color='g',linestyle='--')
+        plt.axvline(x=bfr_bins+aft_bins,color='k')
+        plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+        plt.suptitle('All t',fontsize='small')
+        plt.xticks(my_ticks_num,my_ticks)
+        
+        plt.figlegend(lines,all_label,loc='upper right',ncol=1,fontsize='small')
+        plt.tight_layout(w_pad=0.1)
+        plt.subplots_adjust(top=0.9,right=0.82)
+        plt.rcParams['xtick.labelsize'] = 8
+        plt.rcParams['ytick.labelsize'] = 8
+        
+        plt.savefig('%s_t_all' %(region_key))
+        plt.clf()
+        
+        #####
+        ax = plt.gca()
+        plt.subplot(2,1,2)
+        
+        line0 = plt.plot(bins,np.mean(inv_transform_dict['rt'][0,0,:],axis=0),label=labels[0],color=colors[0])
+        line1 = plt.plot(bins,np.mean(inv_transform_dict['rt'][1,0,:],axis=0),label=labels[1],color=colors[1])
+        line2 = plt.plot(bins,np.mean(inv_transform_dict['rt'][0,1,:],axis=0),label=labels[2],color=colors[2])
+        line3 = plt.plot(bins,np.mean(inv_transform_dict['rt'][1,1,:],axis=0),label=labels[3],color=colors[3])
+        
+        lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
+                        
+        plt.axvline(x=bfr_bins,color='g',linestyle='--')
+        plt.axvline(x=bfr_bins+aft_bins,color='k')
+        plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+        plt.xticks(my_ticks_num,my_ticks)
+        
+        plt.figlegend(lines,labels,loc='lower right',ncol=1,fontsize='small')
+        plt.rcParams['xtick.labelsize'] = 8
+        plt.rcParams['ytick.labelsize'] = 8
+        
+        #
+        ax = plt.gca()
+        plt.subplot(2,1,1)
+        rt_labels = ['r0','rx']
+        line0 = plt.plot(bins,np.mean(inv_transform_dict['rt'],axis=(0,2))[0,:],label=rt_labels[0],color=colors[0])
+        line1 = plt.plot(bins,np.mean(inv_transform_dict['rt'],axis=(0,2))[1,:],label=rt_labels[1],color=colors[1])
+        
+        lines = np.squeeze(np.dstack((line0,line1)))
+        
+        plt.axvline(x=bfr_bins,color='g',linestyle='--')
+        plt.axvline(x=bfr_bins+aft_bins,color='k')
+        plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+        plt.suptitle('All rt',fontsize='small')
+        plt.xticks(my_ticks_num,my_ticks)
+        
+        plt.figlegend(lines,rt_labels,loc='upper right',ncol=1,fontsize='small')
+        plt.tight_layout(w_pad=0.1)
+        plt.subplots_adjust(top=0.9,right=0.82)
+        plt.rcParams['xtick.labelsize'] = 8
+        plt.rcParams['ytick.labelsize'] = 8
+        
+        plt.savefig('%s_rt_all' %(region_key))
+        plt.clf()
+        
+        #####
+        ax = plt.gca()
+        plt.subplot(2,1,2)
+        
+        line0 = plt.plot(bins,np.mean(inv_transform_dict['pt'][0,0,:],axis=0),label=labels[0],color=colors[0])
+        line1 = plt.plot(bins,np.mean(inv_transform_dict['pt'][1,0,:],axis=0),label=labels[1],color=colors[1])
+        line2 = plt.plot(bins,np.mean(inv_transform_dict['pt'][0,1,:],axis=0),label=labels[2],color=colors[2])
+        line3 = plt.plot(bins,np.mean(inv_transform_dict['pt'][1,1,:],axis=0),label=labels[3],color=colors[3])
+        
+        lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
+        
+        plt.axvline(x=bfr_bins,color='g',linestyle='--')
+        plt.axvline(x=bfr_bins+aft_bins,color='k')
+        plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+        plt.xticks(my_ticks_num,my_ticks)
+        
+        plt.figlegend(lines,labels,loc='lower right',ncol=1,fontsize='small')
+        plt.rcParams['xtick.labelsize'] = 8
+        plt.rcParams['ytick.labelsize'] = 8
+        
+        #
+        ax = plt.gca()
+        plt.subplot(2,1,1)
+        p_labels = ['p0','px']
+        line0 = plt.plot(bins,np.mean(inv_transform_dict['pt'],axis=(0,1))[0,:],label=p_labels[0],color=colors[0])
+        line1 = plt.plot(bins,np.mean(inv_transform_dict['pt'],axis=(0,1))[1,:],label=p_labels[1],color=colors[2])
+        
+        lines = np.squeeze(np.dstack((line0,line1)))
+        
+        plt.axvline(x=bfr_bins,color='g',linestyle='--')
+        plt.axvline(x=bfr_bins+aft_bins,color='k')
+        plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+        plt.suptitle('All pt',fontsize='small')
+        plt.xticks(my_ticks_num,my_ticks)
+        
+        plt.figlegend(lines,p_labels,loc='upper right',ncol=1,fontsize='small')
+        plt.tight_layout(w_pad=0.1)
+        plt.subplots_adjust(top=0.9,right=0.82)
+        plt.rcParams['xtick.labelsize'] = 8
+        plt.rcParams['ytick.labelsize'] = 8
+        
+        plt.savefig('%s_pt_all' %(region_key))
+        plt.clf()
+        
+        #####
+        ax = plt.gca()
+        plt.subplot(2,1,2)
+        
+        line0 = plt.plot(bins,np.mean(inv_transform_dict['rpt'][0,0,:],axis=0),label=labels[0],color=colors[0])
+        line1 = plt.plot(bins,np.mean(inv_transform_dict['rpt'][1,0,:],axis=0),label=labels[1],color=colors[1])
+        line2 = plt.plot(bins,np.mean(inv_transform_dict['rpt'][0,1,:],axis=0),label=labels[2],color=colors[2])
+        line3 = plt.plot(bins,np.mean(inv_transform_dict['rpt'][1,1,:],axis=0),label=labels[3],color=colors[3])
+        
+        lines = np.squeeze(np.dstack((line0,line1,line2,line3)))
+        
+        plt.axvline(x=bfr_bins,color='g',linestyle='--')
+        plt.axvline(x=bfr_bins+aft_bins,color='k')
+        plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+        plt.xticks(my_ticks_num,my_ticks)
+        
+        plt.figlegend(lines,labels,loc='lower right',ncol=1,fontsize='small')
+        plt.rcParams['xtick.labelsize'] = 8
+        plt.rcParams['ytick.labelsize'] = 8
+        
+        #
+        ax = plt.gca()
+        plt.subplot(2,1,1)
+        rp_labels = ['comb']
+
+        line0 = plt.plot(bins,np.mean(inv_transform_dict['rpt'],axis=(0,1,2)),label=rp_labels[0],color=colors[0])
+
+        lines = line0
+        
+        plt.axvline(x=bfr_bins,color='g',linestyle='--')
+        plt.axvline(x=bfr_bins+aft_bins,color='k')
+        plt.axvline(x=2*bfr_bins+aft_bins,color='b',linestyle='--')
+        plt.suptitle('All rpt',fontsize='small')
+        plt.xticks(my_ticks_num,my_ticks)
+        
+        plt.figlegend(lines,rp_labels,loc='upper right',ncol=1,fontsize='small')
+        plt.tight_layout(w_pad=0.1)
+        plt.subplots_adjust(top=0.9,right=0.82)
+        plt.rcParams['xtick.labelsize'] = 8
+        plt.rcParams['ytick.labelsize'] = 8
+        
+        plt.savefig('%s_rpt_all' %(region_key))
+        plt.clf()
+        
+
+
+        ###########
+
         print 'plotting'
 	for comb_ind,comb_val in Z.iteritems():
                 #print 'running %s' %(comb_ind)

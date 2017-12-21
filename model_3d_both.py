@@ -32,7 +32,7 @@ normalize_bool = False
 sqrt_bool = False
 plot_3d_bool = False
 mv_bool = True
-zscore = False
+zscore = True
 abs_alphabeta = False
 
 gaussian_bool = True
