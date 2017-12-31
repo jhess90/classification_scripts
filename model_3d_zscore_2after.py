@@ -1036,6 +1036,15 @@ elif extracted_filename == 'Extracted_504_2017-03-14-13-09-46.mat':
 elif extracted_filename == 'Extracted_504_2017-03-14-13-36-38.mat':
         np.save('master_fr_dict_5_14_3.npy',master_fr_dict)
 
+elif extracted_filename == 'Extracted_0059_2015-10-19-16-46-25.mat':
+        np.save('master_fr_dict_0_1.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_0059_2016-01-18-13-02-45.mat':
+        np.save('master_fr_dict_0_2.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2015-09-29-12-48-19.mat':
+        np.save('master_fr_dict_5_1.npy',master_fr_dict)
+elif extracted_filename == 'Extracted_504_2016-01-11-14-10-01.mat':
+        np.save('master_fr_dict_5_2.npy',master_fr_dict)
+
 
 else:
 	np.save('master_fr_dict.npy',master_fr_dict)

@@ -24,7 +24,7 @@ from scipy import ndimage
 #params to set ########
 #######################
 
-bin_size = 10 #in ms
+bin_size = 50 #in ms
 time_before = -0.5 #negative value
 time_after = 1.0
 baseline_time = -1.0 #negative value
@@ -72,10 +72,7 @@ def make_hist_all(spike_data):
 def calc_firing_rates(hists,data_key,condensed):
         bin_size_sec = bin_size / 1000.0
 
-        if zscore and gaussian_bool:
-            hists = stats.zscore(hists,axis=1)
-            hists = ndimage.filters.gaussian_filter1d(hists,gauss_sigma,axis=1)
-        elif zscore:
+        if zscore:
             hists = stats.zscore(hists,axis=1)
         elif gaussian_bool:
             hists = ndimage.filters.gaussian_filter1d(hists,gauss_sigma,axis=1)
@@ -294,183 +291,196 @@ print 'time before: %s, time after: %s, baseline time: %s' %(time_before,time_af
 print 'nlize: %s, sqrt: %s, zscore: %s, gaussian: %s' %(normalize_bool,sqrt_bool,zscore,gaussian_bool)
 
 #load files (from Extracted and timestamp files)
-print extracted_filename
-a = sio.loadmat(extracted_filename);
-timestamps = sio.loadmat(ts_filename);
-
-#create matrix of trial-by-trial info
-trial_breakdown = timestamps['trial_breakdown']
-condensed = np.zeros((np.shape(trial_breakdown)[0],6))
-
-#col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum, 5 = catch_num
-condensed[:,0] = trial_breakdown[:,1]
-condensed[:,1] = trial_breakdown[:,2]
-condensed[:,2] = trial_breakdown[:,3]
-condensed[:,3] = trial_breakdown[:,5]
-condensed[:,4] = trial_breakdown[:,7]
-condensed[:,5] = trial_breakdown[:,10]
-
-#delete end trials if not fully finished
-if condensed[-1,1] == condensed[-1,2] == 0:
-	new_condensed = condensed[0:-1,:]
-        condensed = new_condensed
-condensed = condensed[condensed[:,0] != 0]
-
-#remove trials with now succ or failure scene (not sure why, but saw in one)
-
-condensed = condensed[np.invert(np.logical_and(condensed[:,1] == 0, condensed[:,2] == 0))]
 
 
-#TODOD FOR NOW remove catch trials
-condensed = condensed[condensed[:,5] == 0]
-#col 5 all 0s now, replace with succ/fail vector: succ = 1, fail = -1
-condensed[condensed[:,1] != 0, 5] = 1
-condensed[condensed[:,2] != 0, 5] = -1
+def make_fr_data():
+        print extracted_filename
+        a = sio.loadmat(extracted_filename);
+        timestamps = sio.loadmat(ts_filename);
 
-#Pull and arrange spike data
-neural_data=a['neural_data']
-Spikes = a['neural_data']['spikeTimes'];
+        #create matrix of trial-by-trial info
+        trial_breakdown = timestamps['trial_breakdown']
+        condensed = np.zeros((np.shape(trial_breakdown)[0],6))
 
-#Break spikes into M1 S1 pmd 
-M1_spikes = Spikes[0,0][0,1];
-PmD_spikes = Spikes[0,0][0,0];
-S1_spikes = Spikes[0,0][0,2];
-#Find first channel count for pmv on map1
-#PmV requires extra processing to generate as the data is the last 32 channels of each MAP system
-unit_names={}
-M1_unit_names = []
-for i in range(0,M1_spikes.shape[1]):
-    if int(M1_spikes[0,i]['signame'][0][0][0][3:-1]) > 96:
-        M1_limit = i;
-        print ("The number of units in M1 is: %s"%(M1_limit))
-        break
-    elif (int(M1_spikes[0,i]['signame'][0][0][0][3:-1]) == 96):
-        M1_limit = i;
-        print ("The number of units in M1 is: %s"%(M1_limit))
-    M1_unit_names.append(M1_spikes[0,i]['signame'][0][0][0])
-if not 'M1_limit' in locals():
-	M1_limit = i
-	print ("The number of units in M1 is: %s"%(M1_limit))
-dummy = [];
-#M1_limit not defined for 0526_0059, blocks 1 and 2
-for i in range(M1_limit,M1_spikes.shape[1]):
-    dummy.append(M1_spikes[0,i]['ts'][0,0][0])
-unit_names['M1_unit_names']=M1_unit_names
-#Find first channel count for pmv on map3
-S1_unit_names = []  
-#TODO printing S1 numbers more than once?
-for i in range(0,S1_spikes.shape[1]):
-    if int(S1_spikes[0,i]['signame'][0][0][0][3:-1]) > 96:
-        #if int(S1_spikes[0,i]['signame'][0][0][0][5:-1]) > 96:
-        S1_limit = i;
-        #print S1_limit
-        print ("The number of units in S1 is: %s"%(S1_limit))
-        break
-    elif (int(S1_spikes[0,i]['signame'][0][0][0][3:-1]) == 96):
-        S1_limit = i;
-        #print S1_limit
-        print ('The number of units in S1 is: %s' %(S1_limit))
-    S1_unit_names.append(S1_spikes[0,i]['signame'][0][0][0])
-if not 'S1_limit' in locals():
-	S1_limit = i
-	print ("The number of units in S1 is: %s"%(M1_limit))
-for i in range(S1_limit,S1_spikes.shape[1]):
-    dummy.append(S1_spikes[0,i]['ts'][0,0][0])
-unit_names['S1_unit_names']=S1_unit_names
-#Find first channel count for pmv on map2
-pmd_unit_names = []
-for i in range(0,PmD_spikes.shape[1]):
-    if int(PmD_spikes[0,i]['signame'][0][0][0][3:-1]) > 96:
-        PmD_limit =i;
-        print ("The number of units in PmD is: %s"%(PmD_limit))
-        break
-    elif (int(PmD_spikes[0,i]['signame'][0][0][0][3:-1]) == 96):
-        PmD_limit = i;
-        print ("The number of units in PmD is: %s"%(PmD_limit))
-    pmd_unit_names.append(PmD_spikes[0,i]['signame'][0][0][0])
-if not 'pmd_limit' in locals():
-	PmD_limit = i
-	print ("The number of units in PmD is: %s"%(M1_limit))
-for i in range(PmD_limit,PmD_spikes.shape[1]):
-    dummy.append(PmD_spikes[0,i]['ts'][0,0][0])
-#Generate Pmv Spiking data
-PmV_spikes = np.array(dummy);
-print("The number of units in PmV is: %s"%(len(PmV_spikes)))
-unit_names['pmd_unit_names']=pmd_unit_names
+        #col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum, 5 = catch_num
+        condensed[:,0] = trial_breakdown[:,1]
+        condensed[:,1] = trial_breakdown[:,2]
+        condensed[:,2] = trial_breakdown[:,3]
+        condensed[:,3] = trial_breakdown[:,5]
+        condensed[:,4] = trial_breakdown[:,7]
+        condensed[:,5] = trial_breakdown[:,10]
 
-#trim M1,S1,and PmD spikes to remove PmV spikes trailing at end; nerual data pruning now complete
-M1_spikes = M1_spikes[0,0:M1_limit];
-S1_spikes = S1_spikes[0,0:S1_limit];
-PmD_spikes = PmD_spikes[0,0:PmD_limit];
+        #delete end trials if not fully finished
+        if condensed[-1,1] == condensed[-1,2] == 0:
+                new_condensed = condensed[0:-1,:]
+                condensed = new_condensed
+                condensed = condensed[condensed[:,0] != 0]
 
-#take care of some misc params, save param dict
-no_bins = int((time_after - time_before) * 1000 / bin_size)
-print 'bin size = %s' %(bin_size)
-param_dict = {'time_before':time_before,'time_after':time_after,'bin_size':bin_size,'no_bins':no_bins}
-#TODO add gripforce?
-#gripforce_all = np.asarray(timestamps['gripforce'])
-min_hist_len = 1000000 #set arbitrarily high number, because want to determin min length later
-data_dict={'M1_spikes':M1_spikes,'S1_spikes':S1_spikes,'PmD_spikes':PmD_spikes,'PmV_spikes':PmV_spikes}
+        #remove trials with now succ or failure scene (not sure why, but saw in one)
 
-data_dict_hist_all = {}
-print 'making hist'
-for key, value in data_dict.iteritems():
-	spike_data = []
-	if key == 'PmV_spikes':
-		#for i in range(len(value)):
-		#	spike_data.append(value[i])
-                continue
-	else:
-		for i in range(len(value)):
-			spike_data.append(value[i]['ts'][0,0][0])
+        condensed = condensed[np.invert(np.logical_and(condensed[:,1] == 0, condensed[:,2] == 0))]
 
-        hist_dict = make_hist_all(spike_data)
-        data_dict_hist_all['%s_hist_dict' %(key)] = hist_dict
+
+        #TODOD FOR NOW remove catch trials
+        condensed = condensed[condensed[:,5] == 0]
+        #col 5 all 0s now, replace with succ/fail vector: succ = 1, fail = -1
+        condensed[condensed[:,1] != 0, 5] = 1
+        condensed[condensed[:,2] != 0, 5] = -1
+
+        #Pull and arrange spike data
+        neural_data=a['neural_data']
+        Spikes = a['neural_data']['spikeTimes'];
+
+        #Break spikes into M1 S1 pmd 
+        M1_spikes = Spikes[0,0][0,1];
+        PmD_spikes = Spikes[0,0][0,0];
+        S1_spikes = Spikes[0,0][0,2];
+        #Find first channel count for pmv on map1
+        #PmV requires extra processing to generate as the data is the last 32 channels of each MAP system
+        unit_names={}
+        M1_unit_names = []
+        for i in range(0,M1_spikes.shape[1]):
+                if int(M1_spikes[0,i]['signame'][0][0][0][3:-1]) > 96:
+                        M1_limit = i;
+                        print ("The number of units in M1 is: %s"%(M1_limit))
+                        break
+                elif (int(M1_spikes[0,i]['signame'][0][0][0][3:-1]) == 96):
+                        M1_limit = i;
+                        print ("The number of units in M1 is: %s"%(M1_limit))
+                M1_unit_names.append(M1_spikes[0,i]['signame'][0][0][0])
+        if not 'M1_limit' in locals():
+                M1_limit = i
+                print ("The number of units in M1 is: %s"%(M1_limit))
+        dummy = [];
+        #M1_limit not defined for 0526_0059, blocks 1 and 2
+        for i in range(M1_limit,M1_spikes.shape[1]):
+                dummy.append(M1_spikes[0,i]['ts'][0,0][0])
+        unit_names['M1_unit_names']=M1_unit_names
+        #Find first channel count for pmv on map3
+        S1_unit_names = []  
+        #TODO printing S1 numbers more than once?
+        for i in range(0,S1_spikes.shape[1]):
+                if int(S1_spikes[0,i]['signame'][0][0][0][3:-1]) > 96:
+                        #if int(S1_spikes[0,i]['signame'][0][0][0][5:-1]) > 96:
+                        S1_limit = i;
+                        #print S1_limit
+                        print ("The number of units in S1 is: %s"%(S1_limit))
+                        break
+                elif (int(S1_spikes[0,i]['signame'][0][0][0][3:-1]) == 96):
+                        S1_limit = i;
+                        #print S1_limit
+                        print ('The number of units in S1 is: %s' %(S1_limit))
+                S1_unit_names.append(S1_spikes[0,i]['signame'][0][0][0])
+        if not 'S1_limit' in locals():
+                S1_limit = i
+                print ("The number of units in S1 is: %s"%(M1_limit))
+        for i in range(S1_limit,S1_spikes.shape[1]):
+                dummy.append(S1_spikes[0,i]['ts'][0,0][0])
+        unit_names['S1_unit_names']=S1_unit_names
+        #Find first channel count for pmv on map2
+        pmd_unit_names = []
+        for i in range(0,PmD_spikes.shape[1]):
+                if int(PmD_spikes[0,i]['signame'][0][0][0][3:-1]) > 96:
+                        PmD_limit =i;
+                        print ("The number of units in PmD is: %s"%(PmD_limit))
+                        break
+                elif (int(PmD_spikes[0,i]['signame'][0][0][0][3:-1]) == 96):
+                        PmD_limit = i;
+                        print ("The number of units in PmD is: %s"%(PmD_limit))
+                pmd_unit_names.append(PmD_spikes[0,i]['signame'][0][0][0])
+        if not 'pmd_limit' in locals():
+                PmD_limit = i
+                print ("The number of units in PmD is: %s"%(M1_limit))
+        for i in range(PmD_limit,PmD_spikes.shape[1]):
+                dummy.append(PmD_spikes[0,i]['ts'][0,0][0])
+        #Generate Pmv Spiking data
+        PmV_spikes = np.array(dummy);
+        print("The number of units in PmV is: %s"%(len(PmV_spikes)))
+        unit_names['pmd_unit_names']=pmd_unit_names
+
+        #trim M1,S1,and PmD spikes to remove PmV spikes trailing at end; nerual data pruning now complete
+        M1_spikes = M1_spikes[0,0:M1_limit];
+        S1_spikes = S1_spikes[0,0:S1_limit];
+        PmD_spikes = PmD_spikes[0,0:PmD_limit];
+
+        #take care of some misc params, save param dict
+        no_bins = int((time_after - time_before) * 1000 / bin_size)
+        print 'bin size = %s' %(bin_size)
+        param_dict = {'time_before':time_before,'time_after':time_after,'bin_size':bin_size,'no_bins':no_bins}
+        #TODO add gripforce?
+        #gripforce_all = np.asarray(timestamps['gripforce'])
+        min_hist_len = 1000000 #set arbitrarily high number, because want to determin min length later
+        data_dict={'M1_spikes':M1_spikes,'S1_spikes':S1_spikes,'PmD_spikes':PmD_spikes,'PmV_spikes':PmV_spikes}
+
+        data_dict_hist_all = {}
+        print 'making hist'
+        for key, value in data_dict.iteritems():
+                spike_data = []
+                if key == 'PmV_spikes':
+                        #for i in range(len(value)):
+                        #	spike_data.append(value[i])
+                        continue
+                else:
+                        for i in range(len(value)):
+                                spike_data.append(value[i]['ts'][0,0][0])
+
+                hist_dict = make_hist_all(spike_data)
+                data_dict_hist_all['%s_hist_dict' %(key)] = hist_dict
         
-M1_dicts = {'spikes':data_dict['M1_spikes'],'hist_all':data_dict_hist_all['M1_spikes_hist_dict']['hist_data'],'bins_all':data_dict_hist_all['M1_spikes_hist_dict']['hist_bins']} 
-S1_dicts = {'spikes':data_dict['S1_spikes'],'hist_all':data_dict_hist_all['S1_spikes_hist_dict']['hist_data'],'bins_all':data_dict_hist_all['S1_spikes_hist_dict']['hist_bins']}
-PmD_dicts = {'spikes':data_dict['PmD_spikes'],'hist_all':data_dict_hist_all['PmD_spikes_hist_dict']['hist_data'],'bins_all':data_dict_hist_all['PmD_spikes_hist_dict']['hist_bins']}
-#PmV_dicts = {'spikes':data_dict['PmV_spikes']} #,'nl':data_dict_nl['PmV_spikes_nl']}
+        M1_dicts = {'spikes':data_dict['M1_spikes'],'hist_all':data_dict_hist_all['M1_spikes_hist_dict']['hist_data'],'bins_all':data_dict_hist_all['M1_spikes_hist_dict']['hist_bins']} 
+        S1_dicts = {'spikes':data_dict['S1_spikes'],'hist_all':data_dict_hist_all['S1_spikes_hist_dict']['hist_data'],'bins_all':data_dict_hist_all['S1_spikes_hist_dict']['hist_bins']}
+        PmD_dicts = {'spikes':data_dict['PmD_spikes'],'hist_all':data_dict_hist_all['PmD_spikes_hist_dict']['hist_data'],'bins_all':data_dict_hist_all['PmD_spikes_hist_dict']['hist_bins']}
+        #PmV_dicts = {'spikes':data_dict['PmV_spikes']} #,'nl':data_dict_nl['PmV_spikes_nl']}
 
-data_dict_all = {'M1_dicts':M1_dicts,'S1_dicts':S1_dicts,'PmD_dicts':PmD_dicts}
+        data_dict_all = {'M1_dicts':M1_dicts,'S1_dicts':S1_dicts,'PmD_dicts':PmD_dicts}
 
-print 'calc firing rate'
-for region_key,region_value in data_dict_all.iteritems():
-        hists = data_dict_all[region_key]['hist_all']
-        fr_dict = calc_firing_rates(hists,region_key,condensed)
-        data_dict_all[region_key]['fr_dict'] = fr_dict
+        print 'calc firing rate'
+        for region_key,region_value in data_dict_all.iteritems():
+                hists = data_dict_all[region_key]['hist_all']
+                fr_dict = calc_firing_rates(hists,region_key,condensed)
+                data_dict_all[region_key]['fr_dict'] = fr_dict
 
-        bfr_cue = fr_dict['bfr_cue_fr'][10,:,:]
-        aft_cue = fr_dict['aft_cue_fr'][10,:,:]
-        bfr_result = fr_dict['bfr_result_fr'][10,:,:]
-        aft_result = fr_dict['aft_result_fr'][10,:,:]
+                bfr_cue = fr_dict['bfr_cue_fr'][10,:,:]
+                aft_cue = fr_dict['aft_cue_fr'][10,:,:]
+                bfr_result = fr_dict['bfr_result_fr'][10,:,:]
+                aft_result = fr_dict['aft_result_fr'][10,:,:]
 
-        test_concat = np.append(bfr_cue,aft_cue,axis=1)
-        test_concat = np.append(test_concat,bfr_result,axis=1)
-        test_concat = np.append(test_concat,aft_result,axis=1)
+                test_concat = np.append(bfr_cue,aft_cue,axis=1)
+                test_concat = np.append(test_concat,bfr_result,axis=1)
+                test_concat = np.append(test_concat,aft_result,axis=1)
         
-        ax = plt.gca()
-        plt.subplot(3,3,1)
-        plt.plot(test_concat[0,:])
-        plt.subplot(3,3,2)
-        plt.plot(test_concat[1,:])
-        plt.subplot(3,3,3)
-        plt.plot(test_concat[2,:])
-        plt.subplot(3,3,4)
-        plt.plot(test_concat[3,:])
-        plt.subplot(3,3,5)
-        plt.plot(test_concat[4,:])
-        plt.subplot(3,3,6)
-        plt.plot(test_concat[5,:])
-        plt.subplot(3,3,7)
-        plt.plot(test_concat[6,:])
-        plt.subplot(3,3,8)
-        plt.plot(test_concat[7,:])
-        plt.subplot(3,3,9)
-        plt.plot(test_concat[8,:])
+                ax = plt.gca()
+                plt.subplot(3,3,1)
+                plt.plot(test_concat[0,:])
+                plt.subplot(3,3,2)
+                plt.plot(test_concat[1,:])
+                plt.subplot(3,3,3)
+                plt.plot(test_concat[2,:])
+                plt.subplot(3,3,4)
+                plt.plot(test_concat[3,:])
+                plt.subplot(3,3,5)
+                plt.plot(test_concat[4,:])
+                plt.subplot(3,3,6)
+                plt.plot(test_concat[5,:])
+                plt.subplot(3,3,7)
+                plt.plot(test_concat[6,:])
+                plt.subplot(3,3,8)
+                plt.plot(test_concat[7,:])
+                plt.subplot(3,3,9)
+                plt.plot(test_concat[8,:])
+                
+                plt.savefig('test_%s' %(region_key))
+                plt.clf()
 
-        plt.savefig('test_%s' %(region_key))
-        plt.clf()
+return()
+
+
+
+
+
+
+
+
 
 
 #print 'modeling'
@@ -1036,14 +1046,6 @@ elif extracted_filename == 'Extracted_504_2017-03-14-13-09-46.mat':
 elif extracted_filename == 'Extracted_504_2017-03-14-13-36-38.mat':
         np.save('master_fr_dict_5_14_3.npy',master_fr_dict)
 
-elif extracted_filename == 'Extracted_0059_2015-10-19-16-46-25.mat':
-        np.save('master_fr_dict_0_1.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_0059_2016-01-18-13-02-45.mat':
-        np.save('master_fr_dict_0_2.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2015-09-29-12-48-19.mat':
-        np.save('master_fr_dict_5_1.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2016-01-11-14-10-01.mat':
-        np.save('master_fr_dict_5_2.npy',master_fr_dict)
 
 else:
 	np.save('master_fr_dict.npy',master_fr_dict)

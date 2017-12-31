@@ -249,7 +249,7 @@ sort_dict = {'q_result':q_result,'r_stim':r_stim,'p_stim':p_stim,'condensed':con
 
 #run only certain regions
 #del all_dict['PmD']
-del all_dict['M1']
+#del all_dict['M1']
 #del all_dict['S1']
 
 for region_key,region_val in all_dict.iteritems():
@@ -305,6 +305,14 @@ for region_key,region_val in all_dict.iteritems():
 	tot_bins = (bfr_bins+aft_bins)*2
 	my_ticks_num = np.arange(0,tot_bins*7/6,tot_bins/6)
 	
+        tot_bins = (bfr_bins+aft_bins)*2
+        my_ticks_num = np.arange(0,tot_bins*7/6,tot_bins/6)
+                
+        if params['time_after'] == 2:
+                my_ticks = ['-0.5','0','0.5','1.0','1.5','-0.5','0','0.5','1.0','1.5','2.0']
+                tot_bins = (bfr_bins+aft_bins)*2
+                my_ticks_num = np.arange(0,tot_bins*11/10,tot_bins/10)
+
 	labels = ['r0p0','rxp0','r0px','rxpx']
 	colors = ['black','green','maroon','blue']
         
@@ -800,4 +808,4 @@ for region_key,region_val in all_dict.iteritems():
         all_dict[region_key] = {}
 
 #all_dict['sort_dict'] = sort_dict
-#np.save('dpca_results_binaryrp.npy',all_dict)
+np.save('dpca_results_binaryrp.npy',all_dict)

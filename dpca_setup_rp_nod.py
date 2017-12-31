@@ -182,10 +182,6 @@ for i in range(len(filelist)):
 	PmD_fr_dict = data['PmD_fr_dict']
 	condensed = data['condensed']
 
-        print filelist[i]
-        
-        print np.shape(M1_fr_dict['bfr_cue'])
-
 	M1_unit_ind = np.sort(np.random.choice(np.shape(M1_fr_dict['bfr_cue'])[1],size=min_unit_num[0],replace=False))
 	S1_unit_ind = np.sort(np.random.choice(np.shape(S1_fr_dict['bfr_cue'])[1],size=min_unit_num[1],replace=False))
 	PmD_unit_ind = np.sort(np.random.choice(np.shape(PmD_fr_dict['bfr_cue'])[1],size=min_unit_num[2],replace=False))
@@ -204,7 +200,8 @@ for i in range(len(filelist)):
 	PmD_aft_result_all[count:count+np.shape(condensed)[0],i*min_unit_num[2]:(i+1)*min_unit_num[2]:,:] = PmD_fr_dict['aft_result'][:,PmD_unit_ind,:]
 
 	count += np.shape(condensed)[0]
-
+	
+	
 #For each region, 3D dict [trial x unit x binned data]
 
 all_dict['M1']['M1_fr_dict'] = {'bfr_cue':M1_bfr_cue_all,'aft_cue':M1_aft_cue_all,'bfr_result':M1_bfr_result_all,'aft_result':M1_aft_result_all}
@@ -291,13 +288,9 @@ for region_key,region_val in all_dict.iteritems():
         #PARAM
         components_plot = 4 #even for now
         my_ticks = ['-0.5','0','0.5','-0.5','0','0.5','1.0']
+        
         tot_bins = (bfr_bins+aft_bins)*2
         my_ticks_num = np.arange(0,tot_bins*7/6,tot_bins/6)
-                
-        if params['time_after'] == 2:
-                my_ticks = ['-0.5','0','0.5','1.0','1.5','-0.5','0','0.5','1.0','1.5','2.0']
-                tot_bins = (bfr_bins+aft_bins)*2
-                my_ticks_num = np.arange(0,tot_bins*11/10,tot_bins/10)
         
         labels = ['r0p0 succ','rxp0 succ','r0px succ','rxpx succ','r0p0 fail','rxp0 fail','r0px fail','rxpx fail']
         colors = ['black','green','maroon','blue','black','green','maroon','blue']

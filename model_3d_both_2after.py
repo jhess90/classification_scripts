@@ -26,7 +26,7 @@ from scipy import ndimage
 
 bin_size = 10 #in ms
 time_before = -0.5 #negative value
-time_after = 1.0
+time_after = 2.0
 baseline_time = -1.0 #negative value
 normalize_bool = False
 sqrt_bool = False
@@ -35,7 +35,7 @@ mv_bool = True
 zscore = True
 abs_alphabeta = False
 
-gaussian_bool = False
+gaussian_bool = True
 gauss_sigma = 30
 
 ts_filename = glob.glob('Extracted*_timestamps.mat')[0]
@@ -326,6 +326,33 @@ condensed = condensed[condensed[:,5] == 0]
 #col 5 all 0s now, replace with succ/fail vector: succ = 1, fail = -1
 condensed[condensed[:,1] != 0, 5] = 1
 condensed[condensed[:,2] != 0, 5] = -1
+
+
+###################
+#calc times, can move to other files as well
+
+post_cue_times = condensed[:,1] + condensed[:,2] - condensed[:,0]
+post_delivery_times = np.zeros((np.shape(condensed)[0]-1))
+cue_to_cue_times = np.zeros((np.shape(condensed)[0]-1))
+for i in range(np.shape(condensed)[0]-1):
+        post_delivery_times[i] = condensed[i+1,0] - (condensed[i,1] + condensed[i,2])
+        cue_to_cue_times[i] = condensed[i+1,0] - condensed[i,0]
+
+post_cue_dict = {'avg':np.mean(post_cue_times),'median':np.median(post_cue_times),'max':np.max(post_cue_times),'min':np.min(post_cue_times)}
+post_delivery_dict = {'avg':np.mean(post_delivery_times),'median':np.median(post_delivery_times),'max':np.max(post_delivery_times),'min':np.min(post_delivery_times)}
+cue_cue_dict = {'avg':np.mean(cue_to_cue_times),'median':np.median(cue_to_cue_times),'max':np.max(cue_to_cue_times),'min':np.min(cue_to_cue_times)}
+size_dict = {'unit_num':np.shape(condensed)[0]}
+
+times_dict = {'post_cue_times':post_cue_times,'post_delivery_times':post_delivery_times,'cue_to_cue_times':cue_to_cue_times,'post_cue_dict':post_cue_dict,'post_delivery_dict':post_delivery_dict,'cue_cue_dict':cue_cue_dict,'size_dict':size_dict}
+
+np.save('times_%s.npy' %(extracted_filename[:-4]),times_dict)
+
+f = open('times.txt','w')
+f.write('post_cue: ' + repr(post_cue_dict) + '\n')
+f.write('post_delivery: ' + repr(post_delivery_dict) + '\n')
+f.write('cue_cue: ' + repr(cue_cue_dict) + '\n')
+f.write('size: ' + repr(size_dict) + '\n')
+f.close()
 
 #Pull and arrange spike data
 neural_data=a['neural_data']
@@ -1044,6 +1071,7 @@ elif extracted_filename == 'Extracted_504_2015-09-29-12-48-19.mat':
         np.save('master_fr_dict_5_1.npy',master_fr_dict)
 elif extracted_filename == 'Extracted_504_2016-01-11-14-10-01.mat':
         np.save('master_fr_dict_5_2.npy',master_fr_dict)
+
 
 else:
 	np.save('master_fr_dict.npy',master_fr_dict)
