@@ -33,8 +33,8 @@ import dPCA_new as dPCA
 #params to set ########
 #######################
 
-do_sig_analysis = False
-inv_plot_bool = True
+do_sig_analysis = True
+inv_plot_bool = False
 
 
 

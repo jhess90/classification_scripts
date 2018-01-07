@@ -28,8 +28,8 @@ import dPCA_new as dPCA
 #params to set ########
 #######################
 
-do_sig_analysis = False
-inv_plot_bool = True
+do_sig_analysis = True
+inv_plot_bool = False
 
 
 
@@ -1122,7 +1122,7 @@ for region_key,region_val in all_dict.iteritems():
 		plt.clf()
 
 		if do_sig_analysis:
-			sig_analysis = dpca.significance_analysis(all_avg,all_bal,full=True)
+			sig_analysis = dpca.significance_analysis(all_avg,all_bal,full=True,axis=True,n_shuffles=100,n_splits=100)
 		transformed = dpca.transform(all_avg)
 
 		if do_sig_analysis:
