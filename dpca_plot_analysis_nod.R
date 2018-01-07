@@ -56,9 +56,9 @@ percs.melt <- melt(as.matrix(percs.df))
 
 png('explained_variance_variables_nod.png',width=8,height=6,units="in",res=500)
 
-percs.melt$X1 <- factor(percs.melt$X1,c("t","rt","pt","rpt"))
+percs.melt$Var1 <- factor(percs.melt$Var1,c("t","rt","pt","rpt"))
 
-plt <- ggplot(percs.melt) + geom_bar(aes(x=X1,y=value,fill=X2),stat="identity",position="dodge") + labs(title="Explained Variance",y="Percentage",x="Variables",fill="Region")
+plt <- ggplot(percs.melt) + geom_bar(aes(x=Var1,y=value,fill=Var2),stat="identity",position="dodge") + labs(title="Explained Variance",y="Percentage",x="Variables",fill="Region")
 plt <- plt + scale_y_continuous(labels = scales::percent) + scale_fill_manual(values=c("royalblue","maroon","seagreen"))
 
 
