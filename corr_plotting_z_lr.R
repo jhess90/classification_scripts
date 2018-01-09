@@ -13,14 +13,24 @@ library(gridGraphics)
 library(grid)
 library(gridExtra)
 library(R.matlab)
+library(ggpmisc)
 
 #################
 #### Params #####
 #################
 
+##For beaver: change multiplot above, install ggpmisc pkg
+
+
 units_to_plot <- 5
+
+plot_p_bool <- TRUE
+
+
 region_list <- c('M1','S1','PmD')
 
+
+#############
 
 for (region_index in 1:length(region_list)){
   cat('plotting ',region_list[region_index],'\n')
@@ -651,8 +661,11 @@ for (region_index in 1:length(region_list)){
     m6_res_fail_total_t <- c(m6_res_fail_total_t,m6_res_fail)
 
     ##########
-    png(paste('corr_r_t',i,'_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
     
+    
+    
+    #png(paste('corr_r_t',i,'_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+    graphics.off()
     ravgs <- data.frame(r_values=c(0,1,2,3),r_cue = c(mean(r0_cue),mean(r1_cue),mean(r2_cue),mean(r3_cue)),r_res = c(mean(r0_res),mean(r1_res),mean(r2_res),mean(r3_res)))
     rstds <- data.frame(r_values=c(0,1,2,3),r_cue=c(sd(r0_cue),sd(r1_cue),sd(r2_cue),sd(r3_cue)),r_res=c(sd(r0_res),sd(r1_res),sd(r2_res),sd(r3_res)))
     
@@ -660,13 +673,19 @@ for (region_index in 1:length(region_list)){
     std_melt <- melt(rstds,id="r_values",variable.name='type',value.name='std')
     
     test <- merge(std_melt,avg_melt,row.names='r_values')
-    test[is.na(test)] <- 0
+    #test[is.na(test)] <- 0
     
-    plt <- ggplot(test,aes(x=r_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1) 
-    plt <- plt +  geom_line() + geom_point() + scale_colour_manual(name="Unit Key",values=c("r_cue"="coral4","r_res"="slateblue"))
-    plt <- plt + labs(title=paste('Reward: T',i,' corr, Unit ',r_unit_ind,sep=""),x="Reward Number",y="z-score") 
+    formula <- y ~ x
+    plt <- ggplot(test,aes(x=r_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1.0,alpha=0.75,na.rm=T) + theme_classic()
+    plt <- plt +  geom_smooth(method=lm,se=F,size=0.5,na.rm=T) + geom_point(na.rm=T) + scale_colour_manual(name="Unit Key",values=c("r_cue"="coral4","r_res"="slateblue"))
+    plt <- plt + labs(title=paste('Reward: T',i,' corr, Unit ',r_unit_ind,sep=""),x="Reward Number",y="z-score")
+    if(plot_p_bool){plt <- plt + stat_fit_glance(method = 'lm',method.args=list(formula=formula),geom='text',aes(label = paste("P-value = ", signif(..p.value.., digits = 3), sep = "")),label.x.npc = 'right', label.y.npc = 0.8, size = 3,na.rm=T)}
     plot(plt)
+
     graphics.off()
+    
+    
+    
     ##
     png(paste('corr_r_sf_t',i,'_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
     
