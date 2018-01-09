@@ -16,8 +16,8 @@ import matplotlib.pyplot as plt
 
 ##############
 
-sig_analysis_bool = False
-
+sig_analysis_bool = True
+two_after_bool = True
 
 
 #####################
@@ -109,14 +109,28 @@ if sig_analysis_bool:
  print 'plotting significance analysis'
 
  my_ticks = ['-0.5','0','0.5','-0.5','0','0.5','1.0']
- tot_bins = int(np.shape(data['M1']['sig_analysis'][0]['rt'])[1])
+ tot_bins = int(np.shape(data['M1']['dpca_results']['sig_analysis'][0]['rt'])[1])
  bfr_bins = int(tot_bins / 6)
  aft_bins = bfr_bins * 2
  my_ticks_num = np.arange(0,tot_bins*7/6,tot_bins/6)
 
+ if two_after_bool:
+         #TODO unhardcode
+         my_ticks = ['-0.5','0','0.5','1.0','1.5','-0.5','0','0.5','1.0','1.5','2.0']
+         bfr_bins = 50
+         aft_bins = 200
+         tot_bins = (bfr_bins+aft_bins)*2
+         my_ticks_num = np.arange(0,tot_bins*11/10,tot_bins/10)
 
+
+
+ 
  for region_key,region_value in data.iteritems():
-         sig_data = region_value['sig_analysis']
+         if region_key == 'sort_dict':
+                 continue
+         sig_data = region_value['dpca_results']['sig_analysis']
+
+         #sig_data = region_value['sig_analysis']
          sig_binary = sig_data[0]
          bins = np.shape(sig_data[0]['rt'])[1]
          time = np.arange(bins)
