@@ -24,7 +24,7 @@ library(ggpmisc)
 
 units_to_plot <- 5
 
-plot_p_bool <- TRUE
+plot_p_bool <- FALSE
 
 
 region_list <- c('M1','S1','PmD')
