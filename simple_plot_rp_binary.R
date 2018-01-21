@@ -135,8 +135,21 @@ for(region_index in 1:length(region_list)){
     ## result sf
     png(paste(region_list[region_index],"_r_sf_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
     
-    r_sf_cue_avgs <- data.frame(time=time,r0_s=rollmean(colMeans(all_cue_fr[unit_num,r0_s,]),5),r0_f=rollmean(colMeans(all_cue_fr[unit_num,r0_f,]),5),rx_s=rollmean(colMeans(all_cue_fr[unit_num,rx_s,]),5),rx_f=rollmean(colMeans(all_cue_fr[unit_num,rx_f,]),5))
-    r_sf_res_avgs <- data.frame(time=time,r0_s=rollmean(colMeans(all_res_fr[unit_num,r0_s,]),5),r0_f=rollmean(colMeans(all_res_fr[unit_num,r0_f,]),5),rx_s=rollmean(colMeans(all_res_fr[unit_num,rx_s,]),5),rx_f=rollmean(colMeans(all_res_fr[unit_num,rx_f,]),5))
+    if (length(r0_s) == 1){r0_s_fr_cue <- rollmean(all_cue_fr[unit_num,r0_s,],5)}else if(length(r0_s) == 0){r0_s_fr_cue <- rep(0,146)}else{r0_s_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,r0_s,]),5)}
+    if (length(r0_f) == 1){r0_f_fr_cue <- rollmean(all_cue_fr[unit_num,r0_f,],5)}else if(length(r0_f) == 0){r0_f_fr_cue <- rep(0,146)}else{r0_f_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,r0_f,]),5)}
+    if (length(rx_s) == 1){rx_s_fr_cue <- rollmean(all_cue_fr[unit_num,rx_s,],5)}else if(length(rx_s) == 0){rx_s_fr_cue <- rep(0,146)}else{rx_s_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,rx_s,]),5)}
+    if (length(rx_f) == 1){rx_f_fr_cue <- rollmean(all_cue_fr[unit_num,rx_f,],5)}else if(length(rx_f) == 0){rx_f_fr_cue <- rep(0,146)}else{rx_f_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,rx_f,]),5)}
+    
+    if (length(r0_s) == 1){r0_s_fr_res <- rollmean(all_res_fr[unit_num,r0_s,],5)}else if(length(r0_s) == 0){r0_s_fr_res <- rep(0,146)}else{r0_s_fr_res <- rollmean(colMeans(all_res_fr[unit_num,r0_s,]),5)}
+    if (length(r0_f) == 1){r0_f_fr_res <- rollmean(all_res_fr[unit_num,r0_f,],5)}else if(length(r0_f) == 0){r0_f_fr_res <- rep(0,146)}else{r0_f_fr_res <- rollmean(colMeans(all_res_fr[unit_num,r0_f,]),5)}
+    if (length(rx_s) == 1){rx_s_fr_res <- rollmean(all_res_fr[unit_num,rx_s,],5)}else if(length(rx_s) == 0){rx_s_fr_res <- rep(0,146)}else{rx_s_fr_res <- rollmean(colMeans(all_res_fr[unit_num,rx_s,]),5)}
+    if (length(rx_f) == 1){rx_f_fr_res <- rollmean(all_res_fr[unit_num,rx_f,],5)}else if(length(rx_f) == 0){rx_f_fr_res <- rep(0,146)}else{rx_f_fr_res <- rollmean(colMeans(all_res_fr[unit_num,rx_f,]),5)}
+    
+    r_sf_cue_avgs <- data.frame(time=time,r0_s_cue=r0_s_fr_cue,r0_f_cue=r0_f_fr_cue,rx_s_cue=rx_s_fr_cue,rx_f_cue=rx_f_fr_cue)
+    r_sf_res_avgs <- data.frame(time=time,r0_s_res=r0_s_fr_res,r0_f_res=r0_f_fr_res,rx_s_res=rx_s_fr_res,rx_f_res=rx_f_fr_res)
+    
+    #r_sf_cue_avgs <- data.frame(time=time,r0_s=rollmean(colMeans(all_cue_fr[unit_num,r0_s,]),5),r0_f=rollmean(colMeans(all_cue_fr[unit_num,r0_f,]),5),rx_s=rollmean(colMeans(all_cue_fr[unit_num,rx_s,]),5),rx_f=rollmean(colMeans(all_cue_fr[unit_num,rx_f,]),5))
+    #r_sf_res_avgs <- data.frame(time=time,r0_s=rollmean(colMeans(all_res_fr[unit_num,r0_s,]),5),r0_f=rollmean(colMeans(all_res_fr[unit_num,r0_f,]),5),rx_s=rollmean(colMeans(all_res_fr[unit_num,rx_s,]),5),rx_f=rollmean(colMeans(all_res_fr[unit_num,rx_f,]),5))
     
     r_sf_cue_avgs.m <- melt(r_sf_cue_avgs,id.vars="time",variable="comb")
     plt_cue <- ggplot(r_sf_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=comb),size=1) + theme_classic()
@@ -152,8 +165,21 @@ for(region_index in 1:length(region_list)){
     ## punishment sf
     png(paste(region_list[region_index],"_p_sf_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
     
-    p_sf_cue_avgs <- data.frame(time=time,p0_s=rollmean(colMeans(all_cue_fr[unit_num,p0_s,]),5),p0_f=rollmean(colMeans(all_cue_fr[unit_num,p0_f,]),5),px_s=rollmean(colMeans(all_cue_fr[unit_num,px_s,]),5),px_f=rollmean(colMeans(all_cue_fr[unit_num,px_f,]),5))
-    p_sf_res_avgs <- data.frame(time=time,p0_s=rollmean(colMeans(all_res_fr[unit_num,p0_s,]),5),p0_f=rollmean(colMeans(all_res_fr[unit_num,p0_f,]),5),px_s=rollmean(colMeans(all_res_fr[unit_num,px_s,]),5),px_f=rollmean(colMeans(all_res_fr[unit_num,px_f,]),5))
+    if (length(p0_s) == 1){p0_s_fr_cue <- rollmean(all_cue_fr[unit_num,p0_s,],5)}else if(length(p0_s) == 0){p0_s_fr_cue <- rep(0,146)}else{p0_s_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,p0_s,]),5)}
+    if (length(p0_f) == 1){p0_f_fr_cue <- rollmean(all_cue_fr[unit_num,p0_f,],5)}else if(length(p0_f) == 0){p0_f_fr_cue <- rep(0,146)}else{p0_f_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,p0_f,]),5)}
+    if (length(px_s) == 1){px_s_fr_cue <- rollmean(all_cue_fr[unit_num,px_s,],5)}else if(length(px_s) == 0){px_s_fr_cue <- rep(0,146)}else{px_s_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,px_s,]),5)}
+    if (length(px_f) == 1){px_f_fr_cue <- rollmean(all_cue_fr[unit_num,px_f,],5)}else if(length(px_f) == 0){px_f_fr_cue <- rep(0,146)}else{px_f_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,px_f,]),5)}
+
+    if (length(p0_s) == 1){p0_s_fr_res <- rollmean(all_res_fr[unit_num,p0_s,],5)}else if(length(p0_s) == 0){p0_s_fr_res <- rep(0,146)}else{p0_s_fr_res <- rollmean(colMeans(all_res_fr[unit_num,p0_s,]),5)}
+    if (length(p0_f) == 1){p0_f_fr_res <- rollmean(all_res_fr[unit_num,p0_f,],5)}else if(length(p0_f) == 0){p0_f_fr_res <- rep(0,146)}else{p0_f_fr_res <- rollmean(colMeans(all_res_fr[unit_num,p0_f,]),5)}
+    if (length(px_s) == 1){px_s_fr_res <- rollmean(all_res_fr[unit_num,px_s,],5)}else if(length(px_s) == 0){px_s_fr_res <- rep(0,146)}else{px_s_fr_res <- rollmean(colMeans(all_res_fr[unit_num,px_s,]),5)}
+    if (length(px_f) == 1){px_f_fr_res <- rollmean(all_res_fr[unit_num,px_f,],5)}else if(length(px_f) == 0){px_f_fr_res <- rep(0,146)}else{px_f_fr_res <- rollmean(colMeans(all_res_fr[unit_num,px_f,]),5)}
+    
+    p_sf_cue_avgs <- data.frame(time=time,p0_s_cue=p0_s_fr_cue,p0_f_cue=p0_f_fr_cue,px_s_cue=px_s_fr_cue,px_f_cue=px_f_fr_cue)
+    p_sf_res_avgs <- data.frame(time=time,p0_s_res=p0_s_fr_res,p0_f_res=p0_f_fr_res,px_s_res=px_s_fr_res,px_f_res=px_f_fr_res)
+    
+    #p_sf_cue_avgs <- data.frame(time=time,p0_s=rollmean(colMeans(all_cue_fr[unit_num,p0_s,]),5),p0_f=rollmean(colMeans(all_cue_fr[unit_num,p0_f,]),5),px_s=rollmean(colMeans(all_cue_fr[unit_num,px_s,]),5),px_f=rollmean(colMeans(all_cue_fr[unit_num,px_f,]),5))
+    #p_sf_res_avgs <- data.frame(time=time,p0_s=rollmean(colMeans(all_res_fr[unit_num,p0_s,]),5),p0_f=rollmean(colMeans(all_res_fr[unit_num,p0_f,]),5),px_s=rollmean(colMeans(all_res_fr[unit_num,px_s,]),5),px_f=rollmean(colMeans(all_res_fr[unit_num,px_f,]),5))
     
     p_sf_cue_avgs.m <- melt(p_sf_cue_avgs,id.vars="time",variable="comb")
     plt_cue <- ggplot(p_sf_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=comb),size=1) + theme_classic()
