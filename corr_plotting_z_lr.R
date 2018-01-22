@@ -1206,7 +1206,7 @@ for (region_index in 1:length(region_list)){
   #plot avg over these units
   png(paste('corr_r_t_total_',region_list[region_index],'_lr.png',sep=""),width=8,height=6,units="in",res=500)
   
-  ravgs <- data.frame(r_values=c(0,1,2,3),r_cue = c(mean(r0_cue_total_t),mean(r1_cue_total_t),mean(r2_cue_total_t),mean(r3_cue_total_t)),r_res_total_t = c(mean(r0_res_total_t),mean(r1_res_total_t),mean(r2_res_total_t),mean(r3_res_total_t)))
+  ravgs <- data.frame(r_values=c(0,1,2,3),r_cue_total_t = c(mean(r0_cue_total_t),mean(r1_cue_total_t),mean(r2_cue_total_t),mean(r3_cue_total_t)),r_res_total_t = c(mean(r0_res_total_t),mean(r1_res_total_t),mean(r2_res_total_t),mean(r3_res_total_t)))
   rstds <- data.frame(r_values=c(0,1,2,3),r_cue_total_t=c(sd(r0_cue_total_t),sd(r1_cue_total_t),sd(r2_cue_total_t),sd(r3_cue_total_t)),r_res_total_t=c(sd(r0_res_total_t),sd(r1_res_total_t),sd(r2_res_total_t),sd(r3_res_total_t)))
   
   avg_melt <- melt(ravgs,id="r_values",variable.name='type',value.name='avg')

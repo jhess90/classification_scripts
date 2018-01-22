@@ -56,11 +56,7 @@ for(region_index in 1:length(region_list)){
   
   res0 <- which(condensed[,6] == 0)
   res1 <- which(condensed[,6] == 1)
-  
-  #r0_fail <- which(res0 %in% r0)
-  #r1_fail <- which(res0 %in% r1)
-  #r0_succ <- which(res1 %in% r0)
-  #r1_succ <- which(res1 %in% r1)
+
   
   for (unit_num in 1:dim(all_cue_fr)[1]){
     

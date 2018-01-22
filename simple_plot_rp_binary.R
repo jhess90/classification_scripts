@@ -16,7 +16,6 @@ library(R.matlab)
 
 saveAsPng <- T
 
-#file_list <- c('simple_output')
 region_list <- c('M1','S1','PmD')
 
 
@@ -49,29 +48,29 @@ for(region_index in 1:length(region_list)){
   res0 <- which(condensed[,6] == 0)
   res1 <- which(condensed[,6] == 1)
   
-  r0_f <- which(res0 %in% r0)
-  rx_f <- which(res0 %in% rx)
-  r0_s <- which(res1 %in% r0)
-  rx_s <- which(res1 %in% rx)
+  r0_f <- res0[which(res0 %in% r0)]
+  rx_f <- res0[which(res0 %in% rx)]
+  r0_s <- res1[which(res1 %in% r0)]
+  rx_s <- res1[which(res1 %in% rx)]
   
-  p0_f <- which(res0 %in% p0)
-  px_f <- which(res0 %in% px)
-  p0_s <- which(res1 %in% p0)
-  px_s <- which(res1 %in% px)
+  p0_f <- res0[which(res0 %in% p0)]
+  px_f <- res0[which(res0 %in% px)]
+  p0_s <- res1[which(res1 %in% p0)]
+  px_s <- res1[which(res1 %in% px)]
   
-  r0_p0 <- which(r0 %in% p0)
-  rx_p0 <- which(rx %in% p0)
-  r0_px <- which(r0 %in% px)
-  rx_px <- which(rx %in% px)
+  r0_p0 <- r0[which(r0 %in% p0)]
+  rx_p0 <- rx[which(rx %in% p0)]
+  r0_px <- r0[which(r0 %in% px)]
+  rx_px <- rx[which(rx %in% px)]
   
-  r0_p0_s <- which(res1 %in% r0_p0)
-  rx_p0_s <- which(res1 %in% rx_p0)
-  r0_px_s <- which(res1 %in% r0_px)
-  rx_px_s <- which(res1 %in% rx_px)
-  r0_p0_f <- which(res0 %in% r0_p0)
-  rx_p0_f <- which(res0 %in% rx_p0)
-  r0_px_f <- which(res0 %in% r0_px)
-  rx_px_f <- which(res0 %in% rx_px)
+  r0_p0_s <- res1[which(res1 %in% r0_p0)]
+  rx_p0_s <- res1[which(res1 %in% rx_p0)]
+  r0_px_s <- res1[which(res1 %in% r0_px)]
+  rx_px_s <- res1[which(res1 %in% rx_px)]
+  r0_p0_f <- res0[which(res0 %in% r0_p0)]
+  rx_p0_f <- res0[which(res0 %in% rx_p0)]
+  r0_px_f <- res0[which(res0 %in% r0_px)]
+  rx_px_f <- res0[which(res0 %in% rx_px)]
   
 
   for (unit_num in 1:dim(all_cue_fr)[1]){
