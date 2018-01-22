@@ -16,7 +16,7 @@ saveAsPng <- T
 
 #########
 
-nhp_id <- '0059'
+nhp_id <- '504'
 
 if (nhp_id == '0059'){condensed <- readRDS('0059_total_condensed.rds')
 }else if (nhp_id == '504'){condensed <- readRDS('504_total_condensed.rds')}
@@ -81,7 +81,7 @@ test <- merge(std_melt,avg_melt,row.names='r_values')
 test[is.na(test)] <- 0
 
 plt <- ggplot(data=test,aes(x=r_values,y=avg,ymax=avg+std,ymin=avg-std,fill=type)) + geom_bar(position="dodge",stat="identity") + geom_errorbar(position=position_dodge(width=0.9),color="gray32",width=0.25)
-plt <- plt + scale_fill_manual(values=c("royalblue","seagreen")) + geom_text(aes(y=0.25),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9)) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Reward",fill="")
+plt <- plt + scale_fill_manual(values=c("royalblue","seagreen")) + geom_text(aes(y=0.75),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9)) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Reward",fill="")
 
 plot(plt)
 graphics.off()
@@ -99,7 +99,7 @@ test <- merge(std_melt,avg_melt,row.names='p_values')
 test[is.na(test)] <- 0
 
 plt <- ggplot(data=test,aes(x=p_values,y=avg,ymax=avg+std,ymin=avg-std,fill=type)) + geom_bar(position="dodge",stat="identity") + geom_errorbar(position=position_dodge(width=0.9),color="gray32",width=0.25)
-plt <- plt + scale_fill_manual(values=c("royalblue","seagreen")) + geom_text(aes(y=0.25),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9)) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Punishment",fill="")
+plt <- plt + scale_fill_manual(values=c("royalblue","seagreen")) + geom_text(aes(y=0.75),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9)) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Punishment",fill="")
 
 plot(plt)
 graphics.off()
@@ -117,7 +117,7 @@ test <- merge(std_melt,avg_melt,row.names='res_values')
 test[is.na(test)] <- 0
 
 plt <- ggplot(data=test,aes(x=res_values,y=avg,ymax=avg+std,ymin=avg-std,fill=type)) + geom_bar(position="dodge",stat="identity") + geom_errorbar(position=position_dodge(width=0.9),color="gray32",width=0.25)
-plt <- plt + scale_fill_manual(values=c("royalblue","seagreen")) + geom_text(aes(y=0.25),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9)) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Result",fill="") + scale_x_discrete(limits=0:1,labels=c("fail","succ"))
+plt <- plt + scale_fill_manual(values=c("royalblue","seagreen")) + geom_text(aes(y=0.75),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9)) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Result",fill="") + scale_x_discrete(limits=0:1,labels=c("fail","succ"))
 
 plot(plt)
 graphics.off()
@@ -135,7 +135,7 @@ test <- merge(std_melt,avg_melt,row.names='v_values')
 test[is.na(test)] <- 0
 
 plt <- ggplot(data=test,aes(x=v_values,y=avg,ymax=avg+std,ymin=avg-std,fill=type)) + geom_bar(position="dodge",stat="identity") + geom_errorbar(position=position_dodge(width=0.9),color="gray32",width=0.25)
-plt <- plt + scale_fill_manual(values=c("royalblue","seagreen")) + geom_text(aes(y=0.25),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9)) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Value",fill="")
+plt <- plt + scale_fill_manual(values=c("royalblue","seagreen")) + geom_text(aes(y=0.75),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9)) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Value",fill="")
 
 plot(plt)
 graphics.off()
@@ -153,7 +153,7 @@ test <- merge(std_melt,avg_melt,row.names='m_values')
 test[is.na(test)] <- 0
 
 plt <- ggplot(data=test,aes(x=m_values,y=avg,ymax=avg+std,ymin=avg-std,fill=type)) + geom_bar(position="dodge",stat="identity") + geom_errorbar(position=position_dodge(width=0.9),color="gray32",width=0.25)
-plt <- plt + scale_fill_manual(values=c("royalblue","seagreen")) + geom_text(aes(y=0.25),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9)) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Motivation",fill="")
+plt <- plt + scale_fill_manual(values=c("royalblue","seagreen")) + geom_text(aes(y=0.75),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9)) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Motivation",fill="")
 
 plot(plt)
 graphics.off()
@@ -180,7 +180,7 @@ test <- rbind(test_s,test_f)
 test[is.na(test)] <- 0
 
 plt <- ggplot(data=test,aes(x=r_values,y=avg,ymax=avg+std,ymin=avg-std,fill=type)) + geom_bar(position="dodge",stat="identity") + geom_errorbar(position=position_dodge(width=0.9),color="gray32",width=0.25)
-plt <- plt + scale_fill_manual(values=c("royalblue","seagreen","paleturquoise","lightgreen")) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Reward",fill="")  # + geom_text(aes(y=0.25),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9))
+plt <- plt + scale_fill_manual(values=c("royalblue","seagreen","paleturquoise","lightgreen")) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Reward",fill="")  # + geom_text(aes(y=0.75),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9))
 
 plot(plt)
 graphics.off()
@@ -204,7 +204,7 @@ test <- rbind(test_s,test_f)
 test[is.na(test)] <- 0
 
 plt <- ggplot(data=test,aes(x=p_values,y=avg,ymax=avg+std,ymin=avg-std,fill=type)) + geom_bar(position="dodge",stat="identity") + geom_errorbar(position=position_dodge(width=0.9),color="gray32",width=0.25)
-plt <- plt + scale_fill_manual(values=c("royalblue","seagreen","paleturquoise","lightgreen")) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Punishment",fill="")  # + geom_text(aes(y=0.25),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9))
+plt <- plt + scale_fill_manual(values=c("royalblue","seagreen","paleturquoise","lightgreen")) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Punishment",fill="")  # + geom_text(aes(y=0.75),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9))
 
 plot(plt)
 graphics.off()
