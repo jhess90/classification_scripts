@@ -18,7 +18,7 @@ saveAsPng <- T
 #########
 
 
-nhp_id <- '504'
+nhp_id <- '0059'
 
 if (nhp_id == '0059'){condensed <- readRDS('0059_total_condensed.rds')
 }else if (nhp_id == '504'){condensed <- readRDS('504_total_condensed.rds')}
@@ -56,6 +56,31 @@ p0_fail <- which(res0 %in% p0)
 px_fail <- which(res0 %in% px)
 p0_succ <- which(res1 %in% p0)
 px_succ <- which(res1 %in% px)
+
+r0_f <- which(res0 %in% r0)
+rx_f <- which(res0 %in% rx)
+r0_s <- which(res1 %in% r0)
+rx_s <- which(res1 %in% rx)
+
+p0_f <- which(res0 %in% p0)
+px_f <- which(res0 %in% px)
+p0_s <- which(res1 %in% p0)
+px_s <- which(res1 %in% px)
+
+r0_p0 <- r0[which(r0 %in% p0)]
+rx_p0 <- rx[which(rx %in% p0)]
+r0_px <- r0[which(r0 %in% px)]
+rx_px <- rx[which(rx %in% px)]
+
+r0_p0_s <- res1[which(res1 %in% r0_p0)]
+rx_p0_s <- res1[which(res1 %in% rx_p0)]
+r0_px_s <- res1[which(res1 %in% r0_px)]
+rx_px_s <- res1[which(res1 %in% rx_px)]
+r0_p0_f <- res0[which(res0 %in% r0_p0)]
+rx_p0_f <- res0[which(res0 %in% rx_p0)]
+r0_px_f <- res0[which(res0 %in% r0_px)]
+rx_px_f <- res0[which(res0 %in% rx_px)]
+
 
 #reward
 png(paste("time_", nhp_id,"_reward_binary.png",sep=""),width=8,height=6,units="in",res=500)
@@ -198,8 +223,51 @@ plt <- plt + scale_fill_manual(values=c("royalblue","seagreen","paleturquoise","
 plot(plt)
 graphics.off()
 
+###########
+#comb sf
+png(paste("time_", nhp_id,"_comb_sf_binary.png",sep=""),width=8,height=6,units="in",res=500)
 
-rm(list=ls())
+comb_s_avgs <- data.frame(c_values=c(0,1,2,3),reach_time_s = c(mean(condensed[r0_p0_s,9]),mean(condensed[r0_px_s,9]),mean(condensed[rx_p0_s,9]),mean(condensed[rx_px_s,9])),intertrial_s = c(mean(condensed[r0_p0_s,10]),mean(condensed[r0_px_s,10]),mean(condensed[rx_p0_s,10]),mean(condensed[rx_px_s,10])))
+comb_s_stds <- data.frame(c_values=c(0,1,2,3),reach_time_s = c(sd(condensed[r0_p0_s,9]),sd(condensed[r0_px_s,9]),sd(condensed[rx_p0_s,9]),sd(condensed[rx_px_s,9])),intertrial_s = c(sd(condensed[r0_p0_s,10]),sd(condensed[r0_px_s,10]),sd(condensed[rx_p0_s,10]),sd(condensed[rx_px_s,10])))
+comb_f_avgs <- data.frame(c_values=c(0,1,2,3),reach_time_f = c(mean(condensed[r0_p0_f,9]),mean(condensed[r0_px_f,9]),mean(condensed[rx_p0_f,9]),mean(condensed[rx_px_f,9])),intertrial_f = c(mean(condensed[r0_p0_f,10]),mean(condensed[r0_px_f,10]),mean(condensed[rx_p0_f,10]),mean(condensed[rx_px_f,10])))
+comb_f_stds <- data.frame(c_values=c(0,1,2,3),reach_time_f = c(sd(condensed[r0_p0_f,9]),sd(condensed[r0_px_f,9]),sd(condensed[rx_p0_f,9]),sd(condensed[rx_px_f,9])),intertrial_f = c(sd(condensed[r0_p0_f,10]),sd(condensed[r0_px_f,10]),sd(condensed[rx_p0_f,10]),sd(condensed[rx_px_f,10])))
+
+avg_s_melt <- melt(comb_s_avgs,id="c_values",variable.name='type',value.name='avg')
+std_s_melt <- melt(comb_s_stds,id="c_values",variable.name='type',value.name='std')
+avg_f_melt <- melt(comb_f_avgs,id="c_values",variable.name='type',value.name='avg')
+std_f_melt <- melt(comb_f_stds,id="c_values",variable.name='type',value.name='std')
+
+test_s <- merge(std_s_melt,avg_s_melt,row.names='c_values')
+test_f <- merge(std_f_melt,avg_f_melt,row.names='c_values')
+test <- rbind(test_s,test_f)
+test[is.na(test)] <- 0
+
+plt <- ggplot(data=test,aes(x=c_values,y=avg,ymax=avg+std,ymin=avg-std,fill=type)) + geom_bar(position="dodge",stat="identity") + geom_errorbar(position=position_dodge(width=0.9),color="gray32",width=0.25)
+plt <- plt + scale_fill_manual(values=c("royalblue","seagreen","paleturquoise","lightgreen")) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Combination",fill="") + scale_x_discrete(limits=0:3,labels=c("R0_P0","R0_PX","RX_P0","RX_PX")) # + geom_text(aes(y=0.75),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9))
+
+plot(plt)
+graphics.off()
+
+
+#comb 
+png(paste("time_", nhp_id,"_comb_binary.png",sep=""),width=8,height=6,units="in",res=500)
+
+comb_avgs <- data.frame(c_values=c(0,1,2,3),reach_time = c(mean(condensed[r0_p0,9]),mean(condensed[r0_px,9]),mean(condensed[rx_p0,9]),mean(condensed[rx_px,9])),intertrial = c(mean(condensed[r0_p0,10]),mean(condensed[r0_px,10]),mean(condensed[rx_p0,10]),mean(condensed[rx_px,10])))
+comb_stds <- data.frame(c_values=c(0,1,2,3),reach_time = c(sd(condensed[r0_p0,9]),sd(condensed[r0_px,9]),sd(condensed[rx_p0,9]),sd(condensed[rx_px,9])),intertrial = c(sd(condensed[r0_p0,10]),sd(condensed[r0_px,10]),sd(condensed[rx_p0,10]),sd(condensed[rx_px,10])))
+
+avg_melt <- melt(comb_avgs,id="c_values",variable.name='type',value.name='avg')
+std_melt <- melt(comb_stds,id="c_values",variable.name='type',value.name='std')
+
+test <- merge(std_melt,avg_melt,row.names='c_values')
+test[is.na(test)] <- 0
+
+plt <- ggplot(data=test,aes(x=c_values,y=avg,ymax=avg+std,ymin=avg-std,fill=type)) + geom_bar(position="dodge",stat="identity") + geom_errorbar(position=position_dodge(width=0.9),color="gray32",width=0.25)
+plt <- plt + scale_fill_manual(values=c("royalblue","seagreen")) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Combination",fill="") + scale_x_discrete(limits=0:3,labels=c("R0_P0","R0_PX","RX_P0","RX_PX")) + geom_text(aes(y=0.5),size=3,label=sprintf("%0.2f", round(test$avg, digits = 2)),position=position_dodge(width=0.9))
+
+plot(plt)
+graphics.off()
+
+#rm(list=ls())
 
 
 
