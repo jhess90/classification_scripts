@@ -1117,7 +1117,7 @@ print extracted_filename
 
 #create matrix of trial-by-trial info
 trial_breakdown = timestamps['trial_breakdown']
-condensed = np.zeros((np.shape(trial_breakdown)[0],10))
+condensed = np.zeros((np.shape(trial_breakdown)[0],11))
 
 #0: disp_rp, 1: succ scene 2: failure scene, 3: rnum, 4: pnum, 5:succ/fail, 6: value, 7: motiv, 8: disp_rp bin
 
@@ -1127,6 +1127,7 @@ condensed[:,2] = trial_breakdown[:,3]
 condensed[:,3] = trial_breakdown[:,5]
 condensed[:,4] = trial_breakdown[:,7]
 condensed[:,5] = trial_breakdown[:,10]
+pdb.set_trace()
 #condensed[:,8] = trial_breakdown[   ] Next reset, don't need for now          
 
 bin_size_sec = bin_size / float(1000)

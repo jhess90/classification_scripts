@@ -79,8 +79,8 @@ def run_corr(binned_data,condensed):
         #TODO make combinations of rewarding and succ, punishing and fail, etc?
 
         #dim0 = num bins, dim1 = 5 (see above), dim2 = num units
-        corr_input_matrix = np.zeros((np.shape(binned_data)[1],6,np.shape(binned_data)[0]))
-        corr_output = np.zeros((np.shape(binned_data)[0],5))
+        corr_input_matrix = np.zeros((np.shape(binned_data)[1],8,np.shape(binned_data)[0]))
+        corr_output = np.zeros((np.shape(binned_data)[0],7))
 
         for unit_num in range(np.shape(binned_data)[0]):
                 corr_input_matrix[:,0,unit_num] = binned_data[unit_num,:]
@@ -91,13 +91,18 @@ def run_corr(binned_data,condensed):
 					corr_input_matrix[int(condensed[cond_ind,8]):int(condensed[cond_ind+1,8]),3,unit_num] = condensed[cond_ind,6]
 					corr_input_matrix[int(condensed[cond_ind,8]):int(condensed[cond_ind+1,8]),4,unit_num] = condensed[cond_ind,7]
 					corr_input_matrix[int(condensed[cond_ind,8]):int(condensed[cond_ind+1,8]),5,unit_num] = condensed[cond_ind,5]
+					corr_input_matrix[int(condensed[cond_ind,8]):int(condensed[cond_ind+1,8]),6,unit_num] = condensed[cond_ind,10]
+					corr_input_matrix[int(condensed[cond_ind,8]):int(condensed[cond_ind+1,8]),7,unit_num] = condensed[cond_ind,11]
 
-                corr_df = pd.DataFrame({'binned_rate':corr_input_matrix[:,0,unit_num],'rnum':corr_input_matrix[:,1,unit_num],'pnum':corr_input_matrix[:,2,unit_num],'val':corr_input_matrix[:,3,unit_num],'mtv':corr_input_matrix[:,4,unit_num],'result':corr_input_matrix[:,5,unit_num]})
+
+                corr_df = pd.DataFrame({'binned_rate':corr_input_matrix[:,0,unit_num],'rnum':corr_input_matrix[:,1,unit_num],'pnum':corr_input_matrix[:,2,unit_num],'val':corr_input_matrix[:,3,unit_num],'mtv':corr_input_matrix[:,4,unit_num],'result':corr_input_matrix[:,5,unit_num],'catch_bin':corr_input_matrix[:,6,unit_num],'catch_mult':corr_input_matrix[:,7,unit_num]})
                 corr_output[unit_num,0] = corr_df['binned_rate'].corr(corr_df['rnum'])
                 corr_output[unit_num,1] = corr_df['binned_rate'].corr(corr_df['pnum'])
                 corr_output[unit_num,2] = corr_df['binned_rate'].corr(corr_df['val'])
                 corr_output[unit_num,3] = corr_df['binned_rate'].corr(corr_df['mtv'])
                 corr_output[unit_num,4] = corr_df['binned_rate'].corr(corr_df['result'])
+                corr_output[unit_num,5] = corr_df['binned_rate'].corr(corr_df['catch_bin'])
+                corr_output[unit_num,6] = corr_df['binned_rate'].corr(corr_df['catch_mult'])
         
         return_dict = {'corr_input_matrix':corr_input_matrix,'corr_output':corr_output}
 
@@ -1107,8 +1112,8 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
 #start ########################################
 ###############################################
 
-ts_filename = glob.glob('Extracted*_timestamps.mat')[0]
-extracted_filename = ts_filename[:-15] + '.mat'
+ts_filename = glob.glob('Extracted*_catch_timestamps.mat')[0]
+extracted_filename = ts_filename[:-21] + '.mat'
 
 a = sio.loadmat(extracted_filename)
 timestamps = sio.loadmat(ts_filename)
@@ -1127,17 +1132,17 @@ condensed[:,2] = trial_breakdown[:,3]
 condensed[:,3] = trial_breakdown[:,5]
 condensed[:,4] = trial_breakdown[:,7]
 
-#TODO catch
+#catch trials: -1 = P catch, +1 = R catch
 condensed[:,10] = trial_breakdown[:,10]
-#condensed[:,11] = trial_breakdown[:,11]
+condensed[condensed[:,10] == 2,10] = -1
+condensed[condensed[:,10] == 1,11] = condensed[condensed[:,10] == 1,3]
+condensed[condensed[:,10] == -1,11] = (condensed[condensed[:,10] == -1,4])*-1
 
 
 bin_size_sec = bin_size / float(1000)
 for i in range(np.shape(condensed)[0]):
         condensed[i,8] = int(np.around((round(condensed[i,0] / bin_size_sec) * bin_size_sec),decimals=2)/bin_size_sec)
-        #condensed[i,8] = condensed[i,8].astype(int)
         condensed[i,9] = int(np.around((round((condensed[i,1] + condensed[i,2]) / bin_size_sec) * bin_size_sec),decimals=2)/bin_size_sec)
-        #condensed[i,9] = condensed[i,9].astype(int)
 
 #delete end trials if not fully finished
 if condensed[-1,1] == condensed[-1,2] == 0:
@@ -1256,9 +1261,12 @@ for key,value in data_dict.iteritems():
 
         data_dict[key]['spike_data'] = spike_data
         data_dict[key]['binned_data'] = binned_data
-        data_dict[key]['corr_data'] = corr_data
-		
-        sio.savemat('corr_output_%s' %(key),{'corr_output':corr_data['corr_output']},format='5')
+        
+        corr_data['condensed'] = condensed
 
-		
+        data_dict[key]['corr_data'] = corr_data
+        
+        sio.savemat('corr_output_%s' %(key),{'corr_output':corr_data['corr_output'],'condensed':condensed},format='5')
+
+
 np.save('corr_analysis.npy',data_dict)
