@@ -117,7 +117,7 @@ for(region_index in 1:length(region_list)){
   
   
   for (unit_num in 1:dim(all_cue_fr)[1]){
- 
+    
     ## catch bin both
     png(paste(region_list[region_index],"_catch_bin_both_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
     
@@ -198,66 +198,7 @@ for(region_index in 1:length(region_list)){
     multiplot(plt_cue,plt_res)
     graphics.off()
     
-    ## catch mult reward
-    png(paste(region_list[region_index],"_catch_mult_r_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
-    
-    if (length(catch1) == 1){catch1_fr_cue <- rollmean(all_cue_fr[unit_num,catch1,],5)}else if(length(catch1) == 0){catch1_fr_cue <- rep(0,146)}else{catch1_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,catch1,]),5)}
-    if (length(catch2) == 1){catch2_fr_cue <- rollmean(all_cue_fr[unit_num,catch2,],5)}else if(length(catch2) == 0){catch2_fr_cue <- rep(0,146)}else{catch2_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,catch2,]),5)}
-    if (length(catch3) == 1){catch3_fr_cue <- rollmean(all_cue_fr[unit_num,catch3,],5)}else if(length(catch3) == 0){catch3_fr_cue <- rep(0,146)}else{catch3_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,catch3,]),5)}
-    if (length(rx_s) == 1){rx_s_fr_cue <- rollmean(all_cue_fr[unit_num,rx_s,],5)}else if(length(rx_s) == 0){rx_s_fr_cue <- rep(0,146)}else{rx_s_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,rx_s,]),5)}
-    if (length(r0_s) == 1){r0_s_fr_cue <- rollmean(all_cue_fr[unit_num,r0_s,],5)}else if(length(r0_s) == 0){r0_s_fr_cue <- rep(0,146)}else{r0_s_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,r0_s,]),5)}
-    
-    if (length(catch1) == 1){catch1_fr_res <- rollmean(all_res_fr[unit_num,catch1,],5)}else if(length(catch1) == 0){catch1_fr_res <- rep(0,146)}else{catch1_fr_res <- rollmean(colMeans(all_res_fr[unit_num,catch1,]),5)}
-    if (length(catch2) == 1){catch2_fr_res <- rollmean(all_res_fr[unit_num,catch2,],5)}else if(length(catch2) == 0){catch2_fr_res <- rep(0,146)}else{catch2_fr_res <- rollmean(colMeans(all_res_fr[unit_num,catch2,]),5)}
-    if (length(catch3) == 1){catch3_fr_res <- rollmean(all_res_fr[unit_num,catch3,],5)}else if(length(catch3) == 0){catch3_fr_res <- rep(0,146)}else{catch3_fr_res <- rollmean(colMeans(all_res_fr[unit_num,catch3,]),5)}
-    if (length(rx_s) == 1){rx_s_fr_res <- rollmean(all_res_fr[unit_num,rx_s,],5)}else if(length(rx_s) == 0){rx_s_fr_res <- rep(0,146)}else{rx_s_fr_res <- rollmean(colMeans(all_res_fr[unit_num,rx_s,]),5)}
-    if (length(r0_s) == 1){r0_s_fr_res <- rollmean(all_res_fr[unit_num,r0_s,],5)}else if(length(r0_s) == 0){r0_s_fr_res <- rep(0,146)}else{r0_s_fr_res <- rollmean(colMeans(all_res_fr[unit_num,r0_s,]),5)}
-    
-    catch_mult_r_cue_avgs <- data.frame(time=time,catch1_cue=catch1_fr_cue,catch2_cue=catch2_fr_cue,catch3_cue=catch3_fr_cue,rx_s_cue=rx_s_fr_cue,r0_s_cue=r0_s_fr_cue)
-    catch_mult_r_res_avgs <- data.frame(time=time,catch1_res=catch1_fr_res,catch2_res=catch2_fr_res,catch3_res=catch3_fr_res,rx_s_res=rx_s_fr_res,r0_s_res=r0_s_fr_res)
-    
-    catch_mult_r_cue_avgs.m <- melt(catch_mult_r_cue_avgs,id.vars="time",variable="comb")
-    catch_mult_r_res_avgs.m <- melt(catch_mult_r_res_avgs,id.vars="time",variable="comb")
-    
-    plt_cue <- ggplot(catch_mult_r_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=comb,linetype=comb),show.legend=F,size=0.5) + theme_classic()
-    plt_cue <- plt_cue + scale_colour_manual(values=c("lightsteelblue","royalblue1","royalblue4","forestgreen","goldenrod")) + labs(title=paste("Catch reward levels: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Combination") + geom_vline(xintercept=0) + scale_linetype_manual(values=c("longdash","longdash","longdash","solid","solid"))
-    
-    plt_res <- ggplot(catch_mult_r_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=comb,linetype=comb),show.legend=F,size=0.5) + theme_classic()
-    plt_res <- plt_res + scale_colour_manual(values=c("lightsteelblue","royalblue1","royalblue4","forestgreen","goldenrod")) + labs(title="Result",y="z-score", x="Time(s)",colour="Combination") + geom_vline(xintercept=0) + scale_linetype_manual(values=c("longdash","longdash","longdash","solid","solid"))
-    
-    multiplot(plt_cue,plt_res)
-    graphics.off()
-    
-    ## catch mult punishment
-    png(paste(region_list[region_index],"_catch_mult_p_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
-    
-    if (length(catch_1) == 1){catch_1_fr_cue <- rollmean(all_cue_fr[unit_num,catch_1,],5)}else if(length(catch_1) == 0){catch_1_fr_cue <- rep(0,146)}else{catch_1_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,catch_1,]),5)}
-    if (length(catch_2) == 1){catch_2_fr_cue <- rollmean(all_cue_fr[unit_num,catch_2,],5)}else if(length(catch_2) == 0){catch_2_fr_cue <- rep(0,146)}else{catch_2_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,catch_2,]),5)}
-    if (length(catch_3) == 1){catch_3_fr_cue <- rollmean(all_cue_fr[unit_num,catch_3,],5)}else if(length(catch_3) == 0){catch_3_fr_cue <- rep(0,146)}else{catch_3_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,catch_3,]),5)}
-    if (length(px_f) == 1){px_f_fr_cue <- rollmean(all_cue_fr[unit_num,px_f,],5)}else if(length(px_f) == 0){px_f_fr_cue <- rep(0,146)}else{px_f_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,px_f,]),5)}
-    if (length(p0_f) == 1){p0_f_fr_cue <- rollmean(all_cue_fr[unit_num,p0_f,],5)}else if(length(p0_f) == 0){p0_f_fr_cue <- rep(0,146)}else{p0_f_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,p0_f,]),5)}
-    
-    if (length(catch_1) == 1){catch_1_fr_res <- rollmean(all_res_fr[unit_num,catch_1,],5)}else if(length(catch_1) == 0){catch_1_fr_res <- rep(0,146)}else{catch_1_fr_res <- rollmean(colMeans(all_res_fr[unit_num,catch_1,]),5)}
-    if (length(catch_2) == 1){catch_2_fr_res <- rollmean(all_res_fr[unit_num,catch_2,],5)}else if(length(catch_2) == 0){catch_2_fr_res <- rep(0,146)}else{catch_2_fr_res <- rollmean(colMeans(all_res_fr[unit_num,catch_2,]),5)}
-    if (length(catch_3) == 1){catch_3_fr_res <- rollmean(all_res_fr[unit_num,catch_3,],5)}else if(length(catch_3) == 0){catch_3_fr_res <- rep(0,146)}else{catch_3_fr_res <- rollmean(colMeans(all_res_fr[unit_num,catch_3,]),5)}
-    if (length(px_f) == 1){px_f_fr_res <- rollmean(all_res_fr[unit_num,px_f,],5)}else if(length(px_f) == 0){px_f_fr_res <- rep(0,146)}else{px_f_fr_res <- rollmean(colMeans(all_res_fr[unit_num,px_f,]),5)}
-    if (length(p0_f) == 1){p0_f_fr_res <- rollmean(all_res_fr[unit_num,p0_f,],5)}else if(length(p0_f) == 0){p0_f_fr_res <- rep(0,146)}else{p0_f_fr_res <- rollmean(colMeans(all_res_fr[unit_num,p0_f,]),5)}
 
-    catch_mult_p_cue_avgs <- data.frame(time=time,catch_1_cue=catch1_fr_cue,catch_2_cue=catch_2_fr_cue,catch_3_cue=catch_3_fr_cue,px_f_cue=px_f_fr_cue,p0_f_cue=p0_f_fr_cue)
-    catch_mult_p_res_avgs <- data.frame(time=time,catch_1_res=catch1_fr_res,catch_2_res=catch_2_fr_res,catch_3_res=catch_3_fr_res,px_f_res=px_f_fr_res,p0_f_res=p0_f_fr_res)
-    
-    catch_mult_p_cue_avgs.m <- melt(catch_mult_p_cue_avgs,id.vars="time",variable="comb")
-    catch_mult_p_res_avgs.m <- melt(catch_mult_p_res_avgs,id.vars="time",variable="comb")
-    
-    plt_cue <- ggplot(catch_mult_p_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=comb,linetype=comb),show.legend=F,size=0.5) + theme_classic()
-    plt_cue <- plt_cue + scale_colour_manual(values=c("lightsteelblue","royalblue1","royalblue4","firebrick","goldenrod")) + labs(title=paste("Catch punishment levels: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Combination") + geom_vline(xintercept=0) + scale_linetype_manual(values=c("longdash","longdash","longdash","solid","solid"))
-    
-    plt_res <- ggplot(catch_mult_p_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=comb,linetype=comb),show.legend=F,size=0.5) + theme_classic()
-    plt_res <- plt_res + scale_colour_manual(values=c("lightsteelblue","royalblue1","royalblue4","firebrick","goldenrod")) + labs(title="Result",y="z-score", x="Time(s)",colour="Combination") + geom_vline(xintercept=0) + scale_linetype_manual(values=c("longdash","longdash","longdash","solid","solid"))
-    
-    multiplot(plt_cue,plt_res)
-    graphics.off()
-    
     
   }
 }
