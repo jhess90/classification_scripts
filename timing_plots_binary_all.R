@@ -47,25 +47,25 @@ if (max(condensed[,8]) == 6){
 res0 <- which(condensed[,6] == 0)
 res1 <- which(condensed[,6] == 1)
 
-r0_fail <- which(res0 %in% r0)
-rx_fail <- which(res0 %in% rx)
-r0_succ <- which(res1 %in% r0)
-rx_succ <- which(res1 %in% rx)
+r0_fail <- res0[which(res0 %in% r0)]
+rx_fail <- res0[which(res0 %in% rx)]
+r0_succ <- res1[which(res1 %in% r0)]
+rx_succ <- res1[which(res1 %in% rx)]
 
-p0_fail <- which(res0 %in% p0)
-px_fail <- which(res0 %in% px)
-p0_succ <- which(res1 %in% p0)
-px_succ <- which(res1 %in% px)
+p0_fail <- res0[which(res0 %in% p0)]
+px_fail <- res0[which(res0 %in% px)]
+p0_succ <- res1[which(res1 %in% p0)]
+px_succ <- res1[which(res1 %in% px)]
 
-r0_f <- which(res0 %in% r0)
-rx_f <- which(res0 %in% rx)
-r0_s <- which(res1 %in% r0)
-rx_s <- which(res1 %in% rx)
+r0_f <- res0[which(res0 %in% r0)]
+rx_f <- res0[which(res0 %in% rx)]
+r0_s <- res1[which(res1 %in% r0)]
+rx_s <- res1[which(res1 %in% rx)]
 
-p0_f <- which(res0 %in% p0)
-px_f <- which(res0 %in% px)
-p0_s <- which(res1 %in% p0)
-px_s <- which(res1 %in% px)
+p0_f <- res0[which(res0 %in% p0)]
+px_f <- res0[which(res0 %in% px)]
+p0_s <- res1[which(res1 %in% p0)]
+px_s <- res1[which(res1 %in% px)]
 
 r0_p0 <- r0[which(r0 %in% p0)]
 rx_p0 <- rx[which(rx %in% p0)]
