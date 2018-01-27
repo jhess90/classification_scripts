@@ -1,8 +1,8 @@
 library(openxlsx)
 library(ggplot2)
 library(reshape2)
-#source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
-source("~/workspace/classification_scripts/multiplot.R")
+source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
+#source("~/workspace/classification_scripts/multiplot.R")
 library(zoo)
 library(gplots)
 library(RColorBrewer)
@@ -27,16 +27,16 @@ for(region_index in 1:length(region_list)){
   
   all_cue_fr <- readin$return.dict[,,1]$all.cue.fr
   all_res_fr <- readin$return.dict[,,1]$all.res.fr
-  #condensed <- readin$return.dict[,,1]$condensed
+  condensed_old <- readin$return.dict[,,1]$condensed
   bin_size <- readin$return.dict[,,1]$params[,,1]$bin.size[,]
   rp_vals <- c(0,1,2,3)
   
   readin <- readMat(paste('corr_output_',region_list[region_index],'.mat',sep=""))
   condensed <- readin$condensed
   
+  condensed <- condensed[condensed[,1] %in% condensed_old[,1],]
   
-  #TODO make for diff bfr and aft times
-  #TODO unhardcode rollmean (time and rollmean val)
+
   old_time <- seq(from=-0.5,to=(1.0-bin_size/1000),by=bin_size/1000)
   time <- seq(from=-0.5+2*bin_size/1000,to=(1.0-3*bin_size/1000),by=bin_size/1000)
   

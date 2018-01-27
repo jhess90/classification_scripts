@@ -19,9 +19,6 @@ library(ggpmisc)
 #### Params #####
 #################
 
-##For beaver: change multiplot above, install ggpmisc pkg
-
-
 units_to_plot <- 5
 
 plot_p_bool <- TRUE
@@ -215,7 +212,11 @@ for (region_index in 1:length(region_list)){
   plot(plt)
   graphics.off()
   
+  readin <- readMat(paste('catch_mult_avgs_',region_list[region_index],'.mat',sep=""))
+  catch_mult_avgs <- lapply(readin$catch.mult.avgs,'[[',1)
   
+  readin <- readMat(paste('catch_bin_avgs_',region_list[region_index],'.mat',sep=""))
+  catch_bin_avgs <- lapply(readin$catch.bin.avgs,'[[',1)
   
   ##############
   
@@ -231,6 +232,8 @@ for (region_index in 1:length(region_list)){
   val_corr_order <- readin$order.dict[,,1]$val.corr.order
   mtv_corr_order <- readin$order.dict[,,1]$mtv.corr.order
   res_corr_order <- readin$order.dict[,,1]$res.corr.order
+  catch_mult_corr_order <- readin$order.dict[,,1]$catch.mult.corr.order
+  catch_bin_corr_order <- readin$order.dict[,,1]$catch.bin.corr.order
   condensed <- readin$order.dict[,,1]$condensed
   
   r0_cue_total_t <- c()
@@ -427,6 +430,41 @@ for (region_index in 1:length(region_list)){
   m5_res_fail_total_b <- c()
   m6_res_fail_total_b <- c()
   
+  catch_3_cue_total_t <- c()
+  catch_2_cue_total_t <- c()
+  catch_1_cue_total_t <- c()
+  catch1_cue_total_t <- c()
+  catch2_cue_total_t <- c()
+  catch3_cue_total_t <- c()
+  catch_3_res_total_t <- c()
+  catch_2_res_total_t <- c()
+  catch_1_res_total_t <- c()
+  catch1_res_total_t <- c()
+  catch2_res_total_t <- c()
+  catch3_res_total_t <- c()
+
+  catch_x_cue_total_t <- c()
+  catchx_cue_total_t <- c()
+  catch_x_res_total_t <- c()
+  catchx_res_total_t <- c()
+  
+  catch_3_cue_total_b <- c()
+  catch_2_cue_total_b <- c()
+  catch_1_cue_total_b <- c()
+  catch1_cue_total_b <- c()
+  catch2_cue_total_b <- c()
+  catch3_cue_total_b <- c()
+  catch_3_res_total_b <- c()
+  catch_2_res_total_b <- c()
+  catch_1_res_total_b <- c()
+  catch1_res_total_b <- c()
+  catch2_res_total_b <- c()
+  catch3_res_total_b <- c()
+  
+  catch_x_cue_total_b <- c()
+  catchx_cue_total_b <- c()
+  catch_x_res_total_b <- c()
+  catchx_res_total_b <- c()
   
   #plot top units
   #i-1 b/ python indexing
@@ -436,11 +474,8 @@ for (region_index in 1:length(region_list)){
     val_unit_ind <- which((i-1)==val_corr_order)
     mtv_unit_ind <- which((i-1)==mtv_corr_order)
     res_unit_ind <- which((i-1)==res_corr_order)
-    
-    #cue_avg_frs <- cue_avg[unit_ind,]
-    #res_avg_frs <- res_avg[unit_ind,]
-    #cue_peak_frs <- cue_peaks[unit_ind,]
-    #res_peak_frs <- res_peaks[unit_ind,]
+    catch_mult_unit_ind <- which((i-1)==catch_mult_corr_order)
+    catch_bin_unit_ind <- which((i-1)==catch_bin_corr_order)
     
     r0_cue <- cue_avg[r_unit_ind,][which(condensed[,4]==0)]
     r1_cue <- cue_avg[r_unit_ind,][which(condensed[,4]==1)]
@@ -543,6 +578,26 @@ for (region_index in 1:length(region_list)){
     m5_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==5 & condensed[,6]==0)]
     m6_res_fail <- res_avg[mtv_unit_ind,][which(condensed[,8]==6 & condensed[,6]==0)] 
     
+    catch_3_cue <- cue_avg[catch_mult_unit_ind,][which(condensed[,12]==-3)]
+    catch_2_cue <- cue_avg[catch_mult_unit_ind,][which(condensed[,12]==-2)]
+    catch_1_cue <- cue_avg[catch_mult_unit_ind,][which(condensed[,12]==-1)]
+    catch1_cue <- cue_avg[catch_mult_unit_ind,][which(condensed[,12]==1)]
+    catch2_cue <- cue_avg[catch_mult_unit_ind,][which(condensed[,12]==2)]
+    catch3_cue <- cue_avg[catch_mult_unit_ind,][which(condensed[,12]==3)]
+    catch_3_res <- res_avg[catch_mult_unit_ind,][which(condensed[,12]==-3)]
+    catch_2_res <- res_avg[catch_mult_unit_ind,][which(condensed[,12]==-2)]
+    catch_1_res <- res_avg[catch_mult_unit_ind,][which(condensed[,12]==-1)]
+    catch1_res <- res_avg[catch_mult_unit_ind,][which(condensed[,12]==1)]
+    catch2_res <- res_avg[catch_mult_unit_ind,][which(condensed[,12]==2)]
+    catch3_res <- res_avg[catch_mult_unit_ind,][which(condensed[,12]==3)]    
+    
+    catch_x_cue <- cue_avg[catch_bin_unit_ind,][which(condensed[,12]<=-1)]
+    catchx_cue <- cue_avg[catch_bin_unit_ind,][which(condensed[,12]>=1)]
+    
+    catch_x_res <- res_avg[catch_bin_unit_ind,][which(condensed[,12]<=-1)]
+    catchx_res <- res_avg[catch_bin_unit_ind,][which(condensed[,12]>=1)]
+    
+
     ##########
     r0_cue_total_t <- c(r0_cue_total_t,r0_cue)
     r1_cue_total_t <- c(r1_cue_total_t,r1_cue)
@@ -641,6 +696,26 @@ for (region_index in 1:length(region_list)){
     m5_res_fail_total_t <- c(m5_res_fail_total_t,m5_res_fail)
     m6_res_fail_total_t <- c(m6_res_fail_total_t,m6_res_fail)
 
+    catch_3_cue_total_t <- c(catch_3_cue_total_t,catch_3_cue)
+    catch_2_cue_total_t <- c(catch_2_cue_total_t,catch_2_cue)
+    catch_1_cue_total_t <- c(catch_1_cue_total_t,catch_1_cue)
+    catch1_cue_total_t <- c(catch1_cue_total_t,catch1_cue)
+    catch2_cue_total_t <- c(catch2_cue_total_t,catch2_cue)
+    catch3_cue_total_t <- c(catch3_cue_total_t,catch3_cue)
+    catch_3_res_total_t <- c(catch_3_res_total_t,catch_3_res)
+    catch_2_res_total_t <- c(catch_2_res_total_t,catch_2_res)
+    catch_1_res_total_t <- c(catch_1_res_total_t,catch_1_res)
+    catch1_res_total_t <- c(catch1_res_total_t,catch1_res)
+    catch2_res_total_t <- c(catch2_res_total_t,catch2_res)
+    catch3_res_total_t <- c(catch3_res_total_t,catch3_res)
+    
+    catch_x_cue_total_t <- c(catch_x_cue_total_t,catch_x_cue)
+    catchx_cue_total_t <- c(catchx_cue_total_t,catchx_cue)
+    
+    catch_x_res_total_t <- c(catch_x_res_total_t,catch_x_res)
+    catchx_res_total_t <- c(catchx_res_total_t,catchx_res)
+    
+    
     ##########
 
     png(paste('corr_r_t',i,'_',region_list[region_index],'_lr.png',sep=""),width=8,height=6,units="in",res=500)
@@ -811,7 +886,30 @@ for (region_index in 1:length(region_list)){
     if(plot_p_bool){plt <- plt + stat_fit_glance(method = 'lm',method.args=list(formula=formula),geom='text',aes(label = paste("P-value = ", signif(..p.value.., digits = 3), sep = "")),label.x.npc = 'right', label.y.npc = 0.05, size = 3,na.rm=T)}
     plot(plt)
     graphics.off()  
+   
     
+    
+    png(paste('corr_catch_mult_t',i,'_',region_list[region_index],'_lr.png',sep=""),width=8,height=6,units="in",res=500)
+    
+    cm_avgs <- data.frame(cm_values=c(-3,-2,-1,1,2,3),catch_cue = c(mean(catch_3_cue),mean(catch_2_cue),mean(catch_1_cue),mean(catch1_cue),mean(catch2_cue),mean(catch3_cue)),catch_res = c(mean(catch_3_res),mean(catch_2_res),mean(catch_1_res),mean(catch1_res),mean(catch2_res),mean(catch3_res)))
+    cm_stds <- data.frame(cm_values=c(-3,-2,-1,1,2,3),catch_cue=c(sd(catch_3_cue),sd(catch_2_cue),sd(catch_1_cue),sd(catch1_cue),sd(catch2_cue),sd(catch3_cue)),catch_res=c(sd(catch_3_res),sd(catch_2_res),sd(catch_1_res),sd(catch1_res),sd(catch2_res),sd(catch3_res)))
+    
+    avg_melt <- melt(cm_avgs,id="cm_values",variable.name='type',value.name='avg')
+    std_melt <- melt(cm_stds,id="cm_values",variable.name='type',value.name='std')
+    
+    test <- merge(std_melt,avg_melt,row.names='cm_values')
+    
+    plt <- ggplot(test,aes(x=cm_values,y=avg,color=type)) + geom_errorbar(aes(ymin=avg-std,ymax=avg+std),width=0.1,linetype=1.0,alpha=0.75,na.rm=T) + theme_classic() 
+    plt <- plt +  geom_smooth(method=lm,se=F,size=0.5,na.rm=T) + geom_point(na.rm=T) + scale_colour_manual(name="Unit Key",values=c("cm_cue"="coral4","cm_res"="slateblue"))
+    plt <- plt + labs(title=paste('Catch mult: T',i,' corr, Unit ',val_unit_ind,sep=""),x="Value",y="z-score") 
+    if(plot_p_bool){plt <- plt + stat_fit_glance(method = 'lm',method.args=list(formula=formula),geom='text',aes(label = paste("P-value = ", signif(..p.value.., digits = 3), sep = "")),label.x.npc = 'right', label.y.npc = 0.05, size = 3,na.rm=T)}
+    plot(plt)
+    graphics.off()
+    
+    
+    
+    
+     
   }
   
   #plot bottom units
@@ -1547,4 +1645,4 @@ for (region_index in 1:length(region_list)){
   
 }
 
-rm(list=ls())
+#rm(list=ls())
