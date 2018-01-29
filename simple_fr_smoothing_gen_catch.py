@@ -27,7 +27,7 @@ from scipy import ndimage
 bin_size = 10 #in ms
 
 zscore_bool = True
-gaussian_bool = True
+gaussian_bool = False
 gauss_sigma = 30 #in ms
 
 plot_bool = True
@@ -119,8 +119,8 @@ def run_breakdown(binned_data,condensed,region_key):
 #start ########################################
 ###############################################
 
-ts_filename = glob.glob('Extracted*_timestamps.mat')[0]
-extracted_filename = ts_filename[:-15] + '.mat'
+ts_filename = glob.glob('Extracted*_catch_timestamps.mat')[0]
+extracted_filename = ts_filename[:-21] + '.mat'
 
 a = sio.loadmat(extracted_filename)
 timestamps = sio.loadmat(ts_filename)
@@ -162,7 +162,7 @@ condensed = condensed[np.invert(np.logical_and(condensed[:,1] != 0, condensed[:,
 
 
 #TODOD FOR NOW remove catch trials
-condensed = condensed[condensed[:,5] == 0]
+#condensed = condensed[condensed[:,5] == 0]
 #col 5 all 0s now, replace with succ/fail vector: succ = 1, fail = 0
 condensed[condensed[:,1] != 0, 5] = 1
 condensed[condensed[:,2] != 0, 5] = 0
