@@ -119,8 +119,10 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
         val_corr_order = np.argsort(corr_output[:,2])
         mtv_corr_order = np.argsort(corr_output[:,3])
         res_corr_order = np.argsort(corr_output[:,4])
+        catch_bin_order = np.argsort(corr_output[:,5])
+        catch_mult_order = np.argsort(corr_output[:,6])
 
-        order_dict = {'r_corr_order':r_corr_order,'p_corr_order':p_corr_order,'val_corr_order':val_corr_order,'mtv_corr_order':mtv_corr_order,'res_corr_order':res_corr_order,'condensed':condensed}
+        order_dict = {'r_corr_order':r_corr_order,'p_corr_order':p_corr_order,'val_corr_order':val_corr_order,'mtv_corr_order':mtv_corr_order,'res_corr_order':res_corr_order,'condensed':condensed,'catch_bin_order':catch_bin_order,'catch_mult_order':catch_mult_order}
         sio.savemat('order_dict_%s' %(region_key),{'order_dict':order_dict},format='5')
 		
         #plot top 10%? for now 10
