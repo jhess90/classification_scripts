@@ -128,8 +128,8 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
         #plot top 10%? for now 10
         num_plot = 10
         
-        top_inds = np.zeros((num_plot,5))
-        btm_inds = np.zeros((num_plot,5))
+        top_inds = np.zeros((num_plot,7))
+        btm_inds = np.zeros((num_plot,7))
         total_ind = np.shape(r_corr_order)[0] - 1
 
         for i in range(num_plot):
@@ -138,12 +138,17 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
                 top_inds[i,2] = np.where(val_corr_order == i)[0][0].astype(int)
                 top_inds[i,3] = np.where(mtv_corr_order == i)[0][0].astype(int)
                 top_inds[i,4] = np.where(res_corr_order == i)[0][0].astype(int)
+                top_inds[i,5] = np.where(catch_bin_order == i)[0][0].astype(int)
+                top_inds[i,6] = np.where(catch_mult_order == i)[0][0].astype(int)
 
                 btm_inds[i,0] = np.where(r_corr_order == (total_ind - i))[0][0].astype(int)
                 btm_inds[i,1] = np.where(p_corr_order == (total_ind - i))[0][0].astype(int)
                 btm_inds[i,2] = np.where(val_corr_order == (total_ind - i))[0][0].astype(int)
                 btm_inds[i,3] = np.where(mtv_corr_order == (total_ind - i))[0][0].astype(int)
                 btm_inds[i,4] = np.where(res_corr_order == (total_ind - i))[0][0].astype(int)
+                btm_inds[i,5] = np.where(catch_bin_order == (total_ind - i))[0][0].astype(int)
+                btm_inds[i,6] = np.where(catch_mult_order == (total_ind - i))[0][0].astype(int)
+
         #plot r    
         r0 = np.where(condensed[:,3] == 0)[0].astype(int)
         r1 = np.where(condensed[:,3] == 1)[0].astype(int)
@@ -980,7 +985,6 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
         sio.savemat('m_avgs_%s' %(region_key),{'m_avgs':m_avgs},format='5')
 
         #plot res
-		#TODO make sure :,5
         res0 = np.where(condensed[:,5] == 0)[0].astype(int)
         res1 = np.where(condensed[:,5] == 1)[0].astype(int)
 
@@ -1067,6 +1071,297 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
         res_avgs = [top_res0_cue_avg,top_res0_res_avg,top_res1_cue_avg,top_res1_res_avg,btm_res0_cue_avg,btm_res0_res_avg,btm_res1_cue_avg,btm_res1_res_avg]
         
         sio.savemat('res_avgs_%s' %(region_key),{'res_avgs':res_avgs},format='5')
+
+        #########################
+
+        #plot catch mult
+        catch_x = np.where(condensed[:,6] <= -1)[0].astype(int)
+        catchx = np.where(condensed[:,6] >= 1)[0].astype(int)
+
+        #unit_num = 0
+        top_catch_x_cue = []
+        top_catch_x_res = []
+        top_catchx_cue = []
+        top_catchx_res = []
+
+        btm_catch_x_cue = []
+        btm_catch_x_res = []
+        btm_catchx_cue = []
+        btm_catchx_res = []
+
+        top_catch_x_cue_avg = []
+        top_catch_x_res_avg = []
+        top_catchx_cue_avg = []
+        top_catchx_res_avg = []
+
+        btm_catch_x_cue_avg = []
+        btm_catch_x_res_avg = []
+        btm_catchx_cue_avg = []
+        btm_catchx_res_avg = []
+
+        for j in range(num_plot):
+                top_unit_ind = top_inds[j,5].astype(int)
+                btm_unit_ind = btm_inds[j,5].astype(int)
+
+                for i in range(len(catch_x)):
+                        if catch_x[i] != np.shape(condensed)[0]-1:
+                                top_cue_temp = corr_input[condensed[catch_x[i],8].astype(int):condensed[catch_x[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
+                                top_res_temp = corr_input[condensed[catch_x[i],9].astype(int)-bfr_res_bins:condensed[catch_x[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
+                                
+                                top_catch_x_cue_avg = np.append(top_catch_x_cue_avg,np.mean(top_cue_temp))
+                                top_catch_x_res_avg = np.append(top_catch_x_res_avg,np.mean(top_res_temp))
+                                                        
+                                top_catch_x_cue = np.append(top_catch_x_cue,top_cue_temp)
+                                top_catch_x_res = np.append(top_catch_x_res,top_res_temp)
+
+                                btm_cue_temp = corr_input[condensed[catch_x[i],8].astype(int):condensed[catch_x[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
+                                btm_res_temp = corr_input[condensed[catch_x[i],9].astype(int)-bfr_res_bins:condensed[catch_x[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
+                                
+                                btm_catch_x_cue_avg = np.append(btm_catch_x_cue_avg,np.mean(btm_cue_temp))
+                                btm_catch_x_res_avg = np.append(btm_catch_x_res_avg,np.mean(btm_res_temp))
+                        
+                                btm_catch_x_cue = np.append(btm_catch_x_cue,btm_cue_temp)
+                                btm_catch_x_res = np.append(btm_catch_x_res,btm_res_temp)
+
+
+                for i in range(len(catchx)):
+                        if catchx[i] != np.shape(condensed)[0]-1:
+                                top_cue_temp = corr_input[condensed[catchx[i],8].astype(int):condensed[catchx[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
+                                top_res_temp = corr_input[condensed[catchx[i],9].astype(int)-bfr_res_bins:condensed[catchx[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
+                                
+                                top_catchx_cue_avg = np.append(top_catchx_cue_avg,np.mean(top_cue_temp))
+                                top_catchx_res_avg = np.append(top_catchx_res_avg,np.mean(top_res_temp))
+                                                        
+                                top_catchx_cue = np.append(top_catchx_cue,top_cue_temp)
+                                top_catchx_res = np.append(top_catchx_res,top_res_temp)
+
+                                btm_cue_temp = corr_input[condensed[catchx[i],8].astype(int):condensed[catchx[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
+                                btm_res_temp = corr_input[condensed[catchx[i],9].astype(int)-bfr_res_bins:condensed[catchx[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
+                                
+                                btm_catchx_cue_avg = np.append(btm_catchx_cue_avg,np.mean(btm_cue_temp))
+                                btm_catchx_res_avg = np.append(btm_catchx_res_avg,np.mean(btm_res_temp))
+                        
+                                btm_catchx_cue = np.append(btm_catchx_cue,btm_cue_temp)
+                                btm_catchx_res = np.append(btm_catchx_res,btm_res_temp)
+
+        top_catch_bin_cue_list = [top_catch_x_cue, top_catchx_cue]
+        top_catch_bin_res_list = [top_catch_x_res, top_catchx_res]
+        btm_catch_bin_cue_list = [btm_catch_x_cue, btm_catchx_cue]
+        btm_catch_bin_res_list = [btm_catch_x_res, btm_catchx_res]
+        
+        catch_bin_avgs = [top_catch_x_cue_avg,top_catch_x_res_avg,top_catchx_cue_avg,top_catchx_res_avg,btm_catch_x_cue_avg,btm_catch_x_res_avg,btm_catchx_cue_avg,btm_catchx_res_avg]
+
+        #pdb.set_trace()
+        sio.savemat('catch_bin_avgs_%s' %(region_key),{'catch_bin_avgs':catch_bin_avgs},format='5')
+
+
+        #plot catch mult
+        catch_3 = np.where(condensed[:,6] == -3)[0].astype(int)
+        catch_2 = np.where(condensed[:,6] == -2)[0].astype(int)
+        catch_1 = np.where(condensed[:,6] == -1)[0].astype(int)
+        catch1 = np.where(condensed[:,6] == 1)[0].astype(int)
+        catch2 = np.where(condensed[:,6] == 2)[0].astype(int)
+        catch3 = np.where(condensed[:,6] == 3)[0].astype(int)
+
+        #unit_num = 0
+        top_catch_3_cue = []
+        top_catch_3_res = []
+        top_catch_2_cue = []
+        top_catch_2_res = []
+        top_catch_1_cue = []
+        top_catch_1_res = []
+        top_catch1_cue = []
+        top_catch1_res = []
+        top_catch2_cue = []
+        top_catch2_res = []
+        top_catch3_cue = []
+        top_catch3_res = []
+
+        btm_catch_3_cue = []
+        btm_catch_3_res = []
+        btm_catch_2_cue = []
+        btm_catch_2_res = []
+        btm_catch_1_cue = []
+        btm_catch_1_res = []
+        btm_catch1_cue = []
+        btm_catch1_res = []
+        btm_catch2_cue = []
+        btm_catch2_res = []
+        btm_catch3_cue = []
+        btm_catch3_res = []
+
+        top_catch_3_cue_avg = []
+        top_catch_3_res_avg = []
+        top_catch_2_cue_avg = []
+        top_catch_2_res_avg = []
+        top_catch_1_cue_avg = []
+        top_catch_1_res_avg = []
+        top_catch1_cue_avg = []
+        top_catch1_res_avg = []
+        top_catch2_cue_avg = []
+        top_catch2_res_avg = []
+        top_catch3_cue_avg = []
+        top_catch3_res_avg = []
+
+        btm_catch_3_cue_avg = []
+        btm_catch_3_res_avg = []
+        btm_catch_2_cue_avg = []
+        btm_catch_2_res_avg = []
+        btm_catch_1_cue_avg = []
+        btm_catch_1_res_avg = []
+        btm_catch1_cue_avg = []
+        btm_catch1_res_avg = []
+        btm_catch2_cue_avg = []
+        btm_catch2_res_avg = []
+        btm_catch3_cue_avg = []
+        btm_catch3_res_avg = []
+
+        for j in range(num_plot):
+                top_unit_ind = top_inds[j,6].astype(int)
+                btm_unit_ind = btm_inds[j,6].astype(int)
+
+                for i in range(len(catch_3)):
+                        if catch_3[i] != np.shape(condensed)[0]-1:
+                                top_cue_temp = corr_input[condensed[catch_3[i],8].astype(int):condensed[catch_3[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
+                                top_res_temp = corr_input[condensed[catch_3[i],9].astype(int)-bfr_res_bins:condensed[catch_3[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
+                                
+                                top_catch_3_cue_avg = np.append(top_catch_3_cue_avg,np.mean(top_cue_temp))
+                                top_catch_3_res_avg = np.append(top_catch_3_res_avg,np.mean(top_res_temp))
+                                                        
+                                top_catch_3_cue = np.append(top_catch_3_cue,top_cue_temp)
+                                top_catch_3_res = np.append(top_catch_3_res,top_res_temp)
+
+                                btm_cue_temp = corr_input[condensed[catch_3[i],8].astype(int):condensed[catch_3[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
+                                btm_res_temp = corr_input[condensed[catch_3[i],9].astype(int)-bfr_res_bins:condensed[catch_3[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
+                                
+                                btm_catch_3_cue_avg = np.append(btm_catch_3_cue_avg,np.mean(btm_cue_temp))
+                                btm_catch_3_res_avg = np.append(btm_catch_3_res_avg,np.mean(btm_res_temp))
+                        
+                                btm_catch_3_cue = np.append(btm_catch_3_cue,btm_cue_temp)
+                                btm_catch_3_res = np.append(btm_catch_3_res,btm_res_temp)
+
+                for i in range(len(catch_2)):
+                        if catch_2[i] != np.shape(condensed)[0]-1:
+                                top_cue_temp = corr_input[condensed[catch_2[i],8].astype(int):condensed[catch_2[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
+                                top_res_temp = corr_input[condensed[catch_2[i],9].astype(int)-bfr_res_bins:condensed[catch_2[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
+                                
+                                top_catch_2_cue_avg = np.append(top_catch_2_cue_avg,np.mean(top_cue_temp))
+                                top_catch_2_res_avg = np.append(top_catch_2_res_avg,np.mean(top_res_temp))
+                                                        
+                                top_catch_2_cue = np.append(top_catch_2_cue,top_cue_temp)
+                                top_catch_2_res = np.append(top_catch_2_res,top_res_temp)
+
+                                btm_cue_temp = corr_input[condensed[catch_2[i],8].astype(int):condensed[catch_2[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
+                                btm_res_temp = corr_input[condensed[catch_2[i],9].astype(int)-bfr_res_bins:condensed[catch_2[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
+                                
+                                btm_catch_2_cue_avg = np.append(btm_catch_2_cue_avg,np.mean(btm_cue_temp))
+                                btm_catch_2_res_avg = np.append(btm_catch_2_res_avg,np.mean(btm_res_temp))
+                        
+                                btm_catch_2_cue = np.append(btm_catch_2_cue,btm_cue_temp)
+                                btm_catch_2_res = np.append(btm_catch_2_res,btm_res_temp)
+
+                for i in range(len(catch_1)):
+                        if catch_1[i] != np.shape(condensed)[0]-1:
+                                top_cue_temp = corr_input[condensed[catch_1[i],8].astype(int):condensed[catch_1[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
+                                top_res_temp = corr_input[condensed[catch_1[i],9].astype(int)-bfr_res_bins:condensed[catch_1[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
+                                
+                                top_catch_1_cue_avg = np.append(top_catch_1_cue_avg,np.mean(top_cue_temp))
+                                top_catch_1_res_avg = np.append(top_catch_1_res_avg,np.mean(top_res_temp))
+                                                        
+                                top_catch_1_cue = np.append(top_catch_1_cue,top_cue_temp)
+                                top_catch_1_res = np.append(top_catch_1_res,top_res_temp)
+
+                                btm_cue_temp = corr_input[condensed[catch_1[i],8].astype(int):condensed[catch_1[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
+                                btm_res_temp = corr_input[condensed[catch_1[i],9].astype(int)-bfr_res_bins:condensed[catch_1[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
+                                
+                                btm_catch_1_cue_avg = np.append(btm_catch_1_cue_avg,np.mean(btm_cue_temp))
+                                btm_catch_1_res_avg = np.append(btm_catch_1_res_avg,np.mean(btm_res_temp))
+                        
+                                btm_catch_1_cue = np.append(btm_catch_1_cue,btm_cue_temp)
+                                btm_catch_1_res = np.append(btm_catch_1_res,btm_res_temp)
+
+
+                for i in range(len(catch1)):
+                        if catch1[i] != np.shape(condensed)[0]-1:
+                                top_cue_temp = corr_input[condensed[catch1[i],8].astype(int):condensed[catch1[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
+                                top_res_temp = corr_input[condensed[catch1[i],9].astype(int)-bfr_res_bins:condensed[catch1[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
+                                
+                                top_catch1_cue_avg = np.append(top_catch1_cue_avg,np.mean(top_cue_temp))
+                                top_catch1_res_avg = np.append(top_catch1_res_avg,np.mean(top_res_temp))
+                                                        
+                                top_catch1_cue = np.append(top_catch1_cue,top_cue_temp)
+                                top_catch1_res = np.append(top_catch1_res,top_res_temp)
+
+                                btm_cue_temp = corr_input[condensed[catch1[i],8].astype(int):condensed[catch1[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
+                                btm_res_temp = corr_input[condensed[catch1[i],9].astype(int)-bfr_res_bins:condensed[catch1[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
+                                
+                                btm_catch1_cue_avg = np.append(btm_catch1_cue_avg,np.mean(btm_cue_temp))
+                                btm_catch1_res_avg = np.append(btm_catch1_res_avg,np.mean(btm_res_temp))
+                        
+                                btm_catch1_cue = np.append(btm_catch1_cue,btm_cue_temp)
+                                btm_catch1_res = np.append(btm_catch1_res,btm_res_temp)
+
+                for i in range(len(catch2)):
+                        if catch2[i] != np.shape(condensed)[0]-1:
+                                top_cue_temp = corr_input[condensed[catch2[i],8].astype(int):condensed[catch2[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
+                                top_res_temp = corr_input[condensed[catch2[i],9].astype(int)-bfr_res_bins:condensed[catch2[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
+                                
+                                top_catch2_cue_avg = np.append(top_catch2_cue_avg,np.mean(top_cue_temp))
+                                top_catch2_res_avg = np.append(top_catch2_res_avg,np.mean(top_res_temp))
+                                                        
+                                top_catch2_cue = np.append(top_catch2_cue,top_cue_temp)
+                                top_catch2_res = np.append(top_catch2_res,top_res_temp)
+
+                                btm_cue_temp = corr_input[condensed[catch2[i],8].astype(int):condensed[catch2[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
+                                btm_res_temp = corr_input[condensed[catch2[i],9].astype(int)-bfr_res_bins:condensed[catch2[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
+                                
+                                btm_catch2_cue_avg = np.append(btm_catch2_cue_avg,np.mean(btm_cue_temp))
+                                btm_catch2_res_avg = np.append(btm_catch2_res_avg,np.mean(btm_res_temp))
+                        
+                                btm_catch2_cue = np.append(btm_catch2_cue,btm_cue_temp)
+                                btm_catch2_res = np.append(btm_catch2_res,btm_res_temp)
+
+                for i in range(len(catch3)):
+                        if catch3[i] != np.shape(condensed)[0]-1:
+                                top_cue_temp = corr_input[condensed[catch3[i],8].astype(int):condensed[catch3[i],8].astype(int) + aft_cue_bins,0,top_unit_ind]
+                                top_res_temp = corr_input[condensed[catch3[i],9].astype(int)-bfr_res_bins:condensed[catch3[i],9].astype(int)+aft_res_bins,0,top_unit_ind]
+                                
+                                top_catch3_cue_avg = np.append(top_catch3_cue_avg,np.mean(top_cue_temp))
+                                top_catch3_res_avg = np.append(top_catch3_res_avg,np.mean(top_res_temp))
+                                                        
+                                top_catch3_cue = np.append(top_catch3_cue,top_cue_temp)
+                                top_catch3_res = np.append(top_catch3_res,top_res_temp)
+
+                                btm_cue_temp = corr_input[condensed[catch3[i],8].astype(int):condensed[catch3[i],8].astype(int) + aft_cue_bins,0,btm_unit_ind]
+                                btm_res_temp = corr_input[condensed[catch3[i],9].astype(int)-bfr_res_bins:condensed[catch3[i],9].astype(int)+aft_res_bins,0,btm_unit_ind]
+                                
+                                btm_catch3_cue_avg = np.append(btm_catch3_cue_avg,np.mean(btm_cue_temp))
+                                btm_catch3_res_avg = np.append(btm_catch3_res_avg,np.mean(btm_res_temp))
+                        
+                                btm_catch3_cue = np.append(btm_catch3_cue,btm_cue_temp)
+                                btm_catch3_res = np.append(btm_catch3_res,btm_res_temp)
+
+        top_catch_mult_cue_list = [top_catch_3_cue, top_catch_2_cue, top_catch_1_cue, top_catch1_cue, top_catch2_cue, top_catch3_cue]
+        top_catch_mult_res_list = [top_catch_3_res, top_catch_2_res, top_catch_1_res, top_catch1_res, top_catch2_res, top_catch3_res]
+        btm_catch_mult_cue_list = [btm_catch_3_cue, btm_catch_2_cue, btm_catch_1_cue, btm_catch1_cue, btm_catch2_cue, btm_catch3_cue]
+        btm_catch_mult_res_list = [btm_catch_3_res, btm_catch_2_res, btm_catch_1_res, btm_catch1_res, btm_catch2_res, btm_catch3_res]
+        
+        catch_mult_avgs = [top_catch_3_cue_avg,top_catch_3_res_avg,top_catch_2_cue_avg,top_catch_2_res_avg,top_catch_1_cue_avg,top_catch_1_res_avg,top_catch1_cue_avg,top_catch1_res_avg,top_catch2_cue_avg,top_catch2_res_avg,top_catch3_cue_avg,top_catch3_res_avg,btm_catch_3_cue_avg,btm_catch_3_res_avg,btm_catch_2_cue_avg,btm_catch_2_res_avg,btm_catch_1_cue_avg,btm_catch_1_res_avg,btm_catch1_cue_avg,btm_catch1_res_avg,btm_catch2_cue_avg,btm_catch2_res_avg,btm_catch3_cue_avg,btm_catch3_res_avg]
+
+        #pdb.set_trace()
+        sio.savemat('catch_mult_avgs_%s' %(region_key),{'catch_mult_avgs':catch_mult_avgs},format='5')
+
+
+
+
+
+
+
+
+
+
+
+
 
         #all
         cue_avg = []
