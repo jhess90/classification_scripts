@@ -31,6 +31,26 @@ formula <- y ~ x
 for (region_index in 1:length(region_list)){
   cat('plotting ',region_list[region_index],'\n')
   
+  #corr hists
+  readin <- readMat(paste('corr_output_',region_list[region_index],'.mat',sep=""))
+  corr_output <- readin$corr.output
+  corr_output_df <- data.frame(catch_bin_corr=corr_output[,6],catch_mult_corr=corr_output[,7])
+  
+  catch_bin_corr <- ggplot(corr_output_df,aes(x=corr_output_df$catch_bin_corr))+geom_histogram(position='identity',binwidth=0.05)
+  catch_bin_corr <- catch_bin_corr + labs(title="Catch Binary Correlation",y="Number of Units",x="Correlation Coefficient")
+  
+  catch_mult_corr <- ggplot(corr_output_df,aes(x=corr_output_df$catch_mult_corr))+geom_histogram(position='identity',binwidth=0.05)
+  catch_mult_corr <- catch_mult_corr + labs(title="Catch Multiple Correlation",y="Number of Units",x="Correlation Coefficient")
+  
+
+  png(paste('corr_hist_catch_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  multiplot(catch_bin_corr,catch_mult_corr,cols=1)
+  graphics.off()
+  
+  
+  
+  
+  
   ##################
   
   #
