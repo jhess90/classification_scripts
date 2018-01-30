@@ -54,15 +54,15 @@ res0 = len(np.where(condensed[:,5] == 0)[0].astype(int))
 res1 = len(np.where(condensed[:,5] == 1)[0].astype(int))
 
 try:
-    catch_x = len(np.where(condensed[:,6] <= -1)[0].astype(int))
-    catchx = len(np.where(condensed[:,6] >= 1)[0].astype(int))
+    catch_x = len(np.where(condensed[:,11] <= -1)[0].astype(int))
+    catchx = len(np.where(condensed[:,11] >= 1)[0].astype(int))
 
-    catch_3 = len(np.where(condensed[:,6] == -3)[0].astype(int))
-    catch_2 = len(np.where(condensed[:,6] == -2)[0].astype(int))
-    catch_1 = len(np.where(condensed[:,6] == -1)[0].astype(int))
-    catch1 = len(np.where(condensed[:,6] == 1)[0].astype(int))
-    catch2 = len(np.where(condensed[:,6] == 2)[0].astype(int))
-    catch3 = len(np.where(condensed[:,6] == 3)[0].astype(int))
+    catch_3 = len(np.where(condensed[:,11] == -3)[0].astype(int))
+    catch_2 = len(np.where(condensed[:,11] == -2)[0].astype(int))
+    catch_1 = len(np.where(condensed[:,11] == -1)[0].astype(int))
+    catch1 = len(np.where(condensed[:,11] == 1)[0].astype(int))
+    catch2 = len(np.where(condensed[:,11] == 2)[0].astype(int))
+    catch3 = len(np.where(condensed[:,11] == 3)[0].astype(int))
 except:
     pass
 
@@ -75,14 +75,16 @@ r0_p0_f = sum(np.logical_and(np.logical_and(condensed[:,3] == 0, condensed[:,4] 
 rx_p0_f = sum(np.logical_and(np.logical_and(condensed[:,3] >= 1, condensed[:,4] == 0),condensed[:,5]==0))
 r0_px_f = sum(np.logical_and(np.logical_and(condensed[:,3] == 0, condensed[:,4] >= 1),condensed[:,5]==0))
 rx_px_f = sum(np.logical_and(np.logical_and(condensed[:,3] >= 1, condensed[:,4] >= 1),condensed[:,5]==0))
-r0_p0_s = sum(np.logical_and(np.logical_and(condensed[:,3] == 0, condensed[:,4] == 0),condensed[:,5]==0))
-rx_p0_s = sum(np.logical_and(np.logical_and(condensed[:,3] >= 1, condensed[:,4] == 0),condensed[:,5]==0))
-r0_px_s = sum(np.logical_and(np.logical_and(condensed[:,3] == 0, condensed[:,4] >= 1),condensed[:,5]==0))
-rx_px_s = sum(np.logical_and(np.logical_and(condensed[:,3] >= 1, condensed[:,4] >= 1),condensed[:,5]==0))
+r0_p0_s = sum(np.logical_and(np.logical_and(condensed[:,3] == 0, condensed[:,4] == 0),condensed[:,5]==1))
+rx_p0_s = sum(np.logical_and(np.logical_and(condensed[:,3] >= 1, condensed[:,4] == 0),condensed[:,5]==1))
+r0_px_s = sum(np.logical_and(np.logical_and(condensed[:,3] == 0, condensed[:,4] >= 1),condensed[:,5]==1))
+rx_px_s = sum(np.logical_and(np.logical_and(condensed[:,3] >= 1, condensed[:,4] >= 1),condensed[:,5]==1))
 
 M1_unit_num = np.shape(M1_import['corr_output'])[0]
 S1_unit_num = np.shape(S1_import['corr_output'])[0]
 PmD_unit_num = np.shape(PmD_import['corr_output'])[0]
+
+print('Number of trials: %s\n' %(num_trials))
 
 print ('r0: %s' %(r0))
 print ('r1: %s' %(r1))
@@ -149,6 +151,7 @@ print('PmD units: %s' %(PmD_unit_num))
 
 
 output = open("block_summary.txt","w")
+output.write('Number of trials: %s\n\n' %(num_trials))
 output.write ('r0: %s\n' %(r0))
 output.write ('r1: %s\n' %(r1))
 output.write ('r2: %s\n' %(r2))
