@@ -1151,7 +1151,6 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
         
         catch_bin_avgs = [top_catch_x_cue_avg,top_catch_x_res_avg,top_catchx_cue_avg,top_catchx_res_avg,btm_catch_x_cue_avg,btm_catch_x_res_avg,btm_catchx_cue_avg,btm_catchx_res_avg]
 
-        pdb.set_trace()
         sio.savemat('catch_bin_avgs_%s' %(region_key),{'catch_bin_avgs':catch_bin_avgs},format='5')
 
 
