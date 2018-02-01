@@ -27,13 +27,13 @@ from scipy import ndimage
 bin_size = 10 #in ms
 
 zscore_bool = True
-gaussian_bool = True
+gaussian_bool = False
 gauss_sigma = 30 #in ms
 
 plot_bool = True
 
 aft_cue_time = 1.0
-bfr_result_time = 0.5
+bfr_result_time = -0.5
 aft_result_time = 1.0
 
 
@@ -1151,7 +1151,7 @@ def plot_corr(corr_input,corr_output,condensed,region_key):
         
         catch_bin_avgs = [top_catch_x_cue_avg,top_catch_x_res_avg,top_catchx_cue_avg,top_catchx_res_avg,btm_catch_x_cue_avg,btm_catch_x_res_avg,btm_catchx_cue_avg,btm_catchx_res_avg]
 
-        #pdb.set_trace()
+        pdb.set_trace()
         sio.savemat('catch_bin_avgs_%s' %(region_key),{'catch_bin_avgs':catch_bin_avgs},format='5')
 
 
