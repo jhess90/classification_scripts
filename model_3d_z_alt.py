@@ -27,6 +27,7 @@ from scipy import ndimage
 bin_size = 10 #in ms
 time_before = -0.5 #negative value
 time_after = 1.0
+baseline_time = -1.0 #negative value
 normalize_bool = False
 sqrt_bool = False
 plot_3d_bool = False
@@ -79,8 +80,6 @@ def calc_firing_rates(hists,data_key,condensed):
         elif gaussian_bool:
             hists = ndimage.filters.gaussian_filter1d(hists,gauss_sigma,axis=1)
 
-        #pdb.set_trace()
-            
         baseline_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*baseline_bins))
         bfr_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
         aft_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
@@ -91,8 +90,6 @@ def calc_firing_rates(hists,data_key,condensed):
         aft_cue_hist_all = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
         bfr_result_hist_all = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
         aft_result_hist_all = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
-        
-        
 
         #col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum, 5 = succ/fail
         for i in range(np.shape(condensed)[0]):
@@ -635,7 +632,6 @@ for region_key,region_value in data_dict_all.iteritems():
         data_dict_all[region_key]['model_return'] = model_return
 
 
-
 for region_key,region_value in data_dict_all.iteritems():
         data_dict_all[region_key]['slopes'] = {}
         data_dict_all[region_key]['sig_all_slopes'] = {}
@@ -644,6 +640,10 @@ for region_key,region_value in data_dict_all.iteritems():
         data_dict_all[region_key]['all_sig_all_slopes'] = {}
         data_dict_all[region_key]['all_alpha_beta_only_sig'] = {}
         for type_key,type_value in data_dict_all[region_key]['model_return'].iteritems():
+                #print type_key
+                #if type_key == 'aft_result_model' and region_key == 'M1_dicts':
+                #        pdb.set_trace()
+                
                 sig_rsquared = data_dict_all[region_key]['model_return'][type_key]['conc']['sig_rsquared']
                 sig_fpvalue =  data_dict_all[region_key]['model_return'][type_key]['conc']['sig_fpvalue']
                 sig_pvals =  data_dict_all[region_key]['model_return'][type_key]['conc']['sig_pvals']
@@ -662,50 +662,62 @@ for region_key,region_value in data_dict_all.iteritems():
                         print 'Sig fpvalue- %s %s: %s' %(region_key,type_key,sig_fpvalue)
                 if np.shape(sig_pvals)[0] > 0:
                         print 'Sig pvals- %s %s: %s' %(region_key,type_key,sig_pvals)
+                else:
+                        print 'no sig p val, %s %s' %(region_key,type_key)
 
-                        slopes = np.zeros((np.shape(sig_pvals)[0],7))
-                        sig_all_slopes = np.zeros((np.shape(sig_pvals)[0],7))
-                        sig_all_index = 0
+                ########
+                slopes = np.zeros((np.shape(sig_pvals)[0],7))
+                sig_all_slopes = np.zeros((np.shape(sig_pvals)[0],7))
+                sig_all_index = 0
                         
-                        for i in range(np.shape(sig_pvals)[0]):
-                                unit_num = sig_pvals[i]
-                                slopes[i,0] = unit_num
-                                #alpha
-                                slopes[i,1] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][1]
-                                #beta
-                                slopes[i,2] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][2]
-                                #const
-                                slopes[i,3] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][0]
+                for i in range(np.shape(sig_pvals)[0]):
+                        unit_num = sig_pvals[i]
+                        slopes[i,0] = unit_num
+                        #alpha
+                        slopes[i,1] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][1]
+                        #beta
+                        slopes[i,2] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][2]
+                        #const
+                        slopes[i,3] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][0]
 
-                                #alpha p val
-                                slopes[i,4] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][1]
-                                #alpha p val
-                                slopes[i,5] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][2]
-                                #alpha p val
-                                slopes[i,6] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][0]
+                        #alpha p val
+                        slopes[i,4] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][1]
+                        #alpha p val
+                        slopes[i,5] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][2]
+                        #alpha p val
+                        slopes[i,6] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][0]
                                 
-                                if slopes[i,4] <= 0.05 and slopes[i,5] <= 0.05:
-                                        sig_all_slopes[sig_all_index,:] = slopes[i,:]
-                                        sig_all_index = sig_all_index + 1
-                                elif slopes[i,4] <= 0.05:
-                                        alpha_only_sig +=1
-                                elif slopes[i,5] <= 0.05:
-                                        beta_only_sig <= 0.05
+                        if slopes[i,4] <= 0.05 and slopes[i,5] <= 0.05:
+                                sig_all_slopes[sig_all_index,:] = slopes[i,:]
+                                sig_all_index = sig_all_index + 1
+                        elif slopes[i,4] <= 0.05:
+                                alpha_only_sig +=1
+                        elif slopes[i,5] <= 0.05:
+                                beta_only_sig <= 0.05
+                                
+                        if slopes[i,1] > 0 and slopes[i,2] > 0:
+                                both_pos += 1
+                        elif slopes[i,1] < 0 and slopes[i,2] < 0:
+                                both_neg += 1
+                        elif slopes[i,1] > 0 and slopes[i,2] < 0:
+                                alpha_pos += 1
+                        elif slopes[i,1] < 0 and slopes[i,2] > 0:
+                                beta_pos += 1
 
-                                if slopes[i,1] > 0 and slopes[i,2] > 0:
-                                        both_pos += 1
-                                elif slopes[i,1] < 0 and slopes[i,2] < 0:
-                                        both_neg += 1
-                                elif slopes[i,1] > 0 and slopes[i,2] < 0:
-                                        alpha_pos += 1
-                                elif slopes[i,1] < 0 and slopes[i,2] > 0:
-                                        beta_pos += 1
+                #if type_key == 'aft_result_model' and region_key == 'M1_dicts':
+                #        pdb.set_trace()
+                
 
-                        sig_all_slopes = sig_all_slopes[sig_all_slopes[:,1] != 0]
-                        data_dict_all[region_key]['slopes'][type_key] = slopes
-                        data_dict_all[region_key]['sig_all_slopes'][type_key] = sig_all_slopes
-                        data_dict_all[region_key]['alpha_beta_only_sig'][type_key] = [alpha_only_sig,beta_only_sig,both_pos,both_neg,alpha_pos,beta_pos]
+                sig_all_slopes = sig_all_slopes[sig_all_slopes[:,1] != 0]
+                data_dict_all[region_key]['slopes'][type_key] = slopes
+                #GONE BY HERE M1 aft result
+                #print region_key
+                #print type_key
+                data_dict_all[region_key]['sig_all_slopes'][type_key] = sig_all_slopes
+                data_dict_all[region_key]['alpha_beta_only_sig'][type_key] = [alpha_only_sig,beta_only_sig,both_pos,both_neg,alpha_pos,beta_pos]
 
+                ####################
+                
                 #########
 
                 all_alpha_only_sig = 0
@@ -760,7 +772,6 @@ for region_key,region_value in data_dict_all.iteritems():
 
                         
                 #do same for units where alpha and beta both sig
-
 #######
 for region_key,region_val in data_dict_all.iteritems():
         
@@ -818,8 +829,7 @@ for region_key,region_val in data_dict_all.iteritems():
 
 
 
-
-###### all ##########
+        ###### all ##########
         data_dict_all[region_key]['mv']['all'] = {}
         for type_key,type_val in data_dict_all[region_key]['all_slopes'].iteritems():
                 slopes = data_dict_all[region_key]['all_slopes'][type_key]
@@ -865,17 +875,17 @@ for region_key,region_val in data_dict_all.iteritems():
 ###########
 
 
-
-
 #slopes_workbook = xlsxwriter.Workbook('sig_slopes.xlsx',options={'nan_inf_to_errors':True})
 for region_key,region_val in data_dict_all.iteritems():
+        #slopes_workbook = xlsxwriter.Workbook('sig_slopes_%s_%s.xlsx' %(short_filename,region_key),options={'nan_inf_to_errors':True})
+        #print region_key
         slopes_workbook = xlsxwriter.Workbook('sig_slopes_%s.xlsx' %(region_key),options={'nan_inf_to_errors':True})
         total_unit_num = np.shape(data_dict_all[region_key]['fr_dict']['baseline_fr'])[1]
         names = ['unit_num','alpha','beta','const','alpha_p','beta_p','const_p']
 
         percs = {}
         for type_key,type_val in data_dict_all[region_key]['slopes'].iteritems():
-                
+                #print type_key
                 slopes = np.asarray(data_dict_all[region_key]['slopes'][type_key])
                 sig_slopes = np.asarray(data_dict_all[region_key]['sig_all_slopes'][type_key])
                 sig_alpha = slopes[slopes[:,4] <= 0.05]
@@ -890,15 +900,23 @@ for region_key,region_val in data_dict_all.iteritems():
                 num_sig_alpha_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][0]
                 perc_sig_beta_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][1] / float(total_unit_num)
                 num_sig_beta_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][0]
-                perc_both_pos = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][2] / float(np.shape(slopes)[0]) #of at least one sig
-                perc_both_neg = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][3] / float(np.shape(slopes)[0])
-                perc_alpha_pos = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][4] / float(np.shape(slopes)[0])
-                perc_beta_pos = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][5] / float(np.shape(slopes)[0])
+                try:
+                        perc_both_pos = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][2] / float(np.shape(slopes)[0]) #of at least one sig
+                        perc_both_neg = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][3] / float(np.shape(slopes)[0])
+                        perc_alpha_pos = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][4] / float(np.shape(slopes)[0])
+                        perc_beta_pos = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][5] / float(np.shape(slopes)[0])
+                except:
+                        if np.shape(slopes)[0] ==0:
+                                perc_both_pos = 0
+                                perc_both_neg = 0
+                                perc_alpha_pos = 0
+                                perc_beta_pos = 0
 
-                #pdb.set_trace()
+                                #pdb.set_trace()
+                #print 'xlsx region: %s type %s' %(region_key,type_key)
                 worksheet = slopes_workbook.add_worksheet('slopes_%s' %(type_key))
                 worksheet.write_row(0,0,names)
-                if slopes.ndim == 2:
+                if slopes.ndim == 2 and np.shape(slopes)[0] != 0:
                         len_slopes = np.shape(slopes)[0]
                 elif np.shape(slopes)[0] == 0:
                         len_slopes = -1
@@ -908,7 +926,9 @@ for region_key,region_val in data_dict_all.iteritems():
                 if not len_slopes == -1:
                         for i in range(len_slopes):
                                 worksheet.write_row(i+1,0,slopes[i,:])
-                
+                else:
+                        worksheet.write(0,0,0)
+                                
                 worksheet = slopes_workbook.add_worksheet('sig_all_%s' %(type_key))
                 worksheet.write_row(0,0,names)
                 if sig_slopes.ndim == 2:
@@ -921,11 +941,18 @@ for region_key,region_val in data_dict_all.iteritems():
                 if not len_sig_slopes == -1:
                         for i in range(len_sig_slopes):
                                 worksheet.write_row(i+1,0,sig_slopes[i,:])
+                else:
+                        worksheet.write(0,0,0)
+
                 
                 type_dict = {'perc_slopes':perc_slopes,'perc_sig_slopes':perc_sig_slopes,'num_slopes':np.shape(slopes)[0],'num_sig_slopes':np.shape(sig_slopes)[0],'total_unit_num':total_unit_num,'perc_sig_alpha':perc_sig_alpha,'perc_sig_beta':perc_sig_beta,'num_sig_alpha':num_sig_alpha,'num_sig_beta':num_sig_beta,'perc_sig_alpha_only':perc_sig_alpha_only,'num_sig_alpha_only':num_sig_alpha_only,'perc_sig_beta_only':perc_sig_beta_only,'num_sig_beta_only':num_sig_beta_only,'perc_both_pos':perc_both_pos,'perc_both_neg':perc_both_neg,'perc_alpha_pos':perc_alpha_pos,'perc_beta_pos':perc_beta_pos}
                 percs[type_key] = type_dict
+                #sio.savemat('model_summary_%s_%s_%s.mat' %(short_filename,region_key,type_key),{'perc_summary':percs},format='5')
+                
+        #slopes_workbook.close()
+
         data_dict_all[region_key]['percs'] = percs
-		sio.savemat('model_summary_%s_%s.mat' %(short_filename,region_key),{'perc_summary':percs},format='5'}
+        sio.savemat('model_summary_%s_%s.mat' %(short_filename,region_key),{'perc_summary':percs},format='5')
 
         
 percs_workbook = xlsxwriter.Workbook('percs_workbook.xlsx',options={'nan_inf_to_errors':True})
@@ -964,7 +991,9 @@ if mv_bool:
         for region_key,region_val in data_dict_all.iteritems():
                 #for now individ. should avg across windows? And if so does that affect any other of the analysis?
                 #data_dict_all[region_key]['mv'] = {}
+                #print region_key
                 for type_key,type_val in data_dict_all[region_key]['slopes'].iteritems():
+                        #print type_key
                         slopes = data_dict_all[region_key]['slopes'][type_key]
                         sig_units = slopes[:,0]
 
