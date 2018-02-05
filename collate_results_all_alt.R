@@ -1,8 +1,8 @@
 library(openxlsx)
 library(ggplot2)
 library(reshape2)
-#source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
-source("~/workspace/classification_scripts/multiplot.R")
+source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
+#source("~/workspace/classification_scripts/multiplot.R")
 library(zoo)
 library(gplots)
 library(RColorBrewer)
@@ -16,841 +16,7 @@ library(plyr)
 library(reshape)
 
 
-nhp_id <- '504'
-
-
-
-
-##################
-#### 0059 ########
-##################
-if (nhp_id == '0059'){
-  load('~/Dropbox/model_alt/0_3_13_1/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- bfr_cue_nums
-  S1_aft_cue_nums_sum <- aft_cue_nums
-  S1_bfr_result_nums_sum <- bfr_result_nums
-  S1_aft_result_nums_sum <- aft_result_nums
-  S1_bfr_cue_all_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/S1_bfr_cue_all_slopes_all.rds')
-  S1_aft_cue_all_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/S1_aft_cue_all_slopes_all.rds')
-  S1_bfr_result_all_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/S1_bfr_result_all_slopes_all.rds')
-  S1_aft_result_all_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/S1_aft_result_all_slopes_all.rds')
-  S1_bfr_cue_sig_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/S1_bfr_cue_sig_slopes_all.rds')
-  S1_aft_cue_sig_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/S1_aft_cue_sig_slopes_all.rds')
-  S1_bfr_result_sig_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/S1_bfr_result_sig_slopes_all.rds')
-  S1_aft_result_sig_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/S1_aft_result_sig_slopes_all.rds')
-  
-  load('~/Dropbox/model_alt/0_3_13_1/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- bfr_cue_nums
-  M1_aft_cue_nums_sum <- aft_cue_nums
-  M1_bfr_result_nums_sum <- bfr_result_nums
-  M1_aft_result_nums_sum <- aft_result_nums
-  M1_bfr_cue_all_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/M1_bfr_cue_all_slopes_all.rds')
-  M1_aft_cue_all_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/M1_aft_cue_all_slopes_all.rds')
-  M1_bfr_result_all_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/M1_bfr_result_all_slopes_all.rds')
-  M1_aft_result_all_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/M1_aft_result_all_slopes_all.rds')
-  M1_bfr_cue_sig_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/M1_bfr_cue_sig_slopes_all.rds')
-  M1_aft_cue_sig_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/M1_aft_cue_sig_slopes_all.rds')
-  M1_bfr_result_sig_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/M1_bfr_result_sig_slopes_all.rds')
-  M1_aft_result_sig_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/M1_aft_result_sig_slopes_all.rds')
-  
-  load('~/Dropbox/model_alt/0_3_13_1/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- bfr_cue_nums
-  PmD_aft_cue_nums_sum <- aft_cue_nums
-  PmD_bfr_result_nums_sum <- bfr_result_nums
-  PmD_aft_result_nums_sum <- aft_result_nums
-  PmD_bfr_cue_all_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/PmD_bfr_cue_all_slopes_all.rds')
-  PmD_aft_cue_all_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/PmD_aft_cue_all_slopes_all.rds')
-  PmD_bfr_result_all_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/PmD_bfr_result_all_slopes_all.rds')
-  PmD_aft_result_all_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/PmD_aft_result_all_slopes_all.rds')
-  PmD_bfr_cue_sig_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/PmD_bfr_cue_sig_slopes_all.rds')
-  PmD_aft_cue_sig_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/PmD_aft_cue_sig_slopes_all.rds')
-  PmD_bfr_result_sig_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/PmD_bfr_result_sig_slopes_all.rds')
-  PmD_aft_result_sig_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/PmD_aft_result_sig_slopes_all.rds')
-  
-  #
-  load('~/Dropbox/model_alt/0_3_13_2/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_13_2/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_13_2/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/PmD_aft_result_sig_slopes_all.rds'))
-  
-  #
-  load('~/Dropbox/model_alt/0_3_13_3/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_13_3/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_13_3/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/PmD_aft_result_sig_slopes_all.rds'))
-  
-  #
-  load('~/Dropbox/model_alt/0_3_14_1/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_14_1/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_14_1/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/PmD_aft_result_sig_slopes_all.rds'))
-  
-  #
-  load('~/Dropbox/model_alt/0_3_14_2/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_14_2/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_14_2/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/PmD_aft_result_sig_slopes_all.rds'))
-  
-  #
-  load('~/Dropbox/model_alt/0_3_14_3/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_14_3/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_14_3/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/PmD_aft_result_sig_slopes_all.rds'))
-  
-  #
-  load('~/Dropbox/model_alt/0_3_27_1/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_27_1/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_27_1/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/PmD_aft_result_sig_slopes_all.rds'))
-  
-  #
-  load('~/Dropbox/model_alt/0_3_27_2/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_27_2/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_27_2/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/PmD_aft_result_sig_slopes_all.rds'))
-  
-  #
-  load('~/Dropbox/model_alt/0_3_28_1/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_28_1/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_28_1/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/PmD_aft_result_sig_slopes_all.rds'))
-  
-  #
-  load('~/Dropbox/model_alt/0_3_28_2/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_28_2/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_28_2/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/PmD_aft_result_sig_slopes_all.rds'))
-  
-  #
-  load('~/Dropbox/model_alt/0_3_28_3/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_28_3/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/0_3_28_3/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/PmD_aft_result_sig_slopes_all.rds'))
-
-}else if (nhp_id == '504'){
-    
-  ##################
-  #### 504 #########
-  ##################
-  
-  
-  load('~/Dropbox/model_alt/5_3_13_1/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- bfr_cue_nums
-  S1_aft_cue_nums_sum <- aft_cue_nums
-  S1_bfr_result_nums_sum <- bfr_result_nums
-  S1_aft_result_nums_sum <- aft_result_nums
-  S1_bfr_cue_all_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/S1_bfr_cue_all_slopes_all.rds')
-  S1_aft_cue_all_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/S1_aft_cue_all_slopes_all.rds')
-  S1_bfr_result_all_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/S1_bfr_result_all_slopes_all.rds')
-  S1_aft_result_all_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/S1_aft_result_all_slopes_all.rds')
-  S1_bfr_cue_sig_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/S1_bfr_cue_sig_slopes_all.rds')
-  S1_aft_cue_sig_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/S1_aft_cue_sig_slopes_all.rds')
-  S1_bfr_result_sig_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/S1_bfr_result_sig_slopes_all.rds')
-  S1_aft_result_sig_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/S1_aft_result_sig_slopes_all.rds')
-  
-  load('~/Dropbox/model_alt/5_3_13_1/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- bfr_cue_nums
-  M1_aft_cue_nums_sum <- aft_cue_nums
-  M1_bfr_result_nums_sum <- bfr_result_nums
-  M1_aft_result_nums_sum <- aft_result_nums
-  M1_bfr_cue_all_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/M1_bfr_cue_all_slopes_all.rds')
-  M1_aft_cue_all_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/M1_aft_cue_all_slopes_all.rds')
-  M1_bfr_result_all_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/M1_bfr_result_all_slopes_all.rds')
-  M1_aft_result_all_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/M1_aft_result_all_slopes_all.rds')
-  M1_bfr_cue_sig_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/M1_bfr_cue_sig_slopes_all.rds')
-  M1_aft_cue_sig_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/M1_aft_cue_sig_slopes_all.rds')
-  M1_bfr_result_sig_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/M1_bfr_result_sig_slopes_all.rds')
-  M1_aft_result_sig_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/M1_aft_result_sig_slopes_all.rds')
-  
-  load('~/Dropbox/model_alt/5_3_13_1/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- bfr_cue_nums
-  PmD_aft_cue_nums_sum <- aft_cue_nums
-  PmD_bfr_result_nums_sum <- bfr_result_nums
-  PmD_aft_result_nums_sum <- aft_result_nums
-  PmD_bfr_cue_all_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/PmD_bfr_cue_all_slopes_all.rds')
-  PmD_aft_cue_all_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/PmD_aft_cue_all_slopes_all.rds')
-  PmD_bfr_result_all_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/PmD_bfr_result_all_slopes_all.rds')
-  PmD_aft_result_all_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/PmD_aft_result_all_slopes_all.rds')
-  PmD_bfr_cue_sig_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/PmD_bfr_cue_sig_slopes_all.rds')
-  PmD_aft_cue_sig_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/PmD_aft_cue_sig_slopes_all.rds')
-  PmD_bfr_result_sig_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/PmD_bfr_result_sig_slopes_all.rds')
-  PmD_aft_result_sig_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/PmD_aft_result_sig_slopes_all.rds')
-  
-  #
-  load('~/Dropbox/model_alt/5_3_13_2/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/5_3_13_2/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/5_3_13_2/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/PmD_aft_result_sig_slopes_all.rds'))
-  
-  #
-  load('~/Dropbox/model_alt/5_3_13_3/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/5_3_13_3/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/5_3_13_3/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/PmD_aft_result_sig_slopes_all.rds'))
-  
-  #
-  load('~/Dropbox/model_alt/5_3_14_1/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/5_3_14_1/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/5_3_14_1/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/PmD_aft_result_sig_slopes_all.rds'))
-  
-  #
-  load('~/Dropbox/model_alt/5_3_14_2/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/5_3_14_2/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/5_3_14_2/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/PmD_aft_result_sig_slopes_all.rds'))
-  
-  #
-  load('~/Dropbox/model_alt/5_3_14_3/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/5_3_14_3/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/5_3_14_3/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/PmD_aft_result_sig_slopes_all.rds'))
-  
-  #
-  load('~/Dropbox/model_alt/5_3_28_2/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/5_3_28_2/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/5_3_28_2/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/PmD_aft_result_sig_slopes_all.rds'))
-  
-  #
-  load('~/Dropbox/model_alt/5_3_28_3/alphabeta_M1_all.RData')
-  M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-  M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-  M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-  M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-  M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/M1_bfr_cue_all_slopes_all.rds'))
-  M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/M1_aft_cue_all_slopes_all.rds'))
-  M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/M1_bfr_result_all_slopes_all.rds'))
-  M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/M1_aft_result_all_slopes_all.rds'))
-  M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/M1_bfr_cue_sig_slopes_all.rds'))
-  M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/M1_aft_cue_sig_slopes_all.rds'))
-  M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/M1_bfr_result_sig_slopes_all.rds'))
-  M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/M1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/5_3_28_3/alphabeta_S1_all.RData')
-  S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-  S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-  S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-  S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-  S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/S1_bfr_cue_all_slopes_all.rds'))
-  S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/S1_aft_cue_all_slopes_all.rds'))
-  S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/S1_bfr_result_all_slopes_all.rds'))
-  S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/S1_aft_result_all_slopes_all.rds'))
-  S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/S1_bfr_cue_sig_slopes_all.rds'))
-  S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/S1_aft_cue_sig_slopes_all.rds'))
-  S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/S1_bfr_result_sig_slopes_all.rds'))
-  S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/S1_aft_result_sig_slopes_all.rds'))
-  
-  load('~/Dropbox/model_alt/5_3_28_3/alphabeta_PmD_all.RData')
-  PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-  PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-  PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-  PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-  PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/PmD_bfr_cue_all_slopes_all.rds'))
-  PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/PmD_aft_cue_all_slopes_all.rds'))
-  PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/PmD_bfr_result_all_slopes_all.rds'))
-  PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/PmD_aft_result_all_slopes_all.rds'))
-  PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/PmD_bfr_cue_sig_slopes_all.rds'))
-  PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/PmD_aft_cue_sig_slopes_all.rds'))
-  PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/PmD_bfr_result_sig_slopes_all.rds'))
-  PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/PmD_aft_result_sig_slopes_all.rds'))
-
-}
-
-
-save.image(file='alt_combined_info.RData')
+load('alt_combined_info.RData')
 
 
 
@@ -860,7 +26,8 @@ labs <- c("both pos","both neg","beta pos","alpha pos")
 region_list <- c('M1','S1','PmD')
 
 for (region_index in 1:length(region_list)){
-    if (region_list[region_index] == 'M1'){
+  #nums: [num both pos, num both neg, num beta pos, num alpha pos] 
+   if (region_list[region_index] == 'M1'){
       bfr_cue_nums_sum <- M1_bfr_cue_nums_sum
       aft_cue_nums_sum <- M1_aft_cue_nums_sum
       bfr_result_nums_sum <- M1_bfr_result_nums_sum
@@ -935,31 +102,31 @@ for (region_index in 1:length(region_list)){
   plot(bar_plt)
   graphics.off()
   
-  #########################
+  # #########################
   # png(paste('ALL_slope_collated_hist_',region_list[region_index],'_bfr_cue.png',sep=""),width=8,height=6,units="in",res=500)
-  # 
+  #  
   # sig_plt <- ggplot(bfr_cue_sig_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
   # sig_plt <- sig_plt + labs(title=paste(region_list[region_index],'bfr cue','significant')) 
   # all_plt <- ggplot(bfr_cue_all_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
   # all_plt <- all_plt + labs(title=paste(region_list[region_index],'bfr cue','all'))
-  # 
-  # 
-  # 
+  #  
+  #  
+  #  
   # multiplot(sig_plt,all_plt,cols=1)
   # graphics.off()
-  # 
+  #  
   # png(paste('ALL_slope_collated_hist_',region_list[region_index],'_aft_cue.png',sep=""),width=8,height=6,units="in",res=500)
-  # 
+  #  
   # sig_plt <- ggplot(aft_cue_sig_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
   # sig_plt <- sig_plt + labs(title=paste(region_list[region_index],'aft cue','significant')) 
   # all_plt <- ggplot(aft_cue_all_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
   # all_plt <- all_plt + labs(title=paste(region_list[region_index],'aft cue','all'))
-  # 
+  #  
   # multiplot(sig_plt,all_plt,cols=1)
   # graphics.off()
-  # 
+  #  
   # png(paste('ALL_slope_collated_hist_',region_list[region_index],'_bfr_result.png',sep=""),width=8,height=6,units="in",res=500)
-  # 
+  #  
   # sig_plt <- ggplot(bfr_result_sig_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
   # sig_plt <- sig_plt + labs(title=paste(region_list[region_index],'bfr result','significant')) 
   # all_plt <- ggplot(bfr_result_all_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
@@ -967,9 +134,9 @@ for (region_index in 1:length(region_list)){
   # 
   # multiplot(sig_plt,all_plt,cols=1)
   # graphics.off()
-  # 
+  #  
   # png(paste('ALL_slope_collated_hist_',region_list[region_index],'_aft_result.png',sep=""),width=8,height=6,units="in",res=500)
-  # 
+  #  
   # sig_plt <- ggplot(aft_result_sig_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2) 
   # sig_plt <- sig_plt + labs(title=paste(region_list[region_index],'aft result','significant')) 
   # all_plt <- ggplot(aft_result_all_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
@@ -977,7 +144,7 @@ for (region_index in 1:length(region_list)){
   # 
   # multiplot(sig_plt,all_plt,cols=1)
   # graphics.off()
-  # 
+  ###########
   
   png(paste('ALL_slope_collated_hist_',region_list[region_index],'_bfr_cue.png',sep=""),width=8,height=6,units="in",res=500)
   
@@ -1037,6 +204,89 @@ for (region_index in 1:length(region_list)){
     scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'aft result','all')) + theme_classic()
   
   multiplot(sig_plt,all_plt,cols=1)
+  graphics.off()
+  
+  
+  
+  ####################################
+  
+  # bfr_cue_alpha_sig <- bfr_cue[10]
+  # bfr_cue_beta_sig <- bfr_cue[11]
+  # bfr_cue_both_sig <- bfr_cue[2]
+  # aft_cue_alpha_sig <- aft_cue[10]
+  # aft_cue_beta_sig <- aft_cue[11]
+  # aft_cue_both_sig <- aft_cue[2]
+  # bfr_result_alpha_sig <- bfr_result[10]
+  # bfr_result_beta_sig <- bfr_result[11]
+  # bfr_result_both_sig <- bfr_result[2]
+  # aft_result_alpha_sig <- aft_result[10]
+  # aft_result_beta_sig <- aft_result[11]
+  # aft_result_both_sig <- aft_result[2]
+  
+  bfr_cue_alpha_sig <- 
+  bfr_cue_beta_sig <- 
+  bfr_cue_both_sig <- 
+  aft_cue_alpha_sig <- 
+  aft_cue_beta_sig <- 
+  aft_cue_both_sig <- 
+  bfr_result_alpha_sig <- 
+  bfr_result_beta_sig <- 
+  bfr_result_both_sig <- 
+  aft_result_alpha_sig <- 
+  aft_result_beta_sig <- 
+  aft_result_both_sig <- 
+  
+  
+  bfr_cue_non <- 1 - (bfr_cue_alpha_sig + bfr_cue_beta_sig + bfr_cue_both_sig)
+  aft_cue_non <- 1 - (aft_cue_alpha_sig + aft_cue_beta_sig + aft_cue_both_sig)
+  bfr_result_non <- 1 - (bfr_result_alpha_sig + bfr_result_beta_sig + bfr_result_both_sig)
+  aft_result_non <- 1 - (aft_result_alpha_sig + aft_result_beta_sig + aft_result_both_sig)
+  
+  labs <- c('alpha only sig','beta only sig','both sig','no sig')
+  
+  bfr_cue_vals <- c(bfr_cue_alpha_sig,bfr_cue_beta_sig,bfr_cue_both_sig,bfr_cue_non)
+  aft_cue_vals <- c(aft_cue_alpha_sig,aft_cue_beta_sig,aft_cue_both_sig,aft_cue_non)
+  bfr_result_vals <- c(bfr_result_alpha_sig,bfr_result_beta_sig,bfr_result_both_sig,bfr_result_non)
+  aft_result_vals <- c(aft_result_alpha_sig,aft_result_beta_sig,aft_result_both_sig,aft_result_non)
+  
+  #if (identical(bfr_result_vals,numeric(0))){bfr_result_vals=c(0,0,0,0)}
+  
+  bfr_cue_df <- data.frame(perc=bfr_cue_vals,labs,type='bfr_cue')
+  aft_cue_df <- data.frame(perc=aft_cue_vals,labs,type='aft_cue')
+  bfr_result_df <- data.frame(perc=bfr_result_vals,labs,type='bfr_result')
+  aft_result_df <- data.frame(perc=aft_result_vals,labs,type='aft_result')
+  
+  bfr_cue_df <- bfr_cue_df[rev(order(bfr_cue_df$labs)),]
+  aft_cue_df <- aft_cue_df[rev(order(aft_cue_df$labs)),]
+  bfr_result_df <- bfr_result_df[rev(order(bfr_result_df$labs)),]
+  aft_result_df <- aft_result_df[rev(order(aft_result_df$labs)),]
+  
+  bfr_cue_df <- ddply(bfr_cue_df,.(type),transform,position=(cumsum(bfr_cue_df$perc)-0.5*bfr_cue_df$perc))
+  aft_cue_df <- ddply(aft_cue_df,.(type),transform,position=(cumsum(aft_cue_df$perc)-0.5*aft_cue_df$perc))
+  bfr_result_df <- ddply(bfr_result_df,.(type),transform,position=(cumsum(bfr_result_df$perc)-0.5*bfr_result_df$perc))
+  aft_result_df <- ddply(aft_result_df,.(type),transform,position=(cumsum(aft_result_df$perc)-0.5*aft_result_df$perc))
+  
+  total_units <- bfr_cue[5]
+  bfr_cue_nums <- c(bfr_cue[5]-bfr_cue[4]-bfr_cue[13]-bfr_cue[12],bfr_cue[4],bfr_cue[13],bfr_cue[12])
+  aft_cue_nums <- c(aft_cue[5]-aft_cue[4]-aft_cue[13]-aft_cue[12],aft_cue[4],aft_cue[13],aft_cue[12])
+  bfr_result_nums <- c(bfr_result[5]-bfr_result[4]-bfr_result[13]-bfr_result[12],bfr_result[4],bfr_result[13],bfr_result[12])
+  aft_result_nums <- c(aft_result[5]-aft_result[4]-aft_result[13]-aft_result[12],aft_result[4],aft_result[13],aft_result[12])
+  
+  bfr_cue_df <- ddply(bfr_cue_df,.(type),transform,label=paste(scales::percent(bfr_cue_df$perc),' n=',bfr_cue_nums,sep=""))
+  aft_cue_df <- ddply(aft_cue_df,.(type),transform,label=paste(scales::percent(aft_cue_df$perc),' n=',aft_cue_nums,sep=""))
+  bfr_result_df <- ddply(bfr_result_df,.(type),transform,label=paste(scales::percent(bfr_result_df$perc),' n=',bfr_result_nums,sep=""))
+  aft_result_df <- ddply(aft_result_df,.(type),transform,label=paste(scales::percent(aft_result_df$perc),' n=',aft_result_nums,sep=""))
+  
+  png(paste('all_bar_plotted_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  df_all <- rbind(bfr_cue_df,aft_cue_df,bfr_result_df,aft_result_df)
+  df_all <- df_all[which(df_all$perc > 0),]
+  
+  bar_plt <- ggplot() + geom_bar(aes(x=df_all$type,y=df_all$perc,fill=df_all$labs),data=df_all,stat="identity") 
+  bar_plt <- bar_plt + labs(title=region_list[region_index],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
+  bar_plt <- bar_plt + geom_text(aes(x=df_all$type,y=df_all$position,label=df_all$label),size=3,stat="identity")
+  
+  plot(bar_plt)
   graphics.off()
   
   

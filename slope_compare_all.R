@@ -24,7 +24,9 @@ if (avg_alphabeta_bool & all_alphabeta_bool){cat('ERROR both cant be true')}
 
 #######
 
-file_list <- c('sig_slopes_M1_dicts.xlsx','sig_slopes_S1_dicts.xlsx','sig_slopes_PmD_dicts.xlsx')
+#file_list <- c('sig_slopes_M1_dicts.xlsx','sig_slopes_S1_dicts.xlsx','sig_slopes_PmD_dicts.xlsx')
+file_list <- c(Sys.glob('sig_slopes*M1*.xlsx'),Sys.glob('sig_slopes*S1*.xlsx'),Sys.glob('sig_slopes*PmD*.xlsx'))
+if (length(file_list) != 3){cat('FILE LIST TOO LONG\n')}
 region_list <- c('M1','S1','PmD')
 
 
@@ -100,6 +102,7 @@ for (region_index in 1:length(file_list)){
 
 
 for (region_index in 1:length(region_list)){
+  region_key=region_list[region_index]
   sheet_name = paste(region_list[region_index],"_dicts",sep="")
   percs <- read.xlsx('percs_workbook.xlsx',sheet=sheet_name,colNames=T)
   
@@ -253,10 +256,16 @@ for (region_index in 1:length(region_list)){
   aft_result_df <- ddply(aft_result_df,.(type),transform,position=(cumsum(aft_result_df$perc)-0.5*aft_result_df$perc))
   
   total_units <- bfr_cue[5]
-  bfr_cue_nums <- c(bfr_cue[5]-bfr_cue[4]-bfr_cue[13]-bfr_cue[12],bfr_cue[4],bfr_cue[13],bfr_cue[12])
-  aft_cue_nums <- c(aft_cue[5]-aft_cue[4]-aft_cue[13]-aft_cue[12],aft_cue[4],aft_cue[13],aft_cue[12])
-  bfr_result_nums <- c(bfr_result[5]-bfr_result[4]-bfr_result[13]-bfr_result[12],bfr_result[4],bfr_result[13],bfr_result[12])
-  aft_result_nums <- c(aft_result[5]-aft_result[4]-aft_result[13]-aft_result[12],aft_result[4],aft_result[13],aft_result[12])
+  #bfr_cue_nums <- c(bfr_cue[5]-bfr_cue[4]-bfr_cue[13]-bfr_cue[12],bfr_cue[4],bfr_cue[13],bfr_cue[12])
+  #aft_cue_nums <- c(aft_cue[5]-aft_cue[4]-aft_cue[13]-aft_cue[12],aft_cue[4],aft_cue[13],aft_cue[12])
+  #bfr_result_nums <- c(bfr_result[5]-bfr_result[4]-bfr_result[13]-bfr_result[12],bfr_result[4],bfr_result[13],bfr_result[12])
+  #aft_result_nums <- c(aft_result[5]-aft_result[4]-aft_result[13]-aft_result[12],aft_result[4],aft_result[13],aft_result[12])
+  
+  bfr_cue_nums <- bfr_cue_vals * total_units
+  aft_cue_nums <- aft_cue_vals * total_units
+  bfr_result_nums <- bfr_result_vals * total_units
+  aft_result_nums <- aft_result_vals * total_units
+  
   
   bfr_cue_df <- ddply(bfr_cue_df,.(type),transform,label=paste(scales::percent(bfr_cue_df$perc),' n=',bfr_cue_nums,sep=""))
   aft_cue_df <- ddply(aft_cue_df,.(type),transform,label=paste(scales::percent(aft_cue_df$perc),' n=',aft_cue_nums,sep=""))
@@ -275,6 +284,19 @@ for (region_index in 1:length(region_list)){
   plot(bar_plt)
   graphics.off()
   
+  ##
+  percsig_df_all <- df_all
+  percsig_bfr_cue <- bfr_cue_df    
+  percsig_aft_cue <- aft_cue_df
+  percsig_bfr_res <- bfr_result_df
+  percsig_aft_res <- aft_result_df
+  percsig_total_units <- total_units
+  percsig_bfr_cue_nums <- bfr_cue_nums
+  percsig_aft_cue_nums <- aft_cue_nums
+  percsig_bfr_res_nums <- bfr_result_nums
+  percsig_aft_res_nums <- aft_result_nums
+  
+  save(percsig_df_all,percsig_bfr_cue,percsig_aft_cue,percsig_bfr_res,percsig_aft_res,percsig_total_units,percsig_bfr_cue_nums,percsig_aft_cue_nums,percsig_bfr_res_nums,percsig_aft_res_nums,file=paste('alphabeta_',region_list[region_index],'_percsig_all.RData',sep=""))
   
   # png(paste('all_pie_plotted_',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)
   # bfr_cue_plt <- ggplot(bfr_cue_df,aes(x="",y=bfr_cue_vals,fill=labs)) + geom_bar(width=1,stat="identity") + coord_polar('y',start=0)
@@ -417,10 +439,10 @@ plot_newmv <- function(mv_array,region_key,type_key){
     mtv_plt <- ggplot(df_mtv,aes(x_mtv,fr)) + geom_point(shape=1) + geom_smooth(method=lm)+ labs(title=paste(region_key,type_key),x="Motivation",y="Normalized Firing Rate")
     
     #TODO fix, doesn't quite work
-    val_lm <- tidy(lm(fr~x_val,data=df_val))
     mtv_lm <- tidy(lm(fr~x_mtv,data=df_mtv))
-  
-    #cat(mtv_lm$estimate[2],'\n')
+    val_lm <- tidy(lm(fr~x_val,data=df_val))
+    
+    cat(mtv_lm$estimate[2],'\n')
     
     #will this (or the other complete cases) affect outcomes? see what's causing
     val_lm <- val_lm[complete.cases(val_lm$p.value),]

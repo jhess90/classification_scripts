@@ -25,7 +25,10 @@ if (avg_alphabeta_bool & all_alphabeta_bool){cat('ERROR both cant be true')}
 
 #######
 
-file_list <- c('sig_slopes_M1_dicts.xlsx','sig_slopes_S1_dicts.xlsx','sig_slopes_PmD_dicts.xlsx')
+#file_list <- c('sig_slopes_M1_dicts.xlsx','sig_slopes_S1_dicts.xlsx','sig_slopes_PmD_dicts.xlsx')
+file_list <- c(Sys.glob('sig_slopes*M1*.xlsx'),Sys.glob('sig_slopes*S1*.xlsx'),Sys.glob('sig_slopes*PmD*.xlsx'))
+if (length(file_list) != 3){cat('FILE LIST TOO LONG\n')}
+
 region_list <- c('M1','S1','PmD')
 
 
@@ -276,6 +279,19 @@ for (region_index in 1:length(region_list)){
   plot(bar_plt)
   graphics.off()
   
+  percsig_df_all <- df_all
+  percsig_bfr_cue <- bfr_cue_df    
+  percsig_aft_cue <- aft_cue_df
+  percsig_bfr_res <- bfr_result_df
+  percsig_aft_res <- aft_result_df
+  percsig_total_units <- total_units
+  percsig_bfr_cue_nums <- bfr_cue_nums
+  percsig_aft_cue_nums <- aft_cue_nums
+  percsig_bfr_res_nums <- bfr_result_nums
+  percsig_aft_res_nums <- aft_result_nums
+  
+  save(percsig_df_all,percsig_bfr_cue,percsig_aft_cue,percsig_bfr_res,percsig_aft_res,percsig_total_units,percsig_bfr_cue_nums,percsig_aft_cue_nums,percsig_bfr_res_nums,percsig_aft_res_nums,file=paste('alphabeta_',region_list[region_index],'_percsig_all.RData',sep=""))
+  
   
   # png(paste('all_pie_plotted_',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)
   # bfr_cue_plt <- ggplot(bfr_cue_df,aes(x="",y=bfr_cue_vals,fill=labs)) + geom_bar(width=1,stat="identity") + coord_polar('y',start=0)
@@ -421,7 +437,7 @@ plot_newmv <- function(mv_array,region_key,type_key){
     val_lm <- tidy(lm(fr~x_val,data=df_val))
     mtv_lm <- tidy(lm(fr~x_mtv,data=df_mtv))
     
-    #cat(mtv_lm$estimate[2],'\n')
+    cat(mtv_lm$estimate[2],'\n')
     
     #will this (or the other complete cases) affect outcomes? see what's causing
     val_lm <- val_lm[complete.cases(val_lm$p.value),]
