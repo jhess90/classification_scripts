@@ -291,7 +291,7 @@ for (region_index in 1:length(region_list)){
   percsig_bfr_res_nums <- bfr_result_nums
   percsig_aft_res_nums <- aft_result_nums
   
-  save(percsig_df_all,percsig_bfr_cue,percsig_aft_cue,percsig_bfr_res,percsig_aft_res,percsig_total_units,percsig_bfr_cue_nums,percsig_aft_cue_nums,percsig_bfr_res_nums,percsig_aft_res_nums,file=paste('alphabeta_',region_list[region_index],'_percsig_all.RData',sep=""))
+  save(percsig_df_all,percsig_bfr_cue,percsig_aft_cue,percsig_bfr_res,percsig_aft_res,percsig_total_units,percsig_bfr_cue_nums,percsig_aft_cue_nums,percsig_bfr_res_nums,percsig_aft_res_nums,file=paste('alphabeta_',region_list[region_index],'_percsig_avg.RData',sep=""))
   
   
   # png(paste('all_pie_plotted_',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)
@@ -438,7 +438,7 @@ plot_newmv <- function(mv_array,region_key,type_key){
     val_lm <- tidy(lm(fr~x_val,data=df_val))
     mtv_lm <- tidy(lm(fr~x_mtv,data=df_mtv))
     
-    cat(mtv_lm$estimate[2],'\n')
+    #cat(mtv_lm$estimate[2],'\n')
     
     #will this (or the other complete cases) affect outcomes? see what's causing
     val_lm <- val_lm[complete.cases(val_lm$p.value),]
@@ -470,12 +470,13 @@ plot_newmv <- function(mv_array,region_key,type_key){
     alpha_list <- c(alpha_list,unit_array[1,3])
     beta_list <- c(beta_list,unit_array[1,4])
 
-    if (all_alphabeta_bool){png(paste(region_list[region_index],'_',type_key,'_unit',unit_num,'_all_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)
-    }else if (avg_alphabeta_bool){png(paste(region_list[region_index],'_',type_key,'_unit',unit_num,'_avg_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)
-    }else{png(paste(region_list[region_index],'_',type_key,'_unit',unit_num,'_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)}
-    
-    multiplot(val_plt,mtv_plt,cols=2)
-    graphics.off()    
+    #No plot for now
+    # if (all_alphabeta_bool){png(paste(region_list[region_index],'_',type_key,'_unit',unit_num,'_all_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)
+    # }else if (avg_alphabeta_bool){png(paste(region_list[region_index],'_',type_key,'_unit',unit_num,'_avg_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)
+    # }else{png(paste(region_list[region_index],'_',type_key,'_unit',unit_num,'_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)}
+    # 
+    # multiplot(val_plt,mtv_plt,cols=2)
+    # graphics.off()    
    
   }
   perc_val_sig <- sig_val / dim(mv_array)[1]
@@ -833,7 +834,7 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
     #all_avg_beta <- (all_bfr_cue_beta + all_aft_cue_beta + all_bfr_result_beta + all_aft_result_beta) / 4
     
     #####
-    file_list <- c('sig_slopes_M1_dicts.xlsx','sig_slopes_S1_dicts.xlsx','sig_slopes_PmD_dicts.xlsx')
+    #file_list <- c('sig_slopes_M1_dicts.xlsx','sig_slopes_S1_dicts.xlsx','sig_slopes_PmD_dicts.xlsx')
 
     slopes_bfr_cue <- read.xlsx(file_list[region_index],sheet='slopes_bfr_cue_model',colNames=T)
     slopes_aft_cue <- read.xlsx(file_list[region_index],sheet='slopes_aft_cue_model',colNames=T)

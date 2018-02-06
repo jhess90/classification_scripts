@@ -442,7 +442,7 @@ plot_newmv <- function(mv_array,region_key,type_key){
     mtv_lm <- tidy(lm(fr~x_mtv,data=df_mtv))
     val_lm <- tidy(lm(fr~x_val,data=df_val))
     
-    cat(mtv_lm$estimate[2],'\n')
+    #cat(mtv_lm$estimate[2],'\n')
     
     #will this (or the other complete cases) affect outcomes? see what's causing
     val_lm <- val_lm[complete.cases(val_lm$p.value),]
@@ -474,12 +474,13 @@ plot_newmv <- function(mv_array,region_key,type_key){
     alpha_list <- c(alpha_list,unit_array[1,3])
     beta_list <- c(beta_list,unit_array[1,4])
 
-    if (all_alphabeta_bool){png(paste(region_list[region_index],'_',type_key,'_unit',unit_num,'_all_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)
-    }else if (avg_alphabeta_bool){png(paste(region_list[region_index],'_',type_key,'_unit',unit_num,'_avg_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)
-    }else{png(paste(region_list[region_index],'_',type_key,'_unit',unit_num,'_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)}
-    
-    multiplot(val_plt,mtv_plt,cols=2)
-    graphics.off()    
+    #No plot for now
+    # if (all_alphabeta_bool){png(paste(region_list[region_index],'_',type_key,'_unit',unit_num,'_all_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)
+    # }else if (avg_alphabeta_bool){png(paste(region_list[region_index],'_',type_key,'_unit',unit_num,'_avg_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)
+    # }else{png(paste(region_list[region_index],'_',type_key,'_unit',unit_num,'_mtv_val_plt.png',sep=""),width=8,height=6,units="in",res=500)}
+    # 
+    # multiplot(val_plt,mtv_plt,cols=2)
+    # graphics.off()
    
   }
   perc_val_sig <- sig_val / dim(mv_array)[1]
@@ -837,7 +838,7 @@ if (avg_alphabeta_bool | all_alphabeta_bool){
     #all_avg_beta <- (all_bfr_cue_beta + all_aft_cue_beta + all_bfr_result_beta + all_aft_result_beta) / 4
     
     #####
-    file_list <- c('sig_slopes_M1_dicts.xlsx','sig_slopes_S1_dicts.xlsx','sig_slopes_PmD_dicts.xlsx')
+    #file_list <- c('sig_slopes_M1_dicts.xlsx','sig_slopes_S1_dicts.xlsx','sig_slopes_PmD_dicts.xlsx')
 
     slopes_bfr_cue <- read.xlsx(file_list[region_index],sheet='slopes_bfr_cue_model',colNames=T)
     slopes_aft_cue <- read.xlsx(file_list[region_index],sheet='slopes_aft_cue_model',colNames=T)
