@@ -1,8 +1,8 @@
 library(openxlsx)
 library(ggplot2)
 library(reshape2)
-#source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
-source("~/workspace/classification_scripts/multiplot.R")
+source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
+#source("~/workspace/classification_scripts/multiplot.R")
 library(zoo)
 library(gplots)
 library(RColorBrewer)
@@ -295,7 +295,7 @@ for (region_index in 1:length(region_list)){
   percsig_aft_cue_nums <- aft_cue_nums
   percsig_bfr_res_nums <- bfr_result_nums
   percsig_aft_res_nums <- aft_result_nums
-  
+
   save(percsig_df_all,percsig_bfr_cue,percsig_aft_cue,percsig_bfr_res,percsig_aft_res,percsig_total_units,percsig_bfr_cue_nums,percsig_aft_cue_nums,percsig_bfr_res_nums,percsig_aft_res_nums,file=paste('alphabeta_',region_list[region_index],'_percsig_all.RData',sep=""))
   
   # png(paste('all_pie_plotted_',region_list[region_ind],'.png',sep=""),width=8,height=6,units="in",res=500)
