@@ -17,7 +17,7 @@ library(reshape)
 
 
 load('alt_combined_info.RData')
-
+# attach('alt_combined_xlsx_info.Rdata')
 
 
 #########
@@ -227,6 +227,8 @@ for (region_index in 1:length(region_list)){
   
   
   ####################################
+  attach('alt_combined_xlsx_info.Rdata')
+  
   
   labs <- c('alpha only sig','beta only sig','both sig','no sig')
   
@@ -248,8 +250,8 @@ for (region_index in 1:length(region_list)){
   
   bfr_cue_df <- data.frame(perc=bfr_cue_vals,labs,type='bfr_cue')
   aft_cue_df <- data.frame(perc=aft_cue_vals,labs,type='aft_cue')
-  bfr_result_df <- data.frame(perc=bfr_result_vals,labs,type='bfr_result')
-  aft_result_df <- data.frame(perc=aft_result_vals,labs,type='aft_result')
+  bfr_result_df <- data.frame(perc=bfr_res_vals,labs,type='bfr_result')
+  aft_result_df <- data.frame(perc=aft_res_vals,labs,type='aft_result')
   
   bfr_cue_df <- bfr_cue_df[rev(order(bfr_cue_df$labs)),]
   aft_cue_df <- aft_cue_df[rev(order(aft_cue_df$labs)),]
