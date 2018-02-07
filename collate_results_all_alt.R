@@ -1,8 +1,8 @@
 library(openxlsx)
 library(ggplot2)
 library(reshape2)
-#source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
-source("~/workspace/classification_scripts/multiplot.R")
+source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
+#source("~/workspace/classification_scripts/multiplot.R")
 library(zoo)
 library(gplots)
 library(RColorBrewer)
@@ -273,10 +273,10 @@ for (region_index in 1:length(region_list)){
   
   #percsig nums: no sig, both sig, beta sig, alpha sig
   #ACTUAL percsig nums: alpha sig, both sig, beta sig, no sig
-  bfr_cue_nums <- c(percsig_bfr_cue_nums[4],percsig_bfr_cue_nums[2],percsig_bfr_cue_nums[3],percsig_bfr_cue_nums[1])
-  aft_cue_nums <- c(percsig_aft_cue_nums[4],percsig_aft_cue_nums[2],percsig_aft_cue_nums[3],percsig_aft_cue_nums[1])
-  bfr_res_nums <- c(percsig_bfr_res_nums[4],percsig_bfr_res_nums[2],percsig_bfr_res_nums[3],percsig_bfr_res_nums[1])
-  aft_res_nums <- c(percsig_aft_res_nums[4],percsig_aft_res_nums[2],percsig_aft_res_nums[3],percsig_aft_res_nums[1])
+  bfr_cue_nums <- c(percsig_bfr_cue_nums[4],percsig_bfr_cue_nums[3],percsig_bfr_cue_nums[2],percsig_bfr_cue_nums[1])
+  aft_cue_nums <- c(percsig_aft_cue_nums[4],percsig_aft_cue_nums[3],percsig_aft_cue_nums[2],percsig_aft_cue_nums[1])
+  bfr_res_nums <- c(percsig_bfr_res_nums[4],percsig_bfr_res_nums[3],percsig_bfr_res_nums[2],percsig_bfr_res_nums[1])
+  aft_res_nums <- c(percsig_aft_res_nums[4],percsig_aft_res_nums[3],percsig_aft_res_nums[2],percsig_aft_res_nums[1])
   
   # 
   # bfr_cue_nums <- percsig_bfr_cue_nums

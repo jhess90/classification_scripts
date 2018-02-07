@@ -16,7 +16,6 @@ library(plyr)
 library(reshape)
 
 #######
-rm(list=ls())
 
 avg_alphabeta_bool = FALSE
 all_alphabeta_bool = TRUE
@@ -24,10 +23,12 @@ all_alphabeta_bool = TRUE
 if (avg_alphabeta_bool & all_alphabeta_bool){cat('ERROR both cant be true')}
 
 #######
-
+rm(list=ls())
 region_list <- c('M1','S1','PmD')
 
-load('alt_combined_xlsx_info.RData')
+#load('alt_combined_xlsx_info.RData')
+#load('rp_collated_info_all.RData')
+load('all_r_all.RData')
 
 for (region_index in 1:length(region_list)){
     

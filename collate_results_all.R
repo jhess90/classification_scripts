@@ -681,5 +681,68 @@ for (region_index in 1:length(region_list)){
 }
 
 
+#save.image(file='rp_collated_info.RData')
+#rm(list=ls())
+
+for (region_index in 1:length(region_list)){
+  
+  file_list <- Sys.glob(paste('sig_slopes*',region_list[region_index],'*.xlsx',sep=""))
+  
+  for (i in 1:length(file_list)){
+    cat(file_list[i],'\n')
+    if (i==1){
+      slopes_bfr_cue <- read.xlsx(file_list[i],sheet='slopes_bfr_cue_model',colNames=T)
+      slopes_aft_cue <- read.xlsx(file_list[i],sheet='slopes_aft_cue_model',colNames=T)
+      slopes_bfr_result <- read.xlsx(file_list[i],sheet='slopes_bfr_result_model',colNames=T)
+      slopes_aft_result <- read.xlsx(file_list[i],sheet='slopes_aft_result_model',colNames=T)
+      
+      slopes_bfr_cue_sigall <- read.xlsx(file_list[i],sheet='sig_all_bfr_cue_model',colNames=T)
+      slopes_aft_cue_sigall <- read.xlsx(file_list[i],sheet='sig_all_aft_cue_model',colNames=T)
+      slopes_bfr_result_sigall <- read.xlsx(file_list[i],sheet='sig_all_bfr_result_model',colNames=T)
+      slopes_aft_result_sigall <- read.xlsx(file_list[i],sheet='sig_all_aft_result_model',colNames=T)
+      
+    }else{
+      temp_bfr_cue <- read.xlsx(file_list[i],sheet='slopes_bfr_cue_model',colNames=T)
+      temp_aft_cue <- read.xlsx(file_list[i],sheet='slopes_aft_cue_model',colNames=T)
+      temp_bfr_result <- read.xlsx(file_list[i],sheet='slopes_bfr_result_model',colNames=T)
+      temp_aft_result <- read.xlsx(file_list[i],sheet='slopes_aft_result_model',colNames=T)
+      
+      temp_bfr_cue_sigall <- read.xlsx(file_list[i],sheet='sig_all_bfr_cue_model',colNames=T)
+      temp_aft_cue_sigall <- read.xlsx(file_list[i],sheet='sig_all_aft_cue_model',colNames=T)
+      temp_bfr_result_sigall <- read.xlsx(file_list[i],sheet='sig_all_bfr_result_model',colNames=T)
+      temp_aft_result_sigall <- read.xlsx(file_list[i],sheet='sig_all_aft_result_model',colNames=T)
+      
+      slopes_bfr_cue <- rbind(slopes_bfr_cue,temp_bfr_cue)
+      slopes_aft_cue <- rbind(slopes_aft_cue,temp_aft_cue)
+      slopes_bfr_result <- rbind(slopes_bfr_result,temp_bfr_result)
+      slopes_aft_result <- rbind(slopes_aft_result,temp_aft_result)
+      
+      slopes_bfr_cue_sigall <- rbind(slopes_bfr_cue_sigall,temp_bfr_cue_sigall)
+      slopes_aft_cue_sigall <- rbind(slopes_aft_cue_sigall,temp_aft_cue_sigall)
+      slopes_bfr_result_sigall <- rbind(slopes_bfr_result_sigall,temp_bfr_result_sigall)
+      slopes_aft_result_sigall <- rbind(slopes_aft_result_sigall,temp_aft_result_sigall)
+    }
+    
+    assign(paste(region_list[region_index],"_slopes_bfr_cue",sep=""),slopes_bfr_cue)
+    assign(paste(region_list[region_index],"_slopes_aft_cue",sep=""),slopes_aft_cue)
+    assign(paste(region_list[region_index],"_slopes_bfr_result",sep=""),slopes_bfr_result)
+    assign(paste(region_list[region_index],"_slopes_aft_result",sep=""),slopes_aft_result)
+    
+    assign(paste(region_list[region_index],"_slopes_bfr_cue_sigall",sep=""),slopes_bfr_cue_sigall)
+    assign(paste(region_list[region_index],"_slopes_aft_cue_sigall",sep=""),slopes_aft_cue_sigall)
+    assign(paste(region_list[region_index],"_slopes_bfr_result_sigall",sep=""),slopes_bfr_result_sigall)
+    assign(paste(region_list[region_index],"_slopes_aft_result_sigall",sep=""),slopes_aft_result_sigall)
+    
+    
+  }
+  
+  
+  
+}
+
+
+
 save.image(file='rp_collated_info.RData')
+#save.image(file='alt_combined_xlsx_info.RData')
 rm(list=ls())
+
