@@ -1,9 +1,8 @@
 library(openxlsx)
 library(ggplot2)
 library(reshape2)
-#source("~/dropbox/mult_rp_files/r_test/multiplot.R")
-#source("~/Dropbox/mult_rp_files/r_test/multiplot.R")
-source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
+#source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
+source("~/workspace/classification_scripts/multiplot.R")
 library(zoo)
 library(gplots)
 library(RColorBrewer)
@@ -16,481 +15,485 @@ library(broom)
 library(plyr)
 library(reshape)
 
-##################
-#### 0059 ########
-##################
 
-load('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/alphabeta_S1_avg.RData')
-S1_bfr_cue_nums_sum <- bfr_cue_nums
-S1_aft_cue_nums_sum <- aft_cue_nums
-S1_bfr_result_nums_sum <- bfr_result_nums
-S1_aft_result_nums_sum <- aft_result_nums
-S1_bfr_cue_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/S1_bfr_cue_all_slopes_avg.rds')
-S1_aft_cue_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/S1_aft_cue_all_slopes_avg.rds')
-S1_bfr_result_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/S1_bfr_result_all_slopes_avg.rds')
-S1_aft_result_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/S1_aft_result_all_slopes_avg.rds')
-S1_bfr_cue_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/S1_bfr_cue_sig_slopes_avg.rds')
-S1_aft_cue_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/S1_aft_cue_sig_slopes_avg.rds')
-S1_bfr_result_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/S1_bfr_result_sig_slopes_avg.rds')
-S1_aft_result_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/S1_aft_result_sig_slopes_avg.rds')
+nhp_id <- '504'
 
-load('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/alphabeta_PmD_avg.RData')
-PmD_bfr_cue_nums_sum <- bfr_cue_nums
-PmD_aft_cue_nums_sum <- aft_cue_nums
-PmD_bfr_result_nums_sum <- bfr_result_nums
-PmD_aft_result_nums_sum <- aft_result_nums
-PmD_bfr_cue_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/PmD_bfr_cue_all_slopes_avg.rds')
-PmD_aft_cue_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/PmD_aft_cue_all_slopes_avg.rds')
-PmD_bfr_result_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/PmD_bfr_result_all_slopes_avg.rds')
-PmD_aft_result_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/PmD_aft_result_all_slopes_avg.rds')
-PmD_bfr_cue_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/PmD_bfr_cue_sig_slopes_avg.rds')
-PmD_aft_cue_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/PmD_aft_cue_sig_slopes_avg.rds')
-PmD_bfr_result_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/PmD_bfr_result_sig_slopes_avg.rds')
-PmD_aft_result_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/PmD_aft_result_sig_slopes_avg.rds')
+if (nhp_id == '0059'){
 
-load('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/alphabeta_M1_avg.RData')
-M1_bfr_cue_nums_sum <- bfr_cue_nums
-M1_aft_cue_nums_sum <- aft_cue_nums
-M1_bfr_result_nums_sum <- bfr_result_nums
-M1_aft_result_nums_sum <- aft_result_nums
-M1_bfr_cue_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/M1_bfr_cue_all_slopes_avg.rds')
-M1_aft_cue_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/M1_aft_cue_all_slopes_avg.rds')
-M1_bfr_result_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/M1_bfr_result_all_slopes_avg.rds')
-M1_aft_result_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/M1_aft_result_all_slopes_avg.rds')
-M1_bfr_cue_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/M1_bfr_cue_sig_slopes_avg.rds')
-M1_aft_cue_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/M1_aft_cue_sig_slopes_avg.rds')
-M1_bfr_result_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/M1_bfr_result_sig_slopes_avg.rds')
-M1_aft_result_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_1/M1_aft_result_sig_slopes_avg.rds')
+   ##################
+   #### 0059 ########
+   ##################
 
-load('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/alphabeta_M1_avg.RData')
-M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/M1_bfr_cue_all_slopes_avg.rds'))
-M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/M1_aft_cue_all_slopes_avg.rds'))
-M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/M1_bfr_result_all_slopes_avg.rds'))
-M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/M1_aft_result_all_slopes_avg.rds'))
-M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/M1_bfr_cue_sig_slopes_avg.rds'))
-M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/M1_aft_cue_sig_slopes_avg.rds'))
-M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/M1_bfr_result_sig_slopes_avg.rds'))
-M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/M1_aft_result_sig_slopes_avg.rds'))
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/alphabeta_S1_avg.RData')
+   S1_bfr_cue_nums_sum <- bfr_cue_nums
+   S1_aft_cue_nums_sum <- aft_cue_nums
+   S1_bfr_result_nums_sum <- bfr_result_nums
+   S1_aft_result_nums_sum <- aft_result_nums
+   S1_bfr_cue_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/S1_bfr_cue_all_slopes_avg.rds')
+   S1_aft_cue_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/S1_aft_cue_all_slopes_avg.rds')
+   S1_bfr_result_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/S1_bfr_result_all_slopes_avg.rds')
+   S1_aft_result_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/S1_aft_result_all_slopes_avg.rds')
+   S1_bfr_cue_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/S1_bfr_cue_sig_slopes_avg.rds')
+   S1_aft_cue_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/S1_aft_cue_sig_slopes_avg.rds')
+   S1_bfr_result_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/S1_bfr_result_sig_slopes_avg.rds')
+   S1_aft_result_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/S1_aft_result_sig_slopes_avg.rds')
 
-load('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/alphabeta_S1_avg.RData')
-S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/S1_bfr_cue_all_slopes_avg.rds'))
-S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/S1_aft_cue_all_slopes_avg.rds'))
-S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/S1_bfr_result_all_slopes_avg.rds'))
-S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/S1_aft_result_all_slopes_avg.rds'))
-S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/S1_bfr_cue_sig_slopes_avg.rds'))
-S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/S1_aft_cue_sig_slopes_avg.rds'))
-S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/S1_bfr_result_sig_slopes_avg.rds'))
-S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/S1_aft_result_sig_slopes_avg.rds'))
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/alphabeta_PmD_avg.RData')
+   PmD_bfr_cue_nums_sum <- bfr_cue_nums
+   PmD_aft_cue_nums_sum <- aft_cue_nums
+   PmD_bfr_result_nums_sum <- bfr_result_nums
+   PmD_aft_result_nums_sum <- aft_result_nums
+   PmD_bfr_cue_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/PmD_bfr_cue_all_slopes_avg.rds')
+   PmD_aft_cue_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/PmD_aft_cue_all_slopes_avg.rds')
+   PmD_bfr_result_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/PmD_bfr_result_all_slopes_avg.rds')
+   PmD_aft_result_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/PmD_aft_result_all_slopes_avg.rds')
+   PmD_bfr_cue_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/PmD_bfr_cue_sig_slopes_avg.rds')
+   PmD_aft_cue_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/PmD_aft_cue_sig_slopes_avg.rds')
+   PmD_bfr_result_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/PmD_bfr_result_sig_slopes_avg.rds')
+   PmD_aft_result_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/PmD_aft_result_sig_slopes_avg.rds')
+   
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/alphabeta_M1_avg.RData')
+   M1_bfr_cue_nums_sum <- bfr_cue_nums
+   M1_aft_cue_nums_sum <- aft_cue_nums
+   M1_bfr_result_nums_sum <- bfr_result_nums
+   M1_aft_result_nums_sum <- aft_result_nums
+   M1_bfr_cue_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/M1_bfr_cue_all_slopes_avg.rds')
+   M1_aft_cue_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/M1_aft_cue_all_slopes_avg.rds')
+   M1_bfr_result_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/M1_bfr_result_all_slopes_avg.rds')
+   M1_aft_result_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/M1_aft_result_all_slopes_avg.rds')
+   M1_bfr_cue_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/M1_bfr_cue_sig_slopes_avg.rds')
+   M1_aft_cue_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/M1_aft_cue_sig_slopes_avg.rds')
+   M1_bfr_result_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/M1_bfr_result_sig_slopes_avg.rds')
+   M1_aft_result_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_1/M1_aft_result_sig_slopes_avg.rds')
 
-load('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/alphabeta_PmD_avg.RData')
-PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/PmD_bfr_cue_all_slopes_avg.rds'))
-PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/PmD_aft_cue_all_slopes_avg.rds'))
-PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/PmD_bfr_result_all_slopes_avg.rds'))
-PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/PmD_aft_result_all_slopes_avg.rds'))
-PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/PmD_bfr_cue_sig_slopes_avg.rds'))
-PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/PmD_aft_cue_sig_slopes_avg.rds'))
-PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/PmD_bfr_result_sig_slopes_avg.rds'))
-PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_8_2/PmD_aft_result_sig_slopes_avg.rds'))
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/alphabeta_M1_avg.RData')
+   M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
+   M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
+   M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
+   M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
+   M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/M1_bfr_cue_all_slopes_avg.rds'))
+   M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/M1_aft_cue_all_slopes_avg.rds'))
+   M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/M1_bfr_result_all_slopes_avg.rds'))
+   M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/M1_aft_result_all_slopes_avg.rds'))
+   M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/M1_bfr_cue_sig_slopes_avg.rds'))
+   M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/M1_aft_cue_sig_slopes_avg.rds'))
+   M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/M1_bfr_result_sig_slopes_avg.rds'))
+   M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/M1_aft_result_sig_slopes_avg.rds'))
 
-load('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/alphabeta_M1_avg.RData')
-M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/M1_bfr_cue_all_slopes_avg.rds'))
-M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/M1_aft_cue_all_slopes_avg.rds'))
-M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/M1_bfr_result_all_slopes_avg.rds'))
-M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/M1_aft_result_all_slopes_avg.rds'))
-M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/M1_bfr_cue_sig_slopes_avg.rds'))
-M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/M1_aft_cue_sig_slopes_avg.rds'))
-M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/M1_bfr_result_sig_slopes_avg.rds'))
-M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/M1_aft_result_sig_slopes_avg.rds'))
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/alphabeta_S1_avg.RData')
+   S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
+   S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
+   S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
+   S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
+   S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/S1_bfr_cue_all_slopes_avg.rds'))
+   S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/S1_aft_cue_all_slopes_avg.rds'))
+   S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/S1_bfr_result_all_slopes_avg.rds'))
+   S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/S1_aft_result_all_slopes_avg.rds'))
+   S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/S1_bfr_cue_sig_slopes_avg.rds'))
+   S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/S1_aft_cue_sig_slopes_avg.rds'))
+   S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/S1_bfr_result_sig_slopes_avg.rds'))
+   S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/S1_aft_result_sig_slopes_avg.rds'))
 
-load('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/alphabeta_S1_avg.RData')
-S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/S1_bfr_cue_all_slopes_avg.rds'))
-S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/S1_aft_cue_all_slopes_avg.rds'))
-S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/S1_bfr_result_all_slopes_avg.rds'))
-S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/S1_aft_result_all_slopes_avg.rds'))
-S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/S1_bfr_cue_sig_slopes_avg.rds'))
-S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/S1_aft_cue_sig_slopes_avg.rds'))
-S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/S1_bfr_result_sig_slopes_avg.rds'))
-S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/S1_aft_result_sig_slopes_avg.rds'))
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/alphabeta_PmD_avg.RData')
+   PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
+   PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
+   PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
+   PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
+   PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/PmD_bfr_cue_all_slopes_avg.rds'))
+   PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/PmD_aft_cue_all_slopes_avg.rds'))
+   PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/PmD_bfr_result_all_slopes_avg.rds'))
+   PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/PmD_aft_result_all_slopes_avg.rds')) 
+   PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/PmD_bfr_cue_sig_slopes_avg.rds'))
+   PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/PmD_aft_cue_sig_slopes_avg.rds')) 
+   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/PmD_bfr_result_sig_slopes_avg.rds'))
+   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_8_2/PmD_aft_result_sig_slopes_avg.rds'))
 
-load('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/alphabeta_PmD_avg.RData')
-PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/PmD_bfr_cue_all_slopes_avg.rds'))
-PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/PmD_aft_cue_all_slopes_avg.rds'))
-PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/PmD_bfr_result_all_slopes_avg.rds'))
-PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/PmD_aft_result_all_slopes_avg.rds'))
-PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/PmD_bfr_cue_sig_slopes_avg.rds'))
-PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/PmD_aft_cue_sig_slopes_avg.rds'))
-PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/PmD_bfr_result_sig_slopes_avg.rds'))
-PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_1/PmD_aft_result_sig_slopes_avg.rds'))
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/alphabeta_M1_avg.RData')
+   M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
+   M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
+   M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
+   M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
+   M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/M1_bfr_cue_all_slopes_avg.rds'))
+   M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/M1_aft_cue_all_slopes_avg.rds'))
+   M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/M1_bfr_result_all_slopes_avg.rds'))
+   M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/M1_aft_result_all_slopes_avg.rds'))
+   M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/M1_bfr_cue_sig_slopes_avg.rds'))
+   M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/M1_aft_cue_sig_slopes_avg.rds'))
+   M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/M1_bfr_result_sig_slopes_avg.rds'))
+   M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/M1_aft_result_sig_slopes_avg.rds'))
+   
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/alphabeta_S1_avg.RData')
+   S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
+   S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
+   S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
+   S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
+   S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/S1_bfr_cue_all_slopes_avg.rds'))
+   S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/S1_aft_cue_all_slopes_avg.rds'))
+   S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/S1_bfr_result_all_slopes_avg.rds'))
+   S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/S1_aft_result_all_slopes_avg.rds'))
+   S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/S1_bfr_cue_sig_slopes_avg.rds'))
+   S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/S1_aft_cue_sig_slopes_avg.rds'))
+   S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/S1_bfr_result_sig_slopes_avg.rds'))
+   S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/S1_aft_result_sig_slopes_avg.rds'))
 
-load('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/alphabeta_M1_avg.RData')
-M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/M1_bfr_cue_all_slopes_avg.rds'))
-M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/M1_aft_cue_all_slopes_avg.rds'))
-M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/M1_bfr_result_all_slopes_avg.rds'))
-M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/M1_aft_result_all_slopes_avg.rds'))
-M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/M1_bfr_cue_sig_slopes_avg.rds'))
-M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/M1_aft_cue_sig_slopes_avg.rds'))
-M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/M1_bfr_result_sig_slopes_avg.rds'))
-M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/M1_aft_result_sig_slopes_avg.rds'))
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/alphabeta_PmD_avg.RData')
+   PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
+   PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
+   PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
+   PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
+   PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/PmD_bfr_cue_all_slopes_avg.rds'))
+   PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/PmD_aft_cue_all_slopes_avg.rds'))
+   PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/PmD_bfr_result_all_slopes_avg.rds'))
+   PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/PmD_aft_result_all_slopes_avg.rds'))
+   PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/PmD_bfr_cue_sig_slopes_avg.rds'))
+   PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/PmD_aft_cue_sig_slopes_avg.rds'))
+   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/PmD_bfr_result_sig_slopes_avg.rds'))
+   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_1/PmD_aft_result_sig_slopes_avg.rds'))
 
-load('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/alphabeta_S1_avg.RData')
-S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/S1_bfr_cue_all_slopes_avg.rds'))
-S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/S1_aft_cue_all_slopes_avg.rds'))
-S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/S1_bfr_result_all_slopes_avg.rds'))
-S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/S1_aft_result_all_slopes_avg.rds'))
-S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/S1_bfr_cue_sig_slopes_avg.rds'))
-S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/S1_aft_cue_sig_slopes_avg.rds'))
-S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/S1_bfr_result_sig_slopes_avg.rds'))
-S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/S1_aft_result_sig_slopes_avg.rds'))
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/alphabeta_M1_avg.RData')
+   M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
+   M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
+   M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
+   M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
+   M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/M1_bfr_cue_all_slopes_avg.rds'))
+   M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/M1_aft_cue_all_slopes_avg.rds'))
+   M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/M1_bfr_result_all_slopes_avg.rds'))
+   M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/M1_aft_result_all_slopes_avg.rds'))
+   M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/M1_bfr_cue_sig_slopes_avg.rds'))
+   M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/M1_aft_cue_sig_slopes_avg.rds'))
+   M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/M1_bfr_result_sig_slopes_avg.rds'))
+   M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/M1_aft_result_sig_slopes_avg.rds'))
 
-load('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/alphabeta_PmD_avg.RData')
-PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/PmD_bfr_cue_all_slopes_avg.rds'))
-PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/PmD_aft_cue_all_slopes_avg.rds'))
-PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/PmD_bfr_result_all_slopes_avg.rds'))
-PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/PmD_aft_result_all_slopes_avg.rds'))
-PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/PmD_bfr_cue_sig_slopes_avg.rds'))
-PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/PmD_aft_cue_sig_slopes_avg.rds'))
-PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/PmD_bfr_result_sig_slopes_avg.rds'))
-PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/0_9_2/PmD_aft_result_sig_slopes_avg.rds'))
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/alphabeta_S1_avg.RData')
+   S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
+   S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
+   S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
+   S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
+   S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/S1_bfr_cue_all_slopes_avg.rds'))
+   S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/S1_aft_cue_all_slopes_avg.rds'))
+   S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/S1_bfr_result_all_slopes_avg.rds'))
+   S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/S1_aft_result_all_slopes_avg.rds'))
+   S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/S1_bfr_cue_sig_slopes_avg.rds'))
+   S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/S1_aft_cue_sig_slopes_avg.rds'))
+   S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/S1_bfr_result_sig_slopes_avg.rds'))
+   S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/S1_aft_result_sig_slopes_avg.rds'))
 
-##################
-#### 504 #########
-##################
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/alphabeta_S1_avg.RData')
-# S1_bfr_cue_nums_sum <- bfr_cue_nums
-# S1_aft_cue_nums_sum <- aft_cue_nums
-# S1_bfr_result_nums_sum <- bfr_result_nums
-# S1_aft_result_nums_sum <- aft_result_nums
-# S1_bfr_cue_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/S1_bfr_cue_all_slopes_avg.rds')
-# S1_aft_cue_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/S1_aft_cue_all_slopes_avg.rds')
-# S1_bfr_result_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/S1_bfr_result_all_slopes_avg.rds')
-# S1_aft_result_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/S1_aft_result_all_slopes_avg.rds')
-# S1_bfr_cue_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/S1_bfr_cue_sig_slopes_avg.rds')
-# S1_aft_cue_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/S1_aft_cue_sig_slopes_avg.rds')
-# S1_bfr_result_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/S1_bfr_result_sig_slopes_avg.rds')
-# S1_aft_result_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/S1_aft_result_sig_slopes_avg.rds')
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/alphabeta_PmD_avg.RData')
-# PmD_bfr_cue_nums_sum <- bfr_cue_nums
-# PmD_aft_cue_nums_sum <- aft_cue_nums
-# PmD_bfr_result_nums_sum <- bfr_result_nums
-# PmD_aft_result_nums_sum <- aft_result_nums
-# PmD_bfr_cue_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/PmD_bfr_cue_all_slopes_avg.rds')
-# PmD_aft_cue_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/PmD_aft_cue_all_slopes_avg.rds')
-# PmD_bfr_result_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/PmD_bfr_result_all_slopes_avg.rds')
-# PmD_aft_result_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/PmD_aft_result_all_slopes_avg.rds')
-# PmD_bfr_cue_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/PmD_bfr_cue_sig_slopes_avg.rds')
-# PmD_aft_cue_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/PmD_aft_cue_sig_slopes_avg.rds')
-# PmD_bfr_result_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/PmD_bfr_result_sig_slopes_avg.rds')
-# PmD_aft_result_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/PmD_aft_result_sig_slopes_avg.rds')
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/alphabeta_M1_avg.RData')
-# M1_bfr_cue_nums_sum <- bfr_cue_nums
-# M1_aft_cue_nums_sum <- aft_cue_nums
-# M1_bfr_result_nums_sum <- bfr_result_nums
-# M1_aft_result_nums_sum <- aft_result_nums
-# M1_bfr_cue_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/M1_bfr_cue_all_slopes_avg.rds')
-# M1_aft_cue_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/M1_aft_cue_all_slopes_avg.rds')
-# M1_bfr_result_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/M1_bfr_result_all_slopes_avg.rds')
-# M1_aft_result_all_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/M1_aft_result_all_slopes_avg.rds')
-# M1_bfr_cue_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/M1_bfr_cue_sig_slopes_avg.rds')
-# M1_aft_cue_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/M1_aft_cue_sig_slopes_avg.rds')
-# M1_bfr_result_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/M1_bfr_result_sig_slopes_avg.rds')
-# M1_aft_result_sig_slopes <- readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_1/M1_aft_result_sig_slopes_avg.rds')
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/alphabeta_M1_avg.RData')
-# M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-# M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-# M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-# M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-# M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/M1_bfr_cue_all_slopes_avg.rds'))
-# M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/M1_aft_cue_all_slopes_avg.rds'))
-# M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/M1_bfr_result_all_slopes_avg.rds'))
-# M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/M1_aft_result_all_slopes_avg.rds'))
-# M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/M1_bfr_cue_sig_slopes_avg.rds'))
-# M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/M1_aft_cue_sig_slopes_avg.rds'))
-# M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/M1_bfr_result_sig_slopes_avg.rds'))
-# M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/M1_aft_result_sig_slopes_avg.rds'))
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/alphabeta_S1_avg.RData')
-# S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-# S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-# S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-# S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-# S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/S1_bfr_cue_all_slopes_avg.rds'))
-# S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/S1_aft_cue_all_slopes_avg.rds'))
-# S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/S1_bfr_result_all_slopes_avg.rds'))
-# S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/S1_aft_result_all_slopes_avg.rds'))
-# S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/S1_bfr_cue_sig_slopes_avg.rds'))
-# S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/S1_aft_cue_sig_slopes_avg.rds'))
-# S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/S1_bfr_result_sig_slopes_avg.rds'))
-# S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/S1_aft_result_sig_slopes_avg.rds'))
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/alphabeta_PmD_avg.RData')
-# PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-# PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-# PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-# PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-# PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/PmD_bfr_cue_all_slopes_avg.rds'))
-# PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/PmD_aft_cue_all_slopes_avg.rds'))
-# PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/PmD_bfr_result_all_slopes_avg.rds'))
-# PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/PmD_aft_result_all_slopes_avg.rds'))
-# PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/PmD_bfr_cue_sig_slopes_avg.rds'))
-# PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/PmD_aft_cue_sig_slopes_avg.rds'))
-# PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/PmD_bfr_result_sig_slopes_avg.rds'))
-# PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_8_2/PmD_aft_result_sig_slopes_avg.rds'))
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/alphabeta_M1_avg.RData')
-# M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-# M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-# M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-# M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-# M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/M1_bfr_cue_all_slopes_avg.rds'))
-# M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/M1_aft_cue_all_slopes_avg.rds'))
-# M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/M1_bfr_result_all_slopes_avg.rds'))
-# M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/M1_aft_result_all_slopes_avg.rds'))
-# M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/M1_bfr_cue_sig_slopes_avg.rds'))
-# M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/M1_aft_cue_sig_slopes_avg.rds'))
-# M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/M1_bfr_result_sig_slopes_avg.rds'))
-# M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/M1_aft_result_sig_slopes_avg.rds'))
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/alphabeta_S1_avg.RData')
-# S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-# S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-# S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-# S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-# S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/S1_bfr_cue_all_slopes_avg.rds'))
-# S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/S1_aft_cue_all_slopes_avg.rds'))
-# S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/S1_bfr_result_all_slopes_avg.rds'))
-# S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/S1_aft_result_all_slopes_avg.rds'))
-# S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/S1_bfr_cue_sig_slopes_avg.rds'))
-# S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/S1_aft_cue_sig_slopes_avg.rds'))
-# S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/S1_bfr_result_sig_slopes_avg.rds'))
-# S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/S1_aft_result_sig_slopes_avg.rds'))
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/alphabeta_PmD_avg.RData')
-# PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-# PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-# PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-# PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-# PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/PmD_bfr_cue_all_slopes_avg.rds'))
-# PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/PmD_aft_cue_all_slopes_avg.rds'))
-# PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/PmD_bfr_result_all_slopes_avg.rds'))
-# PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/PmD_aft_result_all_slopes_avg.rds'))
-# PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/PmD_bfr_cue_sig_slopes_avg.rds'))
-# PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/PmD_aft_cue_sig_slopes_avg.rds'))
-# PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/PmD_bfr_result_sig_slopes_avg.rds'))
-# PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_1/PmD_aft_result_sig_slopes_avg.rds'))
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/alphabeta_M1_avg.RData')
-# M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-# M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-# M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-# M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-# M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/M1_bfr_cue_all_slopes_avg.rds'))
-# M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/M1_aft_cue_all_slopes_avg.rds'))
-# M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/M1_bfr_result_all_slopes_avg.rds'))
-# M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/M1_aft_result_all_slopes_avg.rds'))
-# M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/M1_bfr_cue_sig_slopes_avg.rds'))
-# M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/M1_aft_cue_sig_slopes_avg.rds'))
-# M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/M1_bfr_result_sig_slopes_avg.rds'))
-# M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/M1_aft_result_sig_slopes_avg.rds'))
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/alphabeta_S1_avg.RData')
-# S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-# S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-# S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-# S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-# S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/S1_bfr_cue_all_slopes_avg.rds'))
-# S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/S1_aft_cue_all_slopes_avg.rds'))
-# S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/S1_bfr_result_all_slopes_avg.rds'))
-# S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/S1_aft_result_all_slopes_avg.rds'))
-# S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/S1_bfr_cue_sig_slopes_avg.rds'))
-# S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/S1_aft_cue_sig_slopes_avg.rds'))
-# S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/S1_bfr_result_sig_slopes_avg.rds'))
-# S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/S1_aft_result_sig_slopes_avg.rds'))
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/alphabeta_PmD_avg.RData')
-# PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-# PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-# PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-# PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-# PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/PmD_bfr_cue_all_slopes_avg.rds'))
-# PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/PmD_aft_cue_all_slopes_avg.rds'))
-# PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/PmD_bfr_result_all_slopes_avg.rds'))
-# PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/PmD_aft_result_all_slopes_avg.rds'))
-# PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/PmD_bfr_cue_sig_slopes_avg.rds'))
-# PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/PmD_aft_cue_sig_slopes_avg.rds'))
-# PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/PmD_bfr_result_sig_slopes_avg.rds'))
-# PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_9_2/PmD_aft_result_sig_slopes_avg.rds'))
-# 
-# # load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/alphabeta_M1_avg.RData')
-# # M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-# # M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-# # M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-# # M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-# # M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/M1_bfr_cue_all_slopes_avg.rds'))
-# # M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/M1_aft_cue_all_slopes_avg.rds'))
-# # M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/M1_bfr_result_all_slopes_avg.rds'))
-# # M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/M1_aft_result_all_slopes_avg.rds'))
-# # M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/M1_bfr_cue_sig_slopes_avg.rds'))
-# # M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/M1_aft_cue_sig_slopes_avg.rds'))
-# # M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/M1_bfr_result_sig_slopes_avg.rds'))
-# # M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/M1_aft_result_sig_slopes_avg.rds'))
-# # 
-# # load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/alphabeta_S1_avg.RData')
-# # S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-# # S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-# # S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-# # S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-# # S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/S1_bfr_cue_all_slopes_avg.rds'))
-# # S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/S1_aft_cue_all_slopes_avg.rds'))
-# # S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/S1_bfr_result_all_slopes_avg.rds'))
-# # S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/S1_aft_result_all_slopes_avg.rds'))
-# # S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/S1_bfr_cue_sig_slopes_avg.rds'))
-# # S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/S1_aft_cue_sig_slopes_avg.rds'))
-# # S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/S1_bfr_result_sig_slopes_avg.rds'))
-# # S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/S1_aft_result_sig_slopes_avg.rds'))
-# # 
-# # load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/alphabeta_PmD_avg.RData')
-# # PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-# # PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-# # PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-# # PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-# # PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/PmD_bfr_cue_all_slopes_avg.rds'))
-# # PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/PmD_aft_cue_all_slopes_avg.rds'))
-# # PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/PmD_bfr_result_all_slopes_avg.rds'))
-# # PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/PmD_aft_result_all_slopes_avg.rds'))
-# # PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/PmD_bfr_cue_sig_slopes_avg.rds'))
-# # PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/PmD_aft_cue_sig_slopes_avg.rds'))
-# # PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/PmD_bfr_result_sig_slopes_avg.rds'))
-# # PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_1/PmD_aft_result_sig_slopes_avg.rds'))
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/alphabeta_M1_avg.RData')
-# M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-# M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-# M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-# M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-# M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/M1_bfr_cue_all_slopes_avg.rds'))
-# M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/M1_aft_cue_all_slopes_avg.rds'))
-# M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/M1_bfr_result_all_slopes_avg.rds'))
-# M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/M1_aft_result_all_slopes_avg.rds'))
-# M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/M1_bfr_cue_sig_slopes_avg.rds'))
-# M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/M1_aft_cue_sig_slopes_avg.rds'))
-# M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/M1_bfr_result_sig_slopes_avg.rds'))
-# M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/M1_aft_result_sig_slopes_avg.rds'))
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/alphabeta_S1_avg.RData')
-# S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-# S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-# S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-# S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-# S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/S1_bfr_cue_all_slopes_avg.rds'))
-# S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/S1_aft_cue_all_slopes_avg.rds'))
-# S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/S1_bfr_result_all_slopes_avg.rds'))
-# S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/S1_aft_result_all_slopes_avg.rds'))
-# S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/S1_bfr_cue_sig_slopes_avg.rds'))
-# S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/S1_aft_cue_sig_slopes_avg.rds'))
-# S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/S1_bfr_result_sig_slopes_avg.rds'))
-# S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/S1_aft_result_sig_slopes_avg.rds'))
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/alphabeta_PmD_avg.RData')
-# PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-# PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-# PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-# PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-# PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/PmD_bfr_cue_all_slopes_avg.rds'))
-# PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/PmD_aft_cue_all_slopes_avg.rds'))
-# PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/PmD_bfr_result_all_slopes_avg.rds'))
-# PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/PmD_aft_result_all_slopes_avg.rds'))
-# PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/PmD_bfr_cue_sig_slopes_avg.rds'))
-# PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/PmD_aft_cue_sig_slopes_avg.rds'))
-# PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/PmD_bfr_result_sig_slopes_avg.rds'))
-# PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_2/PmD_aft_result_sig_slopes_avg.rds'))
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/alphabeta_M1_avg.RData')
-# M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
-# M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
-# M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
-# M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
-# M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/M1_bfr_cue_all_slopes_avg.rds'))
-# M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/M1_aft_cue_all_slopes_avg.rds'))
-# M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/M1_bfr_result_all_slopes_avg.rds'))
-# M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/M1_aft_result_all_slopes_avg.rds'))
-# M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/M1_bfr_cue_sig_slopes_avg.rds'))
-# M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/M1_aft_cue_sig_slopes_avg.rds'))
-# M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/M1_bfr_result_sig_slopes_avg.rds'))
-# M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/M1_aft_result_sig_slopes_avg.rds'))
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/alphabeta_S1_avg.RData')
-# S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
-# S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
-# S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
-# S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
-# S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/S1_bfr_cue_all_slopes_avg.rds'))
-# S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/S1_aft_cue_all_slopes_avg.rds'))
-# S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/S1_bfr_result_all_slopes_avg.rds'))
-# S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/S1_aft_result_all_slopes_avg.rds'))
-# S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/S1_bfr_cue_sig_slopes_avg.rds'))
-# S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/S1_aft_cue_sig_slopes_avg.rds'))
-# S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/S1_bfr_result_sig_slopes_avg.rds'))
-# S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/S1_aft_result_sig_slopes_avg.rds'))
-# 
-# load('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/alphabeta_PmD_avg.RData')
-# PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
-# PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
-# PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
-# PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
-# PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/PmD_bfr_cue_all_slopes_avg.rds'))
-# PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/PmD_aft_cue_all_slopes_avg.rds'))
-# PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/PmD_bfr_result_all_slopes_avg.rds'))
-# PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/PmD_aft_result_all_slopes_avg.rds'))
-# PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/PmD_bfr_cue_sig_slopes_avg.rds'))
-# PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/PmD_aft_cue_sig_slopes_avg.rds'))
-# PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/PmD_bfr_result_sig_slopes_avg.rds'))
-# PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/dropbox/proposal_figs/model/avg_ab_z_nl/5_14_3/PmD_aft_result_sig_slopes_avg.rds'))
-# 
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/alphabeta_PmD_avg.RData')
+   PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
+   PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
+   PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
+   PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
+   PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/PmD_bfr_cue_all_slopes_avg.rds'))
+   PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/PmD_aft_cue_all_slopes_avg.rds'))
+   PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/PmD_bfr_result_all_slopes_avg.rds'))
+   PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/PmD_aft_result_all_slopes_avg.rds'))
+   PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/PmD_bfr_cue_sig_slopes_avg.rds'))
+   PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/PmD_aft_cue_sig_slopes_avg.rds'))
+   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/PmD_bfr_result_sig_slopes_avg.rds'))
+   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/0_9_2/PmD_aft_result_sig_slopes_avg.rds'))
+}else if (nhp_id == '504'){
+   ##################
+   #### 504 #########
+   ##################
 
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/alphabeta_S1_avg.RData')
+   S1_bfr_cue_nums_sum <- bfr_cue_nums
+   S1_aft_cue_nums_sum <- aft_cue_nums
+   S1_bfr_result_nums_sum <- bfr_result_nums
+   S1_aft_result_nums_sum <- aft_result_nums
+   S1_bfr_cue_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/S1_bfr_cue_all_slopes_avg.rds')
+   S1_aft_cue_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/S1_aft_cue_all_slopes_avg.rds')
+   S1_bfr_result_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/S1_bfr_result_all_slopes_avg.rds')
+   S1_aft_result_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/S1_aft_result_all_slopes_avg.rds')
+   S1_bfr_cue_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/S1_bfr_cue_sig_slopes_avg.rds')
+   S1_aft_cue_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/S1_aft_cue_sig_slopes_avg.rds')
+   S1_bfr_result_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/S1_bfr_result_sig_slopes_avg.rds')
+   S1_aft_result_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/S1_aft_result_sig_slopes_avg.rds')
+    
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/alphabeta_PmD_avg.RData')
+   PmD_bfr_cue_nums_sum <- bfr_cue_nums
+   PmD_aft_cue_nums_sum <- aft_cue_nums
+   PmD_bfr_result_nums_sum <- bfr_result_nums
+   PmD_aft_result_nums_sum <- aft_result_nums
+   PmD_bfr_cue_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/PmD_bfr_cue_all_slopes_avg.rds')
+   PmD_aft_cue_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/PmD_aft_cue_all_slopes_avg.rds')
+   PmD_bfr_result_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/PmD_bfr_result_all_slopes_avg.rds')
+   PmD_aft_result_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/PmD_aft_result_all_slopes_avg.rds')
+   PmD_bfr_cue_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/PmD_bfr_cue_sig_slopes_avg.rds')
+   PmD_aft_cue_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/PmD_aft_cue_sig_slopes_avg.rds')
+   PmD_bfr_result_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/PmD_bfr_result_sig_slopes_avg.rds')
+   PmD_aft_result_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/PmD_aft_result_sig_slopes_avg.rds')
+   
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/alphabeta_M1_avg.RData')
+   M1_bfr_cue_nums_sum <- bfr_cue_nums
+   M1_aft_cue_nums_sum <- aft_cue_nums
+   M1_bfr_result_nums_sum <- bfr_result_nums
+   M1_aft_result_nums_sum <- aft_result_nums
+   M1_bfr_cue_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/M1_bfr_cue_all_slopes_avg.rds')
+   M1_aft_cue_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/M1_aft_cue_all_slopes_avg.rds')
+   M1_bfr_result_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/M1_bfr_result_all_slopes_avg.rds')
+   M1_aft_result_all_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/M1_aft_result_all_slopes_avg.rds')
+   M1_bfr_cue_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/M1_bfr_cue_sig_slopes_avg.rds')
+   M1_aft_cue_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/M1_aft_cue_sig_slopes_avg.rds')
+   M1_bfr_result_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/M1_bfr_result_sig_slopes_avg.rds')
+   M1_aft_result_sig_slopes <- readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_1/M1_aft_result_sig_slopes_avg.rds')
+ 
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/alphabeta_M1_avg.RData')
+   M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
+   M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
+   M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
+   M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
+   M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/M1_bfr_cue_all_slopes_avg.rds'))
+   M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/M1_aft_cue_all_slopes_avg.rds'))
+   M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/M1_bfr_result_all_slopes_avg.rds'))
+   M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/M1_aft_result_all_slopes_avg.rds'))
+   M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/M1_bfr_cue_sig_slopes_avg.rds'))
+   M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/M1_aft_cue_sig_slopes_avg.rds'))
+   M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/M1_bfr_result_sig_slopes_avg.rds'))
+   M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/M1_aft_result_sig_slopes_avg.rds'))
+    
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/alphabeta_S1_avg.RData')
+   S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
+   S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
+   S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
+   S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
+   S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/S1_bfr_cue_all_slopes_avg.rds'))
+   S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/S1_aft_cue_all_slopes_avg.rds'))
+   S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/S1_bfr_result_all_slopes_avg.rds'))
+   S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/S1_aft_result_all_slopes_avg.rds'))
+   S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/S1_bfr_cue_sig_slopes_avg.rds'))
+   S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/S1_aft_cue_sig_slopes_avg.rds'))
+   S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/S1_bfr_result_sig_slopes_avg.rds'))
+   S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/S1_aft_result_sig_slopes_avg.rds'))
+ 
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/alphabeta_PmD_avg.RData')
+   PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
+   PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
+   PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
+   PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
+   PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/PmD_bfr_cue_all_slopes_avg.rds'))
+   PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/PmD_aft_cue_all_slopes_avg.rds'))
+   PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/PmD_bfr_result_all_slopes_avg.rds'))
+   PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/PmD_aft_result_all_slopes_avg.rds'))
+   PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/PmD_bfr_cue_sig_slopes_avg.rds'))
+   PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/PmD_aft_cue_sig_slopes_avg.rds'))
+   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/PmD_bfr_result_sig_slopes_avg.rds'))
+   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_8_2/PmD_aft_result_sig_slopes_avg.rds'))
+   
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/alphabeta_M1_avg.RData')
+   M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
+   M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
+   M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
+   M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
+   M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/M1_bfr_cue_all_slopes_avg.rds'))
+   M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/M1_aft_cue_all_slopes_avg.rds'))
+   M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/M1_bfr_result_all_slopes_avg.rds'))
+   M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/M1_aft_result_all_slopes_avg.rds'))
+   M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/M1_bfr_cue_sig_slopes_avg.rds'))
+   M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/M1_aft_cue_sig_slopes_avg.rds'))
+   M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/M1_bfr_result_sig_slopes_avg.rds'))
+   M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/M1_aft_result_sig_slopes_avg.rds'))
 
-
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/alphabeta_S1_avg.RData')
+   S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
+   S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
+   S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
+   S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
+   S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/S1_bfr_cue_all_slopes_avg.rds'))
+   S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/S1_aft_cue_all_slopes_avg.rds'))
+   S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/S1_bfr_result_all_slopes_avg.rds'))
+   S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/S1_aft_result_all_slopes_avg.rds'))
+   S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/S1_bfr_cue_sig_slopes_avg.rds'))
+   S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/S1_aft_cue_sig_slopes_avg.rds'))
+   S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/S1_bfr_result_sig_slopes_avg.rds'))
+   S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/S1_aft_result_sig_slopes_avg.rds'))
+ 
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/alphabeta_PmD_avg.RData')
+   PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
+   PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
+   PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
+   PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
+   PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/PmD_bfr_cue_all_slopes_avg.rds'))
+   PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/PmD_aft_cue_all_slopes_avg.rds'))
+   PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/PmD_bfr_result_all_slopes_avg.rds'))
+   PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/PmD_aft_result_all_slopes_avg.rds'))
+   PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/PmD_bfr_cue_sig_slopes_avg.rds'))
+   PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/PmD_aft_cue_sig_slopes_avg.rds'))
+   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/PmD_bfr_result_sig_slopes_avg.rds'))
+   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_1/PmD_aft_result_sig_slopes_avg.rds'))
+ 
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/alphabeta_M1_avg.RData')
+   M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
+   M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
+   M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
+   M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
+   M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/M1_bfr_cue_all_slopes_avg.rds'))
+   M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/M1_aft_cue_all_slopes_avg.rds'))
+   M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/M1_bfr_result_all_slopes_avg.rds'))
+   M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/M1_aft_result_all_slopes_avg.rds'))
+   M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/M1_bfr_cue_sig_slopes_avg.rds'))
+   M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/M1_aft_cue_sig_slopes_avg.rds'))
+   M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/M1_bfr_result_sig_slopes_avg.rds'))
+   M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/M1_aft_result_sig_slopes_avg.rds'))
+ 
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/alphabeta_S1_avg.RData')
+   S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
+   S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
+   S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
+   S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
+   S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/S1_bfr_cue_all_slopes_avg.rds'))
+   S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/S1_aft_cue_all_slopes_avg.rds'))
+   S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/S1_bfr_result_all_slopes_avg.rds'))
+   S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/S1_aft_result_all_slopes_avg.rds'))
+   S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/S1_bfr_cue_sig_slopes_avg.rds'))
+   S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/S1_aft_cue_sig_slopes_avg.rds'))
+   S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/S1_bfr_result_sig_slopes_avg.rds'))
+   S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/S1_aft_result_sig_slopes_avg.rds'))
+ 
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/alphabeta_PmD_avg.RData')
+   PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
+   PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
+   PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
+   PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
+   PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/PmD_bfr_cue_all_slopes_avg.rds'))
+   PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/PmD_aft_cue_all_slopes_avg.rds'))
+   PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/PmD_bfr_result_all_slopes_avg.rds'))
+   PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/PmD_aft_result_all_slopes_avg.rds'))
+   PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/PmD_bfr_cue_sig_slopes_avg.rds'))
+   PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/PmD_aft_cue_sig_slopes_avg.rds'))
+   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/PmD_bfr_result_sig_slopes_avg.rds'))
+   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_9_2/PmD_aft_result_sig_slopes_avg.rds'))
+ 
+   #load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/alphabeta_M1_avg.RData')
+   #M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
+   #M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
+   #M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
+   #M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
+   #M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/M1_bfr_cue_all_slopes_avg.rds'))
+   #M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/M1_aft_cue_all_slopes_avg.rds'))
+   #M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/M1_bfr_result_all_slopes_avg.rds'))
+   #M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/M1_aft_result_all_slopes_avg.rds'))
+   #M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/M1_bfr_cue_sig_slopes_avg.rds'))
+   #M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/M1_aft_cue_sig_slopes_avg.rds'))
+   #M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/M1_bfr_result_sig_slopes_avg.rds'))
+   #M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/M1_aft_result_sig_slopes_avg.rds'))
+ 
+   #load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/alphabeta_S1_avg.RData')
+   #S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
+   #S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
+   #S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
+   #S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
+   #S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/S1_bfr_cue_all_slopes_avg.rds'))
+   #S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/S1_aft_cue_all_slopes_avg.rds'))
+   #S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/S1_bfr_result_all_slopes_avg.rds'))
+   #S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/S1_aft_result_all_slopes_avg.rds'))
+   #S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/S1_bfr_cue_sig_slopes_avg.rds'))
+   #S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/S1_aft_cue_sig_slopes_avg.rds'))
+   #S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/S1_bfr_result_sig_slopes_avg.rds'))
+   #S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/S1_aft_result_sig_slopes_avg.rds'))
+ 
+   #load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/alphabeta_PmD_avg.RData')
+   #PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
+   #PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
+   #PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
+   #PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
+   #PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/PmD_bfr_cue_all_slopes_avg.rds'))
+   #PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/PmD_aft_cue_all_slopes_avg.rds'))
+   #PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/PmD_bfr_result_all_slopes_avg.rds'))
+   #PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/PmD_aft_result_all_slopes_avg.rds'))
+   #PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/PmD_bfr_cue_sig_slopes_avg.rds'))
+   #PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/PmD_aft_cue_sig_slopes_avg.rds'))
+   #PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/PmD_bfr_result_sig_slopes_avg.rds'))
+   #PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_1/PmD_aft_result_sig_slopes_avg.rds'))
+ 
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/alphabeta_M1_avg.RData')
+   M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
+   M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
+   M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
+   M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
+   M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/M1_bfr_cue_all_slopes_avg.rds'))
+   M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/M1_aft_cue_all_slopes_avg.rds'))
+   M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/M1_bfr_result_all_slopes_avg.rds'))
+   M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/M1_aft_result_all_slopes_avg.rds'))
+   M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/M1_bfr_cue_sig_slopes_avg.rds'))
+   M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/M1_aft_cue_sig_slopes_avg.rds'))
+   M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/M1_bfr_result_sig_slopes_avg.rds'))
+   M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/M1_aft_result_sig_slopes_avg.rds'))
+ 
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/alphabeta_S1_avg.RData')
+   S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
+   S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
+   S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
+   S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
+   S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/S1_bfr_cue_all_slopes_avg.rds'))
+   S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/S1_aft_cue_all_slopes_avg.rds'))
+   S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/S1_bfr_result_all_slopes_avg.rds'))
+   S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/S1_aft_result_all_slopes_avg.rds'))
+   S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/S1_bfr_cue_sig_slopes_avg.rds'))
+   S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/S1_aft_cue_sig_slopes_avg.rds'))
+   S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/S1_bfr_result_sig_slopes_avg.rds'))
+   S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/S1_aft_result_sig_slopes_avg.rds'))
+    
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/alphabeta_PmD_avg.RData')
+   PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
+   PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
+   PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
+   PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
+   PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/PmD_bfr_cue_all_slopes_avg.rds'))
+   PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/PmD_aft_cue_all_slopes_avg.rds'))
+   PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/PmD_bfr_result_all_slopes_avg.rds'))
+   PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/PmD_aft_result_all_slopes_avg.rds'))
+   PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/PmD_bfr_cue_sig_slopes_avg.rds'))
+   PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/PmD_aft_cue_sig_slopes_avg.rds'))
+   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/PmD_bfr_result_sig_slopes_avg.rds'))
+   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_2/PmD_aft_result_sig_slopes_avg.rds'))
+    
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/alphabeta_M1_avg.RData')
+   M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
+   M1_aft_cue_nums_sum <- M1_aft_cue_nums_sum + aft_cue_nums
+   M1_bfr_result_nums_sum <- M1_bfr_result_nums_sum + bfr_result_nums
+   M1_aft_result_nums_sum <- M1_aft_result_nums_sum + aft_result_nums
+   M1_bfr_cue_all_slopes <- rbind(M1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/M1_bfr_cue_all_slopes_avg.rds'))
+   M1_aft_cue_all_slopes <- rbind(M1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/M1_aft_cue_all_slopes_avg.rds'))
+   M1_bfr_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/M1_bfr_result_all_slopes_avg.rds'))
+   M1_aft_result_all_slopes <- rbind(M1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/M1_aft_result_all_slopes_avg.rds'))
+   M1_bfr_cue_sig_slopes <- rbind(M1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/M1_bfr_cue_sig_slopes_avg.rds'))
+   M1_aft_cue_sig_slopes <- rbind(M1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/M1_aft_cue_sig_slopes_avg.rds'))
+   M1_bfr_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/M1_bfr_result_sig_slopes_avg.rds'))
+   M1_aft_result_sig_slopes <- rbind(M1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/M1_aft_result_sig_slopes_avg.rds'))
+ 
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/alphabeta_S1_avg.RData')
+   S1_bfr_cue_nums_sum <- S1_bfr_cue_nums_sum + bfr_cue_nums
+   S1_aft_cue_nums_sum <- S1_aft_cue_nums_sum + aft_cue_nums
+   S1_bfr_result_nums_sum <- S1_bfr_result_nums_sum + bfr_result_nums
+   S1_aft_result_nums_sum <- S1_aft_result_nums_sum + aft_result_nums
+   S1_bfr_cue_all_slopes <- rbind(S1_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/S1_bfr_cue_all_slopes_avg.rds'))
+   S1_aft_cue_all_slopes <- rbind(S1_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/S1_aft_cue_all_slopes_avg.rds'))
+   S1_bfr_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/S1_bfr_result_all_slopes_avg.rds'))
+   S1_aft_result_all_slopes <- rbind(S1_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/S1_aft_result_all_slopes_avg.rds'))
+   S1_bfr_cue_sig_slopes <- rbind(S1_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/S1_bfr_cue_sig_slopes_avg.rds'))
+   S1_aft_cue_sig_slopes <- rbind(S1_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/S1_aft_cue_sig_slopes_avg.rds'))
+   S1_bfr_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/S1_bfr_result_sig_slopes_avg.rds'))
+   S1_aft_result_sig_slopes <- rbind(S1_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/S1_aft_result_sig_slopes_avg.rds'))
+ 
+   load('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/alphabeta_PmD_avg.RData')
+   PmD_bfr_cue_nums_sum <- PmD_bfr_cue_nums_sum + bfr_cue_nums
+   PmD_aft_cue_nums_sum <- PmD_aft_cue_nums_sum + aft_cue_nums
+   PmD_bfr_result_nums_sum <- PmD_bfr_result_nums_sum + bfr_result_nums
+   PmD_aft_result_nums_sum <- PmD_aft_result_nums_sum + aft_result_nums
+   PmD_bfr_cue_all_slopes <- rbind(PmD_bfr_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/PmD_bfr_cue_all_slopes_avg.rds'))
+   PmD_aft_cue_all_slopes <- rbind(PmD_aft_cue_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/PmD_aft_cue_all_slopes_avg.rds'))
+   PmD_bfr_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/PmD_bfr_result_all_slopes_avg.rds'))
+   PmD_aft_result_all_slopes <- rbind(PmD_bfr_result_all_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/PmD_aft_result_all_slopes_avg.rds'))
+   PmD_bfr_cue_sig_slopes <- rbind(PmD_bfr_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/PmD_bfr_cue_sig_slopes_avg.rds'))
+   PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/PmD_aft_cue_sig_slopes_avg.rds'))
+   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/PmD_bfr_result_sig_slopes_avg.rds'))
+   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/moved_from_dropbox/model_backup/avg_ab_z_nl/5_14_3/PmD_aft_result_sig_slopes_avg.rds'))
+ 
+}
 
 #########
+#labs <- c("both pos","both neg","alpha pos","beta pos")
 labs <- c("both pos","both neg","beta pos","alpha pos")
 region_list <- c('M1','S1','PmD')
 
@@ -535,6 +538,9 @@ for (region_index in 1:length(region_list)){
       aft_result_all_slopes <- PmD_aft_result_all_slopes
       aft_result_sig_slopes <- PmD_aft_result_sig_slopes
     }
+    
+
+  
 
   bfr_cue_df <-data.frame(perc=bfr_cue_nums_sum/sum(bfr_cue_nums_sum),labs,type='bfr_cue')
   aft_cue_df <-data.frame(perc=aft_cue_nums_sum/sum(aft_cue_nums_sum),labs,type='aft_cue')
@@ -564,7 +570,7 @@ for (region_index in 1:length(region_list)){
   df_all <- df_all[which(df_all$perc > 0),]
   
   bar_plt <- ggplot() + geom_bar(aes(x=df_all$type,y=df_all$perc,fill=df_all$labs),data=df_all,stat="identity") 
-  bar_plt <- bar_plt + labs(title=region_list[region_index],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
+  bar_plt <- bar_plt + labs(title=region_list[region_index],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("plum2","turquoise4","lightsalmon","royalblue"))
   bar_plt <- bar_plt + geom_text(aes(x=df_all$type,y=df_all$position,label=df_all$label),size=4,stat="identity")
   
   plot(bar_plt)
@@ -577,6 +583,8 @@ for (region_index in 1:length(region_list)){
   # sig_plt <- sig_plt + labs(title=paste(region_list[region_index],'bfr cue','significant')) 
   # all_plt <- ggplot(bfr_cue_all_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
   # all_plt <- all_plt + labs(title=paste(region_list[region_index],'bfr cue','all'))
+  # 
+  # 
   # 
   # multiplot(sig_plt,all_plt,cols=1)
   # graphics.off()
@@ -603,25 +611,39 @@ for (region_index in 1:length(region_list)){
   # 
   # png(paste('AVG_slope_collated_hist_',region_list[region_index],'_aft_result.png',sep=""),width=8,height=6,units="in",res=500)
   # 
-  # sig_plt <- ggplot(aft_result_sig_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
+  # sig_plt <- ggplot(aft_result_sig_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2) 
   # sig_plt <- sig_plt + labs(title=paste(region_list[region_index],'aft result','significant')) 
   # all_plt <- ggplot(aft_result_all_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
   # all_plt <- all_plt + labs(title=paste(region_list[region_index],'aft result','all'))
   # 
   # multiplot(sig_plt,all_plt,cols=1)
   # graphics.off()
+  # 
   
+  #only plot those w/in 3 sd of mean for now
+  bc_sig_bounds <- 3*sd(bfr_cue_sig_slopes$slopes)
+  bc_all_bounds <- 3*sd(bfr_cue_all_slopes$slopes)
+  ac_sig_bounds <- 3*sd(aft_cue_sig_slopes$slopes)
+  ac_all_bounds <- 3*sd(aft_cue_all_slopes$slopes)
+  br_sig_bounds <- 3*sd(bfr_result_sig_slopes$slopes)
+  br_all_bounds <- 3*sd(bfr_result_all_slopes$slopes)
+  ar_sig_bounds <- 3*sd(aft_result_sig_slopes$slopes)
+  ar_all_bounds <- 3*sd(aft_result_all_slopes$slopes)
+  
+
+
+
   png(paste('AVG_slope_collated_hist_',region_list[region_index],'_bfr_cue.png',sep=""),width=8,height=6,units="in",res=500)
   
   sig_plt <- ggplot(bfr_cue_sig_slopes,aes(x=slopes)) +
     geom_histogram(data=subset(bfr_cue_sig_slopes,type=='val'),fill='maroon',alpha=0.75,position='identity',binwidth=0.2) + 
     geom_histogram(data=subset(bfr_cue_sig_slopes,type=='mtv'),fill='slateblue',alpha=0.6,position='identity',binwidth=0.2) + 
-    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'bfr cue','significant')) 
-  
+    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'bfr cue','significant')) + xlim(-1*bc_sig_bounds,bc_sig_bounds)
+
   all_plt <- ggplot(bfr_cue_all_slopes,aes(x=slopes)) +
     geom_histogram(data=subset(bfr_cue_all_slopes,type=='val'),fill='maroon',alpha=0.75,position='identity',binwidth=0.2) + 
     geom_histogram(data=subset(bfr_cue_all_slopes,type=='mtv'),fill='slateblue',alpha=0.6,position='identity',binwidth=0.2) + 
-    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'bfr cue','all')) 
+    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'bfr cue','all')) + xlim(-1*bc_all_bounds,bc_all_bounds)
   
   multiplot(sig_plt,all_plt,cols=1)
   graphics.off()
@@ -631,12 +653,12 @@ for (region_index in 1:length(region_list)){
   sig_plt <- ggplot(aft_cue_sig_slopes,aes(x=slopes)) +
     geom_histogram(data=subset(aft_cue_sig_slopes,type=='val'),fill='maroon',alpha=0.75,position='identity',binwidth=0.2) + 
     geom_histogram(data=subset(aft_cue_sig_slopes,type=='mtv'),fill='slateblue',alpha=0.6,position='identity',binwidth=0.2) + 
-    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'aft cue','significant')) 
+    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'aft cue','significant')) + xlim(-1*ac_sig_bounds,ac_sig_bounds)
   
   all_plt <- ggplot(aft_cue_all_slopes,aes(x=slopes)) +
     geom_histogram(data=subset(aft_cue_all_slopes,type=='val'),fill='maroon',alpha=0.75,position='identity',binwidth=0.2) + 
     geom_histogram(data=subset(aft_cue_all_slopes,type=='mtv'),fill='slateblue',alpha=0.6,position='identity',binwidth=0.2) + 
-    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'aft cue','all')) 
+    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'aft cue','all')) + xlim(-1*ac_all_bounds,ac_all_bounds)
   
   multiplot(sig_plt,all_plt,cols=1)
   graphics.off()  
@@ -646,12 +668,12 @@ for (region_index in 1:length(region_list)){
   sig_plt <- ggplot(bfr_result_sig_slopes,aes(x=slopes)) +
     geom_histogram(data=subset(bfr_result_sig_slopes,type=='val'),fill='maroon',alpha=0.75,position='identity',binwidth=0.2) + 
     geom_histogram(data=subset(bfr_result_sig_slopes,type=='mtv'),fill='slateblue',alpha=0.6,position='identity',binwidth=0.2) + 
-    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'bfr result','significant')) 
+    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'bfr result','significant')) + xlim(-1*br_sig_bounds,br_sig_bounds)
   
   all_plt <- ggplot(bfr_result_all_slopes,aes(x=slopes)) +
     geom_histogram(data=subset(bfr_result_all_slopes,type=='val'),fill='maroon',alpha=0.75,position='identity',binwidth=0.2) + 
     geom_histogram(data=subset(bfr_result_all_slopes,type=='mtv'),fill='slateblue',alpha=0.6,position='identity',binwidth=0.2) + 
-    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'bfr result','all')) 
+    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'bfr result','all')) + xlim(-1*br_all_bounds,br_all_bounds)
   
   multiplot(sig_plt,all_plt,cols=1)
   graphics.off()  
@@ -661,15 +683,19 @@ for (region_index in 1:length(region_list)){
   sig_plt <- ggplot(aft_result_sig_slopes,aes(x=slopes)) +
     geom_histogram(data=subset(aft_result_sig_slopes,type=='val'),fill='maroon',alpha=0.75,position='identity',binwidth=0.2) + 
     geom_histogram(data=subset(aft_result_sig_slopes,type=='mtv'),fill='slateblue',alpha=0.6,position='identity',binwidth=0.2) + 
-    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'aft result','significant')) 
+    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'aft result','significant')) + xlim(-1*ar_sig_bounds,ar_sig_bounds)
   
   all_plt <- ggplot(aft_result_all_slopes,aes(x=slopes)) +
     geom_histogram(data=subset(aft_result_all_slopes,type=='val'),fill='maroon',alpha=0.75,position='identity',binwidth=0.2) + 
     geom_histogram(data=subset(aft_result_all_slopes,type=='mtv'),fill='slateblue',alpha=0.6,position='identity',binwidth=0.2) + 
-    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'aft result','all')) 
+    scale_fill_manual(name="type",values=c("maroon","slateblue")) + labs(title=paste(region_list[region_index],'aft result','all')) + xlim(-1*ar_all_bounds,ar_all_bounds)
   
   multiplot(sig_plt,all_plt,cols=1)
   graphics.off()
   
   
 }
+
+
+save.image(file='rp_collated_info_avg.RData')
+rm(list=ls())

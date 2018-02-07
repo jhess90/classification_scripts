@@ -16,7 +16,7 @@ library(plyr)
 library(reshape)
 
 
-nhp_id <- '0059'
+nhp_id <- '504'
 
 
 ##################
@@ -84,9 +84,9 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/PmD_bfr_result_sig_slopes_avg.rds')
   PmD_aft_result_sig_slopes <- readRDS('~/Dropbox/model_alt/0_3_13_1/PmD_aft_result_sig_slopes_avg.rds')
 
-  cat('M1:',sum(M1_bfr_cue_nums_sum),'\n',sum(M1_aft_cue_nums_sum),'\n',sum(M1_bfr_res_nums_sum),'\n',sum(M1_aft_res_nums_sum),'\n\n')
-  cat('S1:',sum(S1_bfr_cue_nums_sum),'\n',sum(S1_aft_cue_nums_sum),'\n',sum(S1_bfr_res_nums_sum),'\n',sum(S1_aft_res_nums_sum),'\n\n')
-  cat('PmD:',sum(PmD_bfr_cue_nums_sum),'\n',sum(PmD_aft_cue_nums_sum),'\n',sum(PmD_bfr_res_nums_sum),'\n',sum(PmD_aft_res_nums_sum),'\n\n')
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
   
   #
   load('~/Dropbox/model_alt/0_3_13_2/alphabeta_M1_all.RData')
@@ -149,9 +149,9 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_2/PmD_aft_result_sig_slopes_avg.rds'))
   
-  cat('M1:',sum(M1_bfr_cue_nums_sum),'\n',sum(M1_aft_cue_nums_sum),'\n',sum(M1_bfr_res_nums_sum),'\n',sum(M1_aft_res_nums_sum),'\n\n')
-  cat('S1:',sum(S1_bfr_cue_nums_sum),'\n',sum(S1_aft_cue_nums_sum),'\n',sum(S1_bfr_res_nums_sum),'\n',sum(S1_aft_res_nums_sum),'\n\n')
-  cat('PmD:',sum(PmD_bfr_cue_nums_sum),'\n',sum(PmD_aft_cue_nums_sum),'\n',sum(PmD_bfr_res_nums_sum),'\n',sum(PmD_aft_res_nums_sum),'\n\n')
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
 
   #
   load('~/Dropbox/model_alt/0_3_13_3/alphabeta_M1_all.RData')
@@ -214,9 +214,9 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_13_3/PmD_aft_result_sig_slopes_avg.rds'))
 
-  cat('M1:',sum(M1_bfr_cue_nums_sum),'\n',sum(M1_aft_cue_nums_sum),'\n',sum(M1_bfr_res_nums_sum),'\n',sum(M1_aft_res_nums_sum),'\n\n')
-  cat('S1:',sum(S1_bfr_cue_nums_sum),'\n',sum(S1_aft_cue_nums_sum),'\n',sum(S1_bfr_res_nums_sum),'\n',sum(S1_aft_res_nums_sum),'\n\n')
-  cat('PmD:',sum(PmD_bfr_cue_nums_sum),'\n',sum(PmD_aft_cue_nums_sum),'\n',sum(PmD_bfr_res_nums_sum),'\n',sum(PmD_aft_res_nums_sum),'\n\n')
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
   
   #
   load('~/Dropbox/model_alt/0_3_14_1/alphabeta_M1_all.RData')
@@ -279,9 +279,9 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_1/PmD_aft_result_sig_slopes_avg.rds'))
 
-  cat('M1:',sum(M1_bfr_cue_nums_sum),'\n',sum(M1_aft_cue_nums_sum),'\n',sum(M1_bfr_res_nums_sum),'\n',sum(M1_aft_res_nums_sum),'\n\n')
-  cat('S1:',sum(S1_bfr_cue_nums_sum),'\n',sum(S1_aft_cue_nums_sum),'\n',sum(S1_bfr_res_nums_sum),'\n',sum(S1_aft_res_nums_sum),'\n\n')
-  cat('PmD:',sum(PmD_bfr_cue_nums_sum),'\n',sum(PmD_aft_cue_nums_sum),'\n',sum(PmD_bfr_res_nums_sum),'\n',sum(PmD_aft_res_nums_sum),'\n\n')
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
   
   #
   load('~/Dropbox/model_alt/0_3_14_2/alphabeta_M1_all.RData')
@@ -344,9 +344,9 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_2/PmD_aft_result_sig_slopes_avg.rds'))
 
-  cat('M1:',sum(M1_bfr_cue_nums_sum),'\n',sum(M1_aft_cue_nums_sum),'\n',sum(M1_bfr_res_nums_sum),'\n',sum(M1_aft_res_nums_sum),'\n\n')
-  cat('S1:',sum(S1_bfr_cue_nums_sum),'\n',sum(S1_aft_cue_nums_sum),'\n',sum(S1_bfr_res_nums_sum),'\n',sum(S1_aft_res_nums_sum),'\n\n')
-  cat('PmD:',sum(PmD_bfr_cue_nums_sum),'\n',sum(PmD_aft_cue_nums_sum),'\n',sum(PmD_bfr_res_nums_sum),'\n',sum(PmD_aft_res_nums_sum),'\n\n')
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
   
   #
   load('~/Dropbox/model_alt/0_3_14_3/alphabeta_M1_all.RData')
@@ -409,9 +409,9 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_14_3/PmD_aft_result_sig_slopes_avg.rds'))
 
-  cat('M1:',sum(M1_bfr_cue_nums_sum),'\n',sum(M1_aft_cue_nums_sum),'\n',sum(M1_bfr_res_nums_sum),'\n',sum(M1_aft_res_nums_sum),'\n\n')
-  cat('S1:',sum(S1_bfr_cue_nums_sum),'\n',sum(S1_aft_cue_nums_sum),'\n',sum(S1_bfr_res_nums_sum),'\n',sum(S1_aft_res_nums_sum),'\n\n')
-  cat('PmD:',sum(PmD_bfr_cue_nums_sum),'\n',sum(PmD_aft_cue_nums_sum),'\n',sum(PmD_bfr_res_nums_sum),'\n',sum(PmD_aft_res_nums_sum),'\n\n')
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
   
   #
   load('~/Dropbox/model_alt/0_3_27_1/alphabeta_M1_all.RData')
@@ -474,9 +474,9 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_1/PmD_aft_result_sig_slopes_avg.rds'))
 
-  cat('M1:',sum(M1_bfr_cue_nums_sum),'\n',sum(M1_aft_cue_nums_sum),'\n',sum(M1_bfr_res_nums_sum),'\n',sum(M1_aft_res_nums_sum),'\n\n')
-  cat('S1:',sum(S1_bfr_cue_nums_sum),'\n',sum(S1_aft_cue_nums_sum),'\n',sum(S1_bfr_res_nums_sum),'\n',sum(S1_aft_res_nums_sum),'\n\n')
-  cat('PmD:',sum(PmD_bfr_cue_nums_sum),'\n',sum(PmD_aft_cue_nums_sum),'\n',sum(PmD_bfr_res_nums_sum),'\n',sum(PmD_aft_res_nums_sum),'\n\n')
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
   
   #
   load('~/Dropbox/model_alt/0_3_27_2/alphabeta_M1_all.RData')
@@ -539,9 +539,9 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_27_2/PmD_aft_result_sig_slopes_avg.rds'))
 
-  cat('M1:',sum(M1_bfr_cue_nums_sum),'\n',sum(M1_aft_cue_nums_sum),'\n',sum(M1_bfr_res_nums_sum),'\n',sum(M1_aft_res_nums_sum),'\n\n')
-  cat('S1:',sum(S1_bfr_cue_nums_sum),'\n',sum(S1_aft_cue_nums_sum),'\n',sum(S1_bfr_res_nums_sum),'\n',sum(S1_aft_res_nums_sum),'\n\n')
-  cat('PmD:',sum(PmD_bfr_cue_nums_sum),'\n',sum(PmD_aft_cue_nums_sum),'\n',sum(PmD_bfr_res_nums_sum),'\n',sum(PmD_aft_res_nums_sum),'\n\n')
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
 
   
   #
@@ -605,9 +605,9 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_1/PmD_aft_result_sig_slopes_avg.rds'))
 
-  cat('M1:',sum(M1_bfr_cue_nums_sum),'\n',sum(M1_aft_cue_nums_sum),'\n',sum(M1_bfr_res_nums_sum),'\n',sum(M1_aft_res_nums_sum),'\n\n')
-  cat('S1:',sum(S1_bfr_cue_nums_sum),'\n',sum(S1_aft_cue_nums_sum),'\n',sum(S1_bfr_res_nums_sum),'\n',sum(S1_aft_res_nums_sum),'\n\n')
-  cat('PmD:',sum(PmD_bfr_cue_nums_sum),'\n',sum(PmD_aft_cue_nums_sum),'\n',sum(PmD_bfr_res_nums_sum),'\n',sum(PmD_aft_res_nums_sum),'\n\n')
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
   
   #
   load('~/Dropbox/model_alt/0_3_28_2/alphabeta_M1_all.RData')
@@ -670,9 +670,9 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_2/PmD_aft_result_sig_slopes_avg.rds'))
 
-  cat('M1:',sum(M1_bfr_cue_nums_sum),'\n',sum(M1_aft_cue_nums_sum),'\n',sum(M1_bfr_res_nums_sum),'\n',sum(M1_aft_res_nums_sum),'\n\n')
-  cat('S1:',sum(S1_bfr_cue_nums_sum),'\n',sum(S1_aft_cue_nums_sum),'\n',sum(S1_bfr_res_nums_sum),'\n',sum(S1_aft_res_nums_sum),'\n\n')
-  cat('PmD:',sum(PmD_bfr_cue_nums_sum),'\n',sum(PmD_aft_cue_nums_sum),'\n',sum(PmD_bfr_res_nums_sum),'\n',sum(PmD_aft_res_nums_sum),'\n\n')
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
 
   
   #
@@ -736,9 +736,9 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/0_3_28_3/PmD_aft_result_sig_slopes_avg.rds'))
 
-  cat('M1:',sum(M1_bfr_cue_nums_sum),'\n',sum(M1_aft_cue_nums_sum),'\n',sum(M1_bfr_res_nums_sum),'\n',sum(M1_aft_res_nums_sum),'\n\n')
-  cat('S1:',sum(S1_bfr_cue_nums_sum),'\n',sum(S1_aft_cue_nums_sum),'\n',sum(S1_bfr_res_nums_sum),'\n',sum(S1_aft_res_nums_sum),'\n\n')
-  cat('PmD:',sum(PmD_bfr_cue_nums_sum),'\n',sum(PmD_aft_cue_nums_sum),'\n',sum(PmD_bfr_res_nums_sum),'\n',sum(PmD_aft_res_nums_sum),'\n\n')
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
 
 
 }else if (nhp_id == '504'){
@@ -808,6 +808,10 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/PmD_bfr_result_sig_slopes_avg.rds')
   PmD_aft_result_sig_slopes <- readRDS('~/Dropbox/model_alt/5_3_13_1/PmD_aft_result_sig_slopes_avg.rds')
   
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
+  
   #
   load('~/Dropbox/model_alt/5_3_13_2/alphabeta_M1_all.RData')
   M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
@@ -868,6 +872,10 @@ if (nhp_id == '0059'){
   PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/PmD_aft_cue_sig_slopes_avg.rds'))
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_2/PmD_aft_result_sig_slopes_avg.rds'))
+  
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
   
   #
   load('~/Dropbox/model_alt/5_3_13_3/alphabeta_M1_all.RData')
@@ -930,6 +938,10 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_13_3/PmD_aft_result_sig_slopes_avg.rds'))
   
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
+  
   #
   load('~/Dropbox/model_alt/5_3_14_1/alphabeta_M1_all.RData')
   M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
@@ -990,6 +1002,10 @@ if (nhp_id == '0059'){
   PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/PmD_aft_cue_sig_slopes_avg.rds'))
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_1/PmD_aft_result_sig_slopes_avg.rds'))
+  
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
   
   #
   load('~/Dropbox/model_alt/5_3_14_2/alphabeta_M1_all.RData')
@@ -1052,6 +1068,10 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_2/PmD_aft_result_sig_slopes_avg.rds'))
   
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
+  
   #
   load('~/Dropbox/model_alt/5_3_14_3/alphabeta_M1_all.RData')
   M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
@@ -1112,6 +1132,10 @@ if (nhp_id == '0059'){
   PmD_aft_cue_sig_slopes <- rbind(PmD_aft_cue_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/PmD_aft_cue_sig_slopes_avg.rds'))
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_14_3/PmD_aft_result_sig_slopes_avg.rds'))
+  
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
   
   #
   load('~/Dropbox/model_alt/5_3_28_2/alphabeta_M1_all.RData')
@@ -1174,6 +1198,10 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_2/PmD_aft_result_sig_slopes_avg.rds'))
   
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
+  
   #
   load('~/Dropbox/model_alt/5_3_28_3/alphabeta_M1_all.RData')
   M1_bfr_cue_nums_sum <- M1_bfr_cue_nums_sum + bfr_cue_nums
@@ -1235,6 +1263,10 @@ if (nhp_id == '0059'){
   PmD_bfr_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/PmD_bfr_result_sig_slopes_avg.rds'))
   PmD_aft_result_sig_slopes <- rbind(PmD_bfr_result_sig_slopes,readRDS('~/Dropbox/model_alt/5_3_28_3/PmD_aft_result_sig_slopes_avg.rds'))
 
+  cat('M1:',sum(M1_ps_bfr_cue_nums_sum),'\n',sum(M1_ps_aft_cue_nums_sum),'\n',sum(M1_ps_bfr_res_nums_sum),'\n',sum(M1_ps_aft_res_nums_sum),'\n\n')
+  cat('S1:',sum(S1_ps_bfr_cue_nums_sum),'\n',sum(S1_ps_aft_cue_nums_sum),'\n',sum(S1_ps_bfr_res_nums_sum),'\n',sum(S1_ps_aft_res_nums_sum),'\n\n')
+  cat('PmD:',sum(PmD_ps_bfr_cue_nums_sum),'\n',sum(PmD_ps_aft_cue_nums_sum),'\n',sum(PmD_ps_bfr_res_nums_sum),'\n',sum(PmD_ps_aft_res_nums_sum),'\n\n')
+  
 }
 
 save.image(file='alt_combined_info.RData')

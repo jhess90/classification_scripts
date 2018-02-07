@@ -1,8 +1,8 @@
 library(openxlsx)
 library(ggplot2)
 library(reshape2)
-source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
-#source("~/workspace/classification_scripts/multiplot.R")
+#source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
+source("~/workspace/classification_scripts/multiplot.R")
 library(zoo)
 library(gplots)
 library(RColorBrewer)
@@ -150,7 +150,7 @@ for (region_index in 1:length(region_list)){
   ar.df <- rbind(ar_alpha,ar_beta)
   
   max_val <- max(ac.df$slope,br.df$slope,ar.df$slope)
-  min_vinal <- min(ac.df$slope,br.df$slope,ar.df$slope)
+  min_val <- min(ac.df$slope,br.df$slope,ar.df$slope)
   max_min <- max(max_val,abs(min_val)) + 0.02
   
   ac_plt <- ggplot(ac.df,aes(slope,fill=name),na.rm=T) + geom_histogram(alpha=0.5,position='identity',binwidth=0.005,na.rm=T)
@@ -1110,6 +1110,6 @@ for (region_index in 1:length(region_list)){
 
 save.image('all_r_all.RData')
 
-#rm(list=ls())
+rm(list=ls())
 
  
