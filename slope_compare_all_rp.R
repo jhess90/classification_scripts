@@ -27,8 +27,8 @@ rm(list=ls())
 region_list <- c('M1','S1','PmD')
 
 #load('alt_combined_xlsx_info.RData')
-#load('rp_collated_info_all.RData')
-load('all_r_all.RData')
+load('rp_collated_info.RData')
+#load('all_r_all.RData')
 
 for (region_index in 1:length(region_list)){
     
@@ -155,15 +155,17 @@ for (region_index in 1:length(region_list)){
   min_val <- min(ac.df$slope,br.df$slope,ar.df$slope)
   max_min <- max(max_val,abs(min_val)) + 0.02
   
-  ac_plt <- ggplot(ac.df,aes(slope,fill=name),na.rm=T) + geom_histogram(alpha=0.5,position='identity',binwidth=0.005,na.rm=T)
+  bin_size <- max_min / 30
+  
+  ac_plt <- ggplot(ac.df,aes(slope,fill=name),na.rm=T) + geom_histogram(alpha=0.5,position='identity',binwidth=bin_size,na.rm=T)
   ac_plt <- ac_plt + scale_fill_manual(name='Coeff',values=c("forestgreen","firebrick")) + labs(title="After Cue",y="Units") + theme_classic()
   ac_plt <- ac_plt + xlim(-1*max_min,max_min)
   
-  br_plt <- ggplot(br.df,aes(slope,fill=name)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.005,na.rm=T)
+  br_plt <- ggplot(br.df,aes(slope,fill=name)) + geom_histogram(alpha=0.5,position='identity',binwidth=bin_size,na.rm=T)
   br_plt <- br_plt + scale_fill_manual(name='Coeff',values=c("forestgreen","firebrick")) + labs(title="Before Result",y="Units") + theme_classic()
   br_plt <- br_plt + xlim(-1*max_min,max_min) 
   
-  ar_plt <- ggplot(ar.df,aes(slope,fill=name)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.005,na.rm=T)
+  ar_plt <- ggplot(ar.df,aes(slope,fill=name)) + geom_histogram(alpha=0.5,position='identity',binwidth=bin_size,na.rm=T)
   ar_plt <- ar_plt + scale_fill_manual(name='Coeff',values=c("forestgreen","firebrick")) + labs(title="After Result",y="Units") + theme_classic()
   ar_plt <- ar_plt + xlim(-1*max_min,max_min)
   
@@ -210,15 +212,15 @@ for (region_index in 1:length(region_list)){
   max_min <- max(max_val,abs(min_val)) + 0.02
   
   
-  ac_plt <- ggplot(ac.df,aes(slope,fill=name)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.005,na.rm=T)
+  ac_plt <- ggplot(ac.df,aes(slope,fill=name)) + geom_histogram(alpha=0.5,position='identity',binwidth=bin_size,na.rm=T)
   ac_plt <- ac_plt + scale_fill_manual(name='Coeff',values=c("forestgreen","firebrick")) + labs(title="After Cue",y="Units") + theme_classic()
   ac_plt <- ac_plt + xlim(-1*max_min,max_min)
   
-  br_plt <- ggplot(br.df,aes(slope,fill=name)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.005,na.rm=T)
+  br_plt <- ggplot(br.df,aes(slope,fill=name)) + geom_histogram(alpha=0.5,position='identity',binwidth=bin_size,na.rm=T)
   br_plt <- br_plt + scale_fill_manual(name='Coeff',values=c("forestgreen","firebrick")) + labs(title="Before Result",y="Units") + theme_classic()
   br_plt <- br_plt + xlim(-1*max_min,max_min) 
   
-  ar_plt <- ggplot(ar.df,aes(slope,fill=name)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.005,na.rm=T)
+  ar_plt <- ggplot(ar.df,aes(slope,fill=name)) + geom_histogram(alpha=0.5,position='identity',binwidth=bin_size,na.rm=T)
   ar_plt <- ar_plt + scale_fill_manual(name='Coeff',values=c("forestgreen","firebrick")) + labs(title="After Result",y="Units") + theme_classic()
   ar_plt <- ar_plt + xlim(-1*max_min,max_min)
   
@@ -226,6 +228,73 @@ for (region_index in 1:length(region_list)){
   graphics.off()
   
   
+  labs <- c('alpha only sig','beta only sig','both sig','no sig')
+  
+  #percsig nums: no sig, both sig, beta sig, alpha sig
+  #bfr_cue_vals <- c(percsig_bfr_cue_nums[4]/percsig_total_units,percsig_bfr_cue_nums[3]/percsig_total_units,percsig_bfr_cue_nums[2]/percsig_total_units,percsig_bfr_cue_nums[1]/percsig_total_units)
+  #aft_cue_vals <- c(percsig_aft_cue_nums[4]/percsig_total_units,percsig_aft_cue_nums[3]/percsig_total_units,percsig_aft_cue_nums[2]/percsig_total_units,percsig_aft_cue_nums[1]/percsig_total_units)
+  #bfr_res_vals <- c(percsig_bfr_res_nums[4]/percsig_total_units,percsig_bfr_res_nums[3]/percsig_total_units,percsig_bfr_res_nums[2]/percsig_total_units,percsig_bfr_res_nums[1]/percsig_total_units)
+  #aft_res_vals <- c(percsig_aft_res_nums[4]/percsig_total_units,percsig_aft_res_nums[3]/percsig_total_units,percsig_aft_res_nums[2]/percsig_total_units,percsig_aft_res_nums[1]/percsig_total_units)
+  
+  bfr_cue_vals <- percsig_bfr_cue_nums / percsig_unit_total
+  aft_cue_vals <- percsig_aft_cue_nums / percsig_unit_total
+  bfr_res_vals <- percsig_bfr_res_nums / percsig_unit_total
+  aft_res_vals <- percsig_aft_res_nums / percsig_unit_total
+  
+  # bfr_cue_vals <- c(bfr_cue_alpha_sig,bfr_cue_beta_sig,bfr_cue_both_sig,bfr_cue_non)
+  # aft_cue_vals <- c(aft_cue_alpha_sig,aft_cue_beta_sig,aft_cue_both_sig,aft_cue_non)
+  # bfr_result_vals <- c(bfr_result_alpha_sig,bfr_result_beta_sig,bfr_result_both_sig,bfr_result_non)
+  # aft_result_vals <- c(aft_result_alpha_sig,aft_result_beta_sig,aft_result_both_sig,aft_result_non)
+  
+  bfr_cue_df <- data.frame(perc=bfr_cue_vals,labs,type='bfr_cue')
+  aft_cue_df <- data.frame(perc=aft_cue_vals,labs,type='aft_cue')
+  bfr_res_df <- data.frame(perc=bfr_res_vals,labs,type='bfr_result')
+  aft_res_df <- data.frame(perc=aft_res_vals,labs,type='aft_result')
+  
+  bfr_cue_df <- bfr_cue_df[rev(order(bfr_cue_df$labs)),]
+  aft_cue_df <- aft_cue_df[rev(order(aft_cue_df$labs)),]
+  bfr_res_df <- bfr_res_df[rev(order(bfr_res_df$labs)),]
+  aft_res_df <- aft_res_df[rev(order(aft_res_df$labs)),]
+  
+  bfr_cue_df <- ddply(bfr_cue_df,.(type),transform,position=(cumsum(bfr_cue_df$perc)-0.5*bfr_cue_df$perc))
+  aft_cue_df <- ddply(aft_cue_df,.(type),transform,position=(cumsum(aft_cue_df$perc)-0.5*aft_cue_df$perc))
+  bfr_res_df <- ddply(bfr_res_df,.(type),transform,position=(cumsum(bfr_res_df$perc)-0.5*bfr_res_df$perc))
+  aft_res_df <- ddply(aft_res_df,.(type),transform,position=(cumsum(aft_res_df$perc)-0.5*aft_res_df$perc))
+  
+  #percsig nums: no sig, both sig, beta sig, alpha sig
+  #ACTUAL percsig nums: alpha sig, both sig, beta sig, no sig
+  bfr_cue_nums <- c(percsig_bfr_cue_nums[4],percsig_bfr_cue_nums[3],percsig_bfr_cue_nums[2],percsig_bfr_cue_nums[1])
+  aft_cue_nums <- c(percsig_aft_cue_nums[4],percsig_aft_cue_nums[3],percsig_aft_cue_nums[2],percsig_aft_cue_nums[1])
+  bfr_res_nums <- c(percsig_bfr_res_nums[4],percsig_bfr_res_nums[3],percsig_bfr_res_nums[2],percsig_bfr_res_nums[1])
+  aft_res_nums <- c(percsig_aft_res_nums[4],percsig_aft_res_nums[3],percsig_aft_res_nums[2],percsig_aft_res_nums[1])
+  
+  # 
+  # bfr_cue_nums <- percsig_bfr_cue_nums
+  # aft_cue_nums <- percsig_aft_cue_nums
+  # bfr_res_nums <- percsig_bfr_res_nums
+  # aft_res_nums <- percsig_aft_res_nums
+  # 
+  # bfr_cue_nums <- c(bfr_cue[5]-bfr_cue[4]-bfr_cue[13]-bfr_cue[12],bfr_cue[4],bfr_cue[13],bfr_cue[12])
+  # aft_cue_nums <- c(aft_cue[5]-aft_cue[4]-aft_cue[13]-aft_cue[12],aft_cue[4],aft_cue[13],aft_cue[12])
+  # bfr_result_nums <- c(bfr_result[5]-bfr_result[4]-bfr_result[13]-bfr_result[12],bfr_result[4],bfr_result[13],bfr_result[12])
+  # aft_result_nums <- c(aft_result[5]-aft_result[4]-aft_result[13]-aft_result[12],aft_result[4],aft_result[13],aft_result[12])
+  
+  bfr_cue_df <- ddply(bfr_cue_df,.(type),transform,label=paste(scales::percent(bfr_cue_df$perc),' n=',bfr_cue_nums,sep=""))
+  aft_cue_df <- ddply(aft_cue_df,.(type),transform,label=paste(scales::percent(aft_cue_df$perc),' n=',aft_cue_nums,sep=""))
+  bfr_res_df <- ddply(bfr_res_df,.(type),transform,label=paste(scales::percent(bfr_res_df$perc),' n=',bfr_res_nums,sep=""))
+  aft_res_df <- ddply(aft_res_df,.(type),transform,label=paste(scales::percent(aft_res_df$perc),' n=',aft_res_nums,sep=""))
+  
+  png(paste('all_bar_plotted_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  df_all <- rbind(bfr_cue_df,aft_cue_df,bfr_res_df,aft_res_df)
+  df_all <- df_all[which(df_all$perc > 0),]
+  
+  bar_plt <- ggplot() + geom_bar(aes(x=df_all$type,y=df_all$perc,fill=df_all$labs),data=df_all,stat="identity") 
+  bar_plt <- bar_plt + labs(title=region_list[region_index],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
+  bar_plt <- bar_plt + geom_text(aes(x=df_all$type,y=df_all$position,label=df_all$label),size=3,stat="identity") + theme_classic()
+  
+  plot(bar_plt)
+  graphics.off()
   
   
 }
