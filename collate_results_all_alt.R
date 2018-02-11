@@ -309,4 +309,4 @@ for (region_index in 1:length(region_list)){
   
 }
 
-rm(list=ls())
+#rm(list=ls())

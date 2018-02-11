@@ -14,9 +14,11 @@ library(R.matlab)
 library(broom)
 library(plyr)
 library(reshape)
+library(gtools)
+
 
 #######
-rm(list=ls())
+#rm(list=ls())
 
 avg_alphabeta_bool = FALSE
 all_alphabeta_bool = TRUE
@@ -146,9 +148,13 @@ for (region_index in 1:length(region_list)){
   ar_alpha$name <- 'alpha'
   ar_beta$name <- 'beta'
   
-  ac.df <- rbind(ac_alpha,ac_beta)
-  br.df <- rbind(br_alpha,br_beta)
-  ar.df <- rbind(ar_alpha,ar_beta)
+  #ac.df <- rbind(ac_alpha,ac_beta)
+  #br.df <- rbind(br_alpha,br_beta)
+  #ar.df <- rbind(ar_alpha,ar_beta)
+  
+  ac.df <- smartbind(ac_alpha,ac_beta)
+  br.df <- smartbind(br_alpha,br_beta)
+  ar.df <- smartbind(ar_alpha,ar_beta)
   
   max_val <- max(ac.df$slope,br.df$slope,ar.df$slope)
   min_val <- min(ac.df$slope,br.df$slope,ar.df$slope)
@@ -1111,6 +1117,6 @@ for (region_index in 1:length(region_list)){
 
 save.image('all_r_all.RData')
 
-rm(list=ls())
+#rm(list=ls())
 
  
