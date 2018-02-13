@@ -107,7 +107,7 @@ for (region_index in 1:length(region_list)){
   bfr_result_df <- ddply(bfr_result_df,.(type),transform,label=paste(scales::percent(bfr_result_df$perc),' n=',bfr_result_nums_sum,sep=""))
   aft_result_df <- ddply(aft_result_df,.(type),transform,label=paste(scales::percent(aft_result_df$perc),' n=',aft_result_nums_sum,sep=""))
   
-  png(paste('ALL_all_signs_bar_plotted_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
+  png(paste('AVG_all_signs_bar_plotted_',region_list[region_index],'.png',sep=""),width=8,height=6,units="in",res=500)
   
   df_all <- rbind(bfr_cue_df,aft_cue_df,bfr_result_df,aft_result_df)
   df_all <- df_all[which(df_all$perc > 0),]
@@ -120,7 +120,7 @@ for (region_index in 1:length(region_list)){
   graphics.off()
   
   # #########################
-  # png(paste('ALL_slope_collated_hist_',region_list[region_index],'_bfr_cue.png',sep=""),width=8,height=6,units="in",res=500)
+  # png(paste('AVG_slope_collated_hist_',region_list[region_index],'_bfr_cue.png',sep=""),width=8,height=6,units="in",res=500)
   #  
   # sig_plt <- ggplot(bfr_cue_sig_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
   # sig_plt <- sig_plt + labs(title=paste(region_list[region_index],'bfr cue','significant')) 
@@ -132,7 +132,7 @@ for (region_index in 1:length(region_list)){
   # multiplot(sig_plt,all_plt,cols=1)
   # graphics.off()
   #  
-  # png(paste('ALL_slope_collated_hist_',region_list[region_index],'_aft_cue.png',sep=""),width=8,height=6,units="in",res=500)
+  # png(paste('AVG_slope_collated_hist_',region_list[region_index],'_aft_cue.png',sep=""),width=8,height=6,units="in",res=500)
   #  
   # sig_plt <- ggplot(aft_cue_sig_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
   # sig_plt <- sig_plt + labs(title=paste(region_list[region_index],'aft cue','significant')) 
@@ -142,7 +142,7 @@ for (region_index in 1:length(region_list)){
   # multiplot(sig_plt,all_plt,cols=1)
   # graphics.off()
   #  
-  # png(paste('ALL_slope_collated_hist_',region_list[region_index],'_bfr_result.png',sep=""),width=8,height=6,units="in",res=500)
+  # png(paste('AVG_slope_collated_hist_',region_list[region_index],'_bfr_result.png',sep=""),width=8,height=6,units="in",res=500)
   #  
   # sig_plt <- ggplot(bfr_result_sig_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2)
   # sig_plt <- sig_plt + labs(title=paste(region_list[region_index],'bfr result','significant')) 
@@ -152,7 +152,7 @@ for (region_index in 1:length(region_list)){
   # multiplot(sig_plt,all_plt,cols=1)
   # graphics.off()
   #  
-  # png(paste('ALL_slope_collated_hist_',region_list[region_index],'_aft_result.png',sep=""),width=8,height=6,units="in",res=500)
+  # png(paste('AVG_slope_collated_hist_',region_list[region_index],'_aft_result.png',sep=""),width=8,height=6,units="in",res=500)
   #  
   # sig_plt <- ggplot(aft_result_sig_slopes,aes(slopes,fill=type)) + geom_histogram(alpha=0.5,position='identity',binwidth=0.2) 
   # sig_plt <- sig_plt + labs(title=paste(region_list[region_index],'aft result','significant')) 
@@ -163,7 +163,7 @@ for (region_index in 1:length(region_list)){
   # graphics.off()
   ###########
   
-  png(paste('ALL_2_slope_collated_hist_',region_list[region_index],'_bfr_cue.png',sep=""),width=8,height=6,units="in",res=500)
+  png(paste('AVG_2_slope_collated_hist_',region_list[region_index],'_bfr_cue.png',sep=""),width=8,height=6,units="in",res=500)
   
   #only plot those w/in 3 sd of mean for now
   bc_sig_bounds <- 3*sd(bfr_cue_sig_slopes$slopes)
@@ -189,7 +189,7 @@ for (region_index in 1:length(region_list)){
   multiplot(sig_plt,all_plt,cols=1)
   graphics.off()
   
-  png(paste('ALL_2_slope_collated_hist_',region_list[region_index],'_aft_cue.png',sep=""),width=8,height=6,units="in",res=500)
+  png(paste('AVG_2_slope_collated_hist_',region_list[region_index],'_aft_cue.png',sep=""),width=8,height=6,units="in",res=500)
   
   sig_plt <- ggplot(aft_cue_sig_slopes,aes(x=slopes)) +
     geom_histogram(data=subset(aft_cue_sig_slopes,type=='val'),fill='maroon',alpha=0.75,position='identity',binwidth=0.2) + 
@@ -204,7 +204,7 @@ for (region_index in 1:length(region_list)){
   multiplot(sig_plt,all_plt,cols=1)
   graphics.off()  
   
-  png(paste('ALL_2_slope_collated_hist_',region_list[region_index],'_bfr_result.png',sep=""),width=8,height=6,units="in",res=500)
+  png(paste('AVG_2_slope_collated_hist_',region_list[region_index],'_bfr_result.png',sep=""),width=8,height=6,units="in",res=500)
   
   sig_plt <- ggplot(bfr_result_sig_slopes,aes(x=slopes)) +
     geom_histogram(data=subset(bfr_result_sig_slopes,type=='val'),fill='maroon',alpha=0.75,position='identity',binwidth=0.2) + 
@@ -219,7 +219,7 @@ for (region_index in 1:length(region_list)){
   multiplot(sig_plt,all_plt,cols=1)
   graphics.off()  
   
-  png(paste('ALL_2_slope_collated_hist_',region_list[region_index],'_aft_result.png',sep=""),width=8,height=6,units="in",res=500)
+  png(paste('AVG_2_slope_collated_hist_',region_list[region_index],'_aft_result.png',sep=""),width=8,height=6,units="in",res=500)
   
   sig_plt <- ggplot(aft_result_sig_slopes,aes(x=slopes)) +
     geom_histogram(data=subset(aft_result_sig_slopes,type=='val'),fill='maroon',alpha=0.75,position='identity',binwidth=0.2) + 

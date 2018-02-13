@@ -33,7 +33,7 @@ sqrt_bool = False
 plot_3d_bool = False
 mv_bool = True
 zscore = True
-abs_alphabeta = True
+abs_alphabeta = False
 
 gaussian_bool = False
 gauss_sigma = 30
