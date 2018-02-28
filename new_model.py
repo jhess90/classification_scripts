@@ -80,7 +80,6 @@ def calc_firing_rates(hists,data_key,condensed):
         elif gaussian_bool:
             hists = ndimage.filters.gaussian_filter1d(hists,gauss_sigma,axis=1)
 
-        baseline_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*baseline_bins))
         bfr_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
         aft_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
         bfr_result_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
@@ -105,7 +104,6 @@ def calc_firing_rates(hists,data_key,condensed):
                 #pdb.set_trace()
                 if not (result_start_bin + bins_after) > np.shape(hists)[1]:
                         for j in range(np.shape(hists)[0]):
-                                baseline_hist = hists[j,baseline_bins + cue_start_bin : cue_start_bin]
                                 bfr_cue_hist = hists[j,bins_before + cue_start_bin : cue_start_bin]
                                 aft_cue_hist = hists[j,cue_start_bin : cue_start_bin + bins_after]
                                 bfr_result_hist = hists[j,bins_before + result_start_bin : result_start_bin]
@@ -116,53 +114,47 @@ def calc_firing_rates(hists,data_key,condensed):
                                 bfr_result_hist_all[i,j,:] = bfr_result_hist
                                 aft_result_hist_all[i,j,:] = aft_result_hist
                      
-                                if not zscore:
-                                        baseline_fr[i,j,:] = baseline_hist / float(bin_size) * 1000
-                                        bfr_cue_fr[i,j,:] = bfr_cue_hist / float(bin_size) * 1000
-                                        aft_cue_fr[i,j,:] = aft_cue_hist / float(bin_size) * 1000
-                                        bfr_result_fr[i,j,:] = bfr_result_hist / float(bin_size) * 1000
-                                        aft_result_fr[i,j,:] = aft_result_hist / float(bin_size) * 1000                        
-                                elif zscore:
-                                        baseline_fr[i,j,:] = baseline_hist
-                                        bfr_cue_fr[i,j,:] = bfr_cue_hist
-                                        aft_cue_fr[i,j,:] = aft_cue_hist
-                                        bfr_result_fr[i,j,:] = bfr_result_hist
-                                        aft_result_fr[i,j,:] = aft_result_hist
+                                bfr_cue_fr[i,j,:] = bfr_cue_hist
+                                aft_cue_fr[i,j,:] = aft_cue_hist
+                                bfr_result_fr[i,j,:] = bfr_result_hist
+                                aft_result_fr[i,j,:] = aft_result_hist
 
                 else:
                         continue
                         
         #normalize frs
-        bfr_cue_nl_fr = np.zeros((np.shape(bfr_cue_fr)))
-        aft_cue_nl_fr = np.zeros((np.shape(aft_cue_fr)))
-        bfr_result_nl_fr = np.zeros((np.shape(bfr_result_fr)))
-        aft_result_nl_fr = np.zeros((np.shape(aft_result_fr)))
+        #bfr_cue_nl_fr = np.zeros((np.shape(bfr_cue_fr)))
+        #aft_cue_nl_fr = np.zeros((np.shape(aft_cue_fr)))
+        #bfr_result_nl_fr = np.zeros((np.shape(bfr_result_fr)))
+        #aft_result_nl_fr = np.zeros((np.shape(aft_result_fr)))
 
-        for i in range(bfr_cue_fr.shape[0]):
-                for j in range(bfr_cue_fr.shape[1]):
-                        baseline_max = np.max(baseline_fr[i,j,:])
-                        baseline_min = np.min(baseline_fr[i,j,:])
+        #for i in range(bfr_cue_fr.shape[0]):
+        #        for j in range(bfr_cue_fr.shape[1]):
+        #                #baseline_max = np.max(baseline_fr[i,j,:])
+        #                #baseline_min = np.min(baseline_fr[i,j,:])
 
-                        denom = float(baseline_max - baseline_min)
+        #denom = float(baseline_max - baseline_min)
+        
+        #                #TODO better way to do this?
+        #                if denom == 0:
+        #                        bfr_cue_nl_fr[i,j,:] = bfr_cue_fr[i,j,:]
+        #                        aft_cue_nl_fr[i,j,:] = aft_cue_fr[i,j,:]
+        #                        bfr_result_nl_fr[i,j,:] = bfr_result_fr[i,j,:]
+        #                        aft_result_nl_fr[i,j,:] = aft_result_fr[i,j,:]
 
-                        #TODO better way to do this?
-                        if denom == 0:
-                                bfr_cue_nl_fr[i,j,:] = bfr_cue_fr[i,j,:]
-                                aft_cue_nl_fr[i,j,:] = aft_cue_fr[i,j,:]
-                                bfr_result_nl_fr[i,j,:] = bfr_result_fr[i,j,:]
-                                aft_result_nl_fr[i,j,:] = aft_result_fr[i,j,:]
-
-                        else:
-                                num = np.subtract(bfr_cue_fr[i,j,:],baseline_min)
-                                bfr_cue_nl_fr[i,j,:] = np.true_divide(num,denom)
-                                num = np.subtract(aft_cue_fr[i,j,:],baseline_min)
-                                aft_cue_nl_fr[i,j,:] = np.true_divide(num,denom)
-                                num = np.subtract(bfr_result_fr[i,j,:],baseline_min)
-                                bfr_result_nl_fr[i,j,:] = np.true_divide(num,denom)
-                                num = np.subtract(aft_result_fr[i,j,:],baseline_min)
-                                aft_result_nl_fr[i,j,:] = np.true_divide(num,denom)
+        #                else:
+        #                        num = np.subtract(bfr_cue_fr[i,j,:],baseline_min)
+        #                        bfr_cue_nl_fr[i,j,:] = np.true_divide(num,denom)
+        #                        num = np.subtract(aft_cue_fr[i,j,:],baseline_min)
+        #                        aft_cue_nl_fr[i,j,:] = np.true_divide(num,denom)
+        #                        num = np.subtract(bfr_result_fr[i,j,:],baseline_min)
+        #                        bfr_result_nl_fr[i,j,:] = np.true_divide(num,denom)
+        #                        num = np.subtract(aft_result_fr[i,j,:],baseline_min)
+        #                        aft_result_nl_fr[i,j,:] = np.true_divide(num,denom)
                         
-        return_dict = {'bfr_cue_fr':bfr_cue_fr,'aft_cue_fr':aft_cue_fr,'bfr_result_fr':bfr_result_fr,'aft_result_fr':aft_result_fr,'bfr_cue_nl_fr':bfr_cue_nl_fr,'aft_cue_nl_fr':aft_cue_nl_fr,'bfr_result_nl_fr':bfr_result_nl_fr,'aft_result_nl_fr':aft_result_nl_fr,'baseline_fr':baseline_fr,'bfr_cue_hist':bfr_cue_hist_all,'aft_cue_hist':aft_cue_hist_all,'bfr_result_hist':bfr_result_hist_all,'aft_result_hist':aft_result_hist_all}
+        #return_dict = {'bfr_cue_fr':bfr_cue_fr,'aft_cue_fr':aft_cue_fr,'bfr_result_fr':bfr_result_fr,'aft_result_fr':aft_result_fr,'bfr_cue_nl_fr':bfr_cue_nl_fr,'aft_cue_nl_fr':aft_cue_nl_fr,'bfr_result_nl_fr':bfr_result_nl_fr,'aft_result_nl_fr':aft_result_nl_fr,'baseline_fr':baseline_fr,'bfr_cue_hist':bfr_cue_hist_all,'aft_cue_hist':aft_cue_hist_all,'bfr_result_hist':bfr_result_hist_all,'aft_result_hist':aft_result_hist_all}
+        return_dict = {'bfr_cue_fr':bfr_cue_fr,'aft_cue_fr':aft_cue_fr,'bfr_result_fr':bfr_result_fr,'aft_result_fr':aft_result_fr,'bfr_cue_hist':bfr_cue_hist_all,'aft_cue_hist':aft_cue_hist_all,'bfr_result_hist':bfr_result_hist_all,'aft_result_hist':aft_result_hist_all}
+
         return(return_dict)
 
 def make_3d_model(fr_data,condensed,region_key,type_key):
@@ -248,11 +240,9 @@ def make_3d_model(fr_data,condensed,region_key,type_key):
 
 bins_before = int(time_before / float(bin_size) * 1000)  #neg for now
 bins_after = int(time_after / float(bin_size) * 1000)   
-baseline_bins = int(baseline_time / float(bin_size) * 1000) #neg
 
 print 'bin size: %s' %(bin_size)
-print 'time before: %s, time after: %s, baseline time: %s' %(time_before,time_after,baseline_time)
-print 'nlize: %s, sqrt: %s, zscore: %s, gaussian: %s' %(normalize_bool,sqrt_bool,zscore,gaussian_bool)
+print 'time before: %s, time after: %s' %(time_before,time_after)
 
 #load files (from Extracted and timestamp files)
 print extracted_filename
@@ -519,10 +509,10 @@ for region_key,region_value in data_dict_all.iteritems():
         succ = condensed[condensed[:,5] == 1]
         fail = condensed[condensed[:,5] == -1]
         
-		bfr_cue = data_dict_all[region_key]['fr_dict']['bfr_cue_fr']
-		aft_cue = data_dict_all[region_key]['fr_dict']['aft_cue_fr']
-		bfr_result = data_dict_all[region_key]['fr_dict']['bfr_result_fr']
-		aft_result = data_dict_all[region_key]['fr_dict']['aft_result_fr']
+        bfr_cue = data_dict_all[region_key]['fr_dict']['bfr_cue_fr']
+        aft_cue = data_dict_all[region_key]['fr_dict']['aft_cue_fr']
+        bfr_result = data_dict_all[region_key]['fr_dict']['bfr_result_fr']
+        aft_result = data_dict_all[region_key]['fr_dict']['aft_result_fr']
 
         bfr_cue_succ = bfr_cue[condensed[:,5] == 1]
         aft_cue_succ = aft_cue[condensed[:,5] == 1]
@@ -789,7 +779,8 @@ for region_key,region_val in data_dict_all.iteritems():
         #slopes_workbook = xlsxwriter.Workbook('sig_slopes_%s_%s.xlsx' %(short_filename,region_key),options={'nan_inf_to_errors':True})
         #print region_key
         slopes_workbook = xlsxwriter.Workbook('sig_slopes_%s.xlsx' %(region_key),options={'nan_inf_to_errors':True})
-        total_unit_num = np.shape(data_dict_all[region_key]['fr_dict']['baseline_fr'])[1]
+        #total_unit_num = np.shape(data_dict_all[region_key]['fr_dict']['baseline_fr'])[1]
+        total_unit_num = np.shape(data_dict_all[region_key]['fr_dict']['bfr_cue_hist'])[1]
         names = ['unit_num','alpha','beta','const','alpha_p','beta_p','const_p']
 
         percs = {}
@@ -895,49 +886,48 @@ for region_key,region_val in data_dict_all.iteritems():
                 i += 1
 
 
-if mv_bool:
-        #calc updated motiv and val vectors
-        for region_key,region_val in data_dict_all.iteritems():
-                #for now individ. should avg across windows? And if so does that affect any other of the analysis?
-                #data_dict_all[region_key]['mv'] = {}
-                #print region_key
-                for type_key,type_val in data_dict_all[region_key]['slopes'].iteritems():
-                        #print type_key
-                        slopes = data_dict_all[region_key]['slopes'][type_key]
-                        sig_units = slopes[:,0]
-
-                        alphas = slopes[:,1]
-                        betas = slopes[:,2]
-                        rnums = condensed[:,3]
-                        pnums = condensed[:,4]
-
-                        #mv_array = np.zeros((np.shape(condensed)[0],np.shape(slopes)[0],5))
-                        temp = np.zeros((np.shape(slopes)[0],np.shape(condensed)[0],8))
-                        for i in range(np.shape(slopes)[0]):
-                                unit = sig_units[i]
+#calc updated motiv and val vectors
+for region_key,region_val in data_dict_all.iteritems():
+        #for now individ. should avg across windows? And if so does that affect any other of the analysis?
+        #data_dict_all[region_key]['mv'] = {}
+        #print region_key
+        for type_key,type_val in data_dict_all[region_key]['slopes'].iteritems():
+                #print type_key
+                slopes = data_dict_all[region_key]['slopes'][type_key]
+                sig_units = slopes[:,0]
+                
+                alphas = slopes[:,1]
+                betas = slopes[:,2]
+                rnums = condensed[:,3]
+                pnums = condensed[:,4]
+                
+                #mv_array = np.zeros((np.shape(condensed)[0],np.shape(slopes)[0],5))
+                temp = np.zeros((np.shape(slopes)[0],np.shape(condensed)[0],8))
+                for i in range(np.shape(slopes)[0]):
+                        unit = sig_units[i]
+                        
+                        if abs_alphabeta:
+                                alpha = abs(alphas[i])
+                                beta = abs(betas[i])
+                        else:
+                                alpha = alphas[i]
+                                beta = betas[i]
                                 
-                                if abs_alphabeta:
-                                        alpha = abs(alphas[i])
-                                        beta = abs(betas[i])
-                                else:
-                                        alpha = alphas[i]
-                                        beta = betas[i]
-
-                                unit_condensed = np.zeros((np.shape(condensed)[0],8))
-                                unit_condensed[:,0] = rnums
-                                unit_condensed[:,1] = pnums
-                                unit_condensed[:,2] = alpha
-                                unit_condensed[:,3] = beta
-                                unit_condensed[:,4] = rnums * alpha - pnums * beta #value
-                                unit_condensed[:,5] = rnums * alpha + pnums * beta #motiv
-
-                                window_avg_unit_fr = data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'][:,unit]
-                                unit_condensed[:,6] = window_avg_unit_fr
-                                unit_condensed[:,7] = unit
-                                temp[i,:,:] = unit_condensed
-
+                        unit_condensed = np.zeros((np.shape(condensed)[0],8))
+                        unit_condensed[:,0] = rnums
+                        unit_condensed[:,1] = pnums
+                        unit_condensed[:,2] = alpha
+                        unit_condensed[:,3] = beta
+                        unit_condensed[:,4] = rnums * alpha - pnums * beta #value
+                        unit_condensed[:,5] = rnums * alpha + pnums * beta #motiv
+                        
+                        window_avg_unit_fr = data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'][:,unit]
+                        unit_condensed[:,6] = window_avg_unit_fr
+                        unit_condensed[:,7] = unit
+                        temp[i,:,:] = unit_condensed
+                        
                         new_mv_array = temp
-                                
+                        
                         data_dict_all[region_key]['mv'][type_key] = new_mv_array
 
                         np.save('%s_%s_mv_array.npy' %(region_key,type_key),new_mv_array)
@@ -993,7 +983,6 @@ if mv_bool:
 #                        sio.savemat('%s_%s_all_mv_array.mat' %(region_key,type_key),{'mv_array':new_mv_array},format='5')
 
 
-#For input into GPFA. Run on bin size of 1ms, other params = False (ie no normalizing, etc)
 M1_hist_dict = {'bfr_cue':data_dict_all['M1_dicts']['fr_dict']['bfr_cue_hist'],'aft_cue':data_dict_all['M1_dicts']['fr_dict']['aft_cue_hist'],'bfr_result':data_dict_all['M1_dicts']['fr_dict']['bfr_result_hist'],'aft_result':data_dict_all['M1_dicts']['fr_dict']['aft_result_hist']}
 
 S1_hist_dict = {'bfr_cue':data_dict_all['S1_dicts']['fr_dict']['bfr_cue_hist'],'aft_cue':data_dict_all['S1_dicts']['fr_dict']['aft_cue_hist'],'bfr_result':data_dict_all['S1_dicts']['fr_dict']['bfr_result_hist'],'aft_result':data_dict_all['S1_dicts']['fr_dict']['aft_result_hist']}
@@ -1011,7 +1000,7 @@ S1_fr_dict = {'bfr_cue':data_dict_all['S1_dicts']['fr_dict']['bfr_cue_fr'],'aft_
 PmD_fr_dict = {'bfr_cue':data_dict_all['PmD_dicts']['fr_dict']['bfr_cue_fr'],'aft_cue':data_dict_all['PmD_dicts']['fr_dict']['aft_cue_fr'],'bfr_result':data_dict_all['PmD_dicts']['fr_dict']['bfr_result_fr'],'aft_result':data_dict_all['PmD_dicts']['fr_dict']['aft_result_fr']}
 
 
-params = {'time_before':time_before,'time_after':time_after,'bin_size':bin_size,'baseline_time':baseline_time,'normalize_bool':normalize_bool,'sqrt_bool':sqrt_bool,'zscore_bool':zscore,'gaussian_bool':gaussian_bool,'gauss_sigma':gauss_sigma}
+params = {'time_before':time_before,'time_after':time_after,'bin_size':bin_size,'zscore_bool':zscore,'gauss_bool':gaussian_bool,'gauss_sigma':gauss_sigma}
 master_fr_dict = {'M1_fr_dict':M1_fr_dict,'S1_fr_dict':S1_fr_dict,'PmD_fr_dict':PmD_fr_dict,'condensed':condensed,'params':params}
 
 
@@ -1091,13 +1080,6 @@ elif extracted_filename == 'Extracted_504_2017-03-28-12-27-38.mat':
         np.save('master_fr_dict_5_3_28_2.npy',master_fr_dict)
 elif extracted_filename == 'Extracted_504_2017-03-28-12-54-41.mat':
         np.save('master_fr_dict_5_3_28_3.npy',master_fr_dict)
-
-
-
-
-
-
-
 
 		
 else:
