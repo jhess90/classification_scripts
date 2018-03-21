@@ -11,12 +11,11 @@ library(gridExtra)
 library(R.matlab)
 
 tryCatch({
-  source("~/workspace/classification_scripts/multiplot.R")
-  print('on beaver')
-  },warning=function(war){(print('on laptop'))
-    },finally={source("~/documents/lab/workspace/Classification_scripts/multiplot.R")})
-#try(source("~/workspace/classification_scripts/multiplot.R"),silent=T)
-#try(source("~/documents/lab/workspace/Classification_scripts/multiplot.R"),silent=T)
+  source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
+  print('on laptop')
+  },warning=function(war){(print('on beaver'))
+    source("~/workspace/classification_scripts/multiplot.R")
+  },finally={print('sourced multiplot')})
 
 saveAsPng <- T
 
