@@ -1,10 +1,6 @@
 library(openxlsx)
 library(ggplot2)
 library(reshape2)
-#source("~/dropbox/mult_rp_files/r_test/multiplot.R")
-#source("~/Dropbox/mult_rp_files/r_test/multiplot.R")
-#source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
-source("~/workspace/classification_scripts/multiplot.R")
 library(zoo)
 library(gplots)
 library(RColorBrewer)
@@ -13,6 +9,14 @@ library(gridGraphics)
 library(grid)
 library(gridExtra)
 library(R.matlab)
+
+tryCatch({
+  source("~/workspace/classification_scripts/multiplot.R")
+  print('on beaver')
+  },warning=function(war){(print('on laptop'))
+    },finally={source("~/documents/lab/workspace/Classification_scripts/multiplot.R")})
+#try(source("~/workspace/classification_scripts/multiplot.R"),silent=T)
+#try(source("~/documents/lab/workspace/Classification_scripts/multiplot.R"),silent=T)
 
 saveAsPng <- T
 
