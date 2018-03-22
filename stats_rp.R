@@ -18,16 +18,28 @@ tryCatch({
   },finally={print('sourced multiplot')})
 
 saveAsPng <- T
-
-#file_list <- c('simple_output')
 region_list <- c('M1','S1','PmD')
 
 
-#########
+
+##### func
+
+calc_wsr <- function(baseline,window){
+  
+  if(identical(baseline,window)){return(NA)}
+  
+  
+  wsr <- wilcox.test(baseline,window,paired=T)
+  p_val <- wsr$p.value
+
+  return(p_val)
+}
+
+##########
 
 
 for(region_index in 1:length(region_list)){
-  cat("\nplotting region:",region_list[region_index])
+  cat("\nregion:",region_list[region_index])
   
   readin <- readMat(paste('simple_output_',region_list[region_index],'.mat',sep=""))
   
@@ -35,62 +47,11 @@ for(region_index in 1:length(region_list)){
   all_res_fr <- readin$return.dict[,,1]$all.res.fr
   condensed <- readin$return.dict[,,1]$condensed
   bin_size <- readin$return.dict[,,1]$params[,,1]$bin.size[,]
-  rp_vals <- c(0,1,2,3)
+  total_unit_num <- dim(all_cue_fr)[1]
+  #rp_vals <- c(0,1,2,3)
   
-  
-  #TODO make for diff bfr and aft times
-  #TODO unhardcode rollmean (time and rollmean val)
   old_time <- seq(from=-0.5,to=(1.0-bin_size/1000),by=bin_size/1000)
-  time <- seq(from=-0.5+2*bin_size/1000,to=(1.0-3*bin_size/1000),by=bin_size/1000)
-  
-  
-  
-  r0 <- which(condensed[,4] == 0)
-  r1 <- which(condensed[,4] == 1)
-  r2 <- which(condensed[,4] == 2)
-  r3 <- which(condensed[,4] == 3)
-  
-  p0 <- which(condensed[,5] == 0)
-  p1 <- which(condensed[,5] == 1)
-  p2 <- which(condensed[,5] == 2)
-  p3 <- which(condensed[,5] == 3)
-  
-  v_3 <- which(condensed[,7] == -3)
-  v_2 <- which(condensed[,7] == -2)
-  v_1 <- which(condensed[,7] == -1)
-  v0 <- which(condensed[,7] == 0)
-  v1 <- which(condensed[,7] == 1)
-  v2 <- which(condensed[,7] == 2)
-  v3 <- which(condensed[,7] == 3)
-  
-  m0 <- which(condensed[,8] == 0)
-  m1 <- which(condensed[,8] == 1)
-  m2 <- which(condensed[,8] == 2)
-  m3 <- which(condensed[,8] == 3)
-  m4 <- which(condensed[,8] == 4)
-  m5 <- which(condensed[,8] == 5)
-  m6 <- which(condensed[,8] == 6)
-  
-  res0 <- which(condensed[,6] == 0)
-  res1 <- which(condensed[,6] == 1)
-  
-  r0_fail <- res0[which(res0 %in% r0)]
-  r1_fail <- res0[which(res0 %in% r1)]
-  r2_fail <- res0[which(res0 %in% r2)]
-  r3_fail <- res0[which(res0 %in% r3)]
-  r0_succ <- res1[which(res1 %in% r0)]
-  r1_succ <- res1[which(res1 %in% r1)]
-  r2_succ <- res1[which(res1 %in% r2)]
-  r3_succ <- res1[which(res1 %in% r3)]
-  
-  p0_fail <- res0[which(res0 %in% p0)]
-  p1_fail <- res0[which(res0 %in% p1)]
-  p2_fail <- res0[which(res0 %in% p2)]
-  p3_fail <- res0[which(res0 %in% p3)]
-  p0_succ <- res1[which(res1 %in% p0)]
-  p1_succ <- res1[which(res1 %in% p1)]
-  p2_succ <- res1[which(res1 %in% p2)]
-  p3_succ <- res1[which(res1 %in% p3)]
+  #time <- seq(from=-0.5+2*bin_size/1000,to=(1.0-3*bin_size/1000),by=bin_size/1000)
   
   ###########
   r0 <- which(condensed[,4] == 0)
@@ -167,6 +128,43 @@ for(region_index in 1:length(region_list)){
   rx_p0_f <- res0[which(res0 %in% rx_p0)]
   r0_px_f <- res0[which(res0 %in% r0_px)]
   rx_px_f <- res0[which(res0 %in% rx_px)]
+
+  
+  #########################
+  
+  #TODO make full
+  comb_list <- c('r0','r1','r2','r3')
+
+  for (i in comb_list){
+    comb_inds <- get(i)
+    
+    #row 1 = baseline vs aft_cue, 2 = baseline vs bfr_res, 3 = baseline vs aft_res, 4 = basline vs res_wind, 5 = bfr_res vs after_res, 6 = bfr_res vs res_wind
+    p_val_array <- array(data=NA,dim=c(total_unit_num,6))
+    for (unit_num in 1:total_unit_num){
+
+      #TODO unhardcode time
+      baseline <- rowMeans(all_cue_fr[unit_num,comb_inds,1:50])
+    
+      aft_cue <- rowMeans(all_cue_fr[unit_num,comb_inds,51:150])
+      bfr_res <- rowMeans(all_res_fr[unit_num,comb_inds,1:50])
+      aft_res <- rowMeans(all_res_fr[unit_num,comb_inds,51:150])
+      res_wind <- rowMeans(all_res_fr[unit_num,comb_inds,81:130])
+      
+      p_val_array[unit_num,1] <- calc_wsr(baseline,aft_cue)
+      p_val_array[unit_num,2] <- calc_wsr(baseline,bfr_res)
+      p_val_array[unit_num,3] <- calc_wsr(baseline,aft_res)
+      p_val_array[unit_num,4] <- calc_wsr(baseline,res_wind)
+      p_val_array[unit_num,5] <- calc_wsr(bfr_res,aft_res)
+      p_val_array[unit_num,6] <- calc_wsr(bfr_res,res_wind)
+      
+      
+      
+      
+    }
+  }
+  
+  
+  
 }
 
 
@@ -175,7 +173,31 @@ for(region_index in 1:length(region_list)){
 #baseline time: -0.5 to 0.0. 
 #Comparison times: post-cue, pre-d, post-d, 0.3-0.5 window
 
+baseline_time <- c(-0.5,0)
+after_time <- c(0,1.0)
 
+
+
+
+
+
+##########
+
+
+############ testing
+unit_num <- 1
+
+
+baseline <- all_cue_fr[unit_num,rx,1:50]
+
+res_window <- all_res_fr[unit_num,rx,81:130]
+
+avg_baseline <- rowMeans(baseline)
+avg_res_window <- rowMeans(res_window)
+
+wsr <- wilcox.test(avg_baseline,avg_res_window,paired=T)
+
+p_val <- wsr$p.value
 
 
 
