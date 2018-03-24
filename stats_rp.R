@@ -51,11 +51,9 @@ for(region_index in 1:length(region_list)){
   condensed <- readin$return.dict[,,1]$condensed
   bin_size <- readin$return.dict[,,1]$params[,,1]$bin.size[,]
   total_unit_num <- dim(all_cue_fr)[1]
-  #rp_vals <- c(0,1,2,3)
-  
+
   old_time <- seq(from=-0.5,to=(1.0-bin_size/1000),by=bin_size/1000)
-  #time <- seq(from=-0.5+2*bin_size/1000,to=(1.0-3*bin_size/1000),by=bin_size/1000)
-  
+
   ###########
   r0 <- which(condensed[,4] == 0)
   r1 <- which(condensed[,4] == 1)
@@ -97,6 +95,15 @@ for(region_index in 1:length(region_list)){
   r2_succ <- res1[which(res1 %in% r2)]
   r3_succ <- res1[which(res1 %in% r3)]
   
+  p0_fail <- res0[which(res0 %in% p0)]
+  p1_fail <- res0[which(res0 %in% p1)]
+  p2_fail <- res0[which(res0 %in% p2)]
+  p3_fail <- res0[which(res0 %in% p3)]
+  p0_succ <- res1[which(res1 %in% p0)]
+  p1_succ <- res1[which(res1 %in% p1)]
+  p2_succ <- res1[which(res1 %in% p2)]
+  p3_succ <- res1[which(res1 %in% p3)]
+  
   catch_x <- which(condensed[,12] <= -1)
   catch0 <- which(condensed[,12] == 0)
   catchx <- which(condensed[,12] >= 1)
@@ -134,8 +141,7 @@ for(region_index in 1:length(region_list)){
   
   #########################
   
-  comb_list <- c('r0','r1','r2','r3','p0','p1','p2','p3','res0','res1','r0_fail','r1_fail','r2_fail','r3_fail','r0_succ','r1_succ','r2_succ','r3_succ','catch_x','catch0','catchx','rx','px','r0_f','rx_f','r0_s','rx_s','p0_f','px_f','p0_s','px_s','r0_p0','rx_p0','r0_px','rx_px','r0_p0_s','rx_p0_s','r0_px_s','rx_px_s','r0_p0_f','rx_p0_f','r0_px_f','rx_px_f')
-  #,'v_3','v_2','v_1','v0','v1','v2','v3','m0','m1','m2','m3','m4','m5','m6')
+  comb_list <- c('r0','r1','r2','r3','p0','p1','p2','p3','res0','res1','r0_fail','r1_fail','r2_fail','r3_fail','r0_succ','r1_succ','r2_succ','r3_succ','p0_fail','p1_fail','p2_fail','p3_fail','p0_succ','p1_succ','p2_succ','p3_succ','catch_x','catch0','catchx','rx','px','r0_f','rx_f','r0_s','rx_s','p0_f','px_f','p0_s','px_s','r0_p0','rx_p0','r0_px','rx_px','r0_p0_s','rx_p0_s','r0_px_s','rx_px_s','r0_p0_f','rx_p0_f','r0_px_f','rx_px_f','v_3','v_2','v_1','v0','v1','v2','v3','m0','m1','m2','m3','m4','m5','m6')
   
   out_p_list <- c()
   out_perc_sig_list <- c()
@@ -147,9 +153,13 @@ for(region_index in 1:length(region_list)){
     
     if(length(comb_inds) == 0){
       cat('no instances of',i,'\n')
+      sig_sign_percs <- cbind(bl_ac = rep(0,5),bl_br = rep(0,5),bl_ar = rep(0,5),bl_rw = rep(0,5),br_ar = rep(0,5),br_rw = rep(0,5))
+      out_sig_sign_percs[[paste(i,'_sig_sign_percs',sep="")]] <- sig_sign_percs
       next
     }else if(length(comb_inds) == 1){
       cat('only one instance of',i,'\n')
+      sig_sign_percs <- cbind(bl_ac = rep(0,5),bl_br = rep(0,5),bl_ar = rep(0,5),bl_rw = rep(0,5),br_ar = rep(0,5),br_rw = rep(0,5))
+      out_sig_sign_percs[[paste(i,'_sig_sign_percs',sep="")]] <- sig_sign_percs
       next
     }
     
@@ -225,10 +235,11 @@ for(region_index in 1:length(region_list)){
   ###plot ###############
   ########################
   
+  cat('plotting\n')
   window_names <- c('baseline vs \nafter cue','baseline vs \nbefore result','baseline vs \nafter result','baseline vs \nresult window','before result vs \nafter result','before result vs \nresult window')
   
   #reward
-  png('test',width=8,height=6,units="in",res=500)
+  png(paste(region_list[region_index],'_r_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
   
   num_inc <- rbind(out_sig_sign_percs$r0_sig_sign_percs[2,],out_sig_sign_percs$r1_sig_sign_percs[2,],out_sig_sign_percs$r2_sig_sign_percs[2,],out_sig_sign_percs$r3_sig_sign_percs[2,])
   rownames(num_inc) <- c(0,1,2,3)
@@ -250,48 +261,248 @@ for(region_index in 1:length(region_list)){
   plot(plt)
   graphics.off()
   
+  #punishment
+  png(paste(region_list[region_index],'_p_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
   
+  num_inc <- rbind(out_sig_sign_percs$p0_sig_sign_percs[2,],out_sig_sign_percs$p1_sig_sign_percs[2,],out_sig_sign_percs$p2_sig_sign_percs[2,],out_sig_sign_percs$p3_sig_sign_percs[2,])
+  rownames(num_inc) <- c(0,1,2,3)
+  colnames(num_inc) <- window_names
+  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  num_inc_melt$direction <- 'inc'
   
-
+  num_dec <- rbind(out_sig_sign_percs$p0_sig_sign_percs[3,],out_sig_sign_percs$p1_sig_sign_percs[3,],out_sig_sign_percs$p2_sig_sign_percs[3,],out_sig_sign_percs$p3_sig_sign_percs[3,])
+  rownames(num_dec) <- c(0,1,2,3)
+  colnames(num_dec) <- window_names
+  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  num_dec_melt$direction <- 'dec'
   
+  both_num <- rbind(num_inc_melt,num_dec_melt)
   
-  ########
+  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Punishment Level',y='Number of units')
   
+  plot(plt)
+  graphics.off()
+  
+  #rx outcome
+  png(paste(region_list[region_index],'_rx_outcome_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  num_inc <- rbind(out_sig_sign_percs$r0_s_sig_sign_percs[2,],out_sig_sign_percs$r0_f_sig_sign_percs[2,],out_sig_sign_percs$rx_s_sig_sign_percs[2,],out_sig_sign_percs$rx_f_sig_sign_percs[2,])
+  rownames(num_inc) <- c('r0s','r0f','rxs','rxf')
+  colnames(num_inc) <- window_names
+  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  num_inc_melt$direction <- 'inc'
+  
+  num_dec <- rbind(out_sig_sign_percs$r0_f_sig_sign_percs[3,],out_sig_sign_percs$r0_f_sig_sign_percs[3,],out_sig_sign_percs$rx_s_sig_sign_percs[3,],out_sig_sign_percs$rx_f_sig_sign_percs[3,])
+  rownames(num_dec) <- c('r0s','r0f','rxs','rxf')
+  colnames(num_dec) <- window_names
+  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  num_dec_melt$direction <- 'dec'
+  
+  both_num <- rbind(num_inc_melt,num_dec_melt)
+  
+  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Reward and Outcome Combination',y='Number of units')
+  
+  plot(plt)
+  graphics.off()
+  
+  #px outcome
+  png(paste(region_list[region_index],'_px_outcome_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  num_inc <- rbind(out_sig_sign_percs$p0_s_sig_sign_percs[2,],out_sig_sign_percs$p0_f_sig_sign_percs[2,],out_sig_sign_percs$px_s_sig_sign_percs[2,],out_sig_sign_percs$px_f_sig_sign_percs[2,])
+  rownames(num_inc) <- c('p0s','p0f','pxs','pxf')
+  colnames(num_inc) <- window_names
+  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  num_inc_melt$direction <- 'inc'
+  
+  num_dec <- rbind(out_sig_sign_percs$p0_f_sig_sign_percs[3,],out_sig_sign_percs$p0_f_sig_sign_percs[3,],out_sig_sign_percs$px_s_sig_sign_percs[3,],out_sig_sign_percs$px_f_sig_sign_percs[3,])
+  rownames(num_dec) <- c('p0s','p0f','pxs','pxf')
+  colnames(num_dec) <- window_names
+  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  num_dec_melt$direction <- 'dec'
+  
+  both_num <- rbind(num_inc_melt,num_dec_melt)
+  
+  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Punishment and Outcome Combination',y='Number of units')
+  
+  plot(plt)
+  graphics.off()
+  
+  #res outcome
+  png(paste(region_list[region_index],'_res_outcome_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  num_inc <- rbind(out_sig_sign_percs$res0_sig_sign_percs[2,],out_sig_sign_percs$res1_sig_sign_percs[2,])
+  rownames(num_inc) <- c('fail','succ')
+  colnames(num_inc) <- window_names
+  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  num_inc_melt$direction <- 'inc'
+  
+  num_dec <- rbind(out_sig_sign_percs$res0_sig_sign_percs[3,],out_sig_sign_percs$res1_sig_sign_percs[3,])
+  rownames(num_dec) <- c('fail','succ')
+  colnames(num_dec) <- window_names
+  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  num_dec_melt$direction <- 'dec'
+  
+  both_num <- rbind(num_inc_melt,num_dec_melt)
+  
+  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Result',y='Number of units')
+  
+  plot(plt)
+  graphics.off()
+  
+  #comb
+  png(paste(region_list[region_index],'_comb_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  num_inc <- rbind(out_sig_sign_percs$r0_p0_sig_sign_percs[2,],out_sig_sign_percs$rx_p0_sig_sign_percs[2,],out_sig_sign_percs$r0_px_sig_sign_percs[2,],out_sig_sign_percs$rx_px_sig_sign_percs[2,])
+  rownames(num_inc) <- c('r0p0','rxp0','r0px','rxpx')
+  colnames(num_inc) <- window_names
+  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  num_inc_melt$direction <- 'inc'
+  
+  num_dec <- rbind(out_sig_sign_percs$r0_p0_sig_sign_percs[3,],out_sig_sign_percs$rx_p0_sig_sign_percs[3,],out_sig_sign_percs$r0_px_sig_sign_percs[3,],out_sig_sign_percs$rx_px_sig_sign_percs[3,])
+  rownames(num_dec) <- c('r0p0','rxp0','r0px','rxpx')
+  colnames(num_dec) <- window_names
+  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  num_dec_melt$direction <- 'dec'
+  
+  both_num <- rbind(num_inc_melt,num_dec_melt)
+  
+  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Combination',y='Number of units')
+  plt <- plt + theme(axis.text.x = element_text(size=rel(0.8)))
+  
+  plot(plt)
+  graphics.off()
+  
+  #comb outcome
+  png(paste(region_list[region_index],'_comb_outcome_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  num_inc <- rbind(out_sig_sign_percs$r0_p0_s_sig_sign_percs[2,],out_sig_sign_percs$rx_p0_s_sig_sign_percs[2,],out_sig_sign_percs$r0_px_s_sig_sign_percs[2,],out_sig_sign_percs$rx_px_s_sig_sign_percs[2,],out_sig_sign_percs$r0_p0_f_sig_sign_percs[2,],out_sig_sign_percs$rx_p0_f_sig_sign_percs[2,],out_sig_sign_percs$r0_px_f_sig_sign_percs[2,],out_sig_sign_percs$rx_px_f_sig_sign_percs[2,])
+  rownames(num_inc) <- c('r0p0s','rxp0s','r0pxs','rxpxs','r0p0f','rxp0f','r0pxf','rxpxf')
+  colnames(num_inc) <- window_names
+  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  num_inc_melt$direction <- 'inc'
+  
+  num_dec <- rbind(out_sig_sign_percs$r0_p0_s_sig_sign_percs[3,],out_sig_sign_percs$rx_p0_s_sig_sign_percs[3,],out_sig_sign_percs$r0_px_s_sig_sign_percs[3,],out_sig_sign_percs$rx_px_s_sig_sign_percs[3,],out_sig_sign_percs$r0_p0_f_sig_sign_percs[3,],out_sig_sign_percs$rx_p0_f_sig_sign_percs[3,],out_sig_sign_percs$r0_px_f_sig_sign_percs[3,],out_sig_sign_percs$rx_px_f_sig_sign_percs[3,])
+  rownames(num_dec) <- c('r0p0s','rxp0s','r0pxs','rxpxs','r0p0f','rxp0f','r0pxf','rxpxf')
+  colnames(num_dec) <- window_names
+  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  num_dec_melt$direction <- 'dec'
+  
+  both_num <- rbind(num_inc_melt,num_dec_melt)
+  
+  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Combination and Outcome',y='Number of units')
+  plt <- plt + theme(axis.text.x = element_text(size=rel(0.8)))
+  
+  plot(plt)
+  graphics.off()
+  
+  #reward outcome
+  png(paste(region_list[region_index],'_r_outcome_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  num_inc <- rbind(out_sig_sign_percs$r0_succ_sig_sign_percs[2,],out_sig_sign_percs$r1_succ_sig_sign_percs[2,],out_sig_sign_percs$r2_succ_sig_sign_percs[2,],out_sig_sign_percs$r3_succ_sig_sign_percs[2,],out_sig_sign_percs$r0_fail_sig_sign_percs[2,],out_sig_sign_percs$r1_fail_sig_sign_percs[2,],out_sig_sign_percs$r2_fail_sig_sign_percs[2,],out_sig_sign_percs$r3_fail_sig_sign_percs[2,])
+  rownames(num_inc) <- c('r0s','r1s','r2s','r3s','r0f','r1f','r2f','r3f')
+  colnames(num_inc) <- window_names
+  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  num_inc_melt$direction <- 'inc'
+  
+  num_dec <- rbind(out_sig_sign_percs$r0_succ_sig_sign_percs[3,],out_sig_sign_percs$r1_succ_sig_sign_percs[3,],out_sig_sign_percs$r2_succ_sig_sign_percs[3,],out_sig_sign_percs$r3_succ_sig_sign_percs[3,],out_sig_sign_percs$r0_fail_sig_sign_percs[3,],out_sig_sign_percs$r1_fail_sig_sign_percs[3,],out_sig_sign_percs$r2_fail_sig_sign_percs[3,],out_sig_sign_percs$r3_fail_sig_sign_percs[3,])
+  rownames(num_dec) <- c('r0s','r1s','r2s','r3s','r0f','r1f','r2f','r3f')
+  colnames(num_dec) <- window_names
+  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  num_dec_melt$direction <- 'dec'
+  
+  both_num <- rbind(num_inc_melt,num_dec_melt)
+  
+  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Reward Level and Outcome',y='Number of units')
+  plt <- plt + theme(axis.text.x = element_text(size=rel(0.8)))
+  
+  plot(plt)
+  graphics.off()
+  
+  #punishment outcome
+  png(paste(region_list[region_index],'_p_outcome_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  num_inc <- rbind(out_sig_sign_percs$p0_succ_sig_sign_percs[2,],out_sig_sign_percs$p1_succ_sig_sign_percs[2,],out_sig_sign_percs$p2_succ_sig_sign_percs[2,],out_sig_sign_percs$p3_succ_sig_sign_percs[2,],out_sig_sign_percs$p0_fail_sig_sign_percs[2,],out_sig_sign_percs$p1_fail_sig_sign_percs[2,],out_sig_sign_percs$p2_fail_sig_sign_percs[2,],out_sig_sign_percs$p3_fail_sig_sign_percs[2,])
+  rownames(num_inc) <- c('p0s','p1s','p2s','p3s','p0f','p1f','p2f','p3f')
+  colnames(num_inc) <- window_names
+  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  num_inc_melt$direction <- 'inc'
+  
+  num_dec <- rbind(out_sig_sign_percs$p0_succ_sig_sign_percs[3,],out_sig_sign_percs$p1_succ_sig_sign_percs[3,],out_sig_sign_percs$p2_succ_sig_sign_percs[3,],out_sig_sign_percs$p3_succ_sig_sign_percs[3,],out_sig_sign_percs$p0_fail_sig_sign_percs[3,],out_sig_sign_percs$p1_fail_sig_sign_percs[3,],out_sig_sign_percs$p2_fail_sig_sign_percs[3,],out_sig_sign_percs$p3_fail_sig_sign_percs[3,])
+  rownames(num_dec) <- c('p0s','p1s','p2s','p3s','p0f','p1f','p2f','p3f')
+  colnames(num_dec) <- window_names
+  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  num_dec_melt$direction <- 'dec'
+  
+  both_num <- rbind(num_inc_melt,num_dec_melt)
+  
+  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Punishment Level and Outcome',y='Number of units')
+  plt <- plt + theme(axis.text.x = element_text(size=rel(0.8)))
+  
+  plot(plt)
+  graphics.off()
+  
+  #motivation
+  png(paste(region_list[region_index],'_m_outcome_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  num_inc <- rbind(out_sig_sign_percs$m0_sig_sign_percs[2,],out_sig_sign_percs$m1_sig_sign_percs[2,],out_sig_sign_percs$m2_sig_sign_percs[2,],out_sig_sign_percs$m3_sig_sign_percs[2,],out_sig_sign_percs$m4_sig_sign_percs[2,],out_sig_sign_percs$m5_sig_sign_percs[2,],out_sig_sign_percs$m6_sig_sign_percs[2,])
+  rownames(num_inc) <- c('m0','m1','m2','m3','m4','m5','m6')
+  colnames(num_inc) <- window_names
+  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  num_inc_melt$direction <- 'inc'
+  
+  num_dec <- rbind(out_sig_sign_percs$m0_sig_sign_percs[3,],out_sig_sign_percs$m1_sig_sign_percs[3,],out_sig_sign_percs$m2_sig_sign_percs[3,],out_sig_sign_percs$m3_sig_sign_percs[3,],out_sig_sign_percs$m4_sig_sign_percs[3,],out_sig_sign_percs$m5_sig_sign_percs[3,],out_sig_sign_percs$m6_sig_sign_percs[3,])
+  rownames(num_dec) <- c('m0','m1','m2','m3','m4','m5','m6')
+  colnames(num_dec) <- window_names
+  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  num_dec_melt$direction <- 'dec'
+  
+  both_num <- rbind(num_inc_melt,num_dec_melt)
+  
+  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Motivation',y='Number of units')
+  plt <- plt + theme(axis.text.x = element_text(size=rel(0.8)))
+  
+  plot(plt)
+  graphics.off()
+  
+  #value
+  png(paste(region_list[region_index],'_v_outcome_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  num_inc <- rbind(out_sig_sign_percs$v_3_sig_sign_percs[2,],out_sig_sign_percs$v_2_sig_sign_percs[2,],out_sig_sign_percs$v_1_sig_sign_percs[2,],out_sig_sign_percs$v0_sig_sign_percs[2,],out_sig_sign_percs$v1_sig_sign_percs[2,],out_sig_sign_percs$v2_sig_sign_percs[2,],out_sig_sign_percs$v3_sig_sign_percs[2,])
+  rownames(num_inc) <- c('v_3','v_2','v_1','v0','v1','v2','v3')
+  colnames(num_inc) <- window_names
+  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  num_inc_melt$direction <- 'inc'
+  
+  num_dec <- rbind(out_sig_sign_percs$v_3_sig_sign_percs[3,],out_sig_sign_percs$v_2_sig_sign_percs[3,],out_sig_sign_percs$v_1_sig_sign_percs[3,],out_sig_sign_percs$v0_sig_sign_percs[3,],out_sig_sign_percs$v1_sig_sign_percs[3,],out_sig_sign_percs$v2_sig_sign_percs[3,],out_sig_sign_percs$v3_sig_sign_percs[3,])
+  rownames(num_dec) <- c('v_3','v_2','v_1','v0','v1','v2','v3')
+  colnames(num_dec) <- window_names
+  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  num_dec_melt$direction <- 'dec'
+  
+  both_num <- rbind(num_inc_melt,num_dec_melt)
+  
+  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Motivation',y='Number of units')
+  plt <- plt + theme(axis.text.x = element_text(size=rel(0.8)))
+  
+  plot(plt)
+  graphics.off()
   
   
 }
 
 ###############
 
+####friedman test
+
 #save vals
-
-
-#plotting
-for(region_index in 1:length(region_list)){
-  
-  
-  
-  
-  #r levels
-  #r and outcome
-  
-  #p levels
-  #p and outcome
-  
-  
-  #combs
-  #combs and outcome
-  
-  
-  #r delivery / p delivery
-  
-  
-
-
-
-
-}
-
-
-
 
