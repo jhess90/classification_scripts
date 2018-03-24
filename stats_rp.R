@@ -28,18 +28,21 @@ calc_wsr <- function(baseline,window){
   
   if(identical(baseline,window)){return(NA)}
   
-  
-  wsr <- wilcox.test(baseline,window,paired=T)
-  p_val <- wsr$p.value
+  suppressWarnings(wsr <- wilcox.test(baseline,window,paired=T))
+  p_val <- wsr$p.v
 
-  return(p_val)
+  if (mean(baseline) > mean(window)){change = -1}else if(mean(baseline) < mean(window)){change = 1}else{change=0}
+  
+  output <- c(p_val,change)
+  
+  return(output)
 }
 
 ##########
 
 
 for(region_index in 1:length(region_list)){
-  cat("\nregion:",region_list[region_index])
+  cat("region:",region_list[region_index],'\n')
   
   readin <- readMat(paste('simple_output_',region_list[region_index],'.mat',sep=""))
   
@@ -128,18 +131,31 @@ for(region_index in 1:length(region_list)){
   rx_p0_f <- res0[which(res0 %in% rx_p0)]
   r0_px_f <- res0[which(res0 %in% r0_px)]
   rx_px_f <- res0[which(res0 %in% rx_px)]
-
   
   #########################
   
-  #TODO make full
-  comb_list <- c('r0','r1','r2','r3')
-
+  comb_list <- c('r0','r1','r2','r3','p0','p1','p2','p3','res0','res1','r0_fail','r1_fail','r2_fail','r3_fail','r0_succ','r1_succ','r2_succ','r3_succ','catch_x','catch0','catchx','rx','px','r0_f','rx_f','r0_s','rx_s','p0_f','px_f','p0_s','px_s','r0_p0','rx_p0','r0_px','rx_px','r0_p0_s','rx_p0_s','r0_px_s','rx_px_s','r0_p0_f','rx_p0_f','r0_px_f','rx_px_f')
+  #,'v_3','v_2','v_1','v0','v1','v2','v3','m0','m1','m2','m3','m4','m5','m6')
+  
+  out_p_list <- c()
+  out_perc_sig_list <- c()
+  out_mean_diff_array <- c()
+  out_sig_sign_percs <- c()
+  
   for (i in comb_list){
     comb_inds <- get(i)
     
+    if(length(comb_inds) == 0){
+      cat('no instances of',i,'\n')
+      next
+    }else if(length(comb_inds) == 1){
+      cat('only one instance of',i,'\n')
+      next
+    }
+    
     #row 1 = baseline vs aft_cue, 2 = baseline vs bfr_res, 3 = baseline vs aft_res, 4 = basline vs res_wind, 5 = bfr_res vs after_res, 6 = bfr_res vs res_wind
     p_val_array <- array(data=NA,dim=c(total_unit_num,6))
+    mean_diff_array <- array(data=NA,dim=c(total_unit_num,6))
     for (unit_num in 1:total_unit_num){
 
       #TODO unhardcode time
@@ -150,54 +166,131 @@ for(region_index in 1:length(region_list)){
       aft_res <- rowMeans(all_res_fr[unit_num,comb_inds,51:150])
       res_wind <- rowMeans(all_res_fr[unit_num,comb_inds,81:130])
       
-      p_val_array[unit_num,1] <- calc_wsr(baseline,aft_cue)
-      p_val_array[unit_num,2] <- calc_wsr(baseline,bfr_res)
-      p_val_array[unit_num,3] <- calc_wsr(baseline,aft_res)
-      p_val_array[unit_num,4] <- calc_wsr(baseline,res_wind)
-      p_val_array[unit_num,5] <- calc_wsr(bfr_res,aft_res)
-      p_val_array[unit_num,6] <- calc_wsr(bfr_res,res_wind)
+      temp <- calc_wsr(baseline,aft_cue)
+      p_val_array[unit_num,1] <- temp[1]
+      mean_diff_array[unit_num,1] <- temp[2]
       
+      temp <- calc_wsr(baseline,bfr_res)
+      p_val_array[unit_num,2] <- temp[1]
+      mean_diff_array[unit_num,2] <- temp[2]
       
+      temp <- calc_wsr(baseline,aft_res)
+      p_val_array[unit_num,3] <- temp[1]
+      mean_diff_array[unit_num,3] <- temp[2]
       
+      temp <- calc_wsr(baseline,res_wind)
+      p_val_array[unit_num,4] <- temp[1]
+      mean_diff_array[unit_num,4] <- temp[2]
+      
+      temp <- calc_wsr(bfr_res,aft_res)
+      p_val_array[unit_num,5] <- temp[1]
+      mean_diff_array[unit_num,5] <- temp[2]
+      
+      temp <- calc_wsr(bfr_res,res_wind)
+      p_val_array[unit_num,6] <- temp[1]
+      mean_diff_array[unit_num,6] <- temp[2]
       
     }
+    perc_sig <- c(length(which(p_val_array[,1] < 0.05)),length(which(p_val_array[,2] < 0.05)),length(which(p_val_array[,3] < 0.05)),length(which(p_val_array[,4] < 0.05)),length(which(p_val_array[,5] < 0.05)),length(which(p_val_array[,6] < 0.05))) / dim(p_val_array)[1]
+    
+    sig_signs_1 <- mean_diff_array[,1][p_val_array[,1] < 0.05 & !is.na(p_val_array[,1])]
+    sig_signs_2 <- mean_diff_array[,2][p_val_array[,2] < 0.05 & !is.na(p_val_array[,2])]
+    sig_signs_3 <- mean_diff_array[,3][p_val_array[,3] < 0.05 & !is.na(p_val_array[,3])]
+    sig_signs_4 <- mean_diff_array[,4][p_val_array[,4] < 0.05 & !is.na(p_val_array[,4])]
+    sig_signs_5 <- mean_diff_array[,5][p_val_array[,5] < 0.05 & !is.na(p_val_array[,5])]
+    sig_signs_6 <- mean_diff_array[,6][p_val_array[,6] < 0.05 & !is.na(p_val_array[,6])]
+    
+    #[num sig units, num sig units w/ increase mean fr, num sig units w/ decrease fr, % inc, %dec]
+    out_1 <- c(length(sig_signs_1),length(sig_signs_1[sig_signs_1 > 0]),length(sig_signs_1[sig_signs_1 < 0]),length(sig_signs_1[sig_signs_1 > 0])/length(sig_signs_1),length(sig_signs_1[sig_signs_1 < 0])/length(sig_signs_1))
+    out_2 <- c(length(sig_signs_2),length(sig_signs_2[sig_signs_2 > 0]),length(sig_signs_2[sig_signs_2 < 0]),length(sig_signs_2[sig_signs_2 > 0])/length(sig_signs_2),length(sig_signs_2[sig_signs_2 < 0])/length(sig_signs_2))
+    out_3 <- c(length(sig_signs_3),length(sig_signs_3[sig_signs_3 > 0]),length(sig_signs_3[sig_signs_3 < 0]),length(sig_signs_3[sig_signs_3 > 0])/length(sig_signs_3),length(sig_signs_3[sig_signs_3 < 0])/length(sig_signs_3))
+    out_4 <- c(length(sig_signs_4),length(sig_signs_4[sig_signs_4 > 0]),length(sig_signs_4[sig_signs_4 < 0]),length(sig_signs_4[sig_signs_4 > 0])/length(sig_signs_4),length(sig_signs_4[sig_signs_4 < 0])/length(sig_signs_4))
+    out_5 <- c(length(sig_signs_5),length(sig_signs_5[sig_signs_5 > 0]),length(sig_signs_5[sig_signs_5 < 0]),length(sig_signs_5[sig_signs_5 > 0])/length(sig_signs_5),length(sig_signs_5[sig_signs_5 < 0])/length(sig_signs_5))
+    out_6 <- c(length(sig_signs_6),length(sig_signs_6[sig_signs_6 > 0]),length(sig_signs_6[sig_signs_6 < 0]),length(sig_signs_6[sig_signs_6 > 0])/length(sig_signs_6),length(sig_signs_6[sig_signs_6 < 0])/length(sig_signs_6))
+    
+    sig_sign_percs <- cbind(bl_ac = out_1,bl_br = out_2,bl_ar = out_3,bl_rw = out_4,br_ar = out_5,br_rw =out_6)
+    
+    out_p_list[[paste(i,'_p_vals',sep="")]] <- p_val_array
+    out_perc_sig_list[[paste(i,'_p_vals',sep="")]] <- perc_sig
+    out_mean_diff_array[[paste(i,'_mean_diffs',sep="")]] <- mean_diff_array
+    out_sig_sign_percs[[paste(i,'_sig_sign_percs',sep="")]] <- sig_sign_percs
   }
+  
+  assign(paste(region_list[region_index],'_p_val_list',sep=""),out_p_list)
+  assign(paste(region_list[region_index],'_perc_sig_list',sep=""),out_perc_sig_list)
+  assign(paste(region_list[region_index],'_mean_diffs_list',sep=""),out_mean_diff_array)
+  assign(paste(region_list[region_index],'_sig_sign_percs',sep=""),out_sig_sign_percs)
+  
+  #######################
+  ###plot ###############
+  ########################
+  
+  window_names <- c('baseline vs \nafter cue','baseline vs \nbefore result','baseline vs \nafter result','baseline vs \nresult window','before result vs \nafter result','before result vs \nresult window')
+  
+  #reward
+  png('test',width=8,height=6,units="in",res=500)
+  
+  num_inc <- rbind(out_sig_sign_percs$r0_sig_sign_percs[2,],out_sig_sign_percs$r1_sig_sign_percs[2,],out_sig_sign_percs$r2_sig_sign_percs[2,],out_sig_sign_percs$r3_sig_sign_percs[2,])
+  rownames(num_inc) <- c(0,1,2,3)
+  colnames(num_inc) <- window_names
+  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  num_inc_melt$direction <- 'inc'
+
+  num_dec <- rbind(out_sig_sign_percs$r0_sig_sign_percs[3,],out_sig_sign_percs$r1_sig_sign_percs[3,],out_sig_sign_percs$r2_sig_sign_percs[3,],out_sig_sign_percs$r3_sig_sign_percs[3,])
+  rownames(num_dec) <- c(0,1,2,3)
+  colnames(num_dec) <- window_names
+  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  num_dec_melt$direction <- 'dec'
+  
+  both_num <- rbind(num_inc_melt,num_dec_melt)
+  
+  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Reward Level',y='Number of units')
+
+  plot(plt)
+  graphics.off()
+  
+  
+  
+
+  
+  
+  ########
   
   
   
 }
 
+###############
+
+#save vals
 
 
-#iterate through times
-#baseline time: -0.5 to 0.0. 
-#Comparison times: post-cue, pre-d, post-d, 0.3-0.5 window
+#plotting
+for(region_index in 1:length(region_list)){
+  
+  
+  
+  
+  #r levels
+  #r and outcome
+  
+  #p levels
+  #p and outcome
+  
+  
+  #combs
+  #combs and outcome
+  
+  
+  #r delivery / p delivery
+  
+  
 
-baseline_time <- c(-0.5,0)
-after_time <- c(0,1.0)
 
 
 
-
-
-
-##########
-
-
-############ testing
-unit_num <- 1
-
-
-baseline <- all_cue_fr[unit_num,rx,1:50]
-
-res_window <- all_res_fr[unit_num,rx,81:130]
-
-avg_baseline <- rowMeans(baseline)
-avg_res_window <- rowMeans(res_window)
-
-wsr <- wilcox.test(avg_baseline,avg_res_window,paired=T)
-
-p_val <- wsr$p.value
+}
 
 
 
