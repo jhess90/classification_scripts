@@ -64,7 +64,6 @@ def make_hist_all(spike_data):
                 hist,bins = np.histogram(spike_data[i],bins=total_bin_range,range=(0,int(np.ceil(spike_data[i].max()))),normed=False,density=False)
                 hist_data[i,0:len(hist)] = hist
                 hist_bins[i,0:len(bins)] = bins
-
         
         return_dict = {'hist_data':hist_data,'hist_bins':hist_bins}
         return(return_dict)
@@ -101,7 +100,6 @@ def calc_firing_rates(hists,data_key,condensed):
                         closest_result_start_time = np.around((round(condensed[i,2] / bin_size_sec) * bin_size_sec),decimals=2)
                         result_start_bin = int(closest_result_start_time / bin_size_sec)
                 
-                #pdb.set_trace()
                 if not (result_start_bin + bins_after) > np.shape(hists)[1]:
                         for j in range(np.shape(hists)[0]):
                                 bfr_cue_hist = hists[j,bins_before + cue_start_bin : cue_start_bin]
@@ -118,41 +116,9 @@ def calc_firing_rates(hists,data_key,condensed):
                                 aft_cue_fr[i,j,:] = aft_cue_hist
                                 bfr_result_fr[i,j,:] = bfr_result_hist
                                 aft_result_fr[i,j,:] = aft_result_hist
-
                 else:
                         continue
-                        
-        #normalize frs
-        #bfr_cue_nl_fr = np.zeros((np.shape(bfr_cue_fr)))
-        #aft_cue_nl_fr = np.zeros((np.shape(aft_cue_fr)))
-        #bfr_result_nl_fr = np.zeros((np.shape(bfr_result_fr)))
-        #aft_result_nl_fr = np.zeros((np.shape(aft_result_fr)))
 
-        #for i in range(bfr_cue_fr.shape[0]):
-        #        for j in range(bfr_cue_fr.shape[1]):
-        #                #baseline_max = np.max(baseline_fr[i,j,:])
-        #                #baseline_min = np.min(baseline_fr[i,j,:])
-
-        #denom = float(baseline_max - baseline_min)
-        
-        #                #TODO better way to do this?
-        #                if denom == 0:
-        #                        bfr_cue_nl_fr[i,j,:] = bfr_cue_fr[i,j,:]
-        #                        aft_cue_nl_fr[i,j,:] = aft_cue_fr[i,j,:]
-        #                        bfr_result_nl_fr[i,j,:] = bfr_result_fr[i,j,:]
-        #                        aft_result_nl_fr[i,j,:] = aft_result_fr[i,j,:]
-
-        #                else:
-        #                        num = np.subtract(bfr_cue_fr[i,j,:],baseline_min)
-        #                        bfr_cue_nl_fr[i,j,:] = np.true_divide(num,denom)
-        #                        num = np.subtract(aft_cue_fr[i,j,:],baseline_min)
-        #                        aft_cue_nl_fr[i,j,:] = np.true_divide(num,denom)
-        #                        num = np.subtract(bfr_result_fr[i,j,:],baseline_min)
-        #                        bfr_result_nl_fr[i,j,:] = np.true_divide(num,denom)
-        #                        num = np.subtract(aft_result_fr[i,j,:],baseline_min)
-        #                        aft_result_nl_fr[i,j,:] = np.true_divide(num,denom)
-                        
-        #return_dict = {'bfr_cue_fr':bfr_cue_fr,'aft_cue_fr':aft_cue_fr,'bfr_result_fr':bfr_result_fr,'aft_result_fr':aft_result_fr,'bfr_cue_nl_fr':bfr_cue_nl_fr,'aft_cue_nl_fr':aft_cue_nl_fr,'bfr_result_nl_fr':bfr_result_nl_fr,'aft_result_nl_fr':aft_result_nl_fr,'baseline_fr':baseline_fr,'bfr_cue_hist':bfr_cue_hist_all,'aft_cue_hist':aft_cue_hist_all,'bfr_result_hist':bfr_result_hist_all,'aft_result_hist':aft_result_hist_all}
         return_dict = {'bfr_cue_fr':bfr_cue_fr,'aft_cue_fr':aft_cue_fr,'bfr_result_fr':bfr_result_fr,'aft_result_fr':aft_result_fr,'bfr_cue_hist':bfr_cue_hist_all,'aft_cue_hist':aft_cue_hist_all,'bfr_result_hist':bfr_result_hist_all,'aft_result_hist':aft_result_hist_all}
 
         return(return_dict)
@@ -200,7 +166,6 @@ def make_3d_model(fr_data,condensed,region_key,type_key):
                         sig_rsquared = np.append(sig_rsquared,unit_num)
                 if model.f_pvalue <= 0.05:
                         sig_fpvalue = np.append(sig_fpvalue,unit_num)
-                #if (model.pvalues < 0.05).any():
                 if model.pvalues[1] <= 0.05 or model.pvalues[2] <= 0.05:
                         sig_pvals = np.append(sig_pvals,unit_num)
                 if model.pvalues[0] <= 0.05:
@@ -229,8 +194,6 @@ def make_3d_model(fr_data,condensed,region_key,type_key):
         return_dict['conc'] = {'conc_model':conc_model,'param_conc_dict':param_conc_dict,'stat_conc_result_dict':stat_conc_result_dict,'sig_rsquared':sig_rsquared,'sig_fpvalue':sig_fpvalue,'sig_pvals':sig_pvals,'sig_const':sig_const,'sig_alpha':sig_alpha,'sig_beta':sig_beta,'perc_sic_f_pvals':perc_sig_f_pvals,'perc_sig_rsquared':perc_sig_rsquared,'perc_sig_pvals':perc_sig_pvals,'perc_sig_const':perc_sig_const,'perc_sig_alpha':perc_sig_alpha,'perc_sig_beta':perc_sig_beta,'df_conc_dict':df_conc_dict,'avg_frs':avg_frs,'avg_fr_data':avg_fr_data}
                 
         return(return_dict)
-
-
 
 
 
@@ -267,10 +230,8 @@ if condensed[-1,1] == condensed[-1,2] == 0:
         condensed = new_condensed
 condensed = condensed[condensed[:,0] != 0]
 
-#remove trials with now succ or failure scene (not sure why, but saw in one)
-
+#remove trials with no succ or failure scene (not sure why, but saw in one)
 condensed = condensed[np.invert(np.logical_and(condensed[:,1] == 0, condensed[:,2] == 0))]
-
 
 #TODOD FOR NOW remove catch trials
 condensed = condensed[condensed[:,5] == 0]
@@ -278,10 +239,15 @@ condensed = condensed[condensed[:,5] == 0]
 condensed[condensed[:,1] != 0, 5] = 1
 condensed[condensed[:,2] != 0, 5] = -1
 
+#r_vector = [:,3]
+#p_vector = [:,4]
+#rp_dict = {'r_vector':r_vector,'p_vector':p_vector,'condensed':condensed}
+
+#sio.savemat('rp_vals_%s' %(short_filename),{'rp_dict':rp_dict},format='5')
+
 
 ###################
 #calc times, can move to other files as well
-
 post_cue_times = condensed[:,1] + condensed[:,2] - condensed[:,0]
 post_delivery_times = np.zeros((np.shape(condensed)[0]-1))
 cue_to_cue_times = np.zeros((np.shape(condensed)[0]-1))

@@ -910,6 +910,7 @@ for(region_index in 1:length(region_list)){
         
         suppressWarnings(wsr <- wilcox.test(catch_levels[,1],catch_levels[,2],paired=T))
         p_val <- wsr$p.v
+        #cat(p_val,'\n')
         if(p_val < 0.05 & is.finite(p_val)){
           if (mean(catch_levels[,1],na.rm=T) > mean(catch_levels[,2],na.rm=T)){catch_change = -1}else if(mean(catch_levels[,1],na.rm=T) < mean(catch_levels[,2],na.rm=T)){catch_change = 1}else{change=0}
           sig_p_p_bin_catch_levels <- rbind(sig_p_p_bin_catch_levels,c(unit_num,p_val,catch_change))
@@ -977,7 +978,8 @@ for(region_index in 1:length(region_list)){
     
     },error=function(e){},finally={})
     
-    diffs_length_list <- list(r=length(ph_r_levels),p=length(ph_p_levels),r_outcome=length(ph_r_outcome_levels),p_outcome=length(ph_p_outcome_levels),outcome=length(ph_outcome_levels),comb=length(ph_comb_levels),comb_outcome=length(ph_comb_outcome_levels),r_catch=length(ph_r_catch_levels),p_catch=length(ph_p_catch_levels),r_delivery=length(sm_sig_p_r_delivery_levels[,1]),p_delivery=length(sm_sig_p_p_delivery_levels[,1]),r_bin_catch=length(sig_p_r_bin_catch_levels[,1]),p_bin_catch=length(sig_p_p_bin_catch_levels))
+    diffs_length_list <- list(r=length(ph_r_levels),p=length(ph_p_levels),r_outcome=length(ph_r_outcome_levels),p_outcome=length(ph_p_outcome_levels),outcome=length(ph_outcome_levels),comb=length(ph_comb_levels),comb_outcome=length(ph_comb_outcome_levels),r_catch=length(ph_r_catch_levels),p_catch=length(ph_p_catch_levels),r_delivery=length(sig_p_r_delivery_levels[,1]),p_delivery=length(sig_p_p_delivery_levels[,1]),r_bin_catch=length(sig_p_r_bin_catch_levels[,1]),p_bin_catch=length(sig_p_p_bin_catch_levels))
+
     assign(paste(region_list[region_index],'_diffs_length_list_',window_name[i],sep=""),diffs_length_list)
     
   }
