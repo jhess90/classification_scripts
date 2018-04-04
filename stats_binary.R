@@ -60,15 +60,9 @@ for(region_index in 1:length(region_list)){
 
   ###########
   r0 <- which(condensed[,4] == 0)
-  r1 <- which(condensed[,4] == 1)
-  r2 <- which(condensed[,4] == 2)
-  r3 <- which(condensed[,4] == 3)
   rx <- which(condensed[,4] >= 1)
   
   p0 <- which(condensed[,5] == 0)
-  p1 <- which(condensed[,5] == 1)
-  p2 <- which(condensed[,5] == 2)
-  p3 <- which(condensed[,5] == 3)
   px <- which(condensed[,5] >= 1)
   
   v_3 <- which(condensed[,7] == -3)
@@ -79,45 +73,21 @@ for(region_index in 1:length(region_list)){
   v2 <- which(condensed[,7] == 2)
   v3 <- which(condensed[,7] == 3)
   
-  m0 <- which(condensed[,8] == 0)
-  m1 <- which(condensed[,8] == 1)
-  m2 <- which(condensed[,8] == 2)
-  m3 <- which(condensed[,8] == 3)
-  m4 <- which(condensed[,8] == 4)
-  m5 <- which(condensed[,8] == 5)
-  m6 <- which(condensed[,8] == 6)
+  v_x <- which(condensed[,7] < 0)
+  v0 <- which(condensed[,7] == 0)
+  vx <- which(condensed[,7] > 0)
   
+  #todo unhardcode motivation? doesn't work for all nonbinary
+  m0 <- which(condensed[,8] == 0)
+  mx <- which(condensed[,8] == 3)
+  m2x <- which(condensed[,8] == 6)
+
   res0 <- which(condensed[,6] == 0)
   res1 <- which(condensed[,6] == 1)
-  
-  r0_fail <- res0[which(res0 %in% r0)]
-  r1_fail <- res0[which(res0 %in% r1)]
-  r2_fail <- res0[which(res0 %in% r2)]
-  r3_fail <- res0[which(res0 %in% r3)]
-  r0_succ <- res1[which(res1 %in% r0)]
-  r1_succ <- res1[which(res1 %in% r1)]
-  r2_succ <- res1[which(res1 %in% r2)]
-  r3_succ <- res1[which(res1 %in% r3)]
-  
-  p0_fail <- res0[which(res0 %in% p0)]
-  p1_fail <- res0[which(res0 %in% p1)]
-  p2_fail <- res0[which(res0 %in% p2)]
-  p3_fail <- res0[which(res0 %in% p3)]
-  p0_succ <- res1[which(res1 %in% p0)]
-  p1_succ <- res1[which(res1 %in% p1)]
-  p2_succ <- res1[which(res1 %in% p2)]
-  p3_succ <- res1[which(res1 %in% p3)]
   
   catch_x <- which(condensed[,12] <= -1)
   catch0 <- which(condensed[,12] == 0)
   catchx <- which(condensed[,12] >= 1)
-  
-  catch_3 <- which(condensed[,12] == -3)
-  catch_2 <- which(condensed[,12] == -2)
-  catch_1 <- which(condensed[,12] == -1)
-  catch1 <- which(condensed[,12] == 1)
-  catch2 <- which(condensed[,12] == 2)
-  catch3 <- which(condensed[,12] == 3)
   
   r0_f <- res0[which(res0 %in% r0)]
   rx_f <- res0[which(res0 %in% rx)]
@@ -145,7 +115,7 @@ for(region_index in 1:length(region_list)){
   
   #########################
   
-  comb_list <- c('r0','r1','r2','r3','p0','p1','p2','p3','res0','res1','r0_fail','r1_fail','r2_fail','r3_fail','r0_succ','r1_succ','r2_succ','r3_succ','p0_fail','p1_fail','p2_fail','p3_fail','p0_succ','p1_succ','p2_succ','p3_succ','catch_x','catch0','catchx','rx','px','r0_f','rx_f','r0_s','rx_s','p0_f','px_f','p0_s','px_s','r0_p0','rx_p0','r0_px','rx_px','r0_p0_s','rx_p0_s','r0_px_s','rx_px_s','r0_p0_f','rx_p0_f','r0_px_f','rx_px_f','v_3','v_2','v_1','v0','v1','v2','v3','m0','m1','m2','m3','m4','m5','m6','catch_x','catchx')
+  comb_list <- c('r0','p0','res0','res1','catch_x','catch0','catchx','rx','px','r0_f','rx_f','r0_s','rx_s','p0_f','px_f','p0_s','px_s','r0_p0','rx_p0','r0_px','rx_px','r0_p0_s','rx_p0_s','r0_px_s','rx_px_s','r0_p0_f','rx_p0_f','r0_px_f','rx_px_f','v_x','v0','vx','m0','mx','m2x','catch_x','catchx')
   
   out_p_list <- c()
   out_perc_sig_list <- c()
@@ -976,11 +946,10 @@ for(region_index in 1:length(region_list)){
     tryCatch({assign(paste(region_list[region_index],'_sig_p_p_bin_catch_levels_',window_name[i],sep=""),sig_p_p_bin_catch_levels)
       cat('p bin catch diffs: ',length(sig_p_p_bin_catch_levels[,1]),'units\n')
     
+      diffs_length_list <- list(r=length(ph_r_levels),p=length(ph_p_levels),r_outcome=length(ph_r_outcome_levels),p_outcome=length(ph_p_outcome_levels),outcome=length(ph_outcome_levels),comb=length(ph_comb_levels),comb_outcome=length(ph_comb_outcome_levels),r_catch=length(ph_r_catch_levels),p_catch=length(ph_p_catch_levels),r_delivery=length(sm_sig_p_r_delivery_levels[,1]),p_delivery=length(sm_sig_p_p_delivery_levels[,1]),r_bin_catch=length(sig_p_r_bin_catch_levels[,1]),p_bin_catch=length(sig_p_p_bin_catch_levels))
+      assign(paste(region_list[region_index],'_diffs_length_list_',window_name[i],sep=""),diffs_length_list)
     },error=function(e){},finally={})
-    
-    diffs_length_list <- list(r=length(ph_r_levels),p=length(ph_p_levels),r_outcome=length(ph_r_outcome_levels),p_outcome=length(ph_p_outcome_levels),outcome=length(ph_outcome_levels),comb=length(ph_comb_levels),comb_outcome=length(ph_comb_outcome_levels),r_catch=length(ph_r_catch_levels),p_catch=length(ph_p_catch_levels),r_delivery=length(sm_sig_p_r_delivery_levels[,1]),p_delivery=length(sm_sig_p_p_delivery_levels[,1]),r_bin_catch=length(sig_p_r_bin_catch_levels[,1]),p_bin_catch=length(sig_p_p_bin_catch_levels))
-    assign(paste(region_list[region_index],'_diffs_length_list_',window_name[i],sep=""),diffs_length_list)
-    
+
   }
 }
 
