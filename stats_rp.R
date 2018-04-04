@@ -756,30 +756,29 @@ for(region_index in 1:length(region_list)){
           sig_comb_outcome_level_ct <- sig_comb_outcome_level_ct + 1
         }
       },error=function(e){
-        r0_p0_s_means <- rowMeans(all_total_fr[unit_num,r0_p0_s,windows[i,1]:windows[i,2]])
-        r0_px_s_means <- rowMeans(all_total_fr[unit_num,r0_px_s,windows[i,1]:windows[i,2]])
-        rx_p0_s_means <- rowMeans(all_total_fr[unit_num,rx_p0_s,windows[i,1]:windows[i,2]])
-        rx_px_s_means <- rowMeans(all_total_fr[unit_num,rx_px_s,windows[i,1]:windows[i,2]])
-        r0_p0_f_means <- rowMeans(all_total_fr[unit_num,r0_p0_f,windows[i,1]:windows[i,2]])
-        r0_px_f_means <- rowMeans(all_total_fr[unit_num,r0_px_f,windows[i,1]:windows[i,2]])
-        rx_px_f_means <- rowMeans(all_total_fr[unit_num,rx_px_f,windows[i,1]:windows[i,2]])
+        #r0_p0_s_means <- rowMeans(all_total_fr[unit_num,r0_p0_s,windows[i,1]:windows[i,2]])
+        #r0_px_s_means <- rowMeans(all_total_fr[unit_num,r0_px_s,windows[i,1]:windows[i,2]])
+        #rx_p0_s_means <- rowMeans(all_total_fr[unit_num,rx_p0_s,windows[i,1]:windows[i,2]])
+        #rx_px_s_means <- rowMeans(all_total_fr[unit_num,rx_px_s,windows[i,1]:windows[i,2]])
+        #r0_p0_f_means <- rowMeans(all_total_fr[unit_num,r0_p0_f,windows[i,1]:windows[i,2]])
+        #r0_px_f_means <- rowMeans(all_total_fr[unit_num,r0_px_f,windows[i,1]:windows[i,2]])
+        #rx_px_f_means <- rowMeans(all_total_fr[unit_num,rx_px_f,windows[i,1]:windows[i,2]])
         
-        c_levels <- t(rbind.fill.matrix(t(r0_p0_s_means),t(r0_px_s_means),t(rx_p0_s_means),t(rx_px_s_means),t(r0_p0_f_means),t(r0_px_f_means),t(rx_px_f_means)))
+        #c_levels <- t(rbind.fill.matrix(t(r0_p0_s_means),t(r0_px_s_means),t(rx_p0_s_means),t(rx_px_s_means),t(r0_p0_f_means),t(r0_px_f_means),t(rx_px_f_means)))
         
-        #[p val, SM stat]
-        sm_out <- as.numeric(Ski.Mack(c_levels))
-        #cat('comb outcome',unit_num,'sm:',sm_out,'\n')
+        ##[p val, SM stat]
+        #sm_out <- as.numeric(Ski.Mack(c_levels))
+        ##cat('comb outcome',unit_num,'sm:',sm_out,'\n')
         
-        
-        if(sm_out[1] < 0.05){
-          sm_sig_p_comb_outcome_levels <- rbind(sm_sig_p_comb_outcome_levels,c(unit_num,sm_out))
+        #if(sm_out[1] < 0.05){
+        #  sm_sig_p_comb_outcome_levels <- rbind(sm_sig_p_comb_outcome_levels,c(unit_num,sm_out))
+        #  
+        #  comb_levels.m <- melt(data.frame(r0_p0_s=c_levels[,1],r0_px_s=c_levels[,2],rx_p0_s=c_levels[,3],rx_px_s=c_levels[,4],r0_p0_f=c_levels[,5],r0_px_f=c_levels[,6],rx_px_f=c_levels[,7]),measure.vars=c('r0_p0_s','r0_px_s','rx_p0_s','rx_px_s','r0_p0_f','r0_px_f','rx_px_f'),variable.name='level')
+        #  trash <- capture.output(d_t <- dunn.test(comb_levels.m$value,comb_levels.m$level,method=p.adjust.methods))
           
-          comb_levels.m <- melt(data.frame(r0_p0_s=c_levels[,1],r0_px_s=c_levels[,2],rx_p0_s=c_levels[,3],rx_px_s=c_levels[,4],r0_p0_f=c_levels[,5],r0_px_f=c_levels[,6],rx_px_f=c_levels[,7]),measure.vars=c('r0_p0_s','r0_px_s','rx_p0_s','rx_px_s','r0_p0_f','r0_px_f','rx_px_f'),variable.name='level')
-          trash <- capture.output(d_t <- dunn.test(comb_levels.m$value,comb_levels.m$level,method=p.adjust.methods))
-          
-          ph_comb_outcome_levels[[sig_p_outcome_level_ct]] <- d_t
-          sig_comb_outcome_level_ct <- sig_comb_outcome_level_ct + 1
-        }
+        #  ph_comb_outcome_levels[[sig_p_outcome_level_ct]] <- d_t
+        #  sig_comb_outcome_level_ct <- sig_comb_outcome_level_ct + 1
+        #}
         
       },finally={})
       
@@ -883,7 +882,7 @@ for(region_index in 1:length(region_list)){
       p_val <- wsr$p.v
       if(p_val < 0.05 & is.finite(p_val)){
         if (mean(p_delivery_levels[,1],na.rm=T) > mean(p_delivery_levels[,2],na.rm=T)){p_delivery_change = -1}else if(mean(p_delivery_levels[,1],na.rm=T) < mean(p_delivery_levels[,2],na.rm=T)){p_delivery_change = 1}else{change=0}
-        sig_p_p_delivery_levels <- rbind(sig_p_delivery_levels,c(unit_num,p_val,p_delivery_change))
+        sig_p_p_delivery_levels <- rbind(sig_p_p_delivery_levels,c(unit_num,p_val,p_delivery_change))
       }
       
       #############

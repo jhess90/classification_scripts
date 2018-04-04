@@ -52,7 +52,8 @@ def hist_and_smooth_data(spike_data):
         hist_data = np.zeros((len(spike_data),max_bin_num))
         hist_bins = np.zeros((len(spike_data),max_bin_num))
         for i in range(len(spike_data)):
-                total_bin_range = np.arange(0,int(np.ceil(spike_data[i].max())),bin_size/1000.0)
+                total_bin_range = np.arange(0,int(np.
+ceil(spike_data[i].max())),bin_size/1000.0)
                 hist,bins = np.histogram(spike_data[i],bins=total_bin_range,range=(0,int(np.ceil(spike_data[i].max()))),normed=False,density=False)
                 #pdb.set_trace()
                 hist_data[i,0:len(hist)] = hist
@@ -129,7 +130,7 @@ print extracted_filename
 
 #create matrix of trial-by-trial info
 trial_breakdown = timestamps['trial_breakdown']
-condensed = np.zeros((np.shape(trial_breakdown)[0],10))
+condensed = np.zeros((np.shape(trial_breakdown)[0],12))
 
 #0: disp_rp, 1: succ scene 2: failure scene, 3: rnum, 4: pnum, 5:succ/fail, 6: value, 7: motiv, 8: disp_rp bin
 
@@ -148,17 +149,6 @@ for i in range(np.shape(condensed)[0]):
         condensed[i,9] = int(np.around((round((condensed[i,1] + condensed[i,2]) / bin_size_sec) * bin_size_sec),decimals=2)/bin_size_sec)
         #condensed[i,9] = condensed[i,9].astype(int)
 
-#delete end trials if not fully finished
-if condensed[-1,1] == condensed[-1,2] == 0:
-	new_condensed = condensed[0:-1,:]
-        condensed = new_condensed
-condensed = condensed[condensed[:,0] != 0]
-
-#remove trials with now succ or failure scene (not sure why, but saw in one)
-condensed = condensed[np.invert(np.logical_and(condensed[:,1] == 0, condensed[:,2] == 0))]
-
-#TODO if have both succ and punishment scene (look into why would occur, saw once)
-condensed = condensed[np.invert(np.logical_and(condensed[:,1] != 0, condensed[:,2] != 0 ))]
 
 
 #TODOD FOR NOW remove catch trials
@@ -169,6 +159,28 @@ condensed[condensed[:,2] != 0, 5] = 0
 
 condensed[:,6] = condensed[:,3] - condensed[:,4]
 condensed[:,7] = condensed[:,3] + condensed[:,4]
+
+
+condensed[:,10][trial_breakdown[:,10] == 1] = 1
+condensed[:,10][trial_breakdown[:,10] == 2] = -1
+
+condensed[:,11][trial_breakdown[:,10] == 1] = condensed[:,3][trial_breakdown[:,10] == 1]
+condensed[:,11][trial_breakdown[:,10] == 2] = np.multiply(condensed[:,4][trial_breakdown[:,10] == 2],-1)
+
+
+#######
+#delete end trials if not fully finished
+if condensed[-1,1] == condensed[-1,2] == 0:
+	new_condensed = condensed[0:-1,:]
+        condensed = new_condensed
+condensed = condensed[condensed[:,0] != 0]
+
+#remove trials with no succ or failure scene (not sure why, but saw in one)
+condensed = condensed[np.invert(np.logical_and(condensed[:,1] == 0, condensed[:,2] == 0))]
+
+#TODO if have both succ and punishment scene (look into why would occur, saw once)
+condensed = condensed[np.invert(np.logical_and(condensed[:,1] != 0, condensed[:,2] != 0 ))]
+
 
 
 #Pull and arrange spike data
