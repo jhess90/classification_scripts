@@ -897,9 +897,8 @@ for(region_index in 1:length(region_list)){
 
 pth <- getwd()
 
-#if(substr(pth,nchar(pth)-3,nchar(pth)-2) == "14"){save_name = substr(pth,nchar(pth)-5,nchar(pth))}else{save_name=substr(pth,nchar(pth)-4,nchar(pth))}
+if(substr(pth,nchar(pth)-2,nchar(pth)-2) == "9"){save_name = substr(pth,nchar(pth)-6,nchar(pth))}else{save_name=substr(pth,nchar(pth)-7,nchar(pth))}
 
-save_name = 'test'
 save.image(paste(save_name,".RData",sep=""))
-#rm(list=ls())
+rm(list=ls())
 
