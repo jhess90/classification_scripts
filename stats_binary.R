@@ -574,7 +574,7 @@ for(region_index in 1:length(region_list)){
       #punishment outcome
       p0_s_means <- rowMeans(all_total_fr[unit_num,p0_s,windows[i,1]:windows[i,2]])
       px_s_means <- rowMeans(all_total_fr[unit_num,px_s,windows[i,1]:windows[i,2]])
-      p0_f_means <- rowMeans(all_total_fr[unit_num,p0_f,windows[i,1]:windows[i,2]])
+      if(length(p0_f)==1){p0_f_means = mean(all_total_fr[unit_num,p0_f,windows[i,1]:windows[i,2]])}else{p0_f_means = rowMeans(all_total_fr[unit_num,p0_f,windows[i,1]:windows[i,2]])}
       if(length(px_f)==1){px_f_means = mean(all_total_fr[unit_num,px_f,windows[i,1]:windows[i,2]])}else{px_f_means = rowMeans(all_total_fr[unit_num,px_f,windows[i,1]:windows[i,2]])}
       
       p_levels <- t(rbind.fill.matrix(t(p0_s_means),t(px_s_means),t(p0_f_means),t(px_f_means)))
@@ -594,7 +594,7 @@ for(region_index in 1:length(region_list)){
       #############
       #outcome
 
-      res0_means <- rowMeans(all_total_fr[unit_num,res0,windows[i,1]:windows[i,2]])
+      if(length(res0)==1){res0_means = mean(all_total_fr[unit_num,res0,windows[i,1]:windows[i,2]])}else{res0_means = rowMeans(all_total_fr[unit_num,res0,windows[i,1]:windows[i,2]])}
       res1_means <- rowMeans(all_total_fr[unit_num,res1,windows[i,1]:windows[i,2]])
       
       res_levels <- t(rbind.fill.matrix(t(res0_means),t(res1_means)))
@@ -679,8 +679,8 @@ for(region_index in 1:length(region_list)){
       #reward catch
       rx_s_means <- rowMeans(all_total_fr[unit_num,rx_s,windows[i,1]:windows[i,2]])
       r0_s_means <- rowMeans(all_total_fr[unit_num,r0_s,windows[i,1]:windows[i,2]])
-      catchx_means <- rowMeans(all_total_fr[unit_num,catchx,windows[i,1]:windows[i,2]])
-
+      if(length(catchx)==1){catchx_means = mean(all_total_fr[unit_num,catchx,windows[i,1]:windows[i,2]])}else{catchx_means = rowMeans(all_total_fr[unit_num,catchx,windows[i,1]:windows[i,2]])}
+      
       c_levels <- t(rbind.fill.matrix(t(rx_s_means),t(r0_s_means),t(catchx_means)))
       
       tryCatch({sm_out <- as.numeric(Ski.Mack(c_levels))},error=function(e){sm_out <<- c(1.0,1.0)},finally={})
@@ -741,27 +741,33 @@ for(region_index in 1:length(region_list)){
       #p delivery
       
       tryCatch({px_f_means <- rowMeans(all_total_fr[unit_num,px_f,windows[i,1]:windows[i,2]])},error=function(e){px_f_means <- mean(all_total_fr[unit_num,px_f,windows[i,1]:windows[i,2]])})
-      p0_f_means <- rowMeans(all_total_fr[unit_num,p0_f,windows[i,1]:windows[i,2]])
+      if(length(p0_f)==1){p0_f_means = mean(all_total_fr[unit_num,p0_f,windows[i,1]:windows[i,2]])}else{p0_f_means = rowMeans(all_total_fr[unit_num,p0_f,windows[i,1]:windows[i,2]])}
       
       p_delivery_levels <- t(rbind.fill.matrix(t(px_f_means),t(p0_f_means)))
       
-      suppressWarnings(wsr <- wilcox.test(p_delivery_levels[,1],p_delivery_levels[,2],paired=T))
-      p_val <- wsr$p.v
+      if(length(p_delivery_levels[,1]) != 1){
+        suppressWarnings(wsr <- wilcox.test(p_delivery_levels[,1],p_delivery_levels[,2],paired=T))
+        p_val <- wsr$p.v
+      }else{p_val <- 1.0}
       if(p_val < 0.05 & is.finite(p_val)){
         if (mean(p_delivery_levels[,1],na.rm=T) > mean(p_delivery_levels[,2],na.rm=T)){p_delivery_change = -1}else if(mean(p_delivery_levels[,1],na.rm=T) < mean(p_delivery_levels[,2],na.rm=T)){p_delivery_change = 1}else{change=0}
-        sig_p_p_delivery_levels <- rbind(sig_p_delivery_levels,c(unit_num,p_val,p_delivery_change))
+        sig_p_p_delivery_levels <- rbind(sig_p_p_delivery_levels,c(unit_num,p_val,p_delivery_change))
       }
       
       #############
       #r catch binary
       
       rx_s_means <- rowMeans(all_total_fr[unit_num,rx_s,windows[i,1]:windows[i,2]])
-      catchx_means <- rowMeans(all_total_fr[unit_num,catchx,windows[i,1]:windows[i,2]])
+      if(length(catchx)==1){catchx_means = mean(all_total_fr[unit_num,catchx,windows[i,1]:windows[i,2]])}else{catchx_means = rowMeans(all_total_fr[unit_num,catchx,windows[i,1]:windows[i,2]])}
       
       catch_levels <- t(rbind.fill.matrix(t(rx_s_means),t(catchx_means)))
       
-      suppressWarnings(wsr <- wilcox.test(catch_levels[,1],catch_levels[,2],paired=T))
-      p_val <- wsr$p.v
+      
+      if(length(catchx) != 0){
+        suppressWarnings(wsr <- wilcox.test(catch_levels[,1],catch_levels[,2],paired=T))
+        p_val <- wsr$p.v
+      }else{p_val <- 1.0}
+      
       if(p_val < 0.05 & is.finite(p_val)){
         if (mean(catch_levels[,1],na.rm=T) > mean(catch_levels[,2],na.rm=T)){catch_change = -1}else if(mean(catch_levels[,1],na.rm=T) < mean(catch_levels[,2],na.rm=T)){catch_change = 1}else{change=0}
         sig_p_r_bin_catch_levels <- rbind(sig_p_r_bin_catch_levels,c(unit_num,p_val,catch_change))
