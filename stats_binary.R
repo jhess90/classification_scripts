@@ -553,7 +553,7 @@ for(region_index in 1:length(region_list)){
       #reward outcome
       r0_s_means <- rowMeans(all_total_fr[unit_num,r0_s,windows[i,1]:windows[i,2]])
       rx_s_means <- rowMeans(all_total_fr[unit_num,rx_s,windows[i,1]:windows[i,2]])
-      r0_f_means <- rowMeans(all_total_fr[unit_num,r0_f,windows[i,1]:windows[i,2]])
+      if(length(r0_f)==1){r0_f_means = mean(all_total_fr[unit_num,r0_f,windows[i,1]:windows[i,2]])}else{r0_f_means = rowMeans(all_total_fr[unit_num,r0_f,windows[i,1]:windows[i,2]])}
       if(length(rx_f)==1){rx_f_means = mean(all_total_fr[unit_num,rx_f,windows[i,1]:windows[i,2]])}else{rx_f_means = rowMeans(all_total_fr[unit_num,rx_f,windows[i,1]:windows[i,2]])}
 
       r_levels <- t(rbind.fill.matrix(t(r0_s_means),t(rx_s_means),t(r0_f_means),t(rx_f_means)))
