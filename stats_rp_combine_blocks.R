@@ -14,6 +14,7 @@ library(R.matlab)
 library(plyr)
 library(dunn.test)
 library(PMCMRplus)
+library(xlsx)
 
 tryCatch({
   source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
@@ -26,6 +27,9 @@ tryCatch({
 
 saveAsPng <- T
 region_list <- c('M1','S1','PmD')
+
+ph_list_names <- c('comb','comb_outcome','m','p_catch','p','p_outcome','r_catch','r','r_outcome','v')
+time_windows <- c('ac','br','ar','rw')
 
 #nhp_id <- '504'
 nhp_id <- '0059'
@@ -54,6 +58,20 @@ if(nhp_id == '0059'){
   PmD_diffs_length_list_ar_total <- PmD_diffs_length_list_ar
   PmD_diffs_length_list_rw_total <- PmD_diffs_length_list_rw
   
+  for(region_name in region_list){
+    for(ph_name in ph_list_names){
+      for(window_name in time_windows){
+        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+        temp <- get(name)
+      
+        assign(paste(name,'_totals',sep=""),list())
+        if(length(temp) > 0){
+          #cat(name,'\n')
+          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+          assign(paste(name,'_totals',sep=""),temp2)
+          
+          }}}}
+
   detach()
   attach('0_8_2.RData')
   M1_temp <- M1_sig_sign_percs
@@ -83,6 +101,17 @@ if(nhp_id == '0059'){
     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
   }
+  for(region_name in region_list){
+    for(ph_name in ph_list_names){
+      for(window_name in time_windows){
+        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+        temp <- get(name)
+        
+        if(length(temp) > 0){
+          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+          assign(paste(name,'_totals',sep=""),temp2)
+          
+        }}}}
   detach()
   
   attach('0_9_1.RData')
@@ -112,8 +141,18 @@ if(nhp_id == '0059'){
     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
   }
+  for(region_name in region_list){
+    for(ph_name in ph_list_names){
+      for(window_name in time_windows){
+        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+        temp <- get(name)
+        
+        if(length(temp) > 0){
+          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+          assign(paste(name,'_totals',sep=""),temp2)
+          
+        }}}}
   detach()
-  
   attach('0_9_2.RData')
   M1_temp <- M1_sig_sign_percs
   M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
@@ -141,6 +180,17 @@ if(nhp_id == '0059'){
     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
   }
+  for(region_name in region_list){
+    for(ph_name in ph_list_names){
+      for(window_name in time_windows){
+        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+        temp <- get(name)
+        
+        if(length(temp) > 0){
+          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+          assign(paste(name,'_totals',sep=""),temp2)
+          
+        }}}}
   detach()
   
 }else if(nhp_id == '504'){
@@ -167,6 +217,19 @@ if(nhp_id == '0059'){
   PmD_diffs_length_list_ar_total <- PmD_diffs_length_list_ar
   PmD_diffs_length_list_rw_total <- PmD_diffs_length_list_rw
   
+  for(region_name in region_list){
+    for(ph_name in ph_list_names){
+      for(window_name in time_windows){
+        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+        temp <- get(name)
+        
+        assign(paste(name,'_totals',sep=""),list())
+        if(length(temp) > 0){
+          #cat(name,'\n')
+          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+          assign(paste(name,'_totals',sep=""),temp2)
+          
+        }}}}
   detach()
   attach('5_8_2.RData')
   M1_temp <- M1_sig_sign_percs
@@ -196,7 +259,17 @@ if(nhp_id == '0059'){
     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
   }
-  
+  for(region_name in region_list){
+    for(ph_name in ph_list_names){
+      for(window_name in time_windows){
+        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+        temp <- get(name)
+        
+        if(length(temp) > 0){
+          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+          assign(paste(name,'_totals',sep=""),temp2)
+          
+        }}}}
   detach()
   attach('5_9_1.RData')
   M1_temp <- M1_sig_sign_percs
@@ -225,8 +298,18 @@ if(nhp_id == '0059'){
     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
   }
+  for(region_name in region_list){
+    for(ph_name in ph_list_names){
+      for(window_name in time_windows){
+        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+        temp <- get(name)
+        
+        if(length(temp) > 0){
+          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+          assign(paste(name,'_totals',sep=""),temp2)
+          
+        }}}}
   detach()
-  
   attach('5_9_2.RData')
   M1_temp <- M1_sig_sign_percs
   M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
@@ -254,6 +337,17 @@ if(nhp_id == '0059'){
     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
   }
+  for(region_name in region_list){
+    for(ph_name in ph_list_names){
+      for(window_name in time_windows){
+        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+        temp <- get(name)
+        
+        if(length(temp) > 0){
+          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+          assign(paste(name,'_totals',sep=""),temp2)
+          
+        }}}}
   detach()
   
   attach('5_14_1.RData')
@@ -283,6 +377,17 @@ if(nhp_id == '0059'){
     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
   }
+  for(region_name in region_list){
+    for(ph_name in ph_list_names){
+      for(window_name in time_windows){
+        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+        temp <- get(name)
+        
+        if(length(temp) > 0){
+          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+          assign(paste(name,'_totals',sep=""),temp2)
+          
+        }}}}
   detach()
   
   attach('5_14_2.RData')
@@ -312,6 +417,17 @@ if(nhp_id == '0059'){
     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
   }
+  for(region_name in region_list){
+    for(ph_name in ph_list_names){
+      for(window_name in time_windows){
+        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+        temp <- get(name)
+        
+        if(length(temp) > 0){
+          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+          assign(paste(name,'_totals',sep=""),temp2)
+          
+        }}}}
   detach()
   
   attach('5_14_3.RData')
@@ -341,6 +457,17 @@ if(nhp_id == '0059'){
     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
   }
+  for(region_name in region_list){
+    for(ph_name in ph_list_names){
+      for(window_name in time_windows){
+        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+        temp <- get(name)
+        
+        if(length(temp) > 0){
+          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+          assign(paste(name,'_totals',sep=""),temp2)
+          
+        }}}}
   detach()
 }
 
@@ -653,6 +780,64 @@ for(region_index in 1:length(region_list)){
 }
 
 
+
+###############
+
+
+for(region_name in region_list){
+  for(ph_name in ph_list_names){
+    perc_list_windows <- list()
+    #perc_list_windows_cbind <- c()
+    for(window_name in time_windows){
+      name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,'_totals',sep="")
+      temp <- get(name)
+      if(length(temp) > 0){
+      
+        sig_unit_num <- length(temp)
+        cat(name,':',sig_unit_num,'total sig units\n')
+        ph_sig_num <- 0
+        
+        ph_list <- list()
+        for(i in 1:sig_unit_num){
+          sig_comparisons <- temp[[i]]$comparisons[temp[[i]]$P < 0.05]
+          if(length(sig_comparisons) > 0){
+            cat('unit:',i,sig_comparisons,'\n')
+            ph_list[[ph_sig_num + 1]] <- sig_comparisons
+            ph_sig_num <- ph_sig_num + 1
+            
+          }
+        }
+        assign(paste(name,'_ph_list',sep=""),ph_list)
+        
+        perc_ph_sig <- ph_sig_num / sig_unit_num
+        cat('perc ph pairwise sig:',perc_ph_sig*100,'\n')
+        
+        if(length(ph_list) > 0){
+          comp_perc_list <- list()
+          for(comp_name in temp[[1]]$comparisons){
+            ct <- 0
+            for(i in 1:ph_sig_num){
+              if(comp_name %in% ph_list[[i]]){
+                ct <- ct + 1
+              }
+              comp_perc_list[[comp_name]] <- ct / ph_sig_num
+            }
+            comp_perc_list[['total']] <- ph_sig_num
+          }
+          perc_list_windows[[window_name]] <- comp_perc_list
+        }
+      }
+    }
+    if(length(perc_list_windows) > 0){
+      suppressWarnings(list_length <- do.call(rbind, lapply(perc_list_windows, length)))
+    
+      suppressWarnings(perc_list_windows_cbind <- as.data.frame(do.call(cbind,perc_list_windows)))
+      assign(paste(region_name,'_',ph_name,'_cpl',sep=""),perc_list_windows_cbind)
+      #cat(ph_name,'\n\n')
+      write.xlsx(perc_list_windows_cbind,file=paste(region_name,'_ph_percs.xlsx',sep=""),sheetName=ph_name,append=T)
+    }
+  }
+}
 
 
 save.image(paste(nhp_id,"_summary.RData",sep=""))
