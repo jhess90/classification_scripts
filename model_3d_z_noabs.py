@@ -743,27 +743,35 @@ for region_key,region_value in data_dict_all.iteritems():
 
                         #alpha p val
                         all_slopes[i,4] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][1]
-                        #alpha p val
+                        #beta p val
                         all_slopes[i,5] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][2]
-                        #alpha p val
+                        #k p val
                         all_slopes[i,6] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][0]
                 
                         if all_slopes[i,4] <= 0.05 and all_slopes[i,5] <= 0.05:
                                 all_sig_all_slopes[all_sig_all_index,:] = all_slopes[i,:]
-                                all_sig_all_index = all_sig_all_index + 1
-                        elif all_slopes[i,4] <= 0.05:
-                                all_alpha_only_sig +=1
-                        elif all_slopes[i,5] <= 0.05:
-                                all_beta_only_sig <= 0.05
-                        if all_slopes[i,1] > 0 and all_slopes[i,2] > 0:
-                                all_both_pos += 1
+                        #        all_sig_all_index = all_sig_all_index + 1
+                        #        #pdb.set_trace()
+                        #elif all_slopes[i,4] <= 0.05:
+                        #        all_alpha_only_sig +=1
+                        #elif all_slopes[i,5] <= 0.05:
+                        #        all_beta_only_sig <= 0.05
+                        #if all_slopes[i,1] > 0 and all_slopes[i,2] > 0:
+                        #        all_both_pos += 1
                         elif all_slopes[i,1] < 0 and all_slopes[i,2] < 0:
                                 all_both_neg += 1
                         elif all_slopes[i,1] > 0 and all_slopes[i,2] < 0:
                                 all_alpha_pos += 1
                         elif all_slopes[i,1] < 0 and all_slopes[i,2] > 0:
                                 all_beta_pos += 1
-
+                
+                #pdb.set_trace()
+                
+                #both sig
+                all_sig_all_index = sum(all_slopes[all_slopes[:,4] <= 0.05][:,5] <= 0.05)
+                all_alpha_only_sig = sum(all_slopes[all_slopes[:,4] <= 0.05][:,5] > 0.05)
+                all_beta_only_sig = sum(all_slopes[all_slopes[:,5] <= 0.05][:,4] > 0.05)
+                print 'window: %s, both sig: %s, alpha sig: %s, beta sig: %s' %(type_key,all_sig_all_index,all_alpha_only_sig,all_beta_only_sig)
 
                 all_sig_all_slopes = all_sig_all_slopes[sig_all_slopes[:,1] != 0]
                 data_dict_all[region_key]['all_slopes'][type_key] = all_slopes
@@ -896,10 +904,10 @@ for region_key,region_val in data_dict_all.iteritems():
                 num_sig_beta = np.shape(sig_beta)[0]
                 perc_slopes = np.shape(slopes)[0] / float(total_unit_num)
                 perc_sig_slopes = np.shape(sig_slopes)[0] / float(total_unit_num)
-                perc_sig_alpha_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][0] / float(total_unit_num)
-                num_sig_alpha_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][0]
-                perc_sig_beta_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][1] / float(total_unit_num)
-                num_sig_beta_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][1]
+                perc_sig_alpha_only = data_dict_all[region_key]['all_alpha_beta_only_sig'][type_key][0] / float(total_unit_num)
+                num_sig_alpha_only = data_dict_all[region_key]['all_alpha_beta_only_sig'][type_key][0]
+                perc_sig_beta_only = data_dict_all[region_key]['all_alpha_beta_only_sig'][type_key][1] / float(total_unit_num)
+                num_sig_beta_only = data_dict_all[region_key]['all_alpha_beta_only_sig'][type_key][1]
                 try:
                         perc_both_pos = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][2] / float(np.shape(slopes)[0]) #of at least one sig
                         perc_both_neg = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][3] / float(np.shape(slopes)[0])

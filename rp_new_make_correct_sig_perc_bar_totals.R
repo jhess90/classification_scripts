@@ -13,22 +13,23 @@ library(broom)
 library(plyr)
 library(reshape)
 
+region_list <- c('M1','S1','PmD')
 
-attach('~/dropbox/model_rp/0_8_1/no_abs/alphabeta_M1_percsig_avg.RData')
+attach('~/Dropbox/model_rp/0_8_1/no_abs/alphabeta_M1_percsig_avg.RData')
 M1_percsig_bfr_cue_nums_total <- percsig_bfr_cue_nums
 M1_percsig_aft_cue_nums_total <- percsig_aft_cue_nums
 M1_percsig_bfr_res_nums_total <- percsig_bfr_res_nums
 M1_percsig_aft_res_nums_total <- percsig_aft_res_nums
 M1_percsig_total_units <- percsig_total_units
 detach()
-attach('~/dropbox/model_rp/0_8_1/no_abs/alphabeta_S1_percsig_avg.RData')
+attach('~/Dropbox/model_rp/0_8_1/no_abs/alphabeta_S1_percsig_avg.RData')
 S1_percsig_bfr_cue_nums_total <- percsig_bfr_cue_nums
 S1_percsig_aft_cue_nums_total <- percsig_aft_cue_nums
 S1_percsig_bfr_res_nums_total <- percsig_bfr_res_nums
 S1_percsig_aft_res_nums_total <- percsig_aft_res_nums
 S1_percsig_total_units <- percsig_total_units
 detach()
-attach('~/dropbox/model_rp/0_8_1/no_abs/alphabeta_PmD_percsig_avg.RData')
+attach('~/Dropbox/model_rp/0_8_1/no_abs/alphabeta_PmD_percsig_avg.RData')
 PmD_percsig_bfr_cue_nums_total <- percsig_bfr_cue_nums
 PmD_percsig_aft_cue_nums_total <- percsig_aft_cue_nums
 PmD_percsig_bfr_res_nums_total <- percsig_bfr_res_nums
@@ -36,21 +37,21 @@ PmD_percsig_aft_res_nums_total <- percsig_aft_res_nums
 PmD_percsig_total_units <- percsig_total_units
 detach()
 
-attach('~/dropbox/model_rp/0_8_2/no_abs/alphabeta_M1_percsig_avg.RData')
+attach('~/Dropbox/model_rp/0_8_2/no_abs/alphabeta_M1_percsig_avg.RData')
 M1_percsig_bfr_cue_nums_total <- M1_percsig_bfr_cue_nums_total + percsig_bfr_cue_nums
 M1_percsig_aft_cue_nums_total <- M1_percsig_aft_cue_nums_total + percsig_aft_cue_nums
 M1_percsig_bfr_res_nums_total <- M1_percsig_bfr_res_nums_total + percsig_bfr_res_nums
 M1_percsig_aft_res_nums_total <- M1_percsig_aft_res_nums_total + percsig_aft_res_nums
 M1_percsig_total_units <- M1_percsig_total_units + percsig_total_units
 detach()
-attach('~/dropbox/model_rp/0_8_2/no_abs/alphabeta_S1_percsig_avg.RData')
+attach('~/Dropbox/model_rp/0_8_2/no_abs/alphabeta_S1_percsig_avg.RData')
 S1_percsig_bfr_cue_nums_total <- S1_percsig_bfr_cue_nums_total + percsig_bfr_cue_nums
 S1_percsig_aft_cue_nums_total <- S1_percsig_aft_cue_nums_total + percsig_aft_cue_nums
 S1_percsig_bfr_res_nums_total <- S1_percsig_bfr_res_nums_total + percsig_bfr_res_nums
 S1_percsig_aft_res_nums_total <- S1_percsig_aft_res_nums_total + percsig_aft_res_nums
 S1_percsig_total_units <- S1_percsig_total_units + percsig_total_units
 detach()
-attach('~/dropbox/model_rp/0_8_2/no_abs/alphabeta_PmD_percsig_avg.RData')
+attach('~/Dropbox/model_rp/0_8_2/no_abs/alphabeta_PmD_percsig_avg.RData')
 PmD_percsig_bfr_cue_nums_total <- PmD_percsig_bfr_cue_nums_total + percsig_bfr_cue_nums
 PmD_percsig_aft_cue_nums_total <- PmD_percsig_aft_cue_nums_total + percsig_aft_cue_nums
 PmD_percsig_bfr_res_nums_total <- PmD_percsig_bfr_res_nums_total + percsig_bfr_res_nums
@@ -58,21 +59,21 @@ PmD_percsig_aft_res_nums_total <- PmD_percsig_aft_res_nums_total + percsig_aft_r
 PmD_percsig_total_units <- PmD_percsig_total_units + percsig_total_units
 detach()
 
-attach('~/dropbox/model_rp/0_9_1/no_abs/alphabeta_M1_percsig_avg.RData')
+attach('~/Dropbox/model_rp/0_9_1/no_abs/alphabeta_M1_percsig_avg.RData')
 M1_percsig_bfr_cue_nums_total <- M1_percsig_bfr_cue_nums_total + percsig_bfr_cue_nums
 M1_percsig_aft_cue_nums_total <- M1_percsig_aft_cue_nums_total + percsig_aft_cue_nums
 M1_percsig_bfr_res_nums_total <- M1_percsig_bfr_res_nums_total + percsig_bfr_res_nums
 M1_percsig_aft_res_nums_total <- M1_percsig_aft_res_nums_total + percsig_aft_res_nums
 M1_percsig_total_units <- M1_percsig_total_units + percsig_total_units
 detach()
-attach('~/dropbox/model_rp/0_9_1/no_abs/alphabeta_S1_percsig_avg.RData')
+attach('~/Dropbox/model_rp/0_9_1/no_abs/alphabeta_S1_percsig_avg.RData')
 S1_percsig_bfr_cue_nums_total <- S1_percsig_bfr_cue_nums_total + percsig_bfr_cue_nums
 S1_percsig_aft_cue_nums_total <- S1_percsig_aft_cue_nums_total + percsig_aft_cue_nums
 S1_percsig_bfr_res_nums_total <- S1_percsig_bfr_res_nums_total + percsig_bfr_res_nums
 S1_percsig_aft_res_nums_total <- S1_percsig_aft_res_nums_total + percsig_aft_res_nums
 S1_percsig_total_units <- S1_percsig_total_units + percsig_total_units
 detach()
-attach('~/dropbox/model_rp/0_9_1/no_abs/alphabeta_PmD_percsig_avg.RData')
+attach('~/Dropbox/model_rp/0_9_1/no_abs/alphabeta_PmD_percsig_avg.RData')
 PmD_percsig_bfr_cue_nums_total <- PmD_percsig_bfr_cue_nums_total + percsig_bfr_cue_nums
 PmD_percsig_aft_cue_nums_total <- PmD_percsig_aft_cue_nums_total + percsig_aft_cue_nums
 PmD_percsig_bfr_res_nums_total <- PmD_percsig_bfr_res_nums_total + percsig_bfr_res_nums
@@ -80,21 +81,21 @@ PmD_percsig_aft_res_nums_total <- PmD_percsig_aft_res_nums_total + percsig_aft_r
 PmD_percsig_total_units <- PmD_percsig_total_units + percsig_total_units
 detach()
 
-attach('~/dropbox/model_rp/0_9_2/no_abs/alphabeta_M1_percsig_avg.RData')
+attach('~/Dropbox/model_rp/0_9_2/no_abs/alphabeta_M1_percsig_avg.RData')
 M1_percsig_bfr_cue_nums_total <- M1_percsig_bfr_cue_nums_total + percsig_bfr_cue_nums
 M1_percsig_aft_cue_nums_total <- M1_percsig_aft_cue_nums_total + percsig_aft_cue_nums
 M1_percsig_bfr_res_nums_total <- M1_percsig_bfr_res_nums_total + percsig_bfr_res_nums
 M1_percsig_aft_res_nums_total <- M1_percsig_aft_res_nums_total + percsig_aft_res_nums
 M1_percsig_total_units <- M1_percsig_total_units + percsig_total_units
 detach()
-attach('~/dropbox/model_rp/0_9_2/no_abs/alphabeta_S1_percsig_avg.RData')
+attach('~/Dropbox/model_rp/0_9_2/no_abs/alphabeta_S1_percsig_avg.RData')
 S1_percsig_bfr_cue_nums_total <- S1_percsig_bfr_cue_nums_total + percsig_bfr_cue_nums
 S1_percsig_aft_cue_nums_total <- S1_percsig_aft_cue_nums_total + percsig_aft_cue_nums
 S1_percsig_bfr_res_nums_total <- S1_percsig_bfr_res_nums_total + percsig_bfr_res_nums
 S1_percsig_aft_res_nums_total <- S1_percsig_aft_res_nums_total + percsig_aft_res_nums
 S1_percsig_total_units <- S1_percsig_total_units + percsig_total_units
 detach()
-attach('~/dropbox/model_rp/0_9_2/no_abs/alphabeta_PmD_percsig_avg.RData')
+attach('~/Dropbox/model_rp/0_9_2/no_abs/alphabeta_PmD_percsig_avg.RData')
 PmD_percsig_bfr_cue_nums_total <- PmD_percsig_bfr_cue_nums_total + percsig_bfr_cue_nums
 PmD_percsig_aft_cue_nums_total <- PmD_percsig_aft_cue_nums_total + percsig_aft_cue_nums
 PmD_percsig_bfr_res_nums_total <- PmD_percsig_bfr_res_nums_total + percsig_bfr_res_nums
@@ -224,3 +225,6 @@ for (region_index in 1:length(region_list)){
   
   
 }
+
+
+save.image(file='updated.RData')
