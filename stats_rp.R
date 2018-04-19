@@ -908,7 +908,8 @@ for(region_index in 1:length(region_list)){
       m2_means <- rowMeans(all_total_fr[unit_num,m2,windows[i,1]:windows[i,2]])
       m3_means <- rowMeans(all_total_fr[unit_num,m3,windows[i,1]:windows[i,2]])
       m4_means <- rowMeans(all_total_fr[unit_num,m4,windows[i,1]:windows[i,2]])
-      m5_means <- rowMeans(all_total_fr[unit_num,m5,windows[i,1]:windows[i,2]])
+      #m5_means <- rowMeans(all_total_fr[unit_num,m5,windows[i,1]:windows[i,2]])
+      if(length(m5)==1){m5_means = mean(all_total_fr[unit_num,m5,windows[i,1]:windows[i,2]])}else{m5_means = rowMeans(all_total_fr[unit_num,m5,windows[i,1]:windows[i,2]])}
       m6_means <- rowMeans(all_total_fr[unit_num,m6,windows[i,1]:windows[i,2]])
       
       m_levels <- t(rbind.fill.matrix(t(m0_means),t(m1_means),t(m2_means),t(m3_means),t(m4_means),t(m5_means),t(m6_means)))

@@ -899,7 +899,7 @@ for region_key,region_val in data_dict_all.iteritems():
                 perc_sig_alpha_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][0] / float(total_unit_num)
                 num_sig_alpha_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][0]
                 perc_sig_beta_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][1] / float(total_unit_num)
-                num_sig_beta_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][0]
+                num_sig_beta_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][1]
                 try:
                         perc_both_pos = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][2] / float(np.shape(slopes)[0]) #of at least one sig
                         perc_both_neg = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][3] / float(np.shape(slopes)[0])
@@ -912,7 +912,7 @@ for region_key,region_val in data_dict_all.iteritems():
                                 perc_alpha_pos = 0
                                 perc_beta_pos = 0
 
-                                #pdb.set_trace()
+                #pdb.set_trace()
                 #print 'xlsx region: %s type %s' %(region_key,type_key)
                 worksheet = slopes_workbook.add_worksheet('slopes_%s' %(type_key))
                 worksheet.write_row(0,0,names)
