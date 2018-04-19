@@ -238,6 +238,10 @@ for (region_index in 1:length(region_list)){
   graphics.off()
   
   
+  
+  
+  # #################
+  # #FIX!!?
   # labs <- c('alpha only sig','beta only sig','both sig','no sig')
   # 
   # #percsig nums: no sig, both sig, beta sig, alpha sig
@@ -278,12 +282,12 @@ for (region_index in 1:length(region_list)){
   # bfr_res_nums <- c(percsig_bfr_res_nums[4],percsig_bfr_res_nums[3],percsig_bfr_res_nums[2],percsig_bfr_res_nums[1])
   # aft_res_nums <- c(percsig_aft_res_nums[4],percsig_aft_res_nums[3],percsig_aft_res_nums[2],percsig_aft_res_nums[1])
   # 
-  # # 
+  # #
   # # bfr_cue_nums <- percsig_bfr_cue_nums
   # # aft_cue_nums <- percsig_aft_cue_nums
   # # bfr_res_nums <- percsig_bfr_res_nums
   # # aft_res_nums <- percsig_aft_res_nums
-  # # 
+  # #
   # # bfr_cue_nums <- c(bfr_cue[5]-bfr_cue[4]-bfr_cue[13]-bfr_cue[12],bfr_cue[4],bfr_cue[13],bfr_cue[12])
   # # aft_cue_nums <- c(aft_cue[5]-aft_cue[4]-aft_cue[13]-aft_cue[12],aft_cue[4],aft_cue[13],aft_cue[12])
   # # bfr_result_nums <- c(bfr_result[5]-bfr_result[4]-bfr_result[13]-bfr_result[12],bfr_result[4],bfr_result[13],bfr_result[12])
@@ -299,13 +303,13 @@ for (region_index in 1:length(region_list)){
   # df_all <- rbind(bfr_cue_df,aft_cue_df,bfr_res_df,aft_res_df)
   # df_all <- df_all[which(df_all$perc > 0),]
   # 
-  # bar_plt <- ggplot() + geom_bar(aes(x=df_all$type,y=df_all$perc,fill=df_all$labs),data=df_all,stat="identity") 
+  # bar_plt <- ggplot() + geom_bar(aes(x=df_all$type,y=df_all$perc,fill=df_all$labs),data=df_all,stat="identity")
   # bar_plt <- bar_plt + labs(title=region_list[region_index],fill="",x="Time Window",y="Percentage") + scale_fill_manual(values=c("lightblue","seagreen","grey","slateblue"))
   # bar_plt <- bar_plt + geom_text(aes(x=df_all$type,y=df_all$position,label=df_all$label),size=3,stat="identity") + theme_classic()
   # 
   # plot(bar_plt)
   # graphics.off()
-  # 
+  # # 
   
 }
 
