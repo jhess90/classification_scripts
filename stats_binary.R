@@ -830,13 +830,13 @@ for(region_index in 1:length(region_list)){
       }
       
     }
-    assign(paste(region_list[region_index],'_sm_sig_p_r_levels_',window_name[i],sep=""),sig_p_r_levels)
-    assign(paste(region_list[region_index],'_ph_r_levels_',window_name[i],sep=""),ph_r_levels)
-    cat('r level differences: ',length(ph_r_levels),'units\n')
+    assign(paste(region_list[region_index],'_sig_p_r_levels_',window_name[i],sep=""),sig_p_r_levels)
+    #assign(paste(region_list[region_index],'_ph_r_levels_',window_name[i],sep=""),ph_r_levels)
+    cat('r level differences: ',length(sig_p_r_levels[,1]),'units\n')
     
-    assign(paste(region_list[region_index],'_sm_sig_p_p_levels_',window_name[i],sep=""),sig_p_p_levels)
-    assign(paste(region_list[region_index],'_ph_p_levels_',window_name[i],sep=""),ph_p_levels)
-    cat('p level differences: ',length(ph_p_levels),'units\n')
+    assign(paste(region_list[region_index],'_sig_p_p_levels_',window_name[i],sep=""),sig_p_p_levels)
+    #assign(paste(region_list[region_index],'_ph_p_levels_',window_name[i],sep=""),ph_p_levels)
+    cat('p level differences: ',length(sig_p_p_levels[,1]),'units\n')
     
     assign(paste(region_list[region_index],'_sm_sig_p_r_outcome_levels_',window_name[i],sep=""),sm_sig_p_r_outcome_levels)
     assign(paste(region_list[region_index],'_ph_r_outcome_levels_',window_name[i],sep=""),ph_r_outcome_levels)
@@ -893,7 +893,7 @@ for(region_index in 1:length(region_list)){
     assign(paste(region_list[region_index],'_ph_m_levels_',window_name[i],sep=""),ph_m_levels)
     cat('m level differences: ',length(ph_m_levels),'units\n')
      
-    diffs_length_list <- list(r=length(ph_r_levels),p=length(ph_p_levels),r_outcome=length(ph_r_outcome_levels),p_outcome=length(ph_p_outcome_levels),outcome=length(ph_outcome_levels),comb=length(ph_comb_levels),comb_outcome=length(ph_comb_outcome_levels),r_catch=length(ph_r_catch_levels),p_catch=length(ph_p_catch_levels),r_delivery=length(sig_p_r_delivery_levels[,1]),p_delivery=length(sig_p_p_delivery_levels[,1]),r_bin_catch=length(sig_p_r_bin_catch_levels[,1]),p_bin_catch=length(sig_p_p_bin_catch_levels),value=length(sm_sig_p_v_levels[,1]),motivation=length(sm_sig_p_m_levels[,1]))
+    diffs_length_list <- list(r=length(sig_p_r_levels[,1]),p=length(sig_p_p_levels[,1]),r_outcome=length(ph_r_outcome_levels),p_outcome=length(ph_p_outcome_levels),outcome=length(ph_outcome_levels),comb=length(ph_comb_levels),comb_outcome=length(ph_comb_outcome_levels),r_catch=length(ph_r_catch_levels),p_catch=length(ph_p_catch_levels),r_delivery=length(sig_p_r_delivery_levels[,1]),p_delivery=length(sig_p_p_delivery_levels[,1]),r_bin_catch=length(sig_p_r_bin_catch_levels[,1]),p_bin_catch=length(sig_p_p_bin_catch_levels),value=length(sm_sig_p_v_levels[,1]),motivation=length(sm_sig_p_m_levels[,1]))
     assign(paste(region_list[region_index],'_diffs_length_list_',window_name[i],sep=""),diffs_length_list)
 
   }
