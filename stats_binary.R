@@ -690,6 +690,12 @@ for(region_index in 1:length(region_list)){
         c_levels <- t(rbind.fill.matrix(t(means_2[[1]]),t(means_2[[2]]),t(means_2[[3]]),t(means_2[[4]]),t(means_2[[5]]),t(means_2[[6]]),t(means_2[[7]])))
       }else if (ct == 6){
         c_levels <- t(rbind.fill.matrix(t(means_2[[1]]),t(means_2[[2]]),t(means_2[[3]]),t(means_2[[4]]),t(means_2[[5]]),t(means_2[[6]])))
+      }else if (ct == 5){
+        c_levels <- t(rbind.fill.matrix(t(means_2[[1]]),t(means_2[[2]]),t(means_2[[3]]),t(means_2[[4]]),t(means_2[[5]])))
+      }else if (ct == 4){
+        c_levels <- t(rbind.fill.matrix(t(means_2[[1]]),t(means_2[[2]]),t(means_2[[3]]),t(means_2[[4]])))
+      }else if (ct == 3){
+        c_levels <- t(rbind.fill.matrix(t(means_2[[1]]),t(means_2[[2]]),t(means_2[[3]])))
       }else{cat('ERROR\n\n')}
       
       sm_out <- as.numeric(Ski.Mack(c_levels))
