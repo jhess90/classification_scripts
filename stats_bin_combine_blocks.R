@@ -1456,9 +1456,11 @@ for(region_index in 1:length(region_list)){
 
 for(region_name in region_list){
   for(ph_name in ph_list_names){
+    cat(ph_name,'\n')
     perc_list_windows <- list()
     #perc_list_windows_cbind <- c()
     for(window_name in time_windows){
+      cat(window_name,'\n')
       name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,'_totals',sep="")
       temp <- get(name)
       if(length(temp) > 0){
