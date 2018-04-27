@@ -636,7 +636,7 @@ for(region_index in 1:length(region_list)){
       ct <- 0
       for(j in 1:length(comb_list)){
         if(length(comb_list[[j]]) > 0 ){
-          element_mean <- rowMeans(all_total_fr[unit_num,comb_outcome_list[[j]],windows[i,1]:windows[i,2]])
+          element_mean <- rowMeans(all_total_fr[unit_num,comb_list[[j]],windows[i,1]:windows[i,2]])
           means[[comb_list_names[[j]]]] <- element_mean
           ct <- ct + 1
           means_2[[ct]] <- element_mean
