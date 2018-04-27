@@ -27,11 +27,12 @@ tryCatch({
 
 saveAsPng <- T
 region_list <- c('M1','S1','PmD')
-ph_list_names <- c('comb','comb_outcome','m','p_catch','p','p_outcome','r_catch','r','r_outcome','v')
+#ph_list_names <- c('comb','comb_outcome','m','p_catch','p','p_outcome','r_catch','r','r_outcome','v')
+ph_list_names <- c('comb','comb_outcome','m','p_catch','p_outcome','r_catch','r_outcome','v')
 time_windows <- c('ac','br','ar','rw')
 
-#nhp_id <- '504'
-nhp_id <- '0059'
+nhp_id <- '504'
+#nhp_id <- '0059'
 
 if(nhp_id == '0059'){
   attach('0_3_10_1.RData')
