@@ -31,8 +31,8 @@ region_list <- c('M1','S1','PmD')
 ph_list_names <- c('comb','comb_outcome','m','p_catch','p_outcome','r_catch','r_outcome','v')
 time_windows <- c('ac','br','ar','rw')
 
-nhp_id <- '504'
-#nhp_id <- '0059'
+#nhp_id <- '504'
+nhp_id <- '0059'
 
 if(nhp_id == '0059'){
   attach('0_3_10_1.RData')
@@ -63,9 +63,17 @@ if(nhp_id == '0059'){
         name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
         temp <- get(name)
         
+        # if(ph_name=='comb_outcome'){
+        #   for(i in 1:length(temp)){
+        #     cat(length(temp[[i]]$comparisons),'\n')
+        #   }
+          
+        #}
+        
         assign(paste(name,'_totals',sep=""),list())
         if(length(temp) > 0){
           #cat(name,'\n')
+
           temp2 <- c(get(paste(name,'_totals',sep="")),temp)
           assign(paste(name,'_totals',sep=""),temp2)
           
@@ -144,10 +152,17 @@ if(nhp_id == '0059'){
       for(window_name in time_windows){
         name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
         temp <- get(name)
-        
+
         if(length(temp) > 0){
           temp2 <- c(get(paste(name,'_totals',sep="")),temp)
           assign(paste(name,'_totals',sep=""),temp2)
+          
+          if(ph_name == 'comb_outcome'){
+            for(i in 1:length(temp)){
+              cat(region_name,i,length(temp[[i]]$comparisons),'\n')
+              
+            }
+          }  
           
         }}}}
   detach()
@@ -1454,6 +1469,7 @@ for(region_index in 1:length(region_list)){
   write.table(all_diffs_length,file=paste(region_list[region_index],'_all_diffs_length.csv',sep=""),sep=",",col.names=NA)
 }
 
+#TODO somehow when combining comb outcome, leading to certain combinations being not recorded (0059)
 for(region_name in region_list){
   for(ph_name in ph_list_names){
     cat(ph_name,'\n')

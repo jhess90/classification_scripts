@@ -829,12 +829,15 @@ for(region_name in region_list){
       }
     }
     if(length(perc_list_windows) > 0){
-      suppressWarnings(list_length <- do.call(rbind, lapply(perc_list_windows, length)))
+      if(length(perc_list_windows[[1]]) > 0){
+      
+        suppressWarnings(list_length <- do.call(rbind, lapply(perc_list_windows, length)))
     
-      suppressWarnings(perc_list_windows_cbind <- as.data.frame(do.call(cbind,perc_list_windows)))
-      assign(paste(region_name,'_',ph_name,'_cpl',sep=""),perc_list_windows_cbind)
-      #cat(ph_name,'\n\n')
-      write.xlsx(perc_list_windows_cbind,file=paste(region_name,'_ph_percs.xlsx',sep=""),sheetName=ph_name,append=T)
+        suppressWarnings(perc_list_windows_cbind <- as.data.frame(do.call(cbind,perc_list_windows)))
+        assign(paste(region_name,'_',ph_name,'_cpl',sep=""),perc_list_windows_cbind)
+        #cat(ph_name,'\n\n')
+        write.xlsx(perc_list_windows_cbind,file=paste(region_name,'_ph_percs.xlsx',sep=""),sheetName=ph_name,append=T)
+      }
     }
   }
 }
@@ -844,5 +847,7 @@ save.image(paste(nhp_id,"_summary.RData",sep=""))
 
 
 
+c(length(M1_ph_comb_levels_ac),length(M1_ph_comb_levels_br),length(M1_ph_comb_levels_ar),length(M1_ph_comb_levels_rw),length(S1_ph_comb_levels_ac),length(S1_ph_comb_levels_br),length(S1_ph_comb_levels_ar),length(S1_ph_comb_levels_rw),length(PmD_ph_comb_levels_ac),length(PmD_ph_comb_levels_br),length(PmD_ph_comb_levels_ar),length(PmD_ph_comb_levels_rw))
+c(length(M1_ph_comb_outcome_levels_ac),length(M1_ph_comb_outcome_levels_br),length(M1_ph_comb_outcome_levels_ar),length(M1_ph_comb_outcome_levels_rw),length(S1_ph_comb_outcome_levels_ac),length(S1_ph_comb_outcome_levels_br),length(S1_ph_comb_outcome_levels_ar),length(S1_ph_comb_outcome_levels_rw),length(PmD_ph_comb_outcome_levels_ac),length(PmD_ph_comb_outcome_levels_br),length(PmD_ph_comb_outcome_levels_ar),length(PmD_ph_comb_outcome_levels_rw))
 
 

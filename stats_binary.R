@@ -604,28 +604,7 @@ for(region_index in 1:length(region_list)){
       if(p_val < 0.05 & is.finite(p_val)){
         sm_sig_p_outcome_levels <- rbind(sm_sig_p_outcome_levels,c(unit_num,p_val))
       }
-      # 
-      # #############
-      # #combination
-      # r0_p0_means <- rowMeans(all_total_fr[unit_num,r0_p0,windows[i,1]:windows[i,2]])
-      # r0_px_means <- rowMeans(all_total_fr[unit_num,r0_px,windows[i,1]:windows[i,2]])
-      # rx_p0_means <- rowMeans(all_total_fr[unit_num,rx_p0,windows[i,1]:windows[i,2]])
-      # rx_px_means <- rowMeans(all_total_fr[unit_num,rx_px,windows[i,1]:windows[i,2]])
-      #  
-      # c_levels <- t(rbind.fill.matrix(t(r0_p0_means),t(r0_px_means),t(rx_p0_means),t(rx_px_means)))
-      # 
-      # tryCatch({sm_out <- as.numeric(Ski.Mack(r_levels))},error=function(e){sm_out <<- c(1.0,1.0)},finally={})
-      # 
-      # if(sm_out[1] < 0.05){
-      #   sm_sig_p_comb_levels <- rbind(sm_sig_p_comb_levels,c(unit_num,sm_out))
-      # 
-      #   comb_levels.m <- melt(data.frame(r0_p0=c_levels[,1],r0_px=c_levels[,2],rx_p0=c_levels[,3],rx_px=c_levels[,4]),measure.vars=c('r0_p0','r0_px','rx_p0','rx_px'),variable.name='level')
-      #   trash <- capture.output(d_t <- dunn.test(comb_levels.m$value,comb_levels.m$level,method=p.adjust.methods))
-      #   
-      #   ph_comb_levels[[sig_p_outcome_level_ct]] <- d_t
-      #   sig_comb_outcome_level_ct <- sig_comb_outcome_level_ct + 1
-      # }
-      
+
       #############
       #combination 
       comb_list <- list(r0_p0,r0_px,rx_p0,rx_px)
@@ -660,12 +639,10 @@ for(region_index in 1:length(region_list)){
         
         trash <- capture.output(d_t <- dunn.test(comb_levels.m$value,comb_levels.m$level,method=p.adjust.methods))
         
-        ph_comb_levels[[sig_p_level_ct]] <- d_t
+        ph_comb_levels[[sig_comb_level_ct]] <- d_t
         sig_comb_level_ct <- sig_comb_level_ct + 1
         
       }
-      
-      
       
       #############
       #combination outcome
@@ -709,68 +686,14 @@ for(region_index in 1:length(region_list)){
         
         trash <- capture.output(d_t <- dunn.test(comb_levels.m$value,comb_levels.m$level,method=p.adjust.methods))
          
-        ph_comb_outcome_levels[[sig_p_outcome_level_ct]] <- d_t
+        ph_comb_outcome_levels[[sig_comb_outcome_level_ct]] <- d_t
         sig_comb_outcome_level_ct <- sig_comb_outcome_level_ct + 1
+      
+        #cat(d_t$comparisons,'\n')
+        #cat(unit_num,'\n')
         
       }
-      
-      
-      
-      #   
-      # 
-      # tryCatch({
-      #   r0_p0_s_means <- rowMeans(all_total_fr[unit_num,r0_p0_s,windows[i,1]:windows[i,2]])
-      #   r0_px_s_means <- rowMeans(all_total_fr[unit_num,r0_px_s,windows[i,1]:windows[i,2]])
-      #   rx_p0_s_means <- rowMeans(all_total_fr[unit_num,rx_p0_s,windows[i,1]:windows[i,2]])
-      #   rx_px_s_means <- rowMeans(all_total_fr[unit_num,rx_px_s,windows[i,1]:windows[i,2]])
-      #   r0_p0_f_means <- rowMeans(all_total_fr[unit_num,r0_p0_f,windows[i,1]:windows[i,2]])
-      #   r0_px_f_means <- rowMeans(all_total_fr[unit_num,r0_px_f,windows[i,1]:windows[i,2]])
-      #   rx_p0_f_means <- rowMeans(all_total_fr[unit_num,rx_p0_f,windows[i,1]:windows[i,2]])
-      #   rx_px_f_means <- rowMeans(all_total_fr[unit_num,rx_px_f,windows[i,1]:windows[i,2]])
-      #   
-      #   c_levels <- t(rbind.fill.matrix(t(r0_p0_s_means),t(r0_px_s_means),t(rx_p0_s_means),t(rx_px_s_means),t(r0_p0_f_means),t(r0_px_f_means),t(rx_p0_f_means),t(rx_px_f_means)))
-      #   
-      #   sm_out <- as.numeric(Ski.Mack(c_levels))
-      # 
-      #   if(sm_out[1] < 0.05){
-      #     sm_sig_p_comb_outcome_levels <- rbind(sm_sig_p_comb_outcome_levels,c(unit_num,sm_out))
-      #     
-      #     comb_levels.m <- melt(data.frame(r0_p0_s=c_levels[,1],r0_px_s=c_levels[,2],rx_p0_s=c_levels[,3],rx_px_s=c_levels[,4],r0_p0_f=c_levels[,5],r0_px_f=c_levels[,6],rx_p0_f=c_levels[,7],rx_px_f=c_levels[,8]),measure.vars=c('r0_p0_s','r0_px_s','rx_p0_s','rx_px_s','r0_p0_f','r0_px_f','rx_p0_f','rx_px_f'),variable.name='level')
-      #     trash <- capture.output(d_t <- dunn.test(comb_levels.m$value,comb_levels.m$level,method=p.adjust.methods))
-      #     
-      #     ph_comb_levels[[sig_p_outcome_level_ct]] <- d_t
-      #     sig_comb_outcome_level_ct <- sig_comb_outcome_level_ct + 1
-      #   }
-      # },error=function(e){
-      #   
-      #   
-      #   
-      #   
-      #   
-      #   # r0_p0_s_means <- rowMeans(all_total_fr[unit_num,r0_p0_s,windows[i,1]:windows[i,2]])
-      #   # r0_px_s_means <- rowMeans(all_total_fr[unit_num,r0_px_s,windows[i,1]:windows[i,2]])
-      #   # rx_p0_s_means <- rowMeans(all_total_fr[unit_num,rx_p0_s,windows[i,1]:windows[i,2]])
-      #   # rx_px_s_means <- rowMeans(all_total_fr[unit_num,rx_px_s,windows[i,1]:windows[i,2]])
-      #   # r0_p0_f_means <- rowMeans(all_total_fr[unit_num,r0_p0_f,windows[i,1]:windows[i,2]])
-      #   # r0_px_f_means <- rowMeans(all_total_fr[unit_num,r0_px_f,windows[i,1]:windows[i,2]])
-      #   # rx_px_f_means <- rowMeans(all_total_fr[unit_num,rx_px_f,windows[i,1]:windows[i,2]])
-      #   # 
-      #   # c_levels <- t(rbind.fill.matrix(t(r0_p0_s_means),t(r0_px_s_means),t(rx_p0_s_means),t(rx_px_s_means),t(r0_p0_f_means),t(r0_px_f_means),t(rx_px_f_means)))
-      #   # 
-      #   # sm_out <- as.numeric(Ski.Mack(c_levels))
-      #   # 
-      #   # if(sm_out[1] < 0.05){
-      #   #   sm_sig_p_comb_outcome_levels <- rbind(sm_sig_p_comb_outcome_levels,c(unit_num,sm_out))
-      #   #   
-      #   #   comb_levels.m <- melt(data.frame(r0_p0_s=c_levels[,1],r0_px_s=c_levels[,2],rx_p0_s=c_levels[,3],rx_px_s=c_levels[,4],r0_p0_f=c_levels[,5],r0_px_f=c_levels[,6],rx_px_f=c_levels[,7]),measure.vars=c('r0_p0_s','r0_px_s','rx_p0_s','rx_px_s','r0_p0_f','r0_px_f','rx_px_f'),variable.name='level')
-      #   #   trash <- capture.output(d_t <- dunn.test(comb_levels.m$value,comb_levels.m$level,method=p.adjust.methods))
-      #   #   
-      #   #   ph_comb_outcome_levels[[sig_p_outcome_level_ct]] <- d_t
-      #   #   sig_comb_outcome_level_ct <- sig_comb_outcome_level_ct + 1
-      #   # }
-      #   
-      # },finally={})
-      
+    
       #reward catch
       rx_s_means <- rowMeans(all_total_fr[unit_num,rx_s,windows[i,1]:windows[i,2]])
       r0_s_means <- rowMeans(all_total_fr[unit_num,r0_s,windows[i,1]:windows[i,2]])
@@ -1002,5 +925,5 @@ pth <- getwd()
 if(substr(pth,nchar(pth)-2,nchar(pth)-2) == "9"){save_name = substr(pth,nchar(pth)-6,nchar(pth))}else{save_name=substr(pth,nchar(pth)-7,nchar(pth))}
 
 save.image(paste(save_name,".RData",sep=""))
-rm(list=ls())
+#rm(list=ls())
 
