@@ -27,12 +27,11 @@ tryCatch({
 
 saveAsPng <- T
 region_list <- c('M1','S1','PmD')
-#ph_list_names <- c('comb','comb_outcome','m','p_catch','p','p_outcome','r_catch','r','r_outcome','v')
 ph_list_names <- c('comb','comb_outcome','m','p_catch','p_outcome','r_catch','r_outcome','v')
 time_windows <- c('ac','br','ar','rw')
 
-#nhp_id <- '504'
-nhp_id <- '0059'
+nhp_id <- '504'
+#nhp_id <- '0059'
 
 if(nhp_id == '0059'){
   attach('0_3_10_1.RData')
@@ -62,13 +61,6 @@ if(nhp_id == '0059'){
       for(window_name in time_windows){
         name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
         temp <- get(name)
-        
-        # if(ph_name=='comb_outcome'){
-        #   for(i in 1:length(temp)){
-        #     cat(length(temp[[i]]$comparisons),'\n')
-        #   }
-          
-        #}
         
         assign(paste(name,'_totals',sep=""),list())
         if(length(temp) > 0){
@@ -156,14 +148,7 @@ if(nhp_id == '0059'){
         if(length(temp) > 0){
           temp2 <- c(get(paste(name,'_totals',sep="")),temp)
           assign(paste(name,'_totals',sep=""),temp2)
-          
-          if(ph_name == 'comb_outcome'){
-            for(i in 1:length(temp)){
-              cat(region_name,i,length(temp[[i]]$comparisons),'\n')
-              
-            }
-          }  
-          
+
         }}}}
   detach()
   
@@ -1454,8 +1439,6 @@ for(region_index in 1:length(region_list)){
   plot(plt)
   graphics.off()
   
-  
-  
   #####
   #####
   diffs_ac <- get(paste(region_list[region_index],'_diffs_length_list_ac_total',sep=""))
@@ -1469,12 +1452,11 @@ for(region_index in 1:length(region_list)){
   write.table(all_diffs_length,file=paste(region_list[region_index],'_all_diffs_length.csv',sep=""),sep=",",col.names=NA)
 }
 
-#TODO somehow when combining comb outcome, leading to certain combinations being not recorded (0059)
 for(region_name in region_list){
   for(ph_name in ph_list_names){
     cat(ph_name,'\n')
     perc_list_windows <- list()
-    #perc_list_windows_cbind <- c()
+    total_by_window.l <- list()
     for(window_name in time_windows){
       cat(window_name,'\n')
       name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,'_totals',sep="")
@@ -1502,31 +1484,59 @@ for(region_name in region_list){
         
         if(length(ph_list) > 0){
           comp_perc_list <- list()
-          for(comp_name in temp[[1]]$comparisons){
+
+          if(ph_name == 'comb'){
+            comp_name_list <- c('r0_p0 - r0_px','r0_p0 - rx_p0','r0_p0 - rx_px','r0_px - rx_p0','r0_px - rx_px','rx_p0 - rx_px')
+          }else if(ph_name == 'comb_outcome'){
+            comp_name_list <- c('r0_p0_f - r0_p0_s','r0_p0_f - r0_px_f','r0_p0_f - r0_px_s','r0_p0_f - rx_p0_f',
+                                'r0_p0_f - rx_p0_s','r0_p0_f - rx_px_f','r0_p0_f - rx_px_s','r0_p0_s - r0_px_f','r0_p0_s - r0_px_s','r0_p0_s - rx_p0_f',
+                                'r0_p0_s - rx_p0_s','r0_p0_s - rx_px_f','r0_p0_s - rx_px_s','r0_px_f - r0_px_s','r0_px_f - rx_p0_f',
+                                'r0_px_f - rx_p0_s','r0_px_f - rx_px_f','r0_px_f - rx_px_s','r0_px_s - rx_p0_f','r0_px_s - rx_p0_s',
+                                'r0_px_s - rx_px_f','r0_px_s - rx_px_s','rx_p0_f - rx_p0_s','rx_p0_f - rx_px_f','rx_p0_f - rx_px_s',
+                                'rx_p0_s - rx_px_f','rx_p0_s - rx_px_s','rx_px_f - rx_px_s')
+            
+          }else if(ph_name == 'm'){
+            comp_name_list <- c('m0 - m2x','m0 - mx','m2x - mx')
+          }else if(ph_name == 'p_catch'){
+            comp_name_list <- c('catch_x - p0_f','catch_x - px_f','p0_f - px_f')
+          }else if(ph_name == 'p_outcome'){
+            comp_name_list <- c('p0_f - p0_s','p0_f - px_f','p0_f - px_s','p0_s - px_f','p0_s - px_s','px_f - px_s')
+          }else if(ph_name == 'r_catch'){
+            comp_name_list <- c('catchx - r0_s','catchx - rx_s','r0_s - rx_s')
+          }else if(ph_name == 'r_outcome'){
+            comp_name_list <- c('r0_f - r0_s','r0_f - rx_f','r0_f - rx_s','r0_s - rx_f','r0_s - rx_s','rx_f - rx_s')
+          }else if(ph_name == 'v'){
+            comp_name_list <- c('v0 - v_x','v0 - vx','vx - v_x')
+            
+          }### FOR RP INCLUDE OTHER TWO (R AND P)
+
+            
+          for(comp_name in comp_name_list){
             ct <- 0
+
             for(i in 1:ph_sig_num){
               if(comp_name %in% ph_list[[i]]){
-                ct <- ct + 1
+                ct <- ct+1
               }
-              comp_perc_list[[comp_name]] <- ct / ph_sig_num
             }
-            comp_perc_list[['total']] <- ph_sig_num
+            comp_perc_list[[comp_name]] <- ct / ph_sig_num
           }
           perc_list_windows[[window_name]] <- comp_perc_list
+          total_by_window.l[[window_name]] <- ph_sig_num
+          
         }
       }
     }
+    
     if(length(perc_list_windows) > 0){
-      suppressWarnings(list_length <- do.call(rbind, lapply(perc_list_windows, length)))
-      
       suppressWarnings(perc_list_windows_cbind <- as.data.frame(do.call(cbind,perc_list_windows)))
+    
+      perc_list_windows_cbind <- rbind(perc_list_windows_cbind,total=total_by_window.l,make.row.names=T)
       assign(paste(region_name,'_',ph_name,'_cpl',sep=""),perc_list_windows_cbind)
-      #cat(ph_name,'\n\n')
       write.xlsx(perc_list_windows_cbind,file=paste(region_name,'_ph_percs.xlsx',sep=""),sheetName=ph_name,append=T)
     }
   }
 }
-
 
 save.image(paste(nhp_id,"_summary.RData",sep=""))
 
