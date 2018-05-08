@@ -25,13 +25,20 @@ tryCatch({
   source("~/workspace/classification_scripts/Ski.Mack.JH.R")
 },finally={print('sourced multiplot and ski mack')})
 
+#######Set these params #######
+nhp_id <- '504'
+#nhp_id <- '0059'
+
+pval_adjusted_bool <- TRUE
+#pval_adjusted_bool <- FALSE
+
+##############################
+
 saveAsPng <- T
 region_list <- c('M1','S1','PmD')
 ph_list_names <- c('comb','comb_outcome','m','p_catch','p_outcome','r_catch','r_outcome','v')
 time_windows <- c('ac','br','ar','rw')
 
-nhp_id <- '504'
-#nhp_id <- '0059'
 
 if(nhp_id == '0059'){
   attach('0_3_10_1.RData')
@@ -1449,7 +1456,14 @@ for(region_index in 1:length(region_list)){
   all_diffs_length <- rbind(aft_cue=diffs_ac,bfr_res=diffs_br,aft_res=diffs_ar,res_wind=diffs_rw)
   
   assign(paste(region_list[region_index],'_all_diffs_length',sep=""),all_diffs_length)
-  write.table(all_diffs_length,file=paste(region_list[region_index],'_all_diffs_length.csv',sep=""),sep=",",col.names=NA)
+  #write.table(all_diffs_length,file=paste(region_list[region_index],'_all_diffs_length.csv',sep=""),sep=",",col.names=NA)
+
+  if(pval_adjusted_bool){
+    write.table(all_diffs_length,file=paste(region_list[region_index],'_all_diffs_length_padj.csv',sep=""),sep=",",col.names=NA)
+  }else{  
+    write.table(all_diffs_length,file=paste(region_list[region_index],'_all_diffs_length.csv',sep=""),sep=",",col.names=NA)
+  }
+    
 }
 
 for(region_name in region_list){
@@ -1469,12 +1483,16 @@ for(region_name in region_list){
         
         ph_list <- list()
         for(i in 1:sig_unit_num){
-          sig_comparisons <- temp[[i]]$comparisons[temp[[i]]$P < 0.05]
+          if(pval_adjusted_bool){
+            sig_comparisons <- temp[[i]]$comparisons[temp[[i]]$P.adjusted < 0.05]
+          }else{
+            sig_comparisons <- temp[[i]]$comparisons[temp[[i]]$P < 0.05]
+          }
+          
           if(length(sig_comparisons) > 0){
             cat('unit:',i,sig_comparisons,'\n')
             ph_list[[ph_sig_num + 1]] <- sig_comparisons
             ph_sig_num <- ph_sig_num + 1
-            
           }
         }
         assign(paste(name,'_ph_list',sep=""),ph_list)
@@ -1488,13 +1506,8 @@ for(region_name in region_list){
           if(ph_name == 'comb'){
             comp_name_list <- c('r0_p0 - r0_px','r0_p0 - rx_p0','r0_p0 - rx_px','r0_px - rx_p0','r0_px - rx_px','rx_p0 - rx_px')
           }else if(ph_name == 'comb_outcome'){
-            comp_name_list <- c('r0_p0_f - r0_p0_s','r0_p0_f - r0_px_f','r0_p0_f - r0_px_s','r0_p0_f - rx_p0_f',
-                                'r0_p0_f - rx_p0_s','r0_p0_f - rx_px_f','r0_p0_f - rx_px_s','r0_p0_s - r0_px_f','r0_p0_s - r0_px_s','r0_p0_s - rx_p0_f',
-                                'r0_p0_s - rx_p0_s','r0_p0_s - rx_px_f','r0_p0_s - rx_px_s','r0_px_f - r0_px_s','r0_px_f - rx_p0_f',
-                                'r0_px_f - rx_p0_s','r0_px_f - rx_px_f','r0_px_f - rx_px_s','r0_px_s - rx_p0_f','r0_px_s - rx_p0_s',
-                                'r0_px_s - rx_px_f','r0_px_s - rx_px_s','rx_p0_f - rx_p0_s','rx_p0_f - rx_px_f','rx_p0_f - rx_px_s',
-                                'rx_p0_s - rx_px_f','rx_p0_s - rx_px_s','rx_px_f - rx_px_s')
-            
+            comp_name_list <- c('r0_p0_f - r0_p0_s','r0_p0_f - r0_px_f','r0_p0_f - r0_px_s','r0_p0_f - rx_p0_f','r0_p0_f - rx_p0_s','r0_p0_f - rx_px_f','r0_p0_f - rx_px_s','r0_p0_s - r0_px_f','r0_p0_s - r0_px_s','r0_p0_s - rx_p0_f','r0_p0_s - rx_p0_s','r0_p0_s - rx_px_f','r0_p0_s - rx_px_s','r0_px_f - r0_px_s','r0_px_f - rx_p0_f',
+                                'r0_px_f - rx_p0_s','r0_px_f - rx_px_f','r0_px_f - rx_px_s','r0_px_s - rx_p0_f','r0_px_s - rx_p0_s','r0_px_s - rx_px_f','r0_px_s - rx_px_s','rx_p0_f - rx_p0_s','rx_p0_f - rx_px_f','rx_p0_f - rx_px_s','rx_p0_s - rx_px_f','rx_p0_s - rx_px_s','rx_px_f - rx_px_s')
           }else if(ph_name == 'm'){
             comp_name_list <- c('m0 - m2x','m0 - mx','m2x - mx')
           }else if(ph_name == 'p_catch'){
@@ -1507,9 +1520,7 @@ for(region_name in region_list){
             comp_name_list <- c('r0_f - r0_s','r0_f - rx_f','r0_f - rx_s','r0_s - rx_f','r0_s - rx_s','rx_f - rx_s')
           }else if(ph_name == 'v'){
             comp_name_list <- c('v0 - v_x','v0 - vx','vx - v_x')
-            
-          }### FOR RP INCLUDE OTHER TWO (R AND P)
-
+          }
             
           for(comp_name in comp_name_list){
             ct <- 0
@@ -1523,7 +1534,6 @@ for(region_name in region_list){
           }
           perc_list_windows[[window_name]] <- comp_perc_list
           total_by_window.l[[window_name]] <- ph_sig_num
-          
         }
       }
     }
@@ -1533,7 +1543,11 @@ for(region_name in region_list){
     
       perc_list_windows_cbind <- rbind(perc_list_windows_cbind,total=total_by_window.l,make.row.names=T)
       assign(paste(region_name,'_',ph_name,'_cpl',sep=""),perc_list_windows_cbind)
-      write.xlsx(perc_list_windows_cbind,file=paste(region_name,'_ph_percs.xlsx',sep=""),sheetName=ph_name,append=T)
+      if(pval_adjusted_bool){
+        write.xlsx(perc_list_windows_cbind,file=paste(region_name,'_ph_percs_padj.xlsx',sep=""),sheetName=ph_name,append=T)
+      }else{  
+        write.xlsx(perc_list_windows_cbind,file=paste(region_name,'_ph_percs.xlsx',sep=""),sheetName=ph_name,append=T)
+      }
     }
   }
 }
