@@ -12,13 +12,13 @@ import xlsxwriter
 import glob
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt
-#from mpl_toolkits.mplot3d import Axes3D
 import statsmodels.api as sm
 import pandas as pd
 from matplotlib import cm
 import xlsxwriter
 import scipy.stats as stats
 from scipy import ndimage
+
 
 #######################
 #params to set ########
@@ -27,11 +27,6 @@ from scipy import ndimage
 bin_size = 10 #in ms
 time_before = -0.5 #negative value
 time_after = 1.0
-#baseline_time = -1.0 #negative value
-#normalize_bool = False
-#sqrt_bool = False
-#plot_3d_bool = False
-#mv_bool = True
 zscore = True
 abs_alphabeta = False
 
@@ -123,7 +118,7 @@ def calc_firing_rates(hists,data_key,condensed):
 
         return(return_dict)
 
-def make_3d_model(fr_data,condensed,region_key,type_key):
+def make_linear_model(fr_data,condensed,region_key,type_key):
         
         avg_fr_data = np.mean(fr_data,axis=2)
 
@@ -195,6 +190,36 @@ def make_3d_model(fr_data,condensed,region_key,type_key):
                 
         return(return_dict)
 
+def diff_func(x,a,b):
+        r,p = x
+        return a + b*(r - p)
+
+#def div_nl_func(
+
+def make_diff_model(fr_data,condensed,region_key,type_key):
+        
+        avg_fr_data = np.mean(fr_data,axis=2)
+
+        r_vals = condensed[:,3]
+        p_vals = condensed[:,4]
+
+        cov_total = []
+        fit_params = np.zeros((fr_data.shape[1],2))
+
+        for unit_num in range(fr_data.shape[1]):
+                avg_frs = avg_fr_data[:,unit_num]
+        
+                #firing rate = a + b(R - P)
+                params,covs = curve_fit(diff_func,[r_vals,p_vals],avg_frs)
+                
+                fit_params[unit_num,:] = params
+                cov_total = np.append(cov_total,covs)
+                
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total}
+                
+        return(return_dict)
+
+
 
 
 ###############################################
@@ -238,12 +263,6 @@ condensed = condensed[condensed[:,5] == 0]
 #col 5 all 0s now, replace with succ/fail vector: succ = 1, fail = -1
 condensed[condensed[:,1] != 0, 5] = 1
 condensed[condensed[:,2] != 0, 5] = -1
-
-r_vector = [:,3]
-p_vector = [:,4]
-rp_dict = {'r_vector':r_vector,'p_vector':p_vector,'condensed':condensed}
-
-sio.savemat('rp_vals_%s' %(short_filename),{'rp_dict':rp_dict},format='5')
 
 
 ###################
@@ -454,7 +473,11 @@ elif extracted_filename == 'Extracted_504_2017-03-28-12-54-41.mat':
 else:
 	short_filename = 'NAME'
 
+r_vector = condensed[:,3]
+p_vector = condensed[:,4]
+rp_dict = {'r_vector':r_vector,'p_vector':p_vector,'condensed':condensed}
 
+sio.savemat('rp_vals_%s' %(short_filename),{'rp_dict':rp_dict},format='5')
 
 print 'calc firing rate'
 for region_key,region_value in data_dict_all.iteritems():
@@ -470,32 +493,45 @@ for region_key,region_value in data_dict_all.iteritems():
 #print 'modeling'
 for region_key,region_value in data_dict_all.iteritems():
         print 'modeling: %s' %(region_key)
-        succ = condensed[condensed[:,5] == 1]
-        fail = condensed[condensed[:,5] == -1]
+        data_dict_all[region_key]['models'] = {}
         
-        bfr_cue = data_dict_all[region_key]['fr_dict']['bfr_cue_fr']
         aft_cue = data_dict_all[region_key]['fr_dict']['aft_cue_fr']
-        bfr_result = data_dict_all[region_key]['fr_dict']['bfr_result_fr']
-        aft_result = data_dict_all[region_key]['fr_dict']['aft_result_fr']
+        bfr_res = data_dict_all[region_key]['fr_dict']['bfr_result_fr']
+        aft_res = data_dict_all[region_key]['fr_dict']['aft_result_fr']
+        
+        aft_cue_bins = np.shape(aft_cue)[2]
+        bfr_res_bins = np.shape(bfr_res)[2]
+        aft_res_bins = np.shape(aft_res)[2]
 
-        bfr_cue_succ = bfr_cue[condensed[:,5] == 1]
-        aft_cue_succ = aft_cue[condensed[:,5] == 1]
-        bfr_result_succ = bfr_result[condensed[:,5] == 1]
-        aft_result_succ = aft_result[condensed[:,5] == 1]
-                
-        bfr_cue_fail = bfr_cue[condensed[:,5] == -1]
-        aft_cue_fail = aft_cue[condensed[:,5] == -1]
-        bfr_result_fail = bfr_result[condensed[:,5] == -1]
-        aft_result_fail = aft_result[condensed[:,5] == -1]
+        concat = np.zeros((np.shape(aft_cue)[0],np.shape(aft_cue)[1],aft_cue_bins+bfr_res_bins+aft_res_bins))
+        concat[:,:,0:aft_cue_bins] = aft_cue
+        concat[:,:,aft_cue_bins:aft_cue_bins+bfr_res_bins] = bfr_res_bins
+        concat[:,:,aft_cue_bins+bfr_res_bins:aft_cue_bins+bfr_res_bins+aft_res_bins] = aft_res_bins
 
-        bfr_cue_model = make_3d_model(bfr_cue,condensed,region_key,'bfr_cue')
-        aft_cue_model = make_3d_model(aft_cue,condensed,region_key,'aft_cue')
-        bfr_result_model = make_3d_model(bfr_result,condensed,region_key,'bfr_result')
-        aft_result_model = make_3d_model(aft_result,condensed,region_key,'aft_result')
+        linear_aft_cue_model = make_linear_model(aft_cue,condensed,region_key,'aft_cue')
+        linear_bfr_res_model = make_linear_model(bfr_res,condensed,region_key,'bfr_res')
+        linear_aft_res_model = make_linear_model(aft_res,condensed,region_key,'aft_res')
+        linear_concat_model = make_linear_model(concat,condensed,region_key,'concat')
 
-        model_return= {'bfr_cue_model':bfr_cue_model,'aft_cue_model':aft_cue_model,'bfr_result_model':bfr_result_model,'aft_result_model':aft_result_model}
+        linear_model_return= {'aft_cue':linear_aft_cue_model,'bfr_res':linear_bfr_res_model,'aft_res':linear_aft_res_model,'concat':linear_concat_model}
 
-        data_dict_all[region_key]['model_return'] = model_return
+        data_dict_all[region_key]['models']['linear'] = linear_model_return
+        
+        diff_aft_cue_model = make_diff_model(concat,condensed,region_key,'concat')
+        diff_bfr_res_model = make_diff_model(concat,condensed,region_key,'concat')
+        diff_aft_res_model = make_diff_model(concat,condensed,region_key,'concat')
+        diff_concat_model = make_diff_model(concat,condensed,region_key,'concat')
+        
+        diff_model_return = {'aft_cue':diff_aft_cue_model,'bfr_res':diff_bfr_res_model,'aft_res':diff_aft_res_model,'concat':diff_concat_model}
+        
+        data_dict_all[region_key]['models']['diff'] = diff_model_return
+
+
+
+
+
+
+"""
 
 
 for region_key,region_value in data_dict_all.iteritems():
@@ -964,6 +1000,11 @@ S1_fr_dict = {'bfr_cue':data_dict_all['S1_dicts']['fr_dict']['bfr_cue_fr'],'aft_
 PmD_fr_dict = {'bfr_cue':data_dict_all['PmD_dicts']['fr_dict']['bfr_cue_fr'],'aft_cue':data_dict_all['PmD_dicts']['fr_dict']['aft_cue_fr'],'bfr_result':data_dict_all['PmD_dicts']['fr_dict']['bfr_result_fr'],'aft_result':data_dict_all['PmD_dicts']['fr_dict']['aft_result_fr']}
 
 
+"""
+
+
+
+"""
 params = {'time_before':time_before,'time_after':time_after,'bin_size':bin_size,'zscore_bool':zscore,'gauss_bool':gaussian_bool,'gauss_sigma':gauss_sigma}
 master_fr_dict = {'M1_fr_dict':M1_fr_dict,'S1_fr_dict':S1_fr_dict,'PmD_fr_dict':PmD_fr_dict,'condensed':condensed,'params':params}
 
@@ -1049,7 +1090,7 @@ elif extracted_filename == 'Extracted_504_2017-03-28-12-54-41.mat':
 else:
 	np.save('master_fr_dict.npy',master_fr_dict)
 
-
+"""
 
 
 
