@@ -192,9 +192,17 @@ def make_linear_model(fr_data,condensed,region_key,type_key):
 
 def diff_func(x,a,b):
         r,p = x
+
         return a + b*(r - p)
 
-#def div_nl_func(
+def div_nl_func(x,a,b,c,d):
+        #from Ruff, Cohen: relating normalization to neuronl populations across cortical areas
+        r,p = x        
+        #add an e to the whole thing for some sort of baseline?
+        return (r * a + b * p) / (a + c * b + d)
+
+##make fnct that takes into account activity of entire population (multisensory integration papers). How set that up?
+
 
 def make_diff_model(fr_data,condensed,region_key,type_key):
         
@@ -203,8 +211,9 @@ def make_diff_model(fr_data,condensed,region_key,type_key):
         r_vals = condensed[:,3]
         p_vals = condensed[:,4]
 
-        cov_total = []
         fit_params = np.zeros((fr_data.shape[1],2))
+        cov_total = np.zeros((fr_data.shape[1],2,2))
+        perr_total = np.zeros((fr_data.shape[1],2))
 
         for unit_num in range(fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
@@ -212,11 +221,42 @@ def make_diff_model(fr_data,condensed,region_key,type_key):
                 #firing rate = a + b(R - P)
                 params,covs = curve_fit(diff_func,[r_vals,p_vals],avg_frs)
                 
+                perr = np.sqrt(np.diag(covs))
+
                 fit_params[unit_num,:] = params
-                cov_total = np.append(cov_total,covs)
+                cov_total[unit_num,:,:] = covs
+                perr_total[unit_num,:] = perr
                 
-        return_dict = {'fit_params':fit_params,'cov_total':cov_total}
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total}
                 
+        return(return_dict)
+
+def make_div_nl_model(fr_data,condensed,region_key,type_key):
+        
+        avg_fr_data = np.mean(fr_data,axis=2)
+
+        r_vals = condensed[:,3]
+        p_vals = condensed[:,4]
+
+        cov_total = []
+        fit_params = np.zeros((fr_data.shape[1],4))
+        cov_total = np.zeros((fr_data.shape[1],4,4))
+        perr_total = np.zeros((fr_data.shape[1],4))
+
+        for unit_num in range(fr_data.shape[1]):
+                avg_frs = avg_fr_data[:,unit_num]
+
+                #firing rate  = (R * a + b * P) / (a + c * b + d)
+                params,covs = curve_fit(div_nl_func,[r_vals,p_vals],avg_frs)
+                
+                perr = np.sqrt(np.diag(covs))
+                
+                fit_params[unit_num,:] = params
+                cov_total[unit_num,:,:] = covs
+                perr_total[unit_num,:] = perr
+
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total}
+        
         return(return_dict)
 
 
@@ -517,19 +557,26 @@ for region_key,region_value in data_dict_all.iteritems():
 
         data_dict_all[region_key]['models']['linear'] = linear_model_return
         
-        diff_aft_cue_model = make_diff_model(concat,condensed,region_key,'concat')
-        diff_bfr_res_model = make_diff_model(concat,condensed,region_key,'concat')
-        diff_aft_res_model = make_diff_model(concat,condensed,region_key,'concat')
+        diff_aft_cue_model = make_diff_model(aft_cue,condensed,region_key,'aft_cue')
+        diff_bfr_res_model = make_diff_model(bfr_res,condensed,region_key,'bfr_res')
+        diff_aft_res_model = make_diff_model(aft_res,condensed,region_key,'aft_res')
         diff_concat_model = make_diff_model(concat,condensed,region_key,'concat')
         
         diff_model_return = {'aft_cue':diff_aft_cue_model,'bfr_res':diff_bfr_res_model,'aft_res':diff_aft_res_model,'concat':diff_concat_model}
         
         data_dict_all[region_key]['models']['diff'] = diff_model_return
 
+        div_aft_cue_model = make_div_nl_model(aft_cue,condensed,region_key,'aft_cue')
+        div_bfr_res_model = make_div_nl_model(bfr_res,condensed,region_key,'bfr_res')
+        div_aft_res_model = make_div_nl_model(aft_res,condensed,region_key,'aft_res')
+        div_concat_model = make_div_nl_model(concat,condensed,region_key,'concat')
+        
+        div_model_return = {'aft_cue':div_aft_cue_model,'bfr_res':div_bfr_res_model,'aft_res':div_aft_res_model,'concat':div_concat_model}
+        
+        data_dict_all[region_key]['models']['div_nl'] = diff_model_return
 
 
-
-
+        
 
 """
 
