@@ -195,11 +195,11 @@ def diff_func(x,a,b):
 
         return a + b*(r - p)
 
-def div_nl_func(x,a,b,c,d):
+def div_nl_func(x,a,b,c,d,e):
         #from Ruff, Cohen: relating normalization to neuronl populations across cortical areas
         r,p = x        
         #add an e to the whole thing for some sort of baseline?
-        return (r * a + b * p) / (a + c * b + d)
+        return (r * a + b * p) / (a + c * b + d) + e
 
 ##make fnct that takes into account activity of entire population (multisensory integration papers). How set that up?
 
@@ -242,6 +242,8 @@ def make_div_nl_model(fr_data,condensed,region_key,type_key):
         fit_params = np.zeros((fr_data.shape[1],4))
         cov_total = np.zeros((fr_data.shape[1],4,4))
         perr_total = np.zeros((fr_data.shape[1],4))
+
+        pdb.set_trace()
 
         for unit_num in range(fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
