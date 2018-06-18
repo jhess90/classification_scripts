@@ -18,7 +18,7 @@ from matplotlib import cm
 import xlsxwriter
 import scipy.stats as stats
 from scipy import ndimage
-
+from math import isinf
 
 #######################
 #params to set ########
@@ -190,6 +190,10 @@ def make_linear_model(fr_data,condensed,region_key,type_key):
                 
         return(return_dict)
 
+def lin_func(x,a,b,c):
+        r,p = x
+        return a*r + b*p + c
+
 def diff_func(x,a,b):
         r,p = x
 
@@ -198,22 +202,73 @@ def diff_func(x,a,b):
 def div_nl_func(x,a,b,c,d,e):
         #from Ruff, Cohen: relating normalization to neuronl populations across cortical areas
         r,p = x        
-        #add an e to the whole thing for some sort of baseline?
+        #add an e to the whole thing for intercept?
         return (r * a + b * p) / (a + c * b + d) + e
 
 ##make fnct that takes into account activity of entire population (multisensory integration papers). How set that up?
 
 
+def make_lin_model(fr_data,condensed,region_key,type_key):
+        #set each model
+        num_params = 3
+
+        avg_fr_data = np.mean(fr_data,axis=2)
+
+        r_vals = condensed[:,3]
+        p_vals = condensed[:,4]
+
+        fit_params = np.zeros((fr_data.shape[1],num_params))
+        cov_total = np.zeros((fr_data.shape[1],num_params,num_params))
+        perr_total = np.zeros((fr_data.shape[1],num_params))
+        AIC_total = np.zeros((fr_data.shape[1]))
+
+        for unit_num in range(fr_data.shape[1]):
+                avg_frs = avg_fr_data[:,unit_num]
+        
+                #firing rate = a + b(R - P)
+                params,covs = curve_fit(lin_func,[r_vals,p_vals],avg_frs)
+                
+                perr = np.sqrt(np.diag(covs))
+
+                fit_params[unit_num,:] = params
+                cov_total[unit_num,:,:] = covs
+                perr_total[unit_num,:] = perr
+                if np.size(covs) > 1:
+                        perr = np.sqrt(np.diag(covs))
+                elif isinf(covs):
+                        perr = float('nan')
+                else:
+                        pdb.set_trace()
+
+                fit_params[unit_num,:] = params
+                cov_total[unit_num,:,:] = covs
+                perr_total[unit_num,:] = perr
+
+                model_out = lin_nl_func([r_vals,p_vals],params[0],params[1],params[2])
+                residuals = avg_frs - model_out
+                ss_res = np.sum(residuals**2)
+                k = num_params
+                AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
+                
+                AIC_total[unit_num] = AIC
+
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_total':AIC_total}
+                
+        return(return_dict)
+
+
 def make_diff_model(fr_data,condensed,region_key,type_key):
+        num_params = 2
         
         avg_fr_data = np.mean(fr_data,axis=2)
 
         r_vals = condensed[:,3]
         p_vals = condensed[:,4]
 
-        fit_params = np.zeros((fr_data.shape[1],2))
-        cov_total = np.zeros((fr_data.shape[1],2,2))
-        perr_total = np.zeros((fr_data.shape[1],2))
+        fit_params = np.zeros((fr_data.shape[1],num_params))
+        cov_total = np.zeros((fr_data.shape[1],num_params,num_params))
+        perr_total = np.zeros((fr_data.shape[1],num_params))
+        AIC_total = np.zeros((fr_data.shape[1]))
 
         for unit_num in range(fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
@@ -226,38 +281,82 @@ def make_diff_model(fr_data,condensed,region_key,type_key):
                 fit_params[unit_num,:] = params
                 cov_total[unit_num,:,:] = covs
                 perr_total[unit_num,:] = perr
+                if np.size(covs) > 1:
+                        perr = np.sqrt(np.diag(covs))
+                elif isinf(covs):
+                        perr = float('nan')
+                else:
+                        pdb.set_trace()
+
+                fit_params[unit_num,:] = params
+                cov_total[unit_num,:,:] = covs
+                perr_total[unit_num,:] = perr
+
+                model_out = diff_func([r_vals,p_vals],params[0],params[1])
+                residuals = avg_frs - model_out
+                ss_res = np.sum(residuals**2)
+                k = num_params
+                AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
                 
-        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total}
+                AIC_total[unit_num] = AIC
+
+                
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_total':AIC_total}
                 
         return(return_dict)
 
 def make_div_nl_model(fr_data,condensed,region_key,type_key):
-        
+        num_params = 5
+
         avg_fr_data = np.mean(fr_data,axis=2)
 
         r_vals = condensed[:,3]
         p_vals = condensed[:,4]
 
         cov_total = []
-        fit_params = np.zeros((fr_data.shape[1],4))
-        cov_total = np.zeros((fr_data.shape[1],4,4))
-        perr_total = np.zeros((fr_data.shape[1],4))
-
-        pdb.set_trace()
+        fit_params = np.zeros((fr_data.shape[1],num_params))
+        cov_total = np.zeros((fr_data.shape[1],num_params,num_params))
+        perr_total = np.zeros((fr_data.shape[1],num_params))
+        AIC_total = np.zeros((fr_data.shape[1]))
 
         for unit_num in range(fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
 
-                #firing rate  = (R * a + b * P) / (a + c * b + d)
+                #firing rate  = (R * a + b * P) / (a + c * b + d) + e
                 params,covs = curve_fit(div_nl_func,[r_vals,p_vals],avg_frs)
                 
-                perr = np.sqrt(np.diag(covs))
-                
+                if np.size(covs) > 1:
+                        perr = np.sqrt(np.diag(covs))
+                elif isinf(covs):
+                        perr = float('nan')
+                else:
+                        pdb.set_trace()
+
                 fit_params[unit_num,:] = params
                 cov_total[unit_num,:,:] = covs
                 perr_total[unit_num,:] = perr
 
-        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total}
+                model_out = div_nl_func([r_vals,p_vals],params[0],params[1],params[2],params[3],params[4])
+                residuals = avg_frs - model_out
+                ss_res = np.sum(residuals**2)
+                k = num_params
+                AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
+                
+                AIC_total[unit_num] = AIC
+
+                #calculate residuals, -> AIC
+                #popt, pcov = curve_fit(f, xdata, ydata)
+
+                #You can get the residual sum of squares (ss_tot) with
+                #residuals = ydata- f(xdata, popt)
+                #ss_res = numpy.sum(residuals**2)
+
+                #from reddit
+                #sse = sum(resid**2)
+                #k= # of variables
+                #AIC= 2k - 2ln(sse)
+                
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total, 'AIC_total':AIC_total}
         
         return(return_dict)
 
