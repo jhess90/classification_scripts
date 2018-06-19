@@ -205,7 +205,17 @@ def div_nl_func(x,a,b,c,d,e):
         #add an e to the whole thing for intercept?
         return (r * a + b * p) / (a + c * b + d) + e
 
-##make fnct that takes into account activity of entire population (multisensory integration papers). How set that up?
+def div_nl_noe_func(x,a,b,c,d):
+        #from Ruff, Cohen: relating normalization to neuronl populations across cortical areas
+        r,p = x        
+        #add an e to the whole thing for intercept?
+        return (r * a + b * p) / (a + c * b + d)
+
+def div_nl_Y_func(x,a,b,c,d):
+        #div nl func Yao is using
+        r,p = x
+        return a*(r + b*p) / (c + r + b * p) + d
+
 
 
 def make_lin_model(fr_data,condensed,region_key,type_key):
@@ -221,11 +231,12 @@ def make_lin_model(fr_data,condensed,region_key,type_key):
         cov_total = np.zeros((fr_data.shape[1],num_params,num_params))
         perr_total = np.zeros((fr_data.shape[1],num_params))
         AIC_total = np.zeros((fr_data.shape[1]))
+        ss_res_total = np.zeros((fr_data.shape[1]))
 
         for unit_num in range(fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
         
-                #firing rate = a + b(R - P)
+                #firing rate = a*R + b*P + c
                 params,covs = curve_fit(lin_func,[r_vals,p_vals],avg_frs)
                 
                 perr = np.sqrt(np.diag(covs))
@@ -244,15 +255,16 @@ def make_lin_model(fr_data,condensed,region_key,type_key):
                 cov_total[unit_num,:,:] = covs
                 perr_total[unit_num,:] = perr
 
-                model_out = lin_nl_func([r_vals,p_vals],params[0],params[1],params[2])
+                model_out = lin_func([r_vals,p_vals],params[0],params[1],params[2])
                 residuals = avg_frs - model_out
                 ss_res = np.sum(residuals**2)
                 k = num_params
                 AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
                 
                 AIC_total[unit_num] = AIC
+                ss_res_total[unit_num] = ss_res
 
-        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_total':AIC_total}
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_total':AIC_total,'ss_res_total':ss_res_total}
                 
         return(return_dict)
 
@@ -269,6 +281,7 @@ def make_diff_model(fr_data,condensed,region_key,type_key):
         cov_total = np.zeros((fr_data.shape[1],num_params,num_params))
         perr_total = np.zeros((fr_data.shape[1],num_params))
         AIC_total = np.zeros((fr_data.shape[1]))
+        ss_res_total = np.zeros((fr_data.shape[1]))
 
         for unit_num in range(fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
@@ -299,9 +312,9 @@ def make_diff_model(fr_data,condensed,region_key,type_key):
                 AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
                 
                 AIC_total[unit_num] = AIC
-
+                ss_res_total[unit_num] = ss_res
                 
-        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_total':AIC_total}
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_total':AIC_total,'ss_res_total':ss_res_total}
                 
         return(return_dict)
 
@@ -318,6 +331,7 @@ def make_div_nl_model(fr_data,condensed,region_key,type_key):
         cov_total = np.zeros((fr_data.shape[1],num_params,num_params))
         perr_total = np.zeros((fr_data.shape[1],num_params))
         AIC_total = np.zeros((fr_data.shape[1]))
+        ss_res_total = np.zeros((fr_data.shape[1]))
 
         for unit_num in range(fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
@@ -343,6 +357,7 @@ def make_div_nl_model(fr_data,condensed,region_key,type_key):
                 AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
                 
                 AIC_total[unit_num] = AIC
+                ss_res_total[unit_num] = ss_res
 
                 #calculate residuals, -> AIC
                 #popt, pcov = curve_fit(f, xdata, ydata)
@@ -356,7 +371,113 @@ def make_div_nl_model(fr_data,condensed,region_key,type_key):
                 #k= # of variables
                 #AIC= 2k - 2ln(sse)
                 
-        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total, 'AIC_total':AIC_total}
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total, 'AIC_total':AIC_total,'ss_res_total':ss_res_total}
+        
+        return(return_dict)
+
+def make_div_nl_noe_model(fr_data,condensed,region_key,type_key):
+        num_params = 4
+
+        avg_fr_data = np.mean(fr_data,axis=2)
+
+        r_vals = condensed[:,3]
+        p_vals = condensed[:,4]
+
+        cov_total = []
+        fit_params = np.zeros((fr_data.shape[1],num_params))
+        cov_total = np.zeros((fr_data.shape[1],num_params,num_params))
+        perr_total = np.zeros((fr_data.shape[1],num_params))
+        AIC_total = np.zeros((fr_data.shape[1]))
+        ss_res_total = np.zeros((fr_data.shape[1]))
+
+        for unit_num in range(fr_data.shape[1]):
+                avg_frs = avg_fr_data[:,unit_num]
+
+                #firing rate  = (R * a + b * P) / (a + c * b + d)
+                params,covs = curve_fit(div_nl_noe_func,[r_vals,p_vals],avg_frs)
+                
+                if np.size(covs) > 1:
+                        perr = np.sqrt(np.diag(covs))
+                elif isinf(covs):
+                        perr = float('nan')
+                else:
+                        pdb.set_trace()
+
+                fit_params[unit_num,:] = params
+                cov_total[unit_num,:,:] = covs
+                perr_total[unit_num,:] = perr
+
+                model_out = div_nl_noe_func([r_vals,p_vals],params[0],params[1],params[2],params[3])
+                residuals = avg_frs - model_out
+                ss_res = np.sum(residuals**2)
+                k = num_params
+                AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
+                
+                AIC_total[unit_num] = AIC
+                ss_res_total[unit_num] = ss_res
+
+                #calculate residuals, -> AIC
+                #popt, pcov = curve_fit(f, xdata, ydata)
+
+                #You can get the residual sum of squares (ss_tot) with
+                #residuals = ydata- f(xdata, popt)
+                #ss_res = numpy.sum(residuals**2)
+
+                #from reddit
+                #sse = sum(resid**2)
+                #k= # of variables
+                #AIC= 2k - 2ln(sse)
+                
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total, 'AIC_total':AIC_total,'ss_res_total':ss_res_total}
+        
+        return(return_dict)
+
+def make_div_nl_Y_model(fr_data,condensed,region_key,type_key):
+        num_params = 4
+
+        avg_fr_data = np.mean(fr_data,axis=2)
+
+        r_vals = condensed[:,3]
+        p_vals = condensed[:,4]
+
+        cov_total = []
+        fit_params = np.zeros((fr_data.shape[1],num_params))
+        cov_total = np.zeros((fr_data.shape[1],num_params,num_params))
+        perr_total = np.zeros((fr_data.shape[1],num_params))
+        AIC_total = np.zeros((fr_data.shape[1]))
+        ss_res_total = np.zeros((fr_data.shape[1]))
+
+        for unit_num in range(fr_data.shape[1]):
+                avg_frs = avg_fr_data[:,unit_num]
+
+                # model = a*(r + b*P) / (c + r + b * p) + d
+                try:
+                        params,covs = curve_fit(div_nl_Y_func,[r_vals,p_vals],avg_frs)
+                except:
+                        print 'failure to fit Y nl %s %s unit %s' %(region_key,type_key,unit_num)
+                        break
+
+                if np.size(covs) > 1:
+                        perr = np.sqrt(np.diag(covs))
+                elif isinf(covs):
+                        perr = float('nan')
+                else:
+                        pdb.set_trace()
+
+                fit_params[unit_num,:] = params
+                cov_total[unit_num,:,:] = covs
+                perr_total[unit_num,:] = perr
+
+                model_out = div_nl_Y_func([r_vals,p_vals],params[0],params[1],params[2],params[3])
+                residuals = avg_frs - model_out
+                ss_res = np.sum(residuals**2)
+                k = num_params
+                AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
+                
+                AIC_total[unit_num] = AIC
+                ss_res_total[unit_num] = ss_res
+                
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total, 'AIC_total':AIC_total,'ss_res_total':ss_res_total}
         
         return(return_dict)
 
@@ -649,10 +770,19 @@ for region_key,region_value in data_dict_all.iteritems():
         concat[:,:,aft_cue_bins:aft_cue_bins+bfr_res_bins] = bfr_res_bins
         concat[:,:,aft_cue_bins+bfr_res_bins:aft_cue_bins+bfr_res_bins+aft_res_bins] = aft_res_bins
 
-        linear_aft_cue_model = make_linear_model(aft_cue,condensed,region_key,'aft_cue')
-        linear_bfr_res_model = make_linear_model(bfr_res,condensed,region_key,'bfr_res')
-        linear_aft_res_model = make_linear_model(aft_res,condensed,region_key,'aft_res')
-        linear_concat_model = make_linear_model(concat,condensed,region_key,'concat')
+        #linear_aft_cue_model = make_linear_model(aft_cue,condensed,region_key,'aft_cue')
+        #linear_bfr_res_model = make_linear_model(bfr_res,condensed,region_key,'bfr_res')
+        #linear_aft_res_model = make_linear_model(aft_res,condensed,region_key,'aft_res')
+        #linear_concat_model = make_linear_model(concat,condensed,region_key,'concat')
+
+        #linear_model_return= {'aft_cue':linear_aft_cue_model,'bfr_res':linear_bfr_res_model,'aft_res':linear_aft_res_model,'concat':linear_concat_model}
+
+        #data_dict_all[region_key]['models']['linear'] = linear_model_return
+
+        linear_aft_cue_model = make_lin_model(aft_cue,condensed,region_key,'aft_cue')
+        linear_bfr_res_model = make_lin_model(bfr_res,condensed,region_key,'bfr_res')
+        linear_aft_res_model = make_lin_model(aft_res,condensed,region_key,'aft_res')
+        linear_concat_model = make_lin_model(concat,condensed,region_key,'concat')
 
         linear_model_return= {'aft_cue':linear_aft_cue_model,'bfr_res':linear_bfr_res_model,'aft_res':linear_aft_res_model,'concat':linear_concat_model}
 
@@ -674,8 +804,25 @@ for region_key,region_value in data_dict_all.iteritems():
         
         div_model_return = {'aft_cue':div_aft_cue_model,'bfr_res':div_bfr_res_model,'aft_res':div_aft_res_model,'concat':div_concat_model}
         
-        data_dict_all[region_key]['models']['div_nl'] = diff_model_return
+        data_dict_all[region_key]['models']['div_nl'] = div_model_return
 
+        div_noe_aft_cue_model = make_div_nl_noe_model(aft_cue,condensed,region_key,'aft_cue')
+        div_noe_bfr_res_model = make_div_nl_noe_model(bfr_res,condensed,region_key,'bfr_res')
+        div_noe_aft_res_model = make_div_nl_noe_model(aft_res,condensed,region_key,'aft_res')
+        div_noe_concat_model = make_div_nl_noe_model(concat,condensed,region_key,'concat')
+        
+        div_noe_model_return = {'aft_cue':div_noe_aft_cue_model,'bfr_res':div_noe_bfr_res_model,'aft_res':div_noe_aft_res_model,'concat':div_noe_concat_model}
+        
+        data_dict_all[region_key]['models']['div_noe_nl'] = div_noe_model_return
+
+        div_Y_aft_cue_model = make_div_nl_Y_model(aft_cue,condensed,region_key,'aft_cue')
+        div_Y_bfr_res_model = make_div_nl_Y_model(bfr_res,condensed,region_key,'bfr_res')
+        div_Y_aft_res_model = make_div_nl_Y_model(aft_res,condensed,region_key,'aft_res')
+        div_Y_concat_model = make_div_nl_Y_model(concat,condensed,region_key,'concat')
+        
+        div_Y_model_return = {'aft_cue':div_Y_aft_cue_model,'bfr_res':div_Y_bfr_res_model,'aft_res':div_Y_aft_res_model,'concat':div_Y_concat_model}
+        
+        data_dict_all[region_key]['models']['div_Y_nl'] = div_Y_model_return
 
         
 
