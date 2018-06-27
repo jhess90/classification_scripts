@@ -27,11 +27,7 @@ from math import isinf
 bin_size = 10 #in ms
 time_before = -0.5 #negative value
 time_after = 1.0
-zscore = True
-abs_alphabeta = False
-
-gaussian_bool = False
-gauss_sigma = 30
+#zscore = True
 
 ts_filename = glob.glob('Extracted*_timestamps.mat')[0]
 extracted_filename = ts_filename[:-15] + '.mat'
@@ -66,13 +62,15 @@ def make_hist_all(spike_data):
 def calc_firing_rates(hists,data_key,condensed):
         bin_size_sec = bin_size / 1000.0
 
-        if zscore and gaussian_bool:
-            hists = stats.zscore(hists,axis=1)
-            hists = ndimage.filters.gaussian_filter1d(hists,gauss_sigma,axis=1)
-        elif zscore:
-            hists = stats.zscore(hists,axis=1)
-        elif gaussian_bool:
-            hists = ndimage.filters.gaussian_filter1d(hists,gauss_sigma,axis=1)
+        #if zscore and gaussian_bool:
+        #    hists = stats.zscore(hists,axis=1)
+        #    hists = ndimage.filters.gaussian_filter1d(hists,gauss_sigma,axis=1)
+        #elif zscore:
+        #    hists = stats.zscore(hists,axis=1)
+        #elif gaussian_bool:
+        #    hists = ndimage.filters.gaussian_filter1d(hists,gauss_sigma,axis=1)
+
+        hists = stats.zscore(hists,axis=1)
 
         bfr_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
         aft_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
@@ -118,78 +116,6 @@ def calc_firing_rates(hists,data_key,condensed):
 
         return(return_dict)
 
-def make_linear_model(fr_data,condensed,region_key,type_key):
-        
-        avg_fr_data = np.mean(fr_data,axis=2)
-
-        return_dict = {}
-        conc_r_vals = []
-        conc_p_vals = []
-        conc_avg_frs = []
-        sig_rsquared = []
-        sig_fpvalue = []
-        sig_pvals = []
-        sig_const = []
-        sig_alpha = []
-        sig_beta = []
-
-        for unit_num in range(fr_data.shape[1]):
-                r_vals = condensed[:,3]
-                p_vals = condensed[:,4]
-                avg_frs = avg_fr_data[:,unit_num]
-        
-                conc_r_vals = np.append(conc_r_vals,r_vals)
-                conc_p_vals = np.append(conc_p_vals,p_vals)
-                conc_avg_frs = np.append(conc_avg_frs,avg_frs)
-
-                df_dict = {'R':r_vals,'P':p_vals,'fr':avg_frs}
-                df = pd.DataFrame(df_dict)
-
-                X = df[['R','P']]
-                y = df['fr']
-                X = sm.add_constant(X) #adds k value
-                
-                #fitting to: avg firing rate = alpha * R + beta * P + k
-
-                model = sm.OLS(y,X).fit()
-                param_dict = model.params
-                stat_result_dict = {'rsquared':model.rsquared,'rsquared_adj':model.rsquared_adj,'fvalue':model.fvalue,'f_pvalue':model.f_pvalue,'pvalues':model.pvalues,'conf_int':model.conf_int(),'std_err':model.bse}
-                unit_dict = {'model':model,'param_dict':param_dict,'stat_result_dict':stat_result_dict}
-                return_dict[unit_num] = unit_dict
-
-                if model.rsquared >= 0.8:
-                        sig_rsquared = np.append(sig_rsquared,unit_num)
-                if model.f_pvalue <= 0.05:
-                        sig_fpvalue = np.append(sig_fpvalue,unit_num)
-                if model.pvalues[1] <= 0.05 or model.pvalues[2] <= 0.05:
-                        sig_pvals = np.append(sig_pvals,unit_num)
-                if model.pvalues[0] <= 0.05:
-                        sig_const = np.append(sig_const,unit_num)
-                if model.pvalues[1] <= 0.05:
-                        sig_alpha = np.append(sig_alpha,unit_num)  #alpha * R
-                if model.pvalues[2] <= 0.05:
-                        sig_beta = np.append(sig_beta,unit_num)   #beta * P
-
-        df_conc_dict = {'conc_R_vals':conc_r_vals,'conc_P_vals':conc_p_vals,'conc_avg_frs':conc_avg_frs}
-        df_conc = pd.DataFrame(df_conc_dict)
-        X = df_conc[['conc_R_vals','conc_P_vals']]
-        y = df_conc['conc_avg_frs']
-        X = sm.add_constant(X)
-        conc_model = sm.OLS(y,X).fit()
-        param_conc_dict = conc_model.params
-        stat_conc_result_dict = {'rsquared':conc_model.rsquared,'rsquared_adj':conc_model.rsquared_adj,'fvalue':conc_model.fvalue,'f_pvalue':conc_model.f_pvalue,'pvalues':conc_model.pvalues,'conf_int':conc_model.conf_int(),'std_err':conc_model.bse}
-
-        perc_sig_f_pvals = np.shape(sig_fpvalue)[0] / float(unit_num)
-        perc_sig_rsquared = np.shape(sig_rsquared)[0] / float(unit_num)
-        perc_sig_pvals = np.shape(sig_pvals)[0] / float(unit_num)
-        perc_sig_const = np.shape(sig_const)[0] / float(unit_num)
-        perc_sig_alpha = np.shape(sig_alpha)[0] / float(unit_num)
-        perc_sig_beta = np.shape(sig_beta)[0] / float(unit_num)
-
-        return_dict['conc'] = {'conc_model':conc_model,'param_conc_dict':param_conc_dict,'stat_conc_result_dict':stat_conc_result_dict,'sig_rsquared':sig_rsquared,'sig_fpvalue':sig_fpvalue,'sig_pvals':sig_pvals,'sig_const':sig_const,'sig_alpha':sig_alpha,'sig_beta':sig_beta,'perc_sic_f_pvals':perc_sig_f_pvals,'perc_sig_rsquared':perc_sig_rsquared,'perc_sig_pvals':perc_sig_pvals,'perc_sig_const':perc_sig_const,'perc_sig_alpha':perc_sig_alpha,'perc_sig_beta':perc_sig_beta,'df_conc_dict':df_conc_dict,'avg_frs':avg_frs,'avg_fr_data':avg_fr_data}
-                
-        return(return_dict)
-
 def lin_func(x,a,b,c):
         r,p = x
         return a*r + b*p + c
@@ -216,7 +142,11 @@ def div_nl_Y_func(x,a,b,c,d):
         r,p = x
         return a*(r + b*p) / (c + r + b * p) + d
 
+####################
+# models ###########
+####################
 
+#TODO combine and collate all
 
 def make_lin_model(fr_data,condensed,region_key,type_key):
         #set each model
@@ -241,9 +171,6 @@ def make_lin_model(fr_data,condensed,region_key,type_key):
                 
                 perr = np.sqrt(np.diag(covs))
 
-                fit_params[unit_num,:] = params
-                cov_total[unit_num,:,:] = covs
-                perr_total[unit_num,:] = perr
                 if np.size(covs) > 1:
                         perr = np.sqrt(np.diag(covs))
                 elif isinf(covs):
@@ -264,7 +191,27 @@ def make_lin_model(fr_data,condensed,region_key,type_key):
                 AIC_total[unit_num] = AIC
                 ss_res_total[unit_num] = ss_res
 
-        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_total':AIC_total,'ss_res_total':ss_res_total}
+        
+        params,covs = curve_fit(lin_func,[np.tile(r_vals,fr_data.shape[1]),np.tile(p_vals,fr_data.shape[1])],np.ndarray.flatten(avg_fr_data))
+        
+        if np.size(covs) > 1:
+                perr = np.sqrt(np.diag(covs))
+        elif isinf(covs):
+                perr = float('nan')
+        else:
+                pdb.set_trace()
+
+        model_out = lin_func([r_vals,p_vals],params[0],params[1],params[2])
+        residuals = avg_frs - model_out
+        ss_res = np.sum(residuals**2)
+        k = num_params
+        AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
+
+        print '%s linear AIC: %s' %(type_key,AIC)
+
+        combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}
+        
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_total':AIC_total,'ss_res_total':ss_res_total,'combined':combined_dict}
                 
         return(return_dict)
 
@@ -304,7 +251,6 @@ def make_diff_model(fr_data,condensed,region_key,type_key):
                 fit_params[unit_num,:] = params
                 cov_total[unit_num,:,:] = covs
                 perr_total[unit_num,:] = perr
-
                 model_out = diff_func([r_vals,p_vals],params[0],params[1])
                 residuals = avg_frs - model_out
                 ss_res = np.sum(residuals**2)
@@ -313,8 +259,26 @@ def make_diff_model(fr_data,condensed,region_key,type_key):
                 
                 AIC_total[unit_num] = AIC
                 ss_res_total[unit_num] = ss_res
-                
-        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_total':AIC_total,'ss_res_total':ss_res_total}
+
+        params,covs = curve_fit(lin_func,[np.tile(r_vals,fr_data.shape[1]),np.tile(p_vals,fr_data.shape[1])],np.ndarray.flatten(avg_fr_data))
+        
+        if np.size(covs) > 1:
+                perr = np.sqrt(np.diag(covs))
+        elif isinf(covs):
+                perr = float('nan')
+        else:
+                pdb.set_trace()
+
+        model_out = diff_func([r_vals,p_vals],params[0],params[1])
+        residuals = avg_frs - model_out
+        ss_res = np.sum(residuals**2)
+        k = num_params
+        AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
+
+        print '%s difference AIC: %s' %(type_key,AIC)
+        
+        combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_total':AIC_total,'ss_res_total':ss_res_total,'combined':combined_dict}
                 
         return(return_dict)
 
@@ -371,7 +335,25 @@ def make_div_nl_model(fr_data,condensed,region_key,type_key):
                 #k= # of variables
                 #AIC= 2k - 2ln(sse)
                 
-        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total, 'AIC_total':AIC_total,'ss_res_total':ss_res_total}
+        params,covs = curve_fit(lin_func,[np.tile(r_vals,fr_data.shape[1]),np.tile(p_vals,fr_data.shape[1])],np.ndarray.flatten(avg_fr_data))
+        
+        if np.size(covs) > 1:
+                perr = np.sqrt(np.diag(covs))
+        elif isinf(covs):
+                perr = float('nan')
+        else:
+                pdb.set_trace()
+
+        model_out = div_nl_func([r_vals,p_vals],params[0],params[1],params[2],params[3],params[4])
+        residuals = avg_frs - model_out
+        ss_res = np.sum(residuals**2)
+        k = num_params
+        AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
+        
+        print '%s div nl AIC: %s' %(type_key,AIC)
+
+        combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total, 'AIC_total':AIC_total,'ss_res_total':ss_res_total,'combined':combined_dict}
         
         return(return_dict)
 
@@ -427,8 +409,26 @@ def make_div_nl_noe_model(fr_data,condensed,region_key,type_key):
                 #sse = sum(resid**2)
                 #k= # of variables
                 #AIC= 2k - 2ln(sse)
-                
-        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total, 'AIC_total':AIC_total,'ss_res_total':ss_res_total}
+
+        params,covs = curve_fit(div_nl_noe_func,[np.tile(r_vals,fr_data.shape[1]),np.tile(p_vals,fr_data.shape[1])],np.ndarray.flatten(avg_fr_data))
+        
+        if np.size(covs) > 1:
+                perr = np.sqrt(np.diag(covs))
+        elif isinf(covs):
+                perr = float('nan')
+        else:
+                pdb.set_trace()
+
+        model_out = div_nl_noe_func([r_vals,p_vals],params[0],params[1],params[2],params[3])
+        residuals = avg_frs - model_out
+        ss_res = np.sum(residuals**2)
+        k = num_params
+        AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
+        
+        print '%s div nl noe AIC: %s' %(type_key,AIC)
+
+        combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total, 'AIC_total':AIC_total,'ss_res_total':ss_res_total,'combined':combined_dict}
         
         return(return_dict)
 
@@ -476,8 +476,26 @@ def make_div_nl_Y_model(fr_data,condensed,region_key,type_key):
                 
                 AIC_total[unit_num] = AIC
                 ss_res_total[unit_num] = ss_res
-                
-        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total, 'AIC_total':AIC_total,'ss_res_total':ss_res_total}
+
+        params,covs = curve_fit(div_nl_Y_func,[np.tile(r_vals,fr_data.shape[1]),np.tile(p_vals,fr_data.shape[1])],np.ndarray.flatten(avg_fr_data))
+        
+        if np.size(covs) > 1:
+                perr = np.sqrt(np.diag(covs))
+        elif isinf(covs):
+                perr = float('nan')
+        else:
+                pdb.set_trace()
+
+        model_out = div_nl_Y_func([r_vals,p_vals],params[0],params[1],params[2],params[3])
+        residuals = avg_frs - model_out
+        ss_res = np.sum(residuals**2)
+        k = num_params
+        AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
+        
+        print '%s div nl Y AIC: %s' %(type_key,AIC)
+
+        combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total, 'AIC_total':AIC_total,'ss_res_total':ss_res_total,'combined':combined_dict}
         
         return(return_dict)
 
@@ -577,7 +595,6 @@ if not 'M1_limit' in locals():
 	M1_limit = i
 	print ("The number of units in M1 is: %s"%(M1_limit))
 dummy = [];
-#M1_limit not defined for 0526_0059, blocks 1 and 2
 for i in range(M1_limit,M1_spikes.shape[1]):
     dummy.append(M1_spikes[0,i]['ts'][0,0][0])
 unit_names['M1_unit_names']=M1_unit_names
@@ -735,12 +752,6 @@ elif extracted_filename == 'Extracted_504_2017-03-28-12-54-41.mat':
 else:
 	short_filename = 'NAME'
 
-r_vector = condensed[:,3]
-p_vector = condensed[:,4]
-rp_dict = {'r_vector':r_vector,'p_vector':p_vector,'condensed':condensed}
-
-sio.savemat('rp_vals_%s' %(short_filename),{'rp_dict':rp_dict},format='5')
-
 print 'calc firing rate'
 for region_key,region_value in data_dict_all.iteritems():
         hists = data_dict_all[region_key]['hist_all']
@@ -769,15 +780,6 @@ for region_key,region_value in data_dict_all.iteritems():
         concat[:,:,0:aft_cue_bins] = aft_cue
         concat[:,:,aft_cue_bins:aft_cue_bins+bfr_res_bins] = bfr_res_bins
         concat[:,:,aft_cue_bins+bfr_res_bins:aft_cue_bins+bfr_res_bins+aft_res_bins] = aft_res_bins
-
-        #linear_aft_cue_model = make_linear_model(aft_cue,condensed,region_key,'aft_cue')
-        #linear_bfr_res_model = make_linear_model(bfr_res,condensed,region_key,'bfr_res')
-        #linear_aft_res_model = make_linear_model(aft_res,condensed,region_key,'aft_res')
-        #linear_concat_model = make_linear_model(concat,condensed,region_key,'concat')
-
-        #linear_model_return= {'aft_cue':linear_aft_cue_model,'bfr_res':linear_bfr_res_model,'aft_res':linear_aft_res_model,'concat':linear_concat_model}
-
-        #data_dict_all[region_key]['models']['linear'] = linear_model_return
 
         linear_aft_cue_model = make_lin_model(aft_cue,condensed,region_key,'aft_cue')
         linear_bfr_res_model = make_lin_model(bfr_res,condensed,region_key,'bfr_res')
@@ -826,576 +828,7 @@ for region_key,region_value in data_dict_all.iteritems():
 
         
 
-"""
+np.save('model_save.npy',data_dict_all)
 
-
-for region_key,region_value in data_dict_all.iteritems():
-        data_dict_all[region_key]['slopes'] = {}
-        data_dict_all[region_key]['sig_all_slopes'] = {}
-        data_dict_all[region_key]['alpha_beta_only_sig'] = {}
-        data_dict_all[region_key]['all_slopes'] = {}
-        data_dict_all[region_key]['all_sig_all_slopes'] = {}
-        data_dict_all[region_key]['all_alpha_beta_only_sig'] = {}
-        for type_key,type_value in data_dict_all[region_key]['model_return'].iteritems():
-                
-                sig_rsquared = data_dict_all[region_key]['model_return'][type_key]['conc']['sig_rsquared']
-                sig_fpvalue =  data_dict_all[region_key]['model_return'][type_key]['conc']['sig_fpvalue']
-                sig_pvals =  data_dict_all[region_key]['model_return'][type_key]['conc']['sig_pvals']
-                sig_const =  data_dict_all[region_key]['model_return'][type_key]['conc']['sig_const']
-                sig_alpha =  data_dict_all[region_key]['model_return'][type_key]['conc']['sig_alpha']
-                sig_beta =  data_dict_all[region_key]['model_return'][type_key]['conc']['sig_beta']
-
-                alpha_only_sig = 0
-                beta_only_sig = 0
-                both_pos = 0
-                both_neg = 0
-                alpha_pos = 0
-                beta_pos = 0
-
-                if np.shape(sig_fpvalue)[0] > 0:
-                        print 'Sig fpvalue- %s %s: %s' %(region_key,type_key,sig_fpvalue)
-                if np.shape(sig_pvals)[0] > 0:
-                        print 'Sig pvals- %s %s: %s' %(region_key,type_key,sig_pvals)
-                else:
-                        print 'no sig p val, %s %s' %(region_key,type_key)
-
-                ########
-                slopes = np.zeros((np.shape(sig_pvals)[0],7))
-                sig_all_slopes = np.zeros((np.shape(sig_pvals)[0],7))
-                sig_all_index = 0
-                        
-                for i in range(np.shape(sig_pvals)[0]):
-                        unit_num = sig_pvals[i]
-                        slopes[i,0] = unit_num
-                        #alpha
-                        slopes[i,1] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][1]
-                        #beta
-                        slopes[i,2] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][2]
-                        #const
-                        slopes[i,3] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][0]
-
-                        #alpha p val
-                        slopes[i,4] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][1]
-                        #alpha p val
-                        slopes[i,5] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][2]
-                        #alpha p val
-                        slopes[i,6] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][0]
-                                
-                        if slopes[i,4] <= 0.05 and slopes[i,5] <= 0.05:
-                                sig_all_slopes[sig_all_index,:] = slopes[i,:]
-                                sig_all_index = sig_all_index + 1
-                        elif slopes[i,4] <= 0.05:
-                                alpha_only_sig +=1
-                        elif slopes[i,5] <= 0.05:
-                                beta_only_sig <= 0.05
-                                
-                        if slopes[i,1] > 0 and slopes[i,2] > 0:
-                                both_pos += 1
-                        elif slopes[i,1] < 0 and slopes[i,2] < 0:
-                                both_neg += 1
-                        elif slopes[i,1] > 0 and slopes[i,2] < 0:
-                                alpha_pos += 1
-                        elif slopes[i,1] < 0 and slopes[i,2] > 0:
-                                beta_pos += 1
-
-                #if type_key == 'aft_result_model' and region_key == 'M1_dicts':
-                #        pdb.set_trace()
-                
-
-                sig_all_slopes = sig_all_slopes[sig_all_slopes[:,1] != 0]
-                data_dict_all[region_key]['slopes'][type_key] = slopes
-                #GONE BY HERE M1 aft result
-                #print region_key
-                #print type_key
-                data_dict_all[region_key]['sig_all_slopes'][type_key] = sig_all_slopes
-                data_dict_all[region_key]['alpha_beta_only_sig'][type_key] = [alpha_only_sig,beta_only_sig,both_pos,both_neg,alpha_pos,beta_pos]
-
-                ####################
-                
-                #########
-
-                all_alpha_only_sig = 0
-                all_beta_only_sig = 0
-                all_both_pos = 0
-                all_both_neg = 0
-                all_alpha_pos = 0
-                all_beta_pos = 0
-
-                all_slopes = np.zeros((np.shape(data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'])[1],7))
-                all_sig_all_slopes = np.zeros((np.shape(data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'])[1],7))
-                all_sig_all_index = 0
-
-                for i in range(np.shape(data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'])[1]):
-                        unit_num = i
-                        all_slopes[i,0] = unit_num
-                        #alpha
-                        all_slopes[i,1] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][1]
-                        #beta
-                        all_slopes[i,2] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][2]
-                        #const
-                        all_slopes[i,3] = data_dict_all[region_key]['model_return'][type_key][unit_num]['param_dict'][0]
-
-                        #alpha p val
-                        all_slopes[i,4] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][1]
-                        #alpha p val
-                        all_slopes[i,5] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][2]
-                        #alpha p val
-                        all_slopes[i,6] = data_dict_all[region_key]['model_return'][type_key][unit_num]['stat_result_dict']['pvalues'][0]
-                
-                        if all_slopes[i,4] <= 0.05 and all_slopes[i,5] <= 0.05:
-                                all_sig_all_slopes[all_sig_all_index,:] = all_slopes[i,:]
-                                all_sig_all_index = all_sig_all_index + 1
-                        elif all_slopes[i,4] <= 0.05:
-                                all_alpha_only_sig +=1
-                        elif all_slopes[i,5] <= 0.05:
-                                all_beta_only_sig <= 0.05
-                        if all_slopes[i,1] > 0 and all_slopes[i,2] > 0:
-                                all_both_pos += 1
-                        elif all_slopes[i,1] < 0 and all_slopes[i,2] < 0:
-                                all_both_neg += 1
-                        elif all_slopes[i,1] > 0 and all_slopes[i,2] < 0:
-                                all_alpha_pos += 1
-                        elif all_slopes[i,1] < 0 and all_slopes[i,2] > 0:
-                                all_beta_pos += 1
-
-
-                all_sig_all_slopes = all_sig_all_slopes[sig_all_slopes[:,1] != 0]
-                data_dict_all[region_key]['all_slopes'][type_key] = all_slopes
-                data_dict_all[region_key]['all_sig_all_slopes'][type_key] = all_sig_all_slopes
-                data_dict_all[region_key]['all_alpha_beta_only_sig'][type_key] = [all_alpha_only_sig,all_beta_only_sig,all_both_pos,all_both_neg,all_alpha_pos,all_beta_pos]
-
-                        
-                #do same for units where alpha and beta both sig
-#######
-for region_key,region_val in data_dict_all.iteritems():
-        
-        data_dict_all[region_key]['mv'] = {}
-
-        bfr_cue_array = data_dict_all[region_key]['all_slopes']['bfr_cue_model']
-        aft_cue_array = data_dict_all[region_key]['all_slopes']['aft_cue_model']
-        bfr_result_array = data_dict_all[region_key]['all_slopes']['bfr_result_model']
-        aft_result_array = data_dict_all[region_key]['all_slopes']['aft_result_model']
-
-        avg_alphas = (bfr_cue_array[:,1] + aft_cue_array[:,1] + bfr_result_array[:,1] + aft_result_array[:,1]) / float(4)
-        avg_betas = (bfr_cue_array[:,2] + aft_cue_array[:,2] + bfr_result_array[:,2] + aft_result_array[:,2]) / float(4)
-
-        rnums = condensed[:,3]
-        pnums = condensed[:,4]
-        data_dict_all[region_key]['mv']['avg'] = {}
-        for type_key,type_val in data_dict_all[region_key]['all_slopes'].iteritems():
-                slopes = data_dict_all[region_key]['all_slopes'][type_key]
-                #mv_array = np.zeros((np.shape(condensed)[0],np.shape(slopes)[0],5))
-                temp = np.zeros((np.shape(avg_alphas)[0],np.shape(condensed)[0],8))
-                rnums = condensed[:,3]
-                pnums = condensed[:,4]
-
-                for i in range(np.shape(avg_alphas)[0]):
-                        unit = i
-                        
-                        alpha = avg_alphas[i]
-                        beta= avg_betas[i]
-                                                
-                        unit_condensed = np.zeros((np.shape(condensed)[0],8))
-                        unit_condensed[:,0] = rnums
-                        unit_condensed[:,1] = pnums
-                        unit_condensed[:,2] = alpha
-                        unit_condensed[:,3] = beta
-                        
-                        if abs_alphabeta:
-                                alpha = abs(alpha)
-                                beta = abs(beta)
-
-                        unit_condensed[:,4] = rnums * alpha - pnums * beta #value
-                        unit_condensed[:,5] = rnums * alpha + pnums * beta #motiv
-                
-                        window_avg_unit_fr = data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'][:,unit]
-                        unit_condensed[:,6] = window_avg_unit_fr
-                        unit_condensed[:,7] = unit
-                        
-                        temp[i,:,:] = unit_condensed
-                
-                        new_mv_array = temp
-                
-                        data_dict_all[region_key]['mv']['avg'][type_key] = new_mv_array
-                
-                        np.save('%s_%s_all_avg_mv_array.npy' %(region_key,type_key),new_mv_array)
-                        sio.savemat('%s_%s_all_avg_mv_array.mat' %(region_key,type_key),{'mv_array':new_mv_array},format='5')
-
-
-
-        ###### all ##########
-        data_dict_all[region_key]['mv']['all'] = {}
-        for type_key,type_val in data_dict_all[region_key]['all_slopes'].iteritems():
-                slopes = data_dict_all[region_key]['all_slopes'][type_key]
-                #mv_array = np.zeros((np.shape(condensed)[0],np.shape(slopes)[0],5))
-                temp = np.zeros((np.shape(avg_alphas)[0],np.shape(condensed)[0],8))
-                alphas = slopes[:,1]
-                betas = slopes[:,2]
-                rnums = condensed[:,3]
-                pnums = condensed[:,4]
-
-                for i in range(np.shape(avg_alphas)[0]):
-                        unit = i
-                        
-                        alpha = alphas[i]
-                        beta= betas[i]
-                                                
-                        unit_condensed = np.zeros((np.shape(condensed)[0],8))
-                        unit_condensed[:,0] = rnums
-                        unit_condensed[:,1] = pnums
-                        unit_condensed[:,2] = alpha
-                        unit_condensed[:,3] = beta
-                        
-                        if abs_alphabeta:
-                                alpha = abs(alpha)
-                                beta = abs(beta)
-
-                        unit_condensed[:,4] = rnums * alpha - pnums * beta #value
-                        unit_condensed[:,5] = rnums * alpha + pnums * beta #motiv
-                
-                        window_avg_unit_fr = data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'][:,unit]
-                        unit_condensed[:,6] = window_avg_unit_fr
-                        unit_condensed[:,7] = unit
-                        
-                        temp[i,:,:] = unit_condensed
-                
-                        new_mv_array = temp
-                
-                        data_dict_all[region_key]['mv']['all'][type_key] = new_mv_array
-                
-                        np.save('%s_%s_all_mv_array.npy' %(region_key,type_key),new_mv_array)
-                        sio.savemat('%s_%s_all_mv_array.mat' %(region_key,type_key),{'mv_array':new_mv_array},format='5')
-
-###########
-
-
-#slopes_workbook = xlsxwriter.Workbook('sig_slopes.xlsx',options={'nan_inf_to_errors':True})
-for region_key,region_val in data_dict_all.iteritems():
-        #slopes_workbook = xlsxwriter.Workbook('sig_slopes_%s_%s.xlsx' %(short_filename,region_key),options={'nan_inf_to_errors':True})
-        #print region_key
-        slopes_workbook = xlsxwriter.Workbook('sig_slopes_%s.xlsx' %(region_key),options={'nan_inf_to_errors':True})
-        #total_unit_num = np.shape(data_dict_all[region_key]['fr_dict']['baseline_fr'])[1]
-        total_unit_num = np.shape(data_dict_all[region_key]['fr_dict']['bfr_cue_hist'])[1]
-        names = ['unit_num','alpha','beta','const','alpha_p','beta_p','const_p']
-
-        percs = {}
-        for type_key,type_val in data_dict_all[region_key]['slopes'].iteritems():
-                #print type_key
-                slopes = np.asarray(data_dict_all[region_key]['slopes'][type_key])
-                sig_slopes = np.asarray(data_dict_all[region_key]['sig_all_slopes'][type_key])
-                sig_alpha = slopes[slopes[:,4] <= 0.05]
-                sig_beta = slopes[slopes[:,5] <= 0.05]
-                perc_sig_alpha = np.shape(sig_alpha)[0] / float(total_unit_num)
-                perc_sig_beta = np.shape(sig_beta)[0] / float(total_unit_num)
-                num_sig_alpha = np.shape(sig_alpha)[0]
-                num_sig_beta = np.shape(sig_beta)[0]
-                perc_slopes = np.shape(slopes)[0] / float(total_unit_num)
-                perc_sig_slopes = np.shape(sig_slopes)[0] / float(total_unit_num)
-                perc_sig_alpha_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][0] / float(total_unit_num)
-                num_sig_alpha_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][0]
-                perc_sig_beta_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][1] / float(total_unit_num)
-                num_sig_beta_only = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][0]
-                try:
-                        perc_both_pos = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][2] / float(np.shape(slopes)[0]) #of at least one sig
-                        perc_both_neg = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][3] / float(np.shape(slopes)[0])
-                        perc_alpha_pos = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][4] / float(np.shape(slopes)[0])
-                        perc_beta_pos = data_dict_all[region_key]['alpha_beta_only_sig'][type_key][5] / float(np.shape(slopes)[0])
-                except:
-                        if np.shape(slopes)[0] ==0:
-                                perc_both_pos = 0
-                                perc_both_neg = 0
-                                perc_alpha_pos = 0
-                                perc_beta_pos = 0
-
-                                #pdb.set_trace()
-                #print 'xlsx region: %s type %s' %(region_key,type_key)
-                worksheet = slopes_workbook.add_worksheet('slopes_%s' %(type_key))
-                worksheet.write_row(0,0,names)
-                if slopes.ndim == 2 and np.shape(slopes)[0] != 0:
-                        len_slopes = np.shape(slopes)[0]
-                elif np.shape(slopes)[0] == 0:
-                        len_slopes = -1
-                else:
-                        len_slopes = 0
-                
-                if not len_slopes == -1:
-                        for i in range(len_slopes):
-                                worksheet.write_row(i+1,0,slopes[i,:])
-                else:
-                        worksheet.write(0,0,0)
-                                
-                worksheet = slopes_workbook.add_worksheet('sig_all_%s' %(type_key))
-                worksheet.write_row(0,0,names)
-                if sig_slopes.ndim == 2:
-                        len_sig_slopes = np.shape(sig_slopes)[0]
-                elif np.shape(sig_slopes)[0] == 0:
-                        len_sig_slopes = -1
-                else:
-                        len_sig_slopes = 0
-                                
-                if not len_sig_slopes == -1:
-                        for i in range(len_sig_slopes):
-                                worksheet.write_row(i+1,0,sig_slopes[i,:])
-                else:
-                        worksheet.write(0,0,0)
-
-                
-                type_dict = {'perc_slopes':perc_slopes,'perc_sig_slopes':perc_sig_slopes,'num_slopes':np.shape(slopes)[0],'num_sig_slopes':np.shape(sig_slopes)[0],'total_unit_num':total_unit_num,'perc_sig_alpha':perc_sig_alpha,'perc_sig_beta':perc_sig_beta,'num_sig_alpha':num_sig_alpha,'num_sig_beta':num_sig_beta,'perc_sig_alpha_only':perc_sig_alpha_only,'num_sig_alpha_only':num_sig_alpha_only,'perc_sig_beta_only':perc_sig_beta_only,'num_sig_beta_only':num_sig_beta_only,'perc_both_pos':perc_both_pos,'perc_both_neg':perc_both_neg,'perc_alpha_pos':perc_alpha_pos,'perc_beta_pos':perc_beta_pos}
-                percs[type_key] = type_dict
-                #sio.savemat('model_summary_%s_%s_%s.mat' %(short_filename,region_key,type_key),{'perc_summary':percs},format='5')
-                
-        #slopes_workbook.close()
-
-        data_dict_all[region_key]['percs'] = percs
-        sio.savemat('model_summary_%s_%s.mat' %(short_filename,region_key),{'perc_summary':percs},format='5')
-
-        
-percs_workbook = xlsxwriter.Workbook('percs_workbook.xlsx',options={'nan_inf_to_errors':True})
-for region_key,region_val in data_dict_all.iteritems():
-        worksheet = percs_workbook.add_worksheet('%s' %(region_key))
-        worksheet.write(1,0,'perc slopes')
-        worksheet.write(2,0,'perc sig slopes')
-        worksheet.write(3,0,'num slopes')
-        worksheet.write(4,0,'num sig slopes')
-        worksheet.write(5,0,'total unit num')
-        worksheet.write(6,0,'perc sig alpha')
-        worksheet.write(7,0,'perc sig beta')
-        worksheet.write(8,0,'num sig alpha')
-        worksheet.write(9,0,'num sig beta')
-        worksheet.write(10,0,'perc sig alpha only')
-        worksheet.write(11,0,'perc sig beta only')
-        worksheet.write(12,0,'num sig alpha only')
-        worksheet.write(13,0,'num sig beta only')
-        worksheet.write(14,0,'both alpha and beta pos')
-        worksheet.write(15,0,'both alpha and beta neg')
-        worksheet.write(16,0,'alpha pos beta neg')
-        worksheet.write(17,0,'alpha neg beta pos')
-        
-        
-        percs = data_dict_all[region_key]['percs']
-
-        i = 1
-        for type_key,val in percs.iteritems():
-                worksheet.write(0,i,type_key)
-                worksheet.write_column(1,i,[percs[type_key]['perc_slopes'],percs[type_key]['perc_sig_slopes'],percs[type_key]['num_slopes'],percs[type_key]['num_sig_slopes'],percs[type_key]['total_unit_num'],percs[type_key]['perc_sig_alpha'],percs[type_key]['perc_sig_beta'],percs[type_key]['num_sig_alpha'],percs[type_key]['num_sig_beta'],percs[type_key]['perc_sig_alpha_only'],percs[type_key]['perc_sig_beta_only'],percs[type_key]['num_sig_alpha_only'],percs[type_key]['num_sig_beta_only'],percs[type_key]['perc_both_pos'],percs[type_key]['perc_both_neg'],percs[type_key]['perc_alpha_pos'],percs[type_key]['perc_beta_pos']])
-                i += 1
-
-
-#calc updated motiv and val vectors
-for region_key,region_val in data_dict_all.iteritems():
-        #for now individ. should avg across windows? And if so does that affect any other of the analysis?
-        #data_dict_all[region_key]['mv'] = {}
-        #print region_key
-        for type_key,type_val in data_dict_all[region_key]['slopes'].iteritems():
-                #print type_key
-                slopes = data_dict_all[region_key]['slopes'][type_key]
-                sig_units = slopes[:,0]
-                
-                alphas = slopes[:,1]
-                betas = slopes[:,2]
-                rnums = condensed[:,3]
-                pnums = condensed[:,4]
-                
-                #mv_array = np.zeros((np.shape(condensed)[0],np.shape(slopes)[0],5))
-                temp = np.zeros((np.shape(slopes)[0],np.shape(condensed)[0],8))
-                for i in range(np.shape(slopes)[0]):
-                        unit = sig_units[i]
-                        
-                        if abs_alphabeta:
-                                alpha = abs(alphas[i])
-                                beta = abs(betas[i])
-                        else:
-                                alpha = alphas[i]
-                                beta = betas[i]
-                                
-                        unit_condensed = np.zeros((np.shape(condensed)[0],8))
-                        unit_condensed[:,0] = rnums
-                        unit_condensed[:,1] = pnums
-                        unit_condensed[:,2] = alpha
-                        unit_condensed[:,3] = beta
-                        unit_condensed[:,4] = rnums * alpha - pnums * beta #value
-                        unit_condensed[:,5] = rnums * alpha + pnums * beta #motiv
-                        
-                        window_avg_unit_fr = data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'][:,unit]
-                        unit_condensed[:,6] = window_avg_unit_fr
-                        unit_condensed[:,7] = unit
-                        temp[i,:,:] = unit_condensed
-                        
-                        new_mv_array = temp
-                        
-                        data_dict_all[region_key]['mv'][type_key] = new_mv_array
-
-                        np.save('%s_%s_mv_array.npy' %(region_key,type_key),new_mv_array)
-                        sio.savemat('%s_%s_mv_array.mat' %(region_key,type_key),{'mv_array':new_mv_array},format='5')
-
-
-#for region_key,region_val in data_dict_all.iteritems():
-#        bfr_cue_array = data_dict_all[region_key]['all_slopes']['bfr_cue_model']
-#        aft_cue_array = data_dict_all[region_key]['all_slopes']['aft_cue_model']
-#        bfr_result_array = data_dict_all[region_key]['all_slopes']['bfr_result_model']
-#        aft_result_array = data_dict_all[region_key]['all_slopes']['aft_result_model']
-#
-#        avg_alphas = (bfr_cue_array[:,1] + aft_cue_array[:,1] + bfr_result_array[:,1] + aft_result_array[:,1]) / float(4)
-#        avg_betas = (bfr_cue_array[:,2] + aft_cue_array[:,2] + bfr_result_array[:,2] + aft_result_array[:,2]) / float(4)
-#
-#        rnums = condensed[:,3]
-#        pnums = condensed[:,4]
-#        data_dict_all[region_key]['mv']['all'] = {}
-
-#        for type_key,type_val in data_dict_all[region_key]['all_slopes'].iteritems():
-#
-#                #mv_array = np.zeros((np.shape(condensed)[0],np.shape(slopes)[0],5))
-#                temp = np.zeros((np.shape(avg_alphas)[0],np.shape(condensed)[0],8))
-#                for i in range(np.shape(avg_alphas)[0]):
-#                        unit = i
-#                                
-#                        if abs_alphabeta:
-#                                alpha = abs(avg_alphas[i])
-#                                beta = abs(avg_betas[i])
-#                        else:
-#                                alpha = avg_alphas[i]
-#                                beta = avg_betas[i]
-                        
-#                        unit_condensed = np.zeros((np.shape(condensed)[0],8))
-#                        unit_condensed[:,0] = rnums
-#                        unit_condensed[:,1] = pnums
-#                        unit_condensed[:,2] = alpha
-#                        unit_condensed[:,3] = beta
-#                        unit_condensed[:,4] = rnums * alpha - pnums * beta #value
-#                        unit_condensed[:,5] = rnums * alpha + pnums * beta #motiv
-#                
-#                        window_avg_unit_fr = data_dict_all[region_key]['model_return'][type_key]['conc']['avg_fr_data'][:,unit]
-#                        unit_condensed[:,6] = window_avg_unit_fr
-#                        unit_condensed[:,7] = unit
-#                        
-#                        temp[i,:,:] = unit_condensed
-                
-#                        new_mv_array = temp
-#                
-#                        data_dict_all[region_key]['mv']['all'][type_key] = new_mv_array
-#                
-#                        np.save('%s_%s_all_mv_array.npy' %(region_key,type_key),new_mv_array)
-#                        sio.savemat('%s_%s_all_mv_array.mat' %(region_key,type_key),{'mv_array':new_mv_array},format='5')
-
-
-M1_hist_dict = {'bfr_cue':data_dict_all['M1_dicts']['fr_dict']['bfr_cue_hist'],'aft_cue':data_dict_all['M1_dicts']['fr_dict']['aft_cue_hist'],'bfr_result':data_dict_all['M1_dicts']['fr_dict']['bfr_result_hist'],'aft_result':data_dict_all['M1_dicts']['fr_dict']['aft_result_hist']}
-
-S1_hist_dict = {'bfr_cue':data_dict_all['S1_dicts']['fr_dict']['bfr_cue_hist'],'aft_cue':data_dict_all['S1_dicts']['fr_dict']['aft_cue_hist'],'bfr_result':data_dict_all['S1_dicts']['fr_dict']['bfr_result_hist'],'aft_result':data_dict_all['S1_dicts']['fr_dict']['aft_result_hist']}
-
-PmD_hist_dict = {'bfr_cue':data_dict_all['PmD_dicts']['fr_dict']['bfr_cue_hist'],'aft_cue':data_dict_all['PmD_dicts']['fr_dict']['aft_cue_hist'],'bfr_result':data_dict_all['PmD_dicts']['fr_dict']['bfr_result_hist'],'aft_result':data_dict_all['PmD_dicts']['fr_dict']['aft_result_hist']}
-
-master_hist_dict = {'M1_hist_dict':M1_hist_dict,'S1_hist_dict':S1_hist_dict,'PmD_hist_dict':PmD_hist_dict,'condensed':condensed}
-
-sio.savemat('master_hist',master_hist_dict)
-
-
-#For input into tdr. Run with zscore normalization, whatever bin size.
-M1_fr_dict = {'bfr_cue':data_dict_all['M1_dicts']['fr_dict']['bfr_cue_fr'],'aft_cue':data_dict_all['M1_dicts']['fr_dict']['aft_cue_fr'],'bfr_result':data_dict_all['M1_dicts']['fr_dict']['bfr_result_fr'],'aft_result':data_dict_all['M1_dicts']['fr_dict']['aft_result_fr']}
-S1_fr_dict = {'bfr_cue':data_dict_all['S1_dicts']['fr_dict']['bfr_cue_fr'],'aft_cue':data_dict_all['S1_dicts']['fr_dict']['aft_cue_fr'],'bfr_result':data_dict_all['S1_dicts']['fr_dict']['bfr_result_fr'],'aft_result':data_dict_all['S1_dicts']['fr_dict']['aft_result_fr']}
-PmD_fr_dict = {'bfr_cue':data_dict_all['PmD_dicts']['fr_dict']['bfr_cue_fr'],'aft_cue':data_dict_all['PmD_dicts']['fr_dict']['aft_cue_fr'],'bfr_result':data_dict_all['PmD_dicts']['fr_dict']['bfr_result_fr'],'aft_result':data_dict_all['PmD_dicts']['fr_dict']['aft_result_fr']}
-
-
-"""
-
-
-
-"""
-params = {'time_before':time_before,'time_after':time_after,'bin_size':bin_size,'zscore_bool':zscore,'gauss_bool':gaussian_bool,'gauss_sigma':gauss_sigma}
-master_fr_dict = {'M1_fr_dict':M1_fr_dict,'S1_fr_dict':S1_fr_dict,'PmD_fr_dict':PmD_fr_dict,'condensed':condensed,'params':params}
-
-
-
-if extracted_filename == 'Extracted_504_2017-02-08-10-36-11.mat':
-	np.save('master_fr_dict_5_8_1.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2017-02-08-11-02-03.mat':
-	np.save('master_fr_dict_5_8_2.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2017-02-09-11-50-03.mat':
-	np.save('master_fr_dict_5_9_1.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2017-02-09-12-15-57.mat':
-	np.save('master_fr_dict_5_9_2.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2017-02-14-12-09-21.mat':
-	np.save('master_fr_dict_5_14_1.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2017-02-14-12-35-41.mat':
-	np.save('master_fr_dict_5_14_2.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2017-02-14-13-01-34.mat':
-	np.save('master_fr_dict_5_14_3.npy',master_fr_dict)
-
-elif extracted_filename == 'Extracted_0059_2017-02-08-11-43-22.mat':
-	np.save('master_fr_dict_0_8_1.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_0059_2017-02-08-12-09-22.mat':
-	np.save('master_fr_dict_0_8_2.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_0059_2017-02-09-12-52-17.mat':
-	np.save('master_fr_dict_0_9_1.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_0059_2017-02-09-13-46-37.mat':
-	np.save('master_fr_dict_0_9_2.npy',master_fr_dict)
-
-elif extracted_filename == 'Extracted_0059_2015-10-19-16-46-25.mat':
-        np.save('master_fr_dict_0_1.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_0059_2016-01-18-13-02-45.mat':
-        np.save('master_fr_dict_0_2.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2015-09-29-12-48-19.mat':
-        np.save('master_fr_dict_5_1.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2016-01-11-14-10-01.mat':
-        np.save('master_fr_dict_5_2.npy',master_fr_dict)
-
-###
-		
-elif extracted_filename == 'Extracted_0059_2017-03-13-14-26-36.mat':
-        np.save('master_fr_dict_0_3_13_1.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_0059_2017-03-13-14-54-09.mat':
-        np.save('master_fr_dict_0_3_13_2.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_0059_2017-03-13-15-24-14.mat':
-        np.save('master_fr_dict_0_3_13_3.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_0059_2017-03-14-14-15-04.mat':
-        np.save('master_fr_dict_0_3_14_1.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_0059_2017-03-14-14-51-42.mat':
-        np.save('master_fr_dict_0_3_14_2.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_0059_2017-03-14-15-17-37.mat':
-        np.save('master_fr_dict_0_3_14_3.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_0059_2017-03-27-12-50-24.mat':
-        np.save('master_fr_dict_0_3_27_1.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_0059_2017-03-27-13-16-34.mat':
-        np.save('master_fr_dict_0_3_27_2.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_0059_2017-03-28-13-37-57.mat':
-        np.save('master_fr_dict_0_3_28_1.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_0059_2017-03-28-14-04-05.mat':
-        np.save('master_fr_dict_0_3_28_2.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_0059_2017-03-28-14-32-14.mat':
-        np.save('master_fr_dict_0_3_28_3.npy',master_fr_dict)
-
-
-elif extracted_filename == 'Extracted_504_2017-03-13-12-50-41.mat':
-        np.save('master_fr_dict_5_3_13_1.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2017-03-13-13-16-32.mat':
-        np.save('master_fr_dict_5_3_13_2.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2017-03-13-13-42-37.mat':
-        np.save('master_fr_dict_5_3_13_3.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2017-03-14-12-43-43.mat':
-        np.save('master_fr_dict_5_3_14_1.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2017-03-14-13-09-46.mat':
-        np.save('master_fr_dict_5_3_14_2.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2017-03-14-13-36-38.mat':
-        np.save('master_fr_dict_5_3_14_3.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2017-03-28-12-27-38.mat':
-        np.save('master_fr_dict_5_3_28_2.npy',master_fr_dict)
-elif extracted_filename == 'Extracted_504_2017-03-28-12-54-41.mat':
-        np.save('master_fr_dict_5_3_28_3.npy',master_fr_dict)
-
-		
-else:
-	np.save('master_fr_dict.npy',master_fr_dict)
-
-"""
-
-
-
-
-
-
-
-
-
-
-
-
-	
+#if want to save anything as mat file to -> R
+#sio.savemat('%s_%s_all_avg_mv_array.mat' %(region_key,type_key),{'mv_array':new_mv_array},format='5')
