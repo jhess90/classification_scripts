@@ -19,6 +19,8 @@ import xlsxwriter
 import scipy.stats as stats
 from scipy import ndimage
 from math import isinf
+import os
+from scipy.stats.stats import pearsonr
 
 ########################
 # params to set ########
@@ -27,6 +29,8 @@ from math import isinf
 rp_bool = True
 alt_bool = False
 uncued_bool = False
+
+sig_only_bool = True
 
 bin_size = 10 #in ms
 time_before = -0.5 #negative value
@@ -132,16 +136,30 @@ def div_nl_Y_func(x,a,b,c,d):
         r,p = x
         return a*(r + b*p) / (c + r + b * p) + d
 
+def div_nl_separate_add_func(x,a,b,c,d,e):
+        #separate and add
+        r,p = x
+        return a*r / (r + b) + c*p / (p + d) + e
+
+def div_nl_separate_multiply_func(x,a,b,c,d,e):
+        #separate and multiply
+        r,p = x
+        return (a*r / (r + b)) * (c*p / (p + d)) + e
+
 ####################
 # models ###########
 ####################
 
-def make_lin_model(fr_data_dict,region_key,type_key,file_length):
-        total_unit_num = 0
-        total_trial_num = 0
-        for i in range(file_length):
-            total_unit_num += np.shape(fr_data_dict[i][type_key])[1]
-            total_trial_num += np.shape(fr_data_dict[i]['condensed'])[0]
+def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
+        #pdb.set_trace()
+
+        #total_unit_num = 0
+        #total_trial_num = 0
+        #for num in range(file_length):
+        #    #pdb.set_trace()
+
+        #    total_unit_num += np.shape(fr_data_dict[num][region_key][type_key])[1]
+        #    total_trial_num += np.shape(fr_data_dict[num][region_key]['condensed'])[0]
 
         #set each model
         num_params = 3
@@ -154,14 +172,25 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length):
         ss_res_total = np.zeros((total_unit_num))
 
         for i in range(file_length):
-            fr_data = fr_data_dict[i][type_key]
-            condensed = fr_data_dict[i]['condensed']
-            avg_fr_data = np.mean(fr_data,axis=2)
-
+            #fr_data = fr_data_dict[i][region_key][type_key]
+            condensed = fr_data_dict[i][region_key]['condensed']
+            #avg_fr_data = np.mean(fr_data,axis=2)
+            avg_fr_data = avg_and_corr[type_key]['avg_fr_dict'][i]
+            
             r_vals = condensed[:,3]
             p_vals = condensed[:,4]
 
-            for unit_num in range(fr_data.shape[1]):
+
+            if sig_only_bool:
+                #[r_coeff,r_pval,p_coeff,p_pval]
+                sig_vals = avg_and_corr[type_key]['sig_vals_by_file'][i]
+                
+                either_sig = np.logical_or(sig_vals[:,1] < 0.05,sig_vals[:,3] < 0.05)
+                
+                avg_fr_data = avg_fr_data[:,either_sig]
+
+            #for unit_num in range(fr_data.shape[1]):
+            for unit_num in range(avg_fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
         
                 #firing rate = a*R + b*P + c
@@ -188,13 +217,14 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length):
                 ss_res_total[unit_ct] = ss_res
                 unit_ct +=1
 
+            ####
             if i == 0:
-                r_flat_total = np.tile(r_vals,fr_data.shape[1])
-                p_flat_total = np.tile(p_vals,fr_data.shape[1])
+                r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
+                p_flat_total = np.tile(p_vals,avg_fr_data.shape[1])
                 fr_flat_total = np.ndarray.flatten(avg_fr_data)
             else:
-                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,fr_data.shape[1])))
-                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,fr_data.shape[1])))
+                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
+                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
                 fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
 
         params,covs = curve_fit(lin_func,[r_flat_total,p_flat_total],fr_flat_total)
@@ -221,12 +251,12 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length):
                 
         return(return_dict)
 
-def make_diff_model(fr_data_dict,region_key,type_key,file_length):
+def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
         total_unit_num = 0
         total_trial_num = 0
         for i in range(file_length):
-            total_unit_num += np.shape(fr_data_dict[i][type_key])[1]
-            total_trial_num += np.shape(fr_data_dict[i]['condensed'])[0]
+            total_unit_num += np.shape(fr_data_dict[i][region_key][type_key])[1]
+            total_trial_num += np.shape(fr_data_dict[i][region_key]['condensed'])[0]
 
         #set each model
         num_params = 2
@@ -239,8 +269,8 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length):
         ss_res_total = np.zeros((total_unit_num))
 
         for i in range(file_length):
-            fr_data = fr_data_dict[i][type_key]
-            condensed = fr_data_dict[i]['condensed']
+            fr_data = fr_data_dict[i][region_key][type_key]
+            condensed = fr_data_dict[i][region_key]['condensed']
             avg_fr_data = np.mean(fr_data,axis=2)
 
             r_vals = condensed[:,3]
@@ -306,12 +336,12 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length):
                 
         return(return_dict)
 
-def make_div_nl_model(fr_data_dict,region_key,type_key,file_length):
+def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
         total_unit_num = 0
         total_trial_num = 0
         for i in range(file_length):
-            total_unit_num += np.shape(fr_data_dict[i][type_key])[1]
-            total_trial_num += np.shape(fr_data_dict[i]['condensed'])[0]
+            total_unit_num += np.shape(fr_data_dict[i][region_key][type_key])[1]
+            total_trial_num += np.shape(fr_data_dict[i][region_key]['condensed'])[0]
 
         #set each model
         num_params = 5
@@ -324,8 +354,8 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length):
         ss_res_total = np.zeros((total_unit_num))
 
         for i in range(file_length):
-            fr_data = fr_data_dict[i][type_key]
-            condensed = fr_data_dict[i]['condensed']
+            fr_data = fr_data_dict[i][region_key][type_key]
+            condensed = fr_data_dict[i][region_key]['condensed']
             avg_fr_data = np.mean(fr_data,axis=2)
 
             r_vals = condensed[:,3]
@@ -333,10 +363,14 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length):
 
             for unit_num in range(fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
-        
-                #firing rate  = (R * a + b * P) / (a + c * b + d) + e
-                params,covs = curve_fit(div_nl_func,[r_vals,p_vals],avg_frs)
-                
+
+                try:
+                        #firing rate  = (R * a + b * P) / (a + c * b + d) + e
+                        params,covs = curve_fit(div_nl_func,[r_vals,p_vals],avg_frs)
+                except:
+                        print 'failure to fit div nl %s %s unit %s' %(region_key,type_key,unit_num)
+                        break
+
                 if np.size(covs) > 1:
                         perr = np.sqrt(np.diag(covs))
                 elif isinf(covs):
@@ -395,8 +429,8 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length):
         total_unit_num = 0
         total_trial_num = 0
         for i in range(file_length):
-            total_unit_num += np.shape(fr_data_dict[i][type_key])[1]
-            total_trial_num += np.shape(fr_data_dict[i]['condensed'])[0]
+            total_unit_num += np.shape(fr_data_dict[i][region_key][type_key])[1]
+            total_trial_num += np.shape(fr_data_dict[i][region_key]['condensed'])[0]
 
         #set each model
         num_params = 4
@@ -409,8 +443,8 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length):
         ss_res_total = np.zeros((total_unit_num))
 
         for i in range(file_length):
-            fr_data = fr_data_dict[i][type_key]
-            condensed = fr_data_dict[i]['condensed']
+            fr_data = fr_data_dict[i][region_key][type_key]
+            condensed = fr_data_dict[i][region_key]['condensed']
             avg_fr_data = np.mean(fr_data,axis=2)
 
             r_vals = condensed[:,3]
@@ -419,9 +453,13 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length):
             for unit_num in range(fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
         
-                #firing rate  = (R * a + b * P) / (a + c * b + d)
-                params,covs = curve_fit(div_nl_noe_func,[r_vals,p_vals],avg_frs)
-                
+                try:
+                        #firing rate  = (R * a + b * P) / (a + c * b + d)
+                        params,covs = curve_fit(div_nl_noe_func,[r_vals,p_vals],avg_frs)
+                except:
+                        print 'failure to fit div nl noe %s %s unit %s' %(region_key,type_key,unit_num)
+                        break
+
                 if np.size(covs) > 1:
                         perr = np.sqrt(np.diag(covs))
                 elif isinf(covs):
@@ -480,8 +518,8 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length):
         total_unit_num = 0
         total_trial_num = 0
         for i in range(file_length):
-            total_unit_num += np.shape(fr_data_dict[i][type_key])[1]
-            total_trial_num += np.shape(fr_data_dict[i]['condensed'])[0]
+            total_unit_num += np.shape(fr_data_dict[i][region_key][type_key])[1]
+            total_trial_num += np.shape(fr_data_dict[i][region_key]['condensed'])[0]
 
         #set each model
         num_params = 4
@@ -494,8 +532,8 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length):
         ss_res_total = np.zeros((total_unit_num))
 
         for i in range(file_length):
-            fr_data = fr_data_dict[i][type_key]
-            condensed = fr_data_dict[i]['condensed']
+            fr_data = fr_data_dict[i][region_key][type_key]
+            condensed = fr_data_dict[i][region_key]['condensed']
             avg_fr_data = np.mean(fr_data,axis=2)
 
             r_vals = condensed[:,3]
@@ -541,8 +579,15 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length):
                 p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,fr_data.shape[1])))
                 fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
 
-        params,covs = curve_fit(div_nl_Y_func,[r_flat_total,p_flat_total],fr_flat_total)
-        
+        try:
+                params,covs = curve_fit(div_nl_Y_func,[r_flat_total,p_flat_total],fr_flat_total)
+        except:
+                print 'failure to fit div nl Y on all data %s %s' %(region_key,type_key)
+
+                combined_dict = {'params':0,'covs':0,'perr':0,'ss_res':0,'AIC':0}        
+                return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_combined':0,'ss_res_total':ss_res_total,'combined':combined_dict,'AIC_overall':0}
+
+
         if np.size(covs) > 1:
             perr = np.sqrt(np.diag(covs))
         elif isinf(covs):
@@ -565,6 +610,183 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length):
                 
         return(return_dict)
 
+def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length):
+        total_unit_num = 0
+        total_trial_num = 0
+        for i in range(file_length):
+            total_unit_num += np.shape(fr_data_dict[i][region_key][type_key])[1]
+            total_trial_num += np.shape(fr_data_dict[i][region_key]['condensed'])[0]
+
+        #set each model
+        num_params = 5
+
+        unit_ct = 0
+        fit_params = np.zeros((total_unit_num,num_params))
+        cov_total = np.zeros((total_unit_num,num_params,num_params))
+        perr_total = np.zeros((total_unit_num,num_params))
+        AIC_total = np.zeros((total_unit_num))
+        ss_res_total = np.zeros((total_unit_num))
+
+        for i in range(file_length):
+            fr_data = fr_data_dict[i][region_key][type_key]
+            condensed = fr_data_dict[i][region_key]['condensed']
+            avg_fr_data = np.mean(fr_data,axis=2)
+
+            r_vals = condensed[:,3]
+            p_vals = condensed[:,4]
+
+            for unit_num in range(fr_data.shape[1]):
+                avg_frs = avg_fr_data[:,unit_num]
+                
+                try:
+                        params,covs = curve_fit(div_nl_separate_add_func,[r_vals,p_vals],avg_frs)
+                except:
+                        print 'failure to fit separate add nl %s %s unit %s' %(region_key,type_key,unit_num)
+                        break
+
+                if np.size(covs) > 1:
+                        perr = np.sqrt(np.diag(covs))
+                elif isinf(covs):
+                        perr = float('nan')
+                else:
+                        pdb.set_trace()
+
+                fit_params[unit_ct,:] = params
+                cov_total[unit_ct,:,:] = covs
+                perr_total[unit_ct,:] = perr
+
+                model_out = div_nl_separate_add_func([r_vals,p_vals],params[0],params[1],params[2],params[3],params[4])
+                residuals = avg_frs - model_out
+                ss_res = np.sum(residuals**2)
+                k = num_params
+                AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
+                
+                AIC_total[unit_ct] = AIC
+                ss_res_total[unit_ct] = ss_res
+                unit_ct +=1
+
+            if i == 0:
+                r_flat_total = np.tile(r_vals,fr_data.shape[1])
+                p_flat_total = np.tile(p_vals,fr_data.shape[1])
+                fr_flat_total = np.ndarray.flatten(avg_fr_data)
+            else:
+                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,fr_data.shape[1])))
+                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,fr_data.shape[1])))
+                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
+
+        params,covs = curve_fit(div_nl_separate_add_func,[r_flat_total,p_flat_total],fr_flat_total)
+        
+        if np.size(covs) > 1:
+            perr = np.sqrt(np.diag(covs))
+        elif isinf(covs):
+            perr = float('nan')
+        else:
+            pdb.set_trace()
+
+        model_out = div_nl_separate_add_func([r_vals,p_vals],params[0],params[1],params[2],params[3],params[4])
+        residuals = avg_frs - model_out
+        ss_res = np.sum(residuals**2)
+        k = num_params
+        AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
+        
+        AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
+
+        print '%s div nl separate add overall AIC %s' %(type_key,AIC_overall)
+
+        combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_combined':AIC,'ss_res_total':ss_res_total,'combined':combined_dict,'AIC_overall':AIC_overall}
+                
+        return(return_dict)
+
+def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_length):
+        total_unit_num = 0
+        total_trial_num = 0
+        for i in range(file_length):
+            total_unit_num += np.shape(fr_data_dict[i][region_key][type_key])[1]
+            total_trial_num += np.shape(fr_data_dict[i][region_key]['condensed'])[0]
+
+        #set each model
+        num_params = 5
+
+        unit_ct = 0
+        fit_params = np.zeros((total_unit_num,num_params))
+        cov_total = np.zeros((total_unit_num,num_params,num_params))
+        perr_total = np.zeros((total_unit_num,num_params))
+        AIC_total = np.zeros((total_unit_num))
+        ss_res_total = np.zeros((total_unit_num))
+
+        for i in range(file_length):
+            fr_data = fr_data_dict[i][region_key][type_key]
+            condensed = fr_data_dict[i][region_key]['condensed']
+            avg_fr_data = np.mean(fr_data,axis=2)
+
+            r_vals = condensed[:,3]
+            p_vals = condensed[:,4]
+
+            for unit_num in range(fr_data.shape[1]):
+                avg_frs = avg_fr_data[:,unit_num]
+
+                try:
+                        params,covs = curve_fit(div_nl_separate_multiply_func,[r_vals,p_vals],avg_frs)
+                except:
+                        print 'failure to fit div nl separate multiply %s %s unit %s' %(region_key,type_key,unit_num)
+                        break
+
+                if np.size(covs) > 1:
+                        perr = np.sqrt(np.diag(covs))
+                elif isinf(covs):
+                        perr = float('nan')
+                else:
+                        pdb.set_trace()
+
+                fit_params[unit_ct,:] = params
+                cov_total[unit_ct,:,:] = covs
+                perr_total[unit_ct,:] = perr
+
+                model_out = div_nl_separate_multiply_func([r_vals,p_vals],params[0],params[1],params[2],params[3],params[4])
+                residuals = avg_frs - model_out
+                ss_res = np.sum(residuals**2)
+                k = num_params
+                AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
+                
+                AIC_total[unit_ct] = AIC
+                ss_res_total[unit_ct] = ss_res
+                unit_ct +=1
+
+            if i == 0:
+                r_flat_total = np.tile(r_vals,fr_data.shape[1])
+                p_flat_total = np.tile(p_vals,fr_data.shape[1])
+                fr_flat_total = np.ndarray.flatten(avg_fr_data)
+            else:
+                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,fr_data.shape[1])))
+                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,fr_data.shape[1])))
+                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
+
+        params,covs = curve_fit(div_nl_separate_multiply_func,[r_flat_total,p_flat_total],fr_flat_total)
+        
+        if np.size(covs) > 1:
+            perr = np.sqrt(np.diag(covs))
+        elif isinf(covs):
+            perr = float('nan')
+        else:
+            pdb.set_trace()
+
+        model_out = div_nl_separate_multiply_func([r_vals,p_vals],params[0],params[1],params[2],params[3],params[4])
+        residuals = avg_frs - model_out
+        ss_res = np.sum(residuals**2)
+        k = num_params
+        AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
+        
+        AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
+
+        print '%s div nl separate multiply overall AIC %s' %(type_key,AIC_overall)
+
+        combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
+        return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_combined':AIC,'ss_res_total':ss_res_total,'combined':combined_dict,'AIC_overall':AIC_overall}
+                
+        return(return_dict)
+
+
 
 
 #########################
@@ -573,6 +795,11 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length):
 
 if (rp_bool + alt_bool + uncued_bool > 1):
     print 'ERROR selecting too many types'
+
+if os.path.isfile('model_aic.xlsx'):
+        os.remove('model_aic.xlsx')
+if os.path.isfile('model_params.xlsx'):
+        os.remove('model_params.xlsx')
 
 bins_before = int(time_before / float(bin_size) * 1000)  #neg for now
 bins_after = int(time_after / float(bin_size) * 1000)   
@@ -715,30 +942,82 @@ for file in glob.glob('*timestamps.mat'):
 
     data_dict_all = {'M1_dicts':M1_dicts,'S1_dicts':S1_dicts,'PmD_dicts':PmD_dicts}
 
+    file_dict[file_ct] = {}
+
     for region_key,region_value in data_dict_all.iteritems():
         hists = data_dict_all[region_key]['hist_all']
         fr_dict = calc_firing_rates(hists,region_key,condensed)
         data_dict_all[region_key]['fr_dict'] = fr_dict
         
-        file_dict[file_ct] = {'aft_cue':fr_dict['aft_cue_fr'],'bfr_res':fr_dict['bfr_result_fr'],'aft_res':fr_dict['aft_result_fr'],'res_win':fr_dict['res_wind_fr'],'condensed':condensed,'concat':fr_dict['concat_fr']}
+        file_dict[file_ct][region_key] = {'aft_cue':fr_dict['aft_cue_fr'],'bfr_res':fr_dict['bfr_result_fr'],'aft_res':fr_dict['aft_result_fr'],'res_win':fr_dict['res_wind_fr'],'condensed':condensed,'concat':fr_dict['concat_fr']}
 
-        data_dict_all[region_key]['file_dict'] = file_dict
     file_ct += 1
     
 
+########
+# run correlations
+
+file_length = np.shape(file_dict.keys())[0]
+
+for region_key,region_val in file_dict[0].iteritems():
+    data_dict_all[region_key]['avg_and_corr'] = {}
+    total_unit_num = 0
+    total_trial_num = 0
+    for num in range(file_length):
+        total_unit_num += np.shape(file_dict[num][region_key]['aft_cue'])[1]
+        total_trial_num += np.shape(file_dict[num][region_key]['condensed'])[0]
+
+    for type_key,type_val in file_dict[0][region_key].iteritems():
+            
+        if type_key != 'condensed':
+            sig_vals = np.zeros((total_unit_num,4))
+            r_p_all = np.zeros((total_trial_num,2))
+
+            avg_fr_dict = {}
+            unit_ct = 0
+            trial_ct = 0
+            sig_vals_by_file = {}
+            
+            for file_ind in range(file_length):
+                frs = file_dict[file_ind][region_key][type_key]
+                condensed = file_dict[file_ind][region_key]['condensed']
+                r_vals = condensed[:,3]
+                p_vals = condensed[:,4]
+                sig_vals_temp = np.zeros((np.shape(frs)[1],4))
+
+
+                for unit_ind in range(frs.shape[1]):
+                    avg_fr = np.mean(frs[:,unit_ind,:],axis=1)
+                    r_coeff,r_pval = pearsonr(avg_fr,r_vals)
+                    p_coeff,p_pval = pearsonr(avg_fr,p_vals)
+                
+                    sig_vals_temp[unit_ind,:] = [r_coeff,r_pval,p_coeff,p_pval]
+                    sig_vals[unit_ct + unit_ind,:] = [r_coeff,r_pval,p_coeff,p_pval]
+                 
+                unit_ct += frs.shape[1]
+                r_p_all[trial_ct : trial_ct + np.shape(r_vals)[0],:] = np.column_stack((r_vals,p_vals))
+                trial_ct += np.shape(r_vals)[0]
+                avg_fr_dict[file_ind] = np.mean(frs,axis=2)
+                sig_vals_by_file[file_ind] = sig_vals_temp
+                
+            save_dict = {'avg_fr_dict':avg_fr_dict,'r_p_all':r_p_all,'sig_vals':sig_vals,'sig_vals_by_file':sig_vals_by_file}
+            data_dict_all[region_key]['avg_and_corr'][type_key] = save_dict
+
+#run modeling
 for region_key,region_val in data_dict_all.iteritems():
     print 'modeling: %s' %(region_key)
     
     data_dict_all[region_key]['models'] = {}
 
-    file_dict = data_dict_all[region_key]['file_dict']
+    #file_dict = data_dict_all[region_key]['file_dict']
     file_length = np.shape(file_dict.keys())[0]
-
-    lin_aft_cue_model = make_lin_model(file_dict,region_key,'aft_cue',file_length)
-    lin_bfr_res_model = make_lin_model(file_dict,region_key,'bfr_res',file_length)
-    lin_aft_res_model = make_lin_model(file_dict,region_key,'aft_res',file_length)
-    lin_res_win_model = make_lin_model(file_dict,region_key,'res_win',file_length)
-    lin_concat_model = make_lin_model(file_dict,region_key,'concat',file_length)
+    avg_and_corr = data_dict_all[region_key]['avg_and_corr']
+                            
+    lin_aft_cue_model = make_lin_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr)
+    lin_bfr_res_model = make_lin_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr)
+    lin_aft_res_model = make_lin_model(file_dict,region_key,'aft_res',file_length,avg_and_corr)
+    lin_res_win_model = make_lin_model(file_dict,region_key,'res_win',file_length,avg_and_corr)
+    lin_concat_model = make_lin_model(file_dict,region_key,'concat',file_length,avg_and_corr)
 
     linear_model_return= {'aft_cue':lin_aft_cue_model,'bfr_res':lin_bfr_res_model,'aft_res':lin_aft_res_model,'res_win':lin_res_win_model,'concat':lin_concat_model}
     
@@ -784,13 +1063,315 @@ for region_key,region_val in data_dict_all.iteritems():
     
     data_dict_all[region_key]['models']['div_nl_Y'] = div_nl_Y_model_return
 
-np.save('model_save.npy',data_dict_all)
+    div_nl_separate_add_aft_cue_model = make_div_nl_separate_add_model(file_dict,region_key,'aft_cue',file_length)
+    div_nl_separate_add_bfr_res_model = make_div_nl_separate_add_model(file_dict,region_key,'bfr_res',file_length)
+    div_nl_separate_add_aft_res_model = make_div_nl_separate_add_model(file_dict,region_key,'aft_res',file_length)
+    div_nl_separate_add_res_win_model = make_div_nl_separate_add_model(file_dict,region_key,'res_win',file_length)
+    div_nl_separate_add_concat_model = make_div_nl_separate_add_model(file_dict,region_key,'concat',file_length)
+
+    div_nl_separate_add_model_return= {'aft_cue':div_nl_separate_add_aft_cue_model,'bfr_res':div_nl_separate_add_bfr_res_model,'aft_res':div_nl_separate_add_aft_res_model,'res_win':div_nl_separate_add_res_win_model,'concat':div_nl_separate_add_concat_model}
+    
+    data_dict_all[region_key]['models']['div_nl_separate_add'] = div_nl_separate_add_model_return
+
+    div_nl_separate_multiply_aft_cue_model = make_div_nl_separate_multiply_model(file_dict,region_key,'aft_cue',file_length)
+    div_nl_separate_multiply_bfr_res_model = make_div_nl_separate_multiply_model(file_dict,region_key,'bfr_res',file_length)
+    div_nl_separate_multiply_aft_res_model = make_div_nl_separate_multiply_model(file_dict,region_key,'aft_res',file_length)
+    div_nl_separate_multiply_res_win_model = make_div_nl_separate_multiply_model(file_dict,region_key,'res_win',file_length)
+    div_nl_separate_multiply_concat_model = make_div_nl_separate_multiply_model(file_dict,region_key,'concat',file_length)
+
+    div_nl_separate_multiply_model_return= {'aft_cue':div_nl_separate_multiply_aft_cue_model,'bfr_res':div_nl_separate_multiply_bfr_res_model,'aft_res':div_nl_separate_multiply_aft_res_model,'res_win':div_nl_separate_multiply_res_win_model,'concat':div_nl_separate_multiply_concat_model}
+    
+    data_dict_all[region_key]['models']['div_nl_separate_multiply'] = div_nl_separate_multiply_model_return
 
 
-type_list = list('aft_cue','bfr_res','aft_res','res_win','concat')
+
+##saving 
+if sig_only_bool:
+    np.save('model_save_sig.npy',data_dict_all)
+else:
+    np.save('model_save.npy',data_dict_all)
+data_dict_all['file_dict'] = file_dict
+
+
+#for region_key,region_val in data_dict_all.iteritems():
+type_names = ['aft cue','bfr res','aft res','res win','concat']
+model_names = ['linear','difference','div nl','div nl noe','div nl Y','separate add','separate multiply']
+
+if sig_only_bool:
+    aic_workbook = xlsxwriter.Workbook('model_aic_sig.xlsx',options={'nan_inf_to_errors':True})
+else:
+    aic_workbook = xlsxwriter.Workbook('model_aic.xlsx',options={'nan_inf_to_errors':True})
+
+worksheet = aic_workbook.add_worksheet('model_output')
+# Light red fill with dark red text.
+format1 = aic_workbook.add_format({'bg_color':'#FFC7CE','font_color': '#9C0006'})
+
+lin_aics = [data_dict_all['M1_dicts']['models']['linear']['aft_cue']['AIC_overall'],data_dict_all['M1_dicts']['models']['linear']['bfr_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['linear']['aft_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['linear']['res_win']['AIC_overall'],data_dict_all['M1_dicts']['models']['linear']['concat']['AIC_overall']]
+diff_aics = [data_dict_all['M1_dicts']['models']['diff']['aft_cue']['AIC_overall'],data_dict_all['M1_dicts']['models']['diff']['bfr_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['diff']['aft_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['diff']['res_win']['AIC_overall'],data_dict_all['M1_dicts']['models']['diff']['concat']['AIC_overall']]
+div_nl_aics = [data_dict_all['M1_dicts']['models']['div_nl']['aft_cue']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl']['bfr_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl']['aft_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl']['res_win']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl']['concat']['AIC_overall']]
+div_nl_noe_aics = [data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_cue']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_noe']['bfr_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_noe']['res_win']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_noe']['concat']['AIC_overall']]
+div_nl_Y_aics = [data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_cue']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_Y']['bfr_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_Y']['res_win']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_Y']['concat']['AIC_overall']]
+div_nl_separate_add_aics = [data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['res_win']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['concat']['AIC_overall']]
+div_nl_separate_multiply_aics = [data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_overall']]
+
+worksheet.write(0,0,'M1')
+worksheet.write_row(0,1,type_names)
+worksheet.write_row(1,1,lin_aics)
+worksheet.write_row(2,1,diff_aics)
+worksheet.write_row(3,1,div_nl_aics)
+worksheet.write_row(4,1,div_nl_noe_aics)
+worksheet.write_row(5,1,div_nl_Y_aics)
+worksheet.write_row(6,1,div_nl_separate_add_aics)
+worksheet.write_row(7,1,div_nl_separate_multiply_aics)
+worksheet.write_column(1,0,model_names)
+
+worksheet.conditional_format('B2:B8', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('C2:C8', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('D2:D8', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('E2:E8', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('F2:F8', {'type': 'bottom', 'value':'1', 'format':format1})
+
+lin_aics = [data_dict_all['S1_dicts']['models']['linear']['aft_cue']['AIC_overall'],data_dict_all['S1_dicts']['models']['linear']['bfr_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['linear']['aft_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['linear']['res_win']['AIC_overall'],data_dict_all['S1_dicts']['models']['linear']['concat']['AIC_overall']]
+diff_aics = [data_dict_all['S1_dicts']['models']['diff']['aft_cue']['AIC_overall'],data_dict_all['S1_dicts']['models']['diff']['bfr_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['diff']['aft_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['diff']['res_win']['AIC_overall'],data_dict_all['S1_dicts']['models']['diff']['concat']['AIC_overall']]
+div_nl_aics = [data_dict_all['S1_dicts']['models']['div_nl']['aft_cue']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl']['bfr_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl']['aft_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl']['res_win']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl']['concat']['AIC_overall']]
+div_nl_noe_aics = [data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_cue']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_noe']['bfr_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_noe']['res_win']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_noe']['concat']['AIC_overall']]
+div_nl_Y_aics = [data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_cue']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_Y']['bfr_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_Y']['res_win']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_Y']['concat']['AIC_overall']]
+div_nl_separate_add_aics = [data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['res_win']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['concat']['AIC_overall']]
+div_nl_separate_multiply_aics = [data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_overall']]
+
+worksheet.write(12,0,'S1')
+worksheet.write_row(12,1,type_names)
+worksheet.write_row(13,1,lin_aics)
+worksheet.write_row(14,1,diff_aics)
+worksheet.write_row(15,1,div_nl_aics)
+worksheet.write_row(16,1,div_nl_noe_aics)
+worksheet.write_row(17,1,div_nl_Y_aics)
+worksheet.write_row(18,1,div_nl_separate_add_aics)
+worksheet.write_row(19,1,div_nl_separate_multiply_aics)
+worksheet.write_column(13,0,model_names)
+
+worksheet.conditional_format('B14:B20', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('C14:C20', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('D14:D20', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('E14:E20', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('F14:F20', {'type': 'bottom', 'value':'1', 'format':format1})
+
+lin_aics = [data_dict_all['PmD_dicts']['models']['linear']['aft_cue']['AIC_overall'],data_dict_all['PmD_dicts']['models']['linear']['bfr_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['linear']['aft_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['linear']['res_win']['AIC_overall'],data_dict_all['PmD_dicts']['models']['linear']['concat']['AIC_overall']]
+diff_aics = [data_dict_all['PmD_dicts']['models']['diff']['aft_cue']['AIC_overall'],data_dict_all['PmD_dicts']['models']['diff']['bfr_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['diff']['aft_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['diff']['res_win']['AIC_overall'],data_dict_all['PmD_dicts']['models']['diff']['concat']['AIC_overall']]
+div_nl_aics = [data_dict_all['PmD_dicts']['models']['div_nl']['aft_cue']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl']['bfr_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl']['aft_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl']['res_win']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl']['concat']['AIC_overall']]
+div_nl_noe_aics = [data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_cue']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['bfr_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['res_win']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['concat']['AIC_overall']]
+div_nl_Y_aics = [data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_cue']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['bfr_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['res_win']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['concat']['AIC_overall']]
+div_nl_separate_add_aics = [data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['res_win']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['concat']['AIC_overall']]
+div_nl_separate_multiply_aics = [data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_overall']]
+
+worksheet.write(24,0,'PMd')
+worksheet.write_row(24,1,type_names)
+worksheet.write_row(25,1,lin_aics)
+worksheet.write_row(26,1,diff_aics)
+worksheet.write_row(27,1,div_nl_aics)
+worksheet.write_row(28,1,div_nl_noe_aics)
+worksheet.write_row(29,1,div_nl_Y_aics)
+worksheet.write_row(30,1,div_nl_separate_add_aics)
+worksheet.write_row(31,1,div_nl_separate_multiply_aics)
+worksheet.write_column(25,0,model_names)
+
+worksheet.conditional_format('B26:B32', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('C26:C32', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('D26:D32', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('E26:E32', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('F26:F32', {'type': 'bottom', 'value':'1', 'format':format1})
 
 
 
+################
+if sig_only_bool:
+    param_workbook = xlsxwriter.Workbook('model_params_sig.xlsx',options={'nan_inf_to_errors':True})
+else:
+    param_workbook = xlsxwriter.Workbook('model_params.xlsx',options={'nan_inf_to_errors':True})
+
+worksheet = param_workbook.add_worksheet('model_params')
+
+param_names = ['a:mean','max','min','b:mean','max','min','c:mean','max','min','d:mean','max','min','e:mean','max','min']
+
+#temp = np.full([7,75],np.nan)
+temp = np.zeros((7,75))
+
+for i in range(5):
+    if i ==0:
+        wind = 'aft_cue'
+    elif i == 1:
+        wind = 'bfr_res'
+    elif i == 2:
+        wind = 'aft_res'
+    elif i == 3:
+        wind = 'res_win'
+    elif i == 4:
+        wind = 'concat'
+
+    ct = i*15
+
+    temp[0,[0+ct,3+ct,6+ct]] = np.mean(data_dict_all['M1_dicts']['models']['linear'][wind]['fit_params'],axis=0)
+    temp[0,[1+ct,4+ct,7+ct]] = np.max(data_dict_all['M1_dicts']['models']['linear'][wind]['fit_params'],axis=0)
+    temp[0,[2+ct,5+ct,8+ct]] = np.min(data_dict_all['M1_dicts']['models']['linear'][wind]['fit_params'],axis=0)
+
+    temp[1,[0+ct,3+ct]] = np.mean(data_dict_all['M1_dicts']['models']['diff'][wind]['fit_params'],axis=0)
+    temp[1,[1+ct,4+ct]] = np.max(data_dict_all['M1_dicts']['models']['diff'][wind]['fit_params'],axis=0)
+    temp[1,[2+ct,5+ct]] = np.min(data_dict_all['M1_dicts']['models']['diff'][wind]['fit_params'],axis=0)
+
+    temp[2,[0+ct,3+ct,6+ct,9+ct,12+ct]] = np.mean(data_dict_all['M1_dicts']['models']['div_nl'][wind]['fit_params'],axis=0)
+    temp[2,[1+ct,4+ct,7+ct,10+ct,13+ct]] = np.max(data_dict_all['M1_dicts']['models']['div_nl'][wind]['fit_params'],axis=0)
+    temp[2,[2+ct,5+ct,8+ct,11+ct,14+ct]] = np.min(data_dict_all['M1_dicts']['models']['div_nl'][wind]['fit_params'],axis=0)
+
+    temp[3,[0+ct,3+ct,6+ct,9+ct]] = np.mean(data_dict_all['M1_dicts']['models']['div_nl_noe'][wind]['fit_params'],axis=0)
+    temp[3,[1+ct,4+ct,7+ct,10+ct]] = np.max(data_dict_all['M1_dicts']['models']['div_nl_noe'][wind]['fit_params'],axis=0)
+    temp[3,[2+ct,5+ct,8+ct,11+ct]] = np.min(data_dict_all['M1_dicts']['models']['div_nl_noe'][wind]['fit_params'],axis=0)
+
+    temp[4,[0+ct,3+ct,6+ct,9+ct]] = np.mean(data_dict_all['M1_dicts']['models']['div_nl_Y'][wind]['fit_params'],axis=0)
+    temp[4,[1+ct,4+ct,7+ct,10+ct]] = np.max(data_dict_all['M1_dicts']['models']['div_nl_Y'][wind]['fit_params'],axis=0)
+    temp[4,[2+ct,5+ct,8+ct,11+ct]] = np.min(data_dict_all['M1_dicts']['models']['div_nl_Y'][wind]['fit_params'],axis=0)
+
+    temp[5,[0+ct,3+ct,6+ct,9+ct,12+ct]] = np.mean(data_dict_all['M1_dicts']['models']['div_nl_separate_add'][wind]['fit_params'],axis=0)
+    temp[5,[1+ct,4+ct,7+ct,10+ct,13+ct]] = np.max(data_dict_all['M1_dicts']['models']['div_nl_separate_add'][wind]['fit_params'],axis=0)
+    temp[5,[2+ct,5+ct,8+ct,11+ct,14+ct]] = np.min(data_dict_all['M1_dicts']['models']['div_nl_separate_add'][wind]['fit_params'],axis=0)
+
+    temp[6,[0+ct,3+ct,6+ct,9+ct,12+ct]] = np.mean(data_dict_all['M1_dicts']['models']['div_nl_separate_multiply'][wind]['fit_params'],axis=0)
+    temp[6,[1+ct,4+ct,7+ct,10+ct,13+ct]] = np.max(data_dict_all['M1_dicts']['models']['div_nl_separate_multiply'][wind]['fit_params'],axis=0)
+    temp[6,[2+ct,5+ct,8+ct,11+ct,14+ct]] = np.min(data_dict_all['M1_dicts']['models']['div_nl_separate_multiply'][wind]['fit_params'],axis=0)
+
+worksheet.write(0,0,'M1')
+worksheet.write(0,1,'aft_cue')
+worksheet.write_row(1,1,param_names)
+worksheet.write(0,17,'bfr_res')
+worksheet.write_row(1,17,param_names)
+worksheet.write(0,33,'aft_res')
+worksheet.write_row(1,33,param_names)
+worksheet.write(0,49,'res_win')
+worksheet.write_row(1,49,param_names)
+worksheet.write(0,61,'concat')
+worksheet.write_row(1,61,param_names)
+worksheet.write_column(2,0,model_names)
+for i in range(temp.shape[0]):
+    worksheet.write_row(i + 2,1,temp[i,:])
+
+#temp = np.full([7,75],np.nan)
+temp = np.zeros((7,75))
+
+for i in range(5):
+    if i ==0:
+        wind = 'aft_cue'
+    elif i == 1:
+        wind = 'bfr_res'
+    elif i == 2:
+        wind = 'aft_res'
+    elif i == 3:
+        wind = 'res_win'
+    elif i == 4:
+        wind = 'concat'
+
+    ct = i*15
+
+    temp[0,[0+ct,3+ct,6+ct]] = np.mean(data_dict_all['S1_dicts']['models']['linear'][wind]['fit_params'],axis=0)
+    temp[0,[1+ct,4+ct,7+ct]] = np.max(data_dict_all['S1_dicts']['models']['linear'][wind]['fit_params'],axis=0)
+    temp[0,[2+ct,5+ct,8+ct]] = np.min(data_dict_all['S1_dicts']['models']['linear'][wind]['fit_params'],axis=0)
+
+    temp[1,[0+ct,3+ct]] = np.mean(data_dict_all['S1_dicts']['models']['diff'][wind]['fit_params'],axis=0)
+    temp[1,[1+ct,4+ct]] = np.max(data_dict_all['S1_dicts']['models']['diff'][wind]['fit_params'],axis=0)
+    temp[1,[2+ct,5+ct]] = np.min(data_dict_all['S1_dicts']['models']['diff'][wind]['fit_params'],axis=0)
+
+    temp[2,[0+ct,3+ct,6+ct,9+ct,12+ct]] = np.mean(data_dict_all['S1_dicts']['models']['div_nl'][wind]['fit_params'],axis=0)
+    temp[2,[1+ct,4+ct,7+ct,10+ct,13+ct]] = np.max(data_dict_all['S1_dicts']['models']['div_nl'][wind]['fit_params'],axis=0)
+    temp[2,[2+ct,5+ct,8+ct,11+ct,14+ct]] = np.min(data_dict_all['S1_dicts']['models']['div_nl'][wind]['fit_params'],axis=0)
+
+    temp[3,[0+ct,3+ct,6+ct,9+ct]] = np.mean(data_dict_all['S1_dicts']['models']['div_nl_noe'][wind]['fit_params'],axis=0)
+    temp[3,[1+ct,4+ct,7+ct,10+ct]] = np.max(data_dict_all['S1_dicts']['models']['div_nl_noe'][wind]['fit_params'],axis=0)
+    temp[3,[2+ct,5+ct,8+ct,11+ct]] = np.min(data_dict_all['S1_dicts']['models']['div_nl_noe'][wind]['fit_params'],axis=0)
+
+    temp[4,[0+ct,3+ct,6+ct,9+ct]] = np.mean(data_dict_all['S1_dicts']['models']['div_nl_Y'][wind]['fit_params'],axis=0)
+    temp[4,[1+ct,4+ct,7+ct,10+ct]] = np.max(data_dict_all['S1_dicts']['models']['div_nl_Y'][wind]['fit_params'],axis=0)
+    temp[4,[2+ct,5+ct,8+ct,11+ct]] = np.min(data_dict_all['S1_dicts']['models']['div_nl_Y'][wind]['fit_params'],axis=0)
+
+    temp[5,[0+ct,3+ct,6+ct,9+ct,12+ct]] = np.mean(data_dict_all['S1_dicts']['models']['div_nl_separate_add'][wind]['fit_params'],axis=0)
+    temp[5,[1+ct,4+ct,7+ct,10+ct,13+ct]] = np.max(data_dict_all['S1_dicts']['models']['div_nl_separate_add'][wind]['fit_params'],axis=0)
+    temp[5,[2+ct,5+ct,8+ct,11+ct,14+ct]] = np.min(data_dict_all['S1_dicts']['models']['div_nl_separate_add'][wind]['fit_params'],axis=0)
+
+    temp[6,[0+ct,3+ct,6+ct,9+ct,12+ct]] = np.mean(data_dict_all['S1_dicts']['models']['div_nl_separate_multiply'][wind]['fit_params'],axis=0)
+    temp[6,[1+ct,4+ct,7+ct,10+ct,13+ct]] = np.max(data_dict_all['S1_dicts']['models']['div_nl_separate_multiply'][wind]['fit_params'],axis=0)
+    temp[6,[2+ct,5+ct,8+ct,11+ct,14+ct]] = np.min(data_dict_all['S1_dicts']['models']['div_nl_separate_multiply'][wind]['fit_params'],axis=0)
+
+worksheet.write(12,0,'S1')
+worksheet.write(12,1,'aft_cue')
+worksheet.write_row(13,1,param_names)
+worksheet.write(12,17,'bfr_res')
+worksheet.write_row(13,17,param_names)
+worksheet.write(12,33,'aft_res')
+worksheet.write_row(13,33,param_names)
+worksheet.write(12,49,'res_win')
+worksheet.write_row(13,49,param_names)
+worksheet.write(12,61,'concat')
+worksheet.write_row(13,61,param_names)
+worksheet.write_column(14,0,model_names)
+for i in range(temp.shape[0]):
+    worksheet.write_row(i + 14,1,temp[i,:])
+
+#temp = np.full([7,75],np.nan)
+temp = np.zeros((7,75))
+
+for i in range(5):
+    if i ==0:
+        wind = 'aft_cue'
+    elif i == 1:
+        wind = 'bfr_res'
+    elif i == 2:
+        wind = 'aft_res'
+    elif i == 3:
+        wind = 'res_win'
+    elif i == 4:
+        wind = 'concat'
+
+    ct = i*15
+
+    temp[0,[0+ct,3+ct,6+ct]] = np.mean(data_dict_all['PmD_dicts']['models']['linear'][wind]['fit_params'],axis=0)
+    temp[0,[1+ct,4+ct,7+ct]] = np.max(data_dict_all['PmD_dicts']['models']['linear'][wind]['fit_params'],axis=0)
+    temp[0,[2+ct,5+ct,8+ct]] = np.min(data_dict_all['PmD_dicts']['models']['linear'][wind]['fit_params'],axis=0)
+
+    temp[1,[0+ct,3+ct]] = np.mean(data_dict_all['PmD_dicts']['models']['diff'][wind]['fit_params'],axis=0)
+    temp[1,[1+ct,4+ct]] = np.max(data_dict_all['PmD_dicts']['models']['diff'][wind]['fit_params'],axis=0)
+    temp[1,[2+ct,5+ct]] = np.min(data_dict_all['PmD_dicts']['models']['diff'][wind]['fit_params'],axis=0)
+
+    temp[2,[0+ct,3+ct,6+ct,9+ct,12+ct]] = np.mean(data_dict_all['PmD_dicts']['models']['div_nl'][wind]['fit_params'],axis=0)
+    temp[2,[1+ct,4+ct,7+ct,10+ct,13+ct]] = np.max(data_dict_all['PmD_dicts']['models']['div_nl'][wind]['fit_params'],axis=0)
+    temp[2,[2+ct,5+ct,8+ct,11+ct,14+ct]] = np.min(data_dict_all['PmD_dicts']['models']['div_nl'][wind]['fit_params'],axis=0)
+
+    temp[3,[0+ct,3+ct,6+ct,9+ct]] = np.mean(data_dict_all['PmD_dicts']['models']['div_nl_noe'][wind]['fit_params'],axis=0)
+    temp[3,[1+ct,4+ct,7+ct,10+ct]] = np.max(data_dict_all['PmD_dicts']['models']['div_nl_noe'][wind]['fit_params'],axis=0)
+    temp[3,[2+ct,5+ct,8+ct,11+ct]] = np.min(data_dict_all['PmD_dicts']['models']['div_nl_noe'][wind]['fit_params'],axis=0)
+
+    temp[4,[0+ct,3+ct,6+ct,9+ct]] = np.mean(data_dict_all['PmD_dicts']['models']['div_nl_Y'][wind]['fit_params'],axis=0)
+    temp[4,[1+ct,4+ct,7+ct,10+ct]] = np.max(data_dict_all['PmD_dicts']['models']['div_nl_Y'][wind]['fit_params'],axis=0)
+    temp[4,[2+ct,5+ct,8+ct,11+ct]] = np.min(data_dict_all['PmD_dicts']['models']['div_nl_Y'][wind]['fit_params'],axis=0)
+
+    temp[5,[0+ct,3+ct,6+ct,9+ct,12+ct]] = np.mean(data_dict_all['PmD_dicts']['models']['div_nl_separate_add'][wind]['fit_params'],axis=0)
+    temp[5,[1+ct,4+ct,7+ct,10+ct,13+ct]] = np.max(data_dict_all['PmD_dicts']['models']['div_nl_separate_add'][wind]['fit_params'],axis=0)
+    temp[5,[2+ct,5+ct,8+ct,11+ct,14+ct]] = np.min(data_dict_all['PmD_dicts']['models']['div_nl_separate_add'][wind]['fit_params'],axis=0)
+
+    temp[6,[0+ct,3+ct,6+ct,9+ct,12+ct]] = np.mean(data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply'][wind]['fit_params'],axis=0)
+    temp[6,[1+ct,4+ct,7+ct,10+ct,13+ct]] = np.max(data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply'][wind]['fit_params'],axis=0)
+    temp[6,[2+ct,5+ct,8+ct,11+ct,14+ct]] = np.min(data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply'][wind]['fit_params'],axis=0)
+
+worksheet.write(24,0,'PMd')
+worksheet.write(24,1,'aft_cue')
+worksheet.write_row(25,1,param_names)
+worksheet.write(24,17,'bfr_res')
+worksheet.write_row(25,17,param_names)
+worksheet.write(24,33,'aft_res')
+worksheet.write_row(25,33,param_names)
+worksheet.write(24,49,'res_win')
+worksheet.write_row(25,49,param_names)
+worksheet.write(24,61,'concat')
+worksheet.write_row(25,61,param_names)
+worksheet.write_column(26,0,model_names)
+for i in range(temp.shape[0]):
+    worksheet.write_row(i + 26,1,temp[i,:])
 
 
 
