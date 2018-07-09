@@ -72,7 +72,7 @@ def calc_firing_rates(hists,data_key,condensed):
         bfr_result_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
         aft_result_fr = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
         res_wind_fr = np.zeros((len(condensed),np.shape(hists)[0],res_wind_bins[1] - res_wind_bins[0]))
-        concat_fr = np.zeros((len(condensed),np.shape(hists)[0],2*bins_after + -1*bins_before))
+        concat_fr = np.zeros((len(condensed),np.shape(hists)[0],bins_after + -1*bins_before))
 
         bfr_cue_hist_all = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
         aft_cue_hist_all = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
@@ -99,8 +99,8 @@ def calc_firing_rates(hists,data_key,condensed):
                                 aft_result_fr[i,j,:] = hists[j,result_start_bin : result_start_bin + bins_after]
                                 res_wind_fr[i,j,:] = hists[j,result_start_bin + res_wind_bins[0] : result_start_bin + res_wind_bins[1]]
 
-                                #aft cue + bfr res + aft res
-                                concat_fr[i,j,:] = np.concatenate((hists[j,cue_start_bin : cue_start_bin + bins_after],hists[j,bins_before + result_start_bin : result_start_bin],hists[j,result_start_bin : result_start_bin + bins_after]))
+                                #bfr res + aft res
+                                concat_fr[i,j,:] = np.concatenate((hists[j,bins_before + result_start_bin : result_start_bin],hists[j,result_start_bin : result_start_bin + bins_after]))
 
                 else:
                         continue
