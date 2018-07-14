@@ -21,6 +21,7 @@ from scipy import ndimage
 from math import isinf
 import os
 from scipy.stats.stats import pearsonr
+from mpl_toolkits.mplot3d import Axes3D
 
 ########################
 # params to set ########
@@ -31,6 +32,8 @@ alt_bool = False
 uncued_bool = False
 
 sig_only_bool = False
+
+plot_bool = True
 
 bin_size = 10 #in ms
 time_before = -0.5 #negative value
@@ -146,6 +149,90 @@ def div_nl_separate_multiply_func(x,a,b,c,d,e):
         r,p = x
         return (a*r / (r + b)) * (c*p / (p + d)) + e
 
+def plot_fr_and_model(unit_num,fr_r_p,params,model_type,region_key,type_key):
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111,projection='3d')
+        
+        avg_frs = fr_r_p[:,0]
+        r_vals = fr_r_p[:,1]
+        p_vals = fr_r_p[:,2]
+
+        if 2 in r_vals:
+            r_range = [0,1,2,3]
+            p_range = [0,1,2,3]
+        else:
+            r_range = [0,3]
+            p_range = [0,3]
+
+        avg_avg = np.zeros((np.shape(r_range)[0]*np.shape(p_range)[0],3))
+        avg_std = np.zeros((np.shape(r_range)[0]*np.shape(p_range)[0],3))
+        ct = 0
+        for i in range(np.shape(r_range)[0]):
+            for j in range(np.shape(p_range)[0]):
+                r = r_range[i]
+                p = p_range[j]
+
+                temp = fr_r_p[np.logical_and(fr_r_p[:,1] == r,fr_r_p[:,2] == p),:]
+
+                avg_avg[ct,:] = [np.mean(temp,axis=0)[0],r,p]
+                avg_std[ct,:] = [np.mean(temp,axis=0)[0],r,p]
+
+                ct += 1
+
+        ax.scatter(avg_avg[:,1],avg_avg[:,2],avg_avg[:,0],c='purple',marker='o')
+        
+        pos_std = avg_avg + avg_std
+        neg_std = avg_avg - avg_std
+        
+        for i in range(np.shape(pos_std)[0]):
+            ax.plot([avg_avg[i,1],avg_avg[i,1]],[avg_avg[i,2],avg_avg[i,2]],[pos_std[i,0],neg_std[i,0]],marker='_',color='grey',linewidth=0.5)
+
+        x_linspace = np.linspace(np.min(r_vals)-1,np.max(r_vals)+1)
+        y_linspace = np.linspace(np.min(p_vals)-1,np.max(p_vals)+1)
+        x,y = np.meshgrid(x_linspace,y_linspace)
+        
+        if model_type == 'linear':
+            z = lin_func([x,y],params[0],params[1],params[2])
+        elif model_type == 'diff':
+            z = diff_func([x,y],params[0],params[1])
+        elif model_type == 'div_nl':
+            z = div_nl_func([x,y],params[0],params[1],params[2],params[3],params[4])
+        elif model_type == 'div_nl_noe':
+            z = div_nl_noe_func([x,y],params[0],params[1],params[2],params[3])
+        elif model_type == 'div_nl_Y':
+            z = div_nl_Y_func([x,y],params[0],params[1],params[2],params[3])
+        elif model_type == 'div_nl_separate_add':
+            z = div_nl_separate_add_func([x,y],params[0],params[1],params[2],params[3],params[4])
+        elif model_type == 'div_nl_separate_multiply':
+             z = div_nl_separate_multiply_func([x,y],params[0],params[1],params[2],params[3],params[4])
+
+        surf = ax.plot_surface(x, y, z,cmap='RdBu_r',alpha=0.4,linewidth=0)
+
+        plt.title('%s: %s, %s, unit %s' %(model_type,region_key,type_key,unit_num))
+
+        ax.set_xlabel('R value')
+        ax.set_ylabel('P value')
+        ax.set_zlabel('avg firing rate')
+
+        #flipping z axis to left
+        tmp_planes = ax.zaxis._PLANES
+        ax.zaxis._PLANES = ( tmp_planes[2], tmp_planes[3],
+                             tmp_planes[0], tmp_planes[1],
+                             tmp_planes[4], tmp_planes[5])
+        view_1 = (25,-135)
+        view_2 = (15,-55)
+        init_view = view_2
+        ax.view_init(*init_view)
+
+        ax.set_xlim(np.min(r_vals)-1,np.max(r_vals)+1)
+        ax.set_ylim(np.min(p_vals)-1,np.max(p_vals)+1)
+
+        plt.savefig('sig_plt_%s_%s_%s' %(region_key,type_key,str(unit_num).zfill(2)))
+        plt.clf()
+
+        return 
+
 ####################
 # models ###########
 ####################
@@ -162,7 +249,11 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
         ss_res_total = np.zeros((total_unit_num))
         sig_unit_length = 0
         num_units_no_fit = 0
-
+        p_val_total = np.zeros((total_unit_num))
+        F_val_total = np.zeros((total_unit_num))
+        r_sq_total = np.zeros((total_unit_num))
+        fr_r_p_list = []
+    
         for i in range(file_length):
             condensed = fr_data_dict[i][region_key]['condensed']
             avg_fr_data = avg_and_corr[type_key]['avg_fr_dict'][i]
@@ -202,9 +293,31 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
                 ss_res = np.sum(residuals**2)
                 k = num_params
                 AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
-                
+
+                ss_tot = np.sum((avg_frs-np.mean(avg_frs))**2)
+                r_sq = 1 - (ss_res / ss_tot)
+
+                ss_model = ss_tot - ss_res
+                n = np.shape(avg_frs)[0]
+                k = num_params #repeat for now
+                #degrees of freedom
+                df_total = n - 1
+                df_residual = n - k
+                df_model = k - 1
+
+                #mean squares
+                ms_residual = ss_res / float(df_residual)
+                ms_model = ss_model / float(df_model)
+
+                F_val = ms_model / ms_residual
+                p_val = 1.0 - stats.f.cdf(F_val,df_residual,df_model)
+
                 AIC_total[unit_ct] = AIC
                 ss_res_total[unit_ct] = ss_res
+                p_val_total[unit_ct] = p_val
+                F_val_total[unit_ct] = F_val
+                r_sq_total[unit_ct] = r_sq
+
                 unit_ct +=1
 
             if i == 0:
@@ -225,18 +338,38 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
         else:
             pdb.set_trace()
 
-        model_out = lin_func([r_vals,p_vals],params[0],params[1],params[2])
-        residuals = avg_frs - model_out
+        model_out_total = lin_func([r_flat_total,p_flat_total],params[0],params[1],params[2])
+        residuals = fr_flat_total - model_out_total
         ss_res = np.sum(residuals**2)
         k = num_params
         AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
         
         AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
 
-        print '%s linear overall AIC %s' %(type_key,AIC_overall)
+        #print '%s linear overall AIC %s' %(type_key,AIC_overall)
 
+        num_sig_fit = np.sum(p_val_total < 0.05)
+        if num_sig_fit > 0:
+            AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
+            AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
+
+            for i in range(num_sig_fit):
+                sig_units = np.where((p_val_total < 0.05))
+                unit = sig_units[0][i]
+            
+                if unit < unit_ct:
+                    if plot_bool:
+                        plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'linear',region_key,type_key)
+
+        else:
+            AIC_sig_model = 1000
+            AIC_sig_avg = 1000
+
+        #this will give different values though depending on number of sig fits. That ok?
+        #Or calc AICs for each unit then average? What's kosher
+        
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit}
 
         return(return_dict)
 
@@ -252,6 +385,11 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
         ss_res_total = np.zeros((total_unit_num))
         sig_unit_length = 0
         num_units_no_fit = 0
+        p_val_total = np.zeros((total_unit_num))
+        F_val_total = np.zeros((total_unit_num))
+        r_sq_total = np.zeros((total_unit_num))
+        fr_r_p_list = []
+
 
         for i in range(file_length):
             condensed = fr_data_dict[i][region_key]['condensed']
@@ -293,8 +431,30 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
                 k = num_params
                 AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
                 
+                ss_tot = np.sum((avg_frs-np.mean(avg_frs))**2)
+                r_sq = 1 - (ss_res / ss_tot)
+
+                ss_model = ss_tot - ss_res
+                n = np.shape(avg_frs)[0]
+                k = num_params #repeat for now
+                #degrees of freedom
+                df_total = n - 1
+                df_residual = n - k
+                df_model = k - 1
+
+                #mean squares
+                ms_residual = ss_res / float(df_residual)
+                ms_model = ss_model / float(df_model)
+
+                F_val = ms_model / ms_residual
+                p_val = 1.0 - stats.f.cdf(F_val,df_residual,df_model)
+
                 AIC_total[unit_ct] = AIC
                 ss_res_total[unit_ct] = ss_res
+                p_val_total[unit_ct] = p_val
+                F_val_total[unit_ct] = F_val
+                r_sq_total[unit_ct] = r_sq
+
                 unit_ct +=1
 
             if i == 0:
@@ -315,18 +475,36 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
         else:
             pdb.set_trace()
 
-        model_out = diff_func([r_vals,p_vals],params[0],params[1])
-        residuals = avg_frs - model_out
+        model_out_total = div_diff_func([r_flat_total,p_flat_total],params[0],params[1])
+        residuals = fr_flat_total - model_out_total
         ss_res = np.sum(residuals**2)
         k = num_params
         AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
         
         AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
 
-        print '%s diff overall AIC %s' %(type_key,AIC_overall)
+        #print '%s diff overall AIC %s' %(type_key,AIC_overall)
+
+        num_sig_fit = np.sum(p_val_total < 0.05)
+
+        if num_sig_fit > 0:
+            AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
+            AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
+
+            for i in range(num_sig_fit):
+                sig_units = np.where((p_val_total < 0.05))
+                unit = sig_units[0][i]
+            
+                if unit < unit_ct:
+                    if plot_bool:
+                        plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'diff',region_key,type_key)
+
+        else:
+            AIC_sig_model = 1000
+            AIC_sig_avg = 1000
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit}
                 
         return(return_dict)
 
@@ -342,6 +520,10 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr)
         ss_res_total = np.zeros((total_unit_num))
         sig_unit_length = 0
         num_units_no_fit = 0
+        p_val_total = np.zeros((total_unit_num))
+        F_val_total = np.zeros((total_unit_num))
+        r_sq_total = np.zeros((total_unit_num))
+        fr_r_p_list = []
 
         for i in range(file_length):
             condensed = fr_data_dict[i][region_key]['condensed']
@@ -371,6 +553,7 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr)
                         AIC_total[unit_ct] = 1000
                         ss_res_total[unit_ct] = 1000
                         num_units_no_fit += 1
+                        fr_r_p_list.append(np.array((0,0,0)))
 
                         #print 'failure to fit div nl %s %s unit %s' %(region_key,type_key,unit_num)
                         continue
@@ -392,8 +575,33 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr)
                 k = num_params
                 AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
                 
+                ss_tot = np.sum((avg_frs-np.mean(avg_frs))**2)
+                r_sq = 1 - (ss_res / ss_tot)
+
+                ss_model = ss_tot - ss_res
+                n = np.shape(avg_frs)[0]
+                k = num_params #repeat for now
+                #degrees of freedom
+                df_total = n - 1
+                df_residual = n - k
+                df_model = k - 1
+
+                #mean squares
+                ms_residual = ss_res / float(df_residual)
+                ms_model = ss_model / float(df_model)
+
+                F_val = ms_model / ms_residual
+                p_val = 1.0 - stats.f.cdf(F_val,df_residual,df_model)
+
                 AIC_total[unit_ct] = AIC
                 ss_res_total[unit_ct] = ss_res
+                p_val_total[unit_ct] = p_val
+                F_val_total[unit_ct] = F_val
+                r_sq_total[unit_ct] = r_sq
+                
+                #here add summation array: avg fr, r, and p, by unit
+                fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
+ 
                 unit_ct +=1
 
             if i == 0:
@@ -413,19 +621,39 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr)
             perr = float('nan')
         else:
             pdb.set_trace()
-
-        model_out = div_nl_func([r_vals,p_vals],params[0],params[1],params[2],params[3],params[4])
-        residuals = avg_frs - model_out
+            
+        #########
+        #CHANGE ALL fixed
+        model_out_total = div_nl_func([r_flat_total,p_flat_total],params[0],params[1],params[2],params[3],params[4])
+        residuals = fr_flat_total - model_out_total
         ss_res = np.sum(residuals**2)
         k = num_params
         AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
         
         AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
 
-        print '%s div nl overall AIC %s' %(type_key,AIC_overall)
+        #print '%s div nl overall AIC %s' %(type_key,AIC_overall)
+
+        num_sig_fit = np.sum(p_val_total < 0.05)
+        if num_sig_fit > 0:
+            AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
+            AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
+
+            for i in range(num_sig_fit):
+                sig_units = np.where((p_val_total < 0.05))
+                unit = sig_units[0][i]
+            
+                if unit < unit_ct:
+                    if plot_bool:
+                        plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'div_nl',region_key,type_key)
+
+        else:
+            AIC_sig_model = 1000
+            AIC_sig_avg = 1000
+
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit}
                 
         return(return_dict)
 
@@ -441,6 +669,10 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
         ss_res_total = np.zeros((total_unit_num))
         sig_unit_length = 0
         num_units_no_fit = 0
+        p_val_total = np.zeros((total_unit_num))
+        F_val_total = np.zeros((total_unit_num))
+        r_sq_total = np.zeros((total_unit_num))
+        fr_r_p_list = []
 
         for i in range(file_length):
             condensed = fr_data_dict[i][region_key]['condensed']
@@ -470,6 +702,7 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
                         AIC_total[unit_ct] = 1000
                         ss_res_total[unit_ct] = 1000
                         num_units_no_fit += 1
+                        fr_r_p_list.append(np.array((0,0,0)))
 
                         #print 'failure to fit div nl noe %s %s unit %s' %(region_key,type_key,unit_num)
                         continue
@@ -491,8 +724,30 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
                 k = num_params
                 AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
                 
+                ss_tot = np.sum((avg_frs-np.mean(avg_frs))**2)
+                r_sq = 1 - (ss_res / ss_tot)
+
+                ss_model = ss_tot - ss_res
+                n = np.shape(avg_frs)[0]
+                k = num_params #repeat for now
+                #degrees of freedom
+                df_total = n - 1
+                df_residual = n - k
+                df_model = k - 1
+
+                #mean squares
+                ms_residual = ss_res / float(df_residual)
+                ms_model = ss_model / float(df_model)
+
+                F_val = ms_model / ms_residual
+                p_val = 1.0 - stats.f.cdf(F_val,df_residual,df_model)
+
                 AIC_total[unit_ct] = AIC
                 ss_res_total[unit_ct] = ss_res
+                p_val_total[unit_ct] = p_val
+                F_val_total[unit_ct] = F_val
+                r_sq_total[unit_ct] = r_sq
+
                 unit_ct +=1
 
             if i == 0:
@@ -513,18 +768,36 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
         else:
             pdb.set_trace()
 
-        model_out = div_nl_noe_func([r_vals,p_vals],params[0],params[1],params[2],params[3])
-        residuals = avg_frs - model_out
+        model_out_total = div_nl_noe_func([r_flat_total,p_flat_total],params[0],params[1],params[2],params[3])
+        residuals = fr_flat_total - model_out_total
         ss_res = np.sum(residuals**2)
         k = num_params
         AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
         
         AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
 
-        print '%s div_nl_noe overall AIC %s' %(type_key,AIC_overall)
+        #print '%s div_nl_noe overall AIC %s' %(type_key,AIC_overall)
+
+        num_sig_fit = np.sum(p_val_total < 0.05)
+        if num_sig_fit > 0:
+            AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
+            AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
+
+            for i in range(num_sig_fit):
+                sig_units = np.where((p_val_total < 0.05))
+                unit = sig_units[0][i]
+            
+                if unit < unit_ct:
+                    if plot_bool:
+                        plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'div_nl_noe',region_key,type_key)
+
+        else:
+            AIC_sig_model = 1000
+            AIC_sig_avg = 1000
+
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit}
                 
         return(return_dict)
 
@@ -540,6 +813,10 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
         ss_res_total = np.zeros((total_unit_num))
         sig_unit_length = 0
         num_units_no_fit = 0
+        p_val_total = np.zeros((total_unit_num))
+        F_val_total = np.zeros((total_unit_num))
+        r_sq_total = np.zeros((total_unit_num))
+        fr_r_p_list = []
 
         for i in range(file_length):
             condensed = fr_data_dict[i][region_key]['condensed']
@@ -568,6 +845,7 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
                         #fake very high values
                         AIC_total[unit_ct] = 1000
                         ss_res_total[unit_ct] = 1000
+                        fr_r_p_list.append(np.array((0,0,0)))
 
                         num_units_no_fit += 1
                         #print 'failure to fit Y nl %s %s unit %s' %(region_key,type_key,unit_num)
@@ -590,8 +868,30 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
                 k = num_params
                 AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
                 
+                ss_tot = np.sum((avg_frs-np.mean(avg_frs))**2)
+                r_sq = 1 - (ss_res / ss_tot)
+
+                ss_model = ss_tot - ss_res
+                n = np.shape(avg_frs)[0]
+                k = num_params #repeat for now
+                #degrees of freedom
+                df_total = n - 1
+                df_residual = n - k
+                df_model = k - 1
+
+                #mean squares
+                ms_residual = ss_res / float(df_residual)
+                ms_model = ss_model / float(df_model)
+
+                F_val = ms_model / ms_residual
+                p_val = 1.0 - stats.f.cdf(F_val,df_residual,df_model)
+
                 AIC_total[unit_ct] = AIC
                 ss_res_total[unit_ct] = ss_res
+                p_val_total[unit_ct] = p_val
+                F_val_total[unit_ct] = F_val
+                r_sq_total[unit_ct] = r_sq
+
                 unit_ct +=1
 
             if i == 0:
@@ -619,18 +919,36 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
         else:
             pdb.set_trace()
 
-        model_out = div_nl_Y_func([r_vals,p_vals],params[0],params[1],params[2],params[3])
-        residuals = avg_frs - model_out
+        model_out_total = div_nl_Y_func([r_flat_total,p_flat_total],params[0],params[1],params[2],params[3])
+        residuals = fr_flat_total - model_out_total
         ss_res = np.sum(residuals**2)
         k = num_params
         AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
         
         AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
 
-        print '%s div nl Y overall AIC %s' %(type_key,AIC_overall)
+        #print '%s div nl Y overall AIC %s' %(type_key,AIC_overall)
+
+        num_sig_fit = np.sum(p_val_total < 0.05)
+        if num_sig_fit > 0:
+            AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
+            AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
+
+            for i in range(num_sig_fit):
+                sig_units = np.where((p_val_total < 0.05))
+                unit = sig_units[0][i]
+            
+                if unit < unit_ct:
+                    if plot_bool:
+                        plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'div_nl_Y',region_key,type_key)
+
+        else:
+            AIC_sig_model = 1000
+            AIC_sig_avg = 1000
+
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit}
                 
         return(return_dict)
 
@@ -646,6 +964,10 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
         ss_res_total = np.zeros((total_unit_num))
         sig_unit_length = 0
         num_units_no_fit = 0
+        p_val_total = np.zeros((total_unit_num))
+        F_val_total = np.zeros((total_unit_num))
+        r_sq_total = np.zeros((total_unit_num))
+        fr_r_p_list = []
 
         for i in range(file_length):
             condensed = fr_data_dict[i][region_key]['condensed']
@@ -672,6 +994,7 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
                 except:
                         AIC_total[unit_ct] = 1000
                         ss_res_total[unit_ct] = 1000
+                        fr_r_p_list.append(np.array((0,0,0)))
 
                         num_units_no_fit += 1
                         #print 'failure to fit separate add nl %s %s unit %s' %(region_key,type_key,unit_num)
@@ -694,8 +1017,30 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
                 k = num_params
                 AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
                 
+                ss_tot = np.sum((avg_frs-np.mean(avg_frs))**2)
+                r_sq = 1 - (ss_res / ss_tot)
+
+                ss_model = ss_tot - ss_res
+                n = np.shape(avg_frs)[0]
+                k = num_params #repeat for now
+                #degrees of freedom
+                df_total = n - 1
+                df_residual = n - k
+                df_model = k - 1
+
+                #mean squares
+                ms_residual = ss_res / float(df_residual)
+                ms_model = ss_model / float(df_model)
+
+                F_val = ms_model / ms_residual
+                p_val = 1.0 - stats.f.cdf(F_val,df_residual,df_model)
+
                 AIC_total[unit_ct] = AIC
                 ss_res_total[unit_ct] = ss_res
+                p_val_total[unit_ct] = p_val
+                F_val_total[unit_ct] = F_val
+                r_sq_total[unit_ct] = r_sq
+
                 unit_ct +=1
 
             if i == 0:
@@ -716,18 +1061,36 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
         else:
             pdb.set_trace()
 
-        model_out = div_nl_separate_add_func([r_vals,p_vals],params[0],params[1],params[2],params[3],params[4])
-        residuals = avg_frs - model_out
+        model_out_total = div_nl_separate_add_func([r_flat_total,p_flat_total],params[0],params[1],params[2],params[3],params[4])
+        residuals = fr_flat_total - model_out_total
         ss_res = np.sum(residuals**2)
         k = num_params
         AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
         
         AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
 
-        print '%s div nl separate add overall AIC %s' %(type_key,AIC_overall)
+        #print '%s div nl separate add overall AIC %s' %(type_key,AIC_overall)
+
+        num_sig_fit = np.sum(p_val_total < 0.05)
+        if num_sig_fit > 0:
+            AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
+            AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
+
+            for i in range(num_sig_fit):
+                sig_units = np.where((p_val_total < 0.05))
+                unit = sig_units[0][i]
+            
+                if unit < unit_ct:
+                    if plot_bool:
+                        plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'div_nl_separate_add',region_key,type_key)
+
+        else:
+            AIC_sig_model = 1000
+            AIC_sig_avg = 1000
+
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit}
                 
         return(return_dict)
 
@@ -743,6 +1106,10 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
         ss_res_total = np.zeros((total_unit_num))
         sig_unit_length = 0
         num_units_no_fit = 0
+        p_val_total = np.zeros((total_unit_num))
+        F_val_total = np.zeros((total_unit_num))
+        r_sq_total = np.zeros((total_unit_num))
+        fr_r_p_list = []
 
         for i in range(file_length):
             fr_data = fr_data_dict[i][region_key][type_key]
@@ -776,6 +1143,7 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
                 except:
                         AIC_total[unit_num] = 1000
                         ss_res_total[unit_num] = 1000
+                        fr_r_p_list.append(np.array((0,0,0)))
 
                         num_units_no_fit += 1
                         #print 'failure to fit separate mult nl %s %s unit %s' %(region_key,type_key,unit_num)
@@ -798,8 +1166,30 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
                 k = num_params
                 AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
                 
+                ss_tot = np.sum((avg_frs-np.mean(avg_frs))**2)
+                r_sq = 1 - (ss_res / ss_tot)
+
+                ss_model = ss_tot - ss_res
+                n = np.shape(avg_frs)[0]
+                k = num_params #repeat for now
+                #degrees of freedom
+                df_total = n - 1
+                df_residual = n - k
+                df_model = k - 1
+
+                #mean squares
+                ms_residual = ss_res / float(df_residual)
+                ms_model = ss_model / float(df_model)
+
+                F_val = ms_model / ms_residual
+                p_val = 1.0 - stats.f.cdf(F_val,df_residual,df_model)
+
                 AIC_total[unit_ct] = AIC
                 ss_res_total[unit_ct] = ss_res
+                p_val_total[unit_ct] = p_val
+                F_val_total[unit_ct] = F_val
+                r_sq_total[unit_ct] = r_sq
+
                 unit_ct +=1
 
             if i == 0:
@@ -820,18 +1210,36 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
         else:
             pdb.set_trace()
 
-        model_out = div_nl_separate_multiply_func([r_vals,p_vals],params[0],params[1],params[2],params[3],params[4])
-        residuals = avg_frs - model_out
+        model_out_total = div_nl_separate_multiply([r_flat_total,p_flat_total],params[0],params[1],params[2],params[3],params[4])
+        residuals = fr_flat_total - model_out_total
         ss_res = np.sum(residuals**2)
         k = num_params
         AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
         
         AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
 
-        print '%s div nl separate multiply overall AIC %s' %(type_key,AIC_overall)
+        #print '%s div nl separate multiply overall AIC %s' %(type_key,AIC_overall)
+        
+        num_sig_fit = np.sum(p_val_total < 0.05)
+        if num_sig_fit > 0:
+            AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
+            AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
+
+            for i in range(num_sig_fit):
+                sig_units = np.where((p_val_total < 0.05))
+                unit = sig_units[0][i]
+            
+                if unit < unit_ct:
+                    if plot_bool:
+                        plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'div_nl_separate_multipy',region_key,type_key)
+
+        else:
+            AIC_sig_model = 1000
+            AIC_sig_avg = 1000
+
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit}
                 
         return(return_dict)
 
@@ -1331,6 +1739,125 @@ for i in range(np.shape(no_fit)[0]):
     worksheet.write_row(i+15,1,no_fit[i,:])
 worksheet.write(14,8,'total units')
 worksheet.write_column(15,8,total_units)
+
+#################
+worksheet = aic_workbook.add_worksheet('AIC_averaged_over_sig')
+
+lin_aics = [data_dict_all['M1_dicts']['models']['linear']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['linear']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['linear']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['linear']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['linear']['concat']['AIC_sig_avg']]
+diff_aics = [data_dict_all['M1_dicts']['models']['diff']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['diff']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['diff']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['diff']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['diff']['concat']['AIC_sig_avg']]
+div_nl_aics = [data_dict_all['M1_dicts']['models']['div_nl']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl']['concat']['AIC_sig_avg']]
+div_nl_noe_aics = [data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['concat']['AIC_sig_avg']]
+div_nl_Y_aics = [data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['concat']['AIC_sig_avg']]
+div_nl_separate_add_aics = [data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['concat']['AIC_sig_avg']]
+div_nl_separate_multiply_aics = [data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_sig_avg']]
+
+lin_num_sig = [data_dict_all['M1_dicts']['models']['linear']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['linear']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['linear']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['linear']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['linear']['concat']['num_sig_fit']]
+diff_num_sig = [data_dict_all['M1_dicts']['models']['diff']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['diff']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['diff']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['diff']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['diff']['concat']['num_sig_fit']]
+div_nl_num_sig = [data_dict_all['M1_dicts']['models']['div_nl']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl']['concat']['num_sig_fit']]
+div_nl_noe_num_sig = [data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_noe']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_noe']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_noe']['concat']['num_sig_fit']]
+div_nl_Y_num_sig = [data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_Y']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_Y']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_Y']['concat']['num_sig_fit']]
+div_nl_separate_add_num_sig = [data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['concat']['num_sig_fit']]
+div_nl_separate_multiply_num_sig = [data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['concat']['num_sig_fit']]
+
+worksheet.write(0,0,'M1')
+worksheet.write_row(0,1,type_names)
+worksheet.write_row(1,1,lin_aics)
+worksheet.write_row(2,1,diff_aics)
+worksheet.write_row(3,1,div_nl_aics)
+worksheet.write_row(4,1,div_nl_noe_aics)
+worksheet.write_row(5,1,div_nl_Y_aics)
+worksheet.write_row(6,1,div_nl_separate_add_aics)
+worksheet.write_row(7,1,div_nl_separate_multiply_aics)
+worksheet.write_column(1,0,model_names)
+
+worksheet.write(0,6,'num sig')
+worksheet.write_row(0,7,type_names)
+worksheet.write_row(1,7,lin_num_sig)
+worksheet.write_row(2,7,diff_num_sig)
+worksheet.write_row(3,7,div_nl_num_sig)
+worksheet.write_row(4,7,div_nl_noe_num_sig)
+worksheet.write_row(5,7,div_nl_Y_num_sig)
+worksheet.write_row(6,7,div_nl_separate_add_num_sig)
+worksheet.write_row(7,7,div_nl_separate_multiply_num_sig)
+#worksheet.write_column(1,6,model_names)
+
+worksheet.conditional_format('B2:B8', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('C2:C8', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('D2:D8', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('E2:E8', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('F2:F8', {'type': 'bottom', 'value':'1', 'format':format1})
+
+lin_aics = [data_dict_all['S1_dicts']['models']['linear']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['linear']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['linear']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['linear']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['linear']['concat']['AIC_sig_avg']]
+diff_aics = [data_dict_all['S1_dicts']['models']['diff']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['diff']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['diff']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['diff']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['diff']['concat']['AIC_sig_avg']]
+div_nl_aics = [data_dict_all['S1_dicts']['models']['div_nl']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl']['concat']['AIC_sig_avg']]
+div_nl_noe_aics = [data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['concat']['AIC_sig_avg']]
+div_nl_Y_aics = [data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['concat']['AIC_sig_avg']]
+div_nl_separate_add_aics = [data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['concat']['AIC_sig_avg']]
+div_nl_separate_multiply_aics = [data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_sig_avg']]
+
+lin_num_sig = [data_dict_all['S1_dicts']['models']['linear']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['linear']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['linear']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['linear']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['linear']['concat']['num_sig_fit']]
+diff_num_sig = [data_dict_all['S1_dicts']['models']['diff']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['diff']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['diff']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['diff']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['diff']['concat']['num_sig_fit']]
+div_nl_num_sig = [data_dict_all['S1_dicts']['models']['div_nl']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl']['concat']['num_sig_fit']]
+div_nl_noe_num_sig = [data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_noe']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_noe']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_noe']['concat']['num_sig_fit']]
+div_nl_Y_num_sig = [data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_Y']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_Y']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_Y']['concat']['num_sig_fit']]
+div_nl_separate_add_num_sig = [data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['concat']['num_sig_fit']]
+div_nl_separate_multiply_num_sig = [data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['concat']['num_sig_fit']]
+
+worksheet.write(12,0,'S1')
+worksheet.write_row(12,1,type_names)
+worksheet.write_row(13,1,lin_aics)
+worksheet.write_row(14,1,diff_aics)
+worksheet.write_row(15,1,div_nl_aics)
+worksheet.write_row(16,1,div_nl_noe_aics)
+worksheet.write_row(17,1,div_nl_Y_aics)
+worksheet.write_row(18,1,div_nl_separate_add_aics)
+worksheet.write_row(19,1,div_nl_separate_multiply_aics)
+worksheet.write_column(13,0,model_names)
+
+worksheet.conditional_format('B14:B20', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('C14:C20', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('D14:D20', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('E14:E20', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('F14:F20', {'type': 'bottom', 'value':'1', 'format':format1})
+
+lin_aics = [data_dict_all['PmD_dicts']['models']['linear']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['linear']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['linear']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['linear']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['linear']['concat']['AIC_sig_avg']]
+diff_aics = [data_dict_all['PmD_dicts']['models']['diff']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['diff']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['diff']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['diff']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['diff']['concat']['AIC_sig_avg']]
+div_nl_aics = [data_dict_all['PmD_dicts']['models']['div_nl']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['concat']['AIC_sig_avg']]
+div_nl_noe_aics = [data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['concat']['AIC_sig_avg']]
+div_nl_Y_aics = [data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['concat']['AIC_sig_avg']]
+div_nl_separate_add_aics = [data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['concat']['AIC_sig_avg']]
+div_nl_separate_multiply_aics = [data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_sig_avg']]
+
+lin_num_sig = [data_dict_all['PmD_dicts']['models']['linear']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['linear']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['linear']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['linear']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['linear']['concat']['num_sig_fit']]
+diff_num_sig = [data_dict_all['PmD_dicts']['models']['diff']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['diff']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['diff']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['diff']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['diff']['concat']['num_sig_fit']]
+div_nl_num_sig = [data_dict_all['PmD_dicts']['models']['div_nl']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl']['concat']['num_sig_fit']]
+div_nl_noe_num_sig = [data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['concat']['num_sig_fit']]
+div_nl_Y_num_sig = [data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['concat']['num_sig_fit']]
+div_nl_separate_add_num_sig = [data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['concat']['num_sig_fit']]
+div_nl_separate_multiply_num_sig = [data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['concat']['num_sig_fit']]
+
+
+worksheet.write(24,0,'PMd')
+worksheet.write_row(24,1,type_names)
+worksheet.write_row(25,1,lin_aics)
+worksheet.write_row(26,1,diff_aics)
+worksheet.write_row(27,1,div_nl_aics)
+worksheet.write_row(28,1,div_nl_noe_aics)
+worksheet.write_row(29,1,div_nl_Y_aics)
+worksheet.write_row(30,1,div_nl_separate_add_aics)
+worksheet.write_row(31,1,div_nl_separate_multiply_aics)
+worksheet.write_column(25,0,model_names)
+
+worksheet.conditional_format('B26:B32', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('C26:C32', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('D26:D32', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('E26:E32', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('F26:F32', {'type': 'bottom', 'value':'1', 'format':format1})
+
+
+
+
+
 
 
 ###########
