@@ -188,8 +188,11 @@ def plot_fr_and_model(unit_num,fr_r_p,params,model_type,region_key,type_key):
         for i in range(np.shape(pos_std)[0]):
             ax.plot([avg_avg[i,1],avg_avg[i,1]],[avg_avg[i,2],avg_avg[i,2]],[pos_std[i,0],neg_std[i,0]],marker='_',color='grey',linewidth=0.5)
 
-        x_linspace = np.linspace(np.min(r_vals)-1,np.max(r_vals)+1)
-        y_linspace = np.linspace(np.min(p_vals)-1,np.max(p_vals)+1)
+        #x_linspace = np.linspace(np.min(r_vals)-1,np.max(r_vals)+1)
+        #y_linspace = np.linspace(np.min(p_vals)-1,np.max(p_vals)+1)
+        x_linspace = np.linspace(np.min(r_vals),np.max(r_vals))
+        y_linspace = np.linspace(np.min(p_vals),np.max(p_vals))
+
         x,y = np.meshgrid(x_linspace,y_linspace)
         
         if model_type == 'linear':
@@ -213,7 +216,7 @@ def plot_fr_and_model(unit_num,fr_r_p,params,model_type,region_key,type_key):
 
         ax.set_xlabel('R value')
         ax.set_ylabel('P value')
-        ax.set_zlabel('avg firing rate')
+        ax.set_zlabel('avg z-score firing rate')
 
         #flipping z axis to left
         tmp_planes = ax.zaxis._PLANES
@@ -228,7 +231,7 @@ def plot_fr_and_model(unit_num,fr_r_p,params,model_type,region_key,type_key):
         ax.set_xlim(np.min(r_vals)-1,np.max(r_vals)+1)
         ax.set_ylim(np.min(p_vals)-1,np.max(p_vals)+1)
 
-        plt.savefig('sig_plt_%s_%s_%s' %(region_key,type_key,str(unit_num).zfill(2)))
+        plt.savefig('sig_plt_%s_%s_%s_%s' %(model_type,region_key,type_key,str(unit_num).zfill(2)))
         plt.clf()
 
         return 
@@ -361,11 +364,12 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
                 unit = sig_units[0][i]
             
                 if unit < unit_ct:
-                    try:
-                        if plot_bool:
+                    if plot_bool:
+                        try:
                             plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'linear',region_key,type_key)
-                    except:
-                        pdb.set_trace()
+                        except:
+                            pdb.set_trace()
+
         else:
             AIC_sig_model = 1000
             AIC_sig_avg = 1000
@@ -769,7 +773,6 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
 
                 #here add summation array: avg fr, r, and p, by unit
                 fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
-                
                 unit_ct +=1
 
             if i == 0:
@@ -839,6 +842,8 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
         F_val_total = np.zeros((total_unit_num))
         r_sq_total = np.zeros((total_unit_num))
         fr_r_p_list = []
+        err_ct = 0
+        #err_bool = False
 
         for i in range(file_length):
             condensed = fr_data_dict[i][region_key]['condensed']
@@ -862,30 +867,30 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
         
                 # model = a*(r + b*P) / (c + r + b * p) + d
                 try:
-                        params,covs = curve_fit(div_nl_Y_func,[r_vals,p_vals],avg_frs)
+                    params,covs = curve_fit(div_nl_Y_func,[r_vals,p_vals],avg_frs)
                 except:
-                        #fake very high values
-                        AIC_total[unit_ct] = 1000
-                        ss_res_total[unit_ct] = 1000
-                        fr_r_p_list.append(np.array((0,0,0)))
+                    #fake very high values
+                    AIC_total[unit_ct] = 1000
+                    ss_res_total[unit_ct] = 1000
+                    fr_r_p_list.append(None)
+                    err_ct +=1
+                    
+                    num_units_no_fit += 1
+                    
+                    p_val_total[unit_ct] = 1
+                    F_val_total[unit_ct] = 1000
+                    r_sq_total[unit_ct] = 1000                    
+                    unit_ct +=1
+                    #print 'failure to fit Y nl %s %s unit %s' %(region_key,type_key,unit_num)
+                    continue
 
-                        num_units_no_fit += 1
-
-                        p_val_total[unit_ct] = 1
-                        F_val_total[unit_ct] = 1000
-                        r_sq_total[unit_ct] = 1000
-
-                        unit_ct += 1
-                        #print 'failure to fit Y nl %s %s unit %s' %(region_key,type_key,unit_num)
-                        continue
-                
                 if np.size(covs) > 1:
-                        perr = np.sqrt(np.diag(covs))
+                    perr = np.sqrt(np.diag(covs))
                 elif isinf(covs):
-                        perr = float('nan')
+                    perr = float('nan')
                 else:
-                        pdb.set_trace()
-
+                    pdb.set_trace()
+                
                 fit_params[unit_ct,:] = params
                 cov_total[unit_ct,:,:] = covs
                 perr_total[unit_ct,:] = perr
@@ -913,20 +918,18 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
 
                 F_val = ms_model / ms_residual
                 p_val = 1.0 - stats.f.cdf(F_val,df_residual,df_model)
-
-                try:
-                    AIC_total[unit_ct] = AIC
-                    ss_res_total[unit_ct] = ss_res
-                    p_val_total[unit_ct] = p_val
-                    F_val_total[unit_ct] = F_val
-                    r_sq_total[unit_ct] = r_sq
-                except:
-                    pdb.set_trace()
-                    
+                
+                AIC_total[unit_ct] = AIC
+                ss_res_total[unit_ct] = ss_res
+                p_val_total[unit_ct] = p_val
+                F_val_total[unit_ct] = F_val
+                r_sq_total[unit_ct] = r_sq
+                
                 #here add summation array: avg fr, r, and p, by unit
                 fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
 
                 unit_ct +=1
+                #err_bool = False
 
             if i == 0:
                 r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
@@ -938,12 +941,12 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
                 fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
 
         try:
-                params,covs = curve_fit(div_nl_Y_func,[r_flat_total,p_flat_total],fr_flat_total)
+            params,covs = curve_fit(div_nl_Y_func,[r_flat_total,p_flat_total],fr_flat_total)
         except:
-                print 'failure to fit div nl Y on all data %s %s' %(region_key,type_key)
+            print 'failure to fit div nl Y on all data %s %s' %(region_key,type_key)
 
-                combined_dict = {'params':0,'covs':0,'perr':0,'ss_res':0,'AIC':0}        
-                return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_combined':0,'ss_res_total':ss_res_total,'combined':combined_dict,'AIC_overall':0}
+            combined_dict = {'params':0,'covs':0,'perr':0,'ss_res':0,'AIC':0}        
+            return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_combined':0,'ss_res_total':ss_res_total,'combined':combined_dict,'AIC_overall':0}
 
 
         if np.size(covs) > 1:
@@ -974,8 +977,10 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
             
                 if unit < unit_ct:
                     if plot_bool:
-                        plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'div_nl_Y',region_key,type_key)
-
+                        try:
+                            plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'div_nl_Y',region_key,type_key)
+                        except:
+                            pdb.set_trace()
         else:
             AIC_sig_model = 1000
             AIC_sig_avg = 1000
@@ -1024,20 +1029,20 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
                 avg_frs = avg_fr_data[:,unit_num]
                 
                 try:
-                        params,covs = curve_fit(div_nl_separate_add_func,[r_vals,p_vals],avg_frs)
+                    params,covs = curve_fit(div_nl_separate_add_func,[r_vals,p_vals],avg_frs)
                 except:
-                        AIC_total[unit_ct] = 1000
-                        ss_res_total[unit_ct] = 1000
-                        fr_r_p_list.append(np.array((0,0,0)))
+                    AIC_total[unit_ct] = 1000
+                    ss_res_total[unit_ct] = 1000
+                    fr_r_p_list.append(np.array((0,0,0)))
+                    
+                    num_units_no_fit += 1
 
-                        num_units_no_fit += 1
-                        p_val_total[unit_ct] = 1
-                        F_val_total[unit_ct] = 1000
-                        r_sq_total[unit_ct] = 1000
-
-                        unit_ct += 1
-                        #print 'failure to fit separate add nl %s %s unit %s' %(region_key,type_key,unit_num)
-                        continue
+                    p_val_total[unit_ct] = 1
+                    F_val_total[unit_ct] = 1000
+                    r_sq_total[unit_ct] = 1000                    
+                    unit_ct +=1
+                    #print 'failure to fit separate add nl %s %s unit %s' %(region_key,type_key,unit_num)
+                    continue
 
                 if np.size(covs) > 1:
                         perr = np.sqrt(np.diag(covs))
@@ -1181,20 +1186,20 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
                 avg_frs = avg_fr_data[:,unit_num]
 
                 try:
-                        params,covs = curve_fit(div_nl_separate_multiply_func,[r_vals,p_vals],avg_frs)
+                    params,covs = curve_fit(div_nl_separate_multiply_func,[r_vals,p_vals],avg_frs)
                 except:
-                        AIC_total[unit_num] = 1000
-                        ss_res_total[unit_num] = 1000
-                        fr_r_p_list.append(np.array((0,0,0)))
+                    AIC_total[unit_num] = 1000
+                    ss_res_total[unit_num] = 1000
+                    fr_r_p_list.append(np.array((0,0,0)))
 
-                        num_units_no_fit += 1
-                        p_val_total[unit_ct] = 1
-                        F_val_total[unit_ct] = 1000
-                        r_sq_total[unit_ct] = 1000
-
-                        unit_ct += 1
-                        #print 'failure to fit separate mult nl %s %s unit %s' %(region_key,type_key,unit_num)
-                        continue
+                    num_units_no_fit += 1
+                    p_val_total[unit_ct] = 1
+                    F_val_total[unit_ct] = 1000
+                    r_sq_total[unit_ct] = 1000                    
+                    unit_ct +=1
+                   
+                    #print 'failure to fit separate mult nl %s %s unit %s' %(region_key,type_key,unit_num)
+                    continue
 
                 if np.size(covs) > 1:
                         perr = np.sqrt(np.diag(covs))
@@ -1260,7 +1265,7 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
         else:
             pdb.set_trace()
 
-        model_out_total = div_nl_separate_multiply([r_flat_total,p_flat_total],params[0],params[1],params[2],params[3],params[4])
+        model_out_total = div_nl_separate_multiply_func([r_flat_total,p_flat_total],params[0],params[1],params[2],params[3],params[4])
         residuals = fr_flat_total - model_out_total
         ss_res = np.sum(residuals**2)
         k = num_params
