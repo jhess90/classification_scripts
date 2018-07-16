@@ -318,6 +318,9 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
                 F_val_total[unit_ct] = F_val
                 r_sq_total[unit_ct] = r_sq
 
+                #here add summation array: avg fr, r, and p, by unit
+                fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
+
                 unit_ct +=1
 
             if i == 0:
@@ -358,9 +361,11 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
                 unit = sig_units[0][i]
             
                 if unit < unit_ct:
-                    if plot_bool:
-                        plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'linear',region_key,type_key)
-
+                    try:
+                        if plot_bool:
+                            plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'linear',region_key,type_key)
+                    except:
+                        pdb.set_trace()
         else:
             AIC_sig_model = 1000
             AIC_sig_avg = 1000
@@ -455,6 +460,9 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
                 F_val_total[unit_ct] = F_val
                 r_sq_total[unit_ct] = r_sq
 
+                #here add summation array: avg fr, r, and p, by unit
+                fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
+
                 unit_ct +=1
 
             if i == 0:
@@ -475,7 +483,7 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
         else:
             pdb.set_trace()
 
-        model_out_total = div_diff_func([r_flat_total,p_flat_total],params[0],params[1])
+        model_out_total = diff_func([r_flat_total,p_flat_total],params[0],params[1])
         residuals = fr_flat_total - model_out_total
         ss_res = np.sum(residuals**2)
         k = num_params
@@ -555,6 +563,11 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr)
                         num_units_no_fit += 1
                         fr_r_p_list.append(np.array((0,0,0)))
 
+                        p_val_total[unit_ct] = 1
+                        F_val_total[unit_ct] = 1000
+                        r_sq_total[unit_ct] = 1000
+
+                        unit_ct += 1
                         #print 'failure to fit div nl %s %s unit %s' %(region_key,type_key,unit_num)
                         continue
 
@@ -704,6 +717,12 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
                         num_units_no_fit += 1
                         fr_r_p_list.append(np.array((0,0,0)))
 
+                        p_val_total[unit_ct] = 1
+                        F_val_total[unit_ct] = 1000
+                        r_sq_total[unit_ct] = 1000
+
+                        unit_ct += 1
+
                         #print 'failure to fit div nl noe %s %s unit %s' %(region_key,type_key,unit_num)
                         continue
 
@@ -748,6 +767,9 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
                 F_val_total[unit_ct] = F_val
                 r_sq_total[unit_ct] = r_sq
 
+                #here add summation array: avg fr, r, and p, by unit
+                fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
+                
                 unit_ct +=1
 
             if i == 0:
@@ -848,6 +870,12 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
                         fr_r_p_list.append(np.array((0,0,0)))
 
                         num_units_no_fit += 1
+
+                        p_val_total[unit_ct] = 1
+                        F_val_total[unit_ct] = 1000
+                        r_sq_total[unit_ct] = 1000
+
+                        unit_ct += 1
                         #print 'failure to fit Y nl %s %s unit %s' %(region_key,type_key,unit_num)
                         continue
                 
@@ -886,11 +914,17 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
                 F_val = ms_model / ms_residual
                 p_val = 1.0 - stats.f.cdf(F_val,df_residual,df_model)
 
-                AIC_total[unit_ct] = AIC
-                ss_res_total[unit_ct] = ss_res
-                p_val_total[unit_ct] = p_val
-                F_val_total[unit_ct] = F_val
-                r_sq_total[unit_ct] = r_sq
+                try:
+                    AIC_total[unit_ct] = AIC
+                    ss_res_total[unit_ct] = ss_res
+                    p_val_total[unit_ct] = p_val
+                    F_val_total[unit_ct] = F_val
+                    r_sq_total[unit_ct] = r_sq
+                except:
+                    pdb.set_trace()
+                    
+                #here add summation array: avg fr, r, and p, by unit
+                fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
 
                 unit_ct +=1
 
@@ -997,6 +1031,11 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
                         fr_r_p_list.append(np.array((0,0,0)))
 
                         num_units_no_fit += 1
+                        p_val_total[unit_ct] = 1
+                        F_val_total[unit_ct] = 1000
+                        r_sq_total[unit_ct] = 1000
+
+                        unit_ct += 1
                         #print 'failure to fit separate add nl %s %s unit %s' %(region_key,type_key,unit_num)
                         continue
 
@@ -1040,6 +1079,9 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
                 p_val_total[unit_ct] = p_val
                 F_val_total[unit_ct] = F_val
                 r_sq_total[unit_ct] = r_sq
+
+                #here add summation array: avg fr, r, and p, by unit
+                fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
 
                 unit_ct +=1
 
@@ -1146,6 +1188,11 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
                         fr_r_p_list.append(np.array((0,0,0)))
 
                         num_units_no_fit += 1
+                        p_val_total[unit_ct] = 1
+                        F_val_total[unit_ct] = 1000
+                        r_sq_total[unit_ct] = 1000
+
+                        unit_ct += 1
                         #print 'failure to fit separate mult nl %s %s unit %s' %(region_key,type_key,unit_num)
                         continue
 
@@ -1190,6 +1237,9 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
                 F_val_total[unit_ct] = F_val
                 r_sq_total[unit_ct] = r_sq
 
+                #here add summation array: avg fr, r, and p, by unit
+                fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
+
                 unit_ct +=1
 
             if i == 0:
@@ -1231,7 +1281,7 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
             
                 if unit < unit_ct:
                     if plot_bool:
-                        plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'div_nl_separate_multipy',region_key,type_key)
+                        plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'div_nl_separate_multiply',region_key,type_key)
 
         else:
             AIC_sig_model = 1000
@@ -1475,7 +1525,8 @@ for region_key,region_val in data_dict_all.iteritems():
     #file_dict = data_dict_all[region_key]['file_dict']
     file_length = np.shape(file_dict.keys())[0]
     avg_and_corr = data_dict_all[region_key]['avg_and_corr']
-                            
+
+    print 'linear'
     lin_aft_cue_model = make_lin_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr)
     lin_bfr_res_model = make_lin_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr)
     lin_aft_res_model = make_lin_model(file_dict,region_key,'aft_res',file_length,avg_and_corr)
@@ -1486,6 +1537,7 @@ for region_key,region_val in data_dict_all.iteritems():
     
     data_dict_all[region_key]['models']['linear'] = linear_model_return
 
+    print 'diff'
     diff_aft_cue_model = make_diff_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr)
     diff_bfr_res_model = make_diff_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr)
     diff_aft_res_model = make_diff_model(file_dict,region_key,'aft_res',file_length,avg_and_corr)
@@ -1496,6 +1548,7 @@ for region_key,region_val in data_dict_all.iteritems():
     
     data_dict_all[region_key]['models']['diff'] = diff_model_return
 
+    print 'div nl'   
     div_nl_aft_cue_model = make_div_nl_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr)
     div_nl_bfr_res_model = make_div_nl_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr)
     div_nl_aft_res_model = make_div_nl_model(file_dict,region_key,'aft_res',file_length,avg_and_corr)
@@ -1506,6 +1559,7 @@ for region_key,region_val in data_dict_all.iteritems():
     
     data_dict_all[region_key]['models']['div_nl'] = div_nl_model_return
 
+    print 'div nl noe'   
     div_nl_noe_aft_cue_model = make_div_nl_noe_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr)
     div_nl_noe_bfr_res_model = make_div_nl_noe_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr)
     div_nl_noe_aft_res_model = make_div_nl_noe_model(file_dict,region_key,'aft_res',file_length,avg_and_corr)
@@ -1516,6 +1570,7 @@ for region_key,region_val in data_dict_all.iteritems():
     
     data_dict_all[region_key]['models']['div_nl_noe'] = div_nl_noe_model_return
 
+    print 'div nl Y'   
     div_nl_Y_aft_cue_model = make_div_nl_Y_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr)
     div_nl_Y_bfr_res_model = make_div_nl_Y_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr)
     div_nl_Y_aft_res_model = make_div_nl_Y_model(file_dict,region_key,'aft_res',file_length,avg_and_corr)
@@ -1526,6 +1581,7 @@ for region_key,region_val in data_dict_all.iteritems():
     
     data_dict_all[region_key]['models']['div_nl_Y'] = div_nl_Y_model_return
 
+    print 'div nl separate add'   
     div_nl_separate_add_aft_cue_model = make_div_nl_separate_add_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr)
     div_nl_separate_add_bfr_res_model = make_div_nl_separate_add_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr)
     div_nl_separate_add_aft_res_model = make_div_nl_separate_add_model(file_dict,region_key,'aft_res',file_length,avg_and_corr)
@@ -1536,6 +1592,7 @@ for region_key,region_val in data_dict_all.iteritems():
     
     data_dict_all[region_key]['models']['div_nl_separate_add'] = div_nl_separate_add_model_return
 
+    print 'div nl separate multiply'   
     div_nl_separate_multiply_aft_cue_model = make_div_nl_separate_multiply_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr)
     div_nl_separate_multiply_bfr_res_model = make_div_nl_separate_multiply_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr)
     div_nl_separate_multiply_aft_res_model = make_div_nl_separate_multiply_model(file_dict,region_key,'aft_res',file_length,avg_and_corr)
