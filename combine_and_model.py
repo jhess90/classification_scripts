@@ -33,7 +33,7 @@ uncued_bool = False
 
 sig_only_bool = False
 
-plot_bool = True
+plot_bool = False
 
 bin_size = 10 #in ms
 time_before = -0.5 #negative value
@@ -240,7 +240,7 @@ def plot_fr_and_model(unit_num,fr_r_p,params,model_type,region_key,type_key):
 # models ###########
 ####################
 
-def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
+def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,total_unit_num):
         #set each model
         num_params = 3
 
@@ -297,7 +297,7 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
                 k = num_params
                 AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
 
-                ss_tot = np.sum((avg_frs-np.mean(avg_frs))**2)
+                ss_t ot = np.sum((avg_frs-np.mean(avg_frs))**2)
                 r_sq = 1 - (ss_res / ss_tot)
 
                 ss_model = ss_tot - ss_res
@@ -358,6 +358,7 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
         if num_sig_fit > 0:
             AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
             AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
+            r_sq_avg = np.mean(r_sq_total[p_val_total < 0.05])
 
             for i in range(num_sig_fit):
                 sig_units = np.where((p_val_total < 0.05))
@@ -373,16 +374,17 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
         else:
             AIC_sig_model = 1000
             AIC_sig_avg = 1000
+            r_sq_avg = 0
 
         #this will give different values though depending on number of sig fits. That ok?
         #Or calc AICs for each unit then average? What's kosher
         
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg}
 
         return(return_dict)
 
-def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
+def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,total_unit_num):
         #set each model
         num_params = 2
 
@@ -502,6 +504,7 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
         if num_sig_fit > 0:
             AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
             AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
+            r_sq_avg = np.mean(r_sq_total[p_val_total < 0.05])
 
             for i in range(num_sig_fit):
                 sig_units = np.where((p_val_total < 0.05))
@@ -514,13 +517,14 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
         else:
             AIC_sig_model = 1000
             AIC_sig_avg = 1000
+            r_sq_avg = 0
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg}
                 
         return(return_dict)
 
-def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
+def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,total_unit_num):
         #set each model
         num_params = 5
 
@@ -655,6 +659,7 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr)
         if num_sig_fit > 0:
             AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
             AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
+            r_sq_avg = np.mean(r_sq_total[p_val_total < 0.05])
 
             for i in range(num_sig_fit):
                 sig_units = np.where((p_val_total < 0.05))
@@ -667,14 +672,14 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr)
         else:
             AIC_sig_model = 1000
             AIC_sig_avg = 1000
-
+            r_sq_avg = 0
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg}
                 
         return(return_dict)
 
-def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
+def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,total_unit_num):
         #set each model
         num_params = 4
 
@@ -807,6 +812,7 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
         if num_sig_fit > 0:
             AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
             AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
+            r_sq_avg = np.mean(r_sq_total[p_val_total < 0.05])
 
             for i in range(num_sig_fit):
                 sig_units = np.where((p_val_total < 0.05))
@@ -819,14 +825,14 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
         else:
             AIC_sig_model = 1000
             AIC_sig_avg = 1000
-
+            r_sq_avg = 0
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg}
                 
         return(return_dict)
 
-def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
+def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,total_unit_num):
         #set each model
         num_params = 4
 
@@ -970,6 +976,7 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
         if num_sig_fit > 0:
             AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
             AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
+            r_sq_avg = np.mean(r_sq_total[p_val_total < 0.05])
 
             for i in range(num_sig_fit):
                 sig_units = np.where((p_val_total < 0.05))
@@ -984,14 +991,14 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
         else:
             AIC_sig_model = 1000
             AIC_sig_avg = 1000
-
+            r_sq_avg = 0
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg}
                 
         return(return_dict)
 
-def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
+def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,total_unit_num):
         #set each model
         num_params = 5
 
@@ -1122,6 +1129,7 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
         if num_sig_fit > 0:
             AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
             AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
+            r_sq_avg = np.mean(r_sq_total[p_val_total < 0.05])
 
             for i in range(num_sig_fit):
                 sig_units = np.where((p_val_total < 0.05))
@@ -1134,14 +1142,14 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
         else:
             AIC_sig_model = 1000
             AIC_sig_avg = 1000
-
+            r_sq_avg = 0
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg}
                 
         return(return_dict)
 
-def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr):
+def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,total_unit_num):
         #set each model
         num_params = 5
 
@@ -1279,7 +1287,9 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
         if num_sig_fit > 0:
             AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
             AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
-
+            #
+            r_sq_avg = np.mean(r_sq_total[p_val_total < 0.05])
+            
             for i in range(num_sig_fit):
                 sig_units = np.where((p_val_total < 0.05))
                 unit = sig_units[0][i]
@@ -1291,10 +1301,11 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
         else:
             AIC_sig_model = 1000
             AIC_sig_avg = 1000
-
+            #
+            r_sq_avg = 0
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg}
                 
         return(return_dict)
 
@@ -1518,7 +1529,7 @@ for region_key,region_val in file_dict[0].iteritems():
                 avg_fr_dict[file_ind] = np.mean(frs,axis=2)
                 sig_vals_by_file[file_ind] = sig_vals_temp
                 
-            save_dict = {'avg_fr_dict':avg_fr_dict,'r_p_all':r_p_all,'sig_vals':sig_vals,'sig_vals_by_file':sig_vals_by_file}
+            save_dict = {'avg_fr_dict':avg_fr_dict,'r_p_all':r_p_all,'sig_vals':sig_vals,'sig_vals_by_file':sig_vals_by_file,'total_unit_num':total_unit_num,'total_trial_num':total_trial_num}
             data_dict_all[region_key]['avg_and_corr'][type_key] = save_dict
 
 #run modeling
@@ -1531,78 +1542,82 @@ for region_key,region_val in data_dict_all.iteritems():
     file_length = np.shape(file_dict.keys())[0]
     avg_and_corr = data_dict_all[region_key]['avg_and_corr']
 
+    if not sig_only_bool:
+        total_unit_num = avg_and_corr['aft_cue']['total_unit_num']
+
+
     print 'linear'
-    lin_aft_cue_model = make_lin_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr)
-    lin_bfr_res_model = make_lin_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr)
-    lin_aft_res_model = make_lin_model(file_dict,region_key,'aft_res',file_length,avg_and_corr)
-    lin_res_win_model = make_lin_model(file_dict,region_key,'res_win',file_length,avg_and_corr)
-    lin_concat_model = make_lin_model(file_dict,region_key,'concat',file_length,avg_and_corr)
+    lin_aft_cue_model = make_lin_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr,total_unit_num)
+    lin_bfr_res_model = make_lin_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr,total_unit_num)
+    lin_aft_res_model = make_lin_model(file_dict,region_key,'aft_res',file_length,avg_and_corr,total_unit_num)
+    lin_res_win_model = make_lin_model(file_dict,region_key,'res_win',file_length,avg_and_corr,total_unit_num)
+    lin_concat_model = make_lin_model(file_dict,region_key,'concat',file_length,avg_and_corr,total_unit_num)
 
     linear_model_return= {'aft_cue':lin_aft_cue_model,'bfr_res':lin_bfr_res_model,'aft_res':lin_aft_res_model,'res_win':lin_res_win_model,'concat':lin_concat_model}
     
     data_dict_all[region_key]['models']['linear'] = linear_model_return
 
     print 'diff'
-    diff_aft_cue_model = make_diff_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr)
-    diff_bfr_res_model = make_diff_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr)
-    diff_aft_res_model = make_diff_model(file_dict,region_key,'aft_res',file_length,avg_and_corr)
-    diff_res_win_model = make_diff_model(file_dict,region_key,'res_win',file_length,avg_and_corr)
-    diff_concat_model = make_diff_model(file_dict,region_key,'concat',file_length,avg_and_corr)
+    diff_aft_cue_model = make_diff_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr,total_unit_num)
+    diff_bfr_res_model = make_diff_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr,total_unit_num)
+    diff_aft_res_model = make_diff_model(file_dict,region_key,'aft_res',file_length,avg_and_corr,total_unit_num)
+    diff_res_win_model = make_diff_model(file_dict,region_key,'res_win',file_length,avg_and_corr,total_unit_num)
+    diff_concat_model = make_diff_model(file_dict,region_key,'concat',file_length,avg_and_corr,total_unit_num)
 
     diff_model_return= {'aft_cue':diff_aft_cue_model,'bfr_res':diff_bfr_res_model,'aft_res':diff_aft_res_model,'res_win':diff_res_win_model,'concat':diff_concat_model}
     
     data_dict_all[region_key]['models']['diff'] = diff_model_return
 
     print 'div nl'   
-    div_nl_aft_cue_model = make_div_nl_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr)
-    div_nl_bfr_res_model = make_div_nl_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr)
-    div_nl_aft_res_model = make_div_nl_model(file_dict,region_key,'aft_res',file_length,avg_and_corr)
-    div_nl_res_win_model = make_div_nl_model(file_dict,region_key,'res_win',file_length,avg_and_corr)
-    div_nl_concat_model = make_div_nl_model(file_dict,region_key,'concat',file_length,avg_and_corr)
+    div_nl_aft_cue_model = make_div_nl_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr,total_unit_num)
+    div_nl_bfr_res_model = make_div_nl_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr,total_unit_num)
+    div_nl_aft_res_model = make_div_nl_model(file_dict,region_key,'aft_res',file_length,avg_and_corr,total_unit_num)
+    div_nl_res_win_model = make_div_nl_model(file_dict,region_key,'res_win',file_length,avg_and_corr,total_unit_num)
+    div_nl_concat_model = make_div_nl_model(file_dict,region_key,'concat',file_length,avg_and_corr,total_unit_num)
 
     div_nl_model_return= {'aft_cue':div_nl_aft_cue_model,'bfr_res':div_nl_bfr_res_model,'aft_res':div_nl_aft_res_model,'res_win':div_nl_res_win_model,'concat':div_nl_concat_model}
     
     data_dict_all[region_key]['models']['div_nl'] = div_nl_model_return
 
     print 'div nl noe'   
-    div_nl_noe_aft_cue_model = make_div_nl_noe_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr)
-    div_nl_noe_bfr_res_model = make_div_nl_noe_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr)
-    div_nl_noe_aft_res_model = make_div_nl_noe_model(file_dict,region_key,'aft_res',file_length,avg_and_corr)
-    div_nl_noe_res_win_model = make_div_nl_noe_model(file_dict,region_key,'res_win',file_length,avg_and_corr)
-    div_nl_noe_concat_model = make_div_nl_noe_model(file_dict,region_key,'concat',file_length,avg_and_corr)
+    div_nl_noe_aft_cue_model = make_div_nl_noe_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr,total_unit_num)
+    div_nl_noe_bfr_res_model = make_div_nl_noe_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr,total_unit_num)
+    div_nl_noe_aft_res_model = make_div_nl_noe_model(file_dict,region_key,'aft_res',file_length,avg_and_corr,total_unit_num)
+    div_nl_noe_res_win_model = make_div_nl_noe_model(file_dict,region_key,'res_win',file_length,avg_and_corr,total_unit_num)
+    div_nl_noe_concat_model = make_div_nl_noe_model(file_dict,region_key,'concat',file_length,avg_and_corr,total_unit_num)
 
     div_nl_noe_model_return= {'aft_cue':div_nl_noe_aft_cue_model,'bfr_res':div_nl_noe_bfr_res_model,'aft_res':div_nl_noe_aft_res_model,'res_win':div_nl_noe_res_win_model,'concat':div_nl_noe_concat_model}
     
     data_dict_all[region_key]['models']['div_nl_noe'] = div_nl_noe_model_return
 
     print 'div nl Y'   
-    div_nl_Y_aft_cue_model = make_div_nl_Y_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr)
-    div_nl_Y_bfr_res_model = make_div_nl_Y_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr)
-    div_nl_Y_aft_res_model = make_div_nl_Y_model(file_dict,region_key,'aft_res',file_length,avg_and_corr)
-    div_nl_Y_res_win_model = make_div_nl_Y_model(file_dict,region_key,'res_win',file_length,avg_and_corr)
-    div_nl_Y_concat_model = make_div_nl_Y_model(file_dict,region_key,'concat',file_length,avg_and_corr)
+    div_nl_Y_aft_cue_model = make_div_nl_Y_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr,total_unit_num)
+    div_nl_Y_bfr_res_model = make_div_nl_Y_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr,total_unit_num)
+    div_nl_Y_aft_res_model = make_div_nl_Y_model(file_dict,region_key,'aft_res',file_length,avg_and_corr,total_unit_num)
+    div_nl_Y_res_win_model = make_div_nl_Y_model(file_dict,region_key,'res_win',file_length,avg_and_corr,total_unit_num)
+    div_nl_Y_concat_model = make_div_nl_Y_model(file_dict,region_key,'concat',file_length,avg_and_corr,total_unit_num)
 
     div_nl_Y_model_return= {'aft_cue':div_nl_Y_aft_cue_model,'bfr_res':div_nl_Y_bfr_res_model,'aft_res':div_nl_Y_aft_res_model,'res_win':div_nl_Y_res_win_model,'concat':div_nl_Y_concat_model}
     
     data_dict_all[region_key]['models']['div_nl_Y'] = div_nl_Y_model_return
 
     print 'div nl separate add'   
-    div_nl_separate_add_aft_cue_model = make_div_nl_separate_add_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr)
-    div_nl_separate_add_bfr_res_model = make_div_nl_separate_add_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr)
-    div_nl_separate_add_aft_res_model = make_div_nl_separate_add_model(file_dict,region_key,'aft_res',file_length,avg_and_corr)
-    div_nl_separate_add_res_win_model = make_div_nl_separate_add_model(file_dict,region_key,'res_win',file_length,avg_and_corr)
-    div_nl_separate_add_concat_model = make_div_nl_separate_add_model(file_dict,region_key,'concat',file_length,avg_and_corr)
+    div_nl_separate_add_aft_cue_model = make_div_nl_separate_add_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr,total_unit_num)
+    div_nl_separate_add_bfr_res_model = make_div_nl_separate_add_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr,total_unit_num)
+    div_nl_separate_add_aft_res_model = make_div_nl_separate_add_model(file_dict,region_key,'aft_res',file_length,avg_and_corr,total_unit_num)
+    div_nl_separate_add_res_win_model = make_div_nl_separate_add_model(file_dict,region_key,'res_win',file_length,avg_and_corr,total_unit_num)
+    div_nl_separate_add_concat_model = make_div_nl_separate_add_model(file_dict,region_key,'concat',file_length,avg_and_corr,total_unit_num)
 
     div_nl_separate_add_model_return= {'aft_cue':div_nl_separate_add_aft_cue_model,'bfr_res':div_nl_separate_add_bfr_res_model,'aft_res':div_nl_separate_add_aft_res_model,'res_win':div_nl_separate_add_res_win_model,'concat':div_nl_separate_add_concat_model}
     
     data_dict_all[region_key]['models']['div_nl_separate_add'] = div_nl_separate_add_model_return
 
     print 'div nl separate multiply'   
-    div_nl_separate_multiply_aft_cue_model = make_div_nl_separate_multiply_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr)
-    div_nl_separate_multiply_bfr_res_model = make_div_nl_separate_multiply_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr)
-    div_nl_separate_multiply_aft_res_model = make_div_nl_separate_multiply_model(file_dict,region_key,'aft_res',file_length,avg_and_corr)
-    div_nl_separate_multiply_res_win_model = make_div_nl_separate_multiply_model(file_dict,region_key,'res_win',file_length,avg_and_corr)
-    div_nl_separate_multiply_concat_model = make_div_nl_separate_multiply_model(file_dict,region_key,'concat',file_length,avg_and_corr)
+    div_nl_separate_multiply_aft_cue_model = make_div_nl_separate_multiply_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr,total_unit_num)
+    div_nl_separate_multiply_bfr_res_model = make_div_nl_separate_multiply_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr,total_unit_num)
+    div_nl_separate_multiply_aft_res_model = make_div_nl_separate_multiply_model(file_dict,region_key,'aft_res',file_length,avg_and_corr,total_unit_num)
+    div_nl_separate_multiply_res_win_model = make_div_nl_separate_multiply_model(file_dict,region_key,'res_win',file_length,avg_and_corr,total_unit_num)
+    div_nl_separate_multiply_concat_model = make_div_nl_separate_multiply_model(file_dict,region_key,'concat',file_length,avg_and_corr,total_unit_num)
 
     div_nl_separate_multiply_model_return= {'aft_cue':div_nl_separate_multiply_aft_cue_model,'bfr_res':div_nl_separate_multiply_bfr_res_model,'aft_res':div_nl_separate_multiply_aft_res_model,'res_win':div_nl_separate_multiply_res_win_model,'concat':div_nl_separate_multiply_concat_model}
     
@@ -1723,6 +1738,24 @@ for region_key,region_val in data_dict_all.iteritems():
     
             all_model_AICs = np.column_stack((data_dict_all[region_key]['models']['linear'][type_key]['AIC_total'],data_dict_all[region_key]['models']['diff'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_noe'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_Y'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_separate_add'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_separate_multiply'][type_key]['AIC_total']))
 
+            ###
+            all_model_p_vals = np.column_stack((data_dict_all[region_key]['models']['linear'][type_key]['p_val_total'],data_dict_all[region_key]['models']['diff'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_noe'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_Y'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_separate_add'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_separate_multiply'][type_key]['p_val_total']))
+            
+            all_p_bool = all_model_p_vals < 0.05
+            sig_multiple_models = np.sum(all_p_bool,axis=1)
+            num_sig_multiple_models = np.sum(sig_multiple_models > 0)
+            perc_sig_multiple_models = num_sig_multiple_models / float(np.shape(sig_multiple_models)[0])
+            
+            for j in range(np.shape(sig_multiple_models)[0]):
+                if sig_multiple_models[j]:
+                    p_vals = all_p_bool[j,:]
+                    AICs = np.array((all_model_AICs[j,:],range(np.shape(model_names)[0])))
+                    #keep model type (number) with AIC
+                    sig_AICs = AICs[:,p_vals]
+                    model_type = sig_AICs[1,np.argmin(sig_AICs[0,:])]
+            
+                    #TODO finish this part
+
             arg_mins = np.argmin(all_model_AICs,axis=1)
             perc_min = np.zeros((np.shape(all_model_AICs)[1]))
             for j in range(np.shape(all_model_AICs)[1]):
@@ -1813,6 +1846,14 @@ div_nl_Y_aics = [data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_cue']['AIC
 div_nl_separate_add_aics = [data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['concat']['AIC_sig_avg']]
 div_nl_separate_multiply_aics = [data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_sig_avg']]
 
+lin_aics_comb = [data_dict_all['M1_dicts']['models']['linear']['aft_cue']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['linear']['bfr_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['linear']['aft_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['linear']['res_win']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['linear']['concat']['AIC_sig_model']]
+diff_aics_comb = [data_dict_all['M1_dicts']['models']['diff']['aft_cue']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['diff']['bfr_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['diff']['aft_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['diff']['res_win']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['diff']['concat']['AIC_sig_model']]
+div_nl_aics_comb = [data_dict_all['M1_dicts']['models']['div_nl']['aft_cue']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl']['bfr_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl']['aft_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl']['res_win']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl']['concat']['AIC_sig_model']]
+div_nl_noe_aics_comb = [data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_cue']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_noe']['bfr_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_noe']['res_win']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_noe']['concat']['AIC_sig_model']]
+div_nl_Y_aics_comb = [data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_cue']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_Y']['bfr_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_Y']['res_win']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_Y']['concat']['AIC_sig_model']]
+div_nl_separate_add_aics_comb = [data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['res_win']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['concat']['AIC_sig_model']]
+div_nl_separate_multiply_aics_comb = [data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_sig_model']]
+
 lin_num_sig = [data_dict_all['M1_dicts']['models']['linear']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['linear']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['linear']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['linear']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['linear']['concat']['num_sig_fit']]
 diff_num_sig = [data_dict_all['M1_dicts']['models']['diff']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['diff']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['diff']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['diff']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['diff']['concat']['num_sig_fit']]
 div_nl_num_sig = [data_dict_all['M1_dicts']['models']['div_nl']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl']['concat']['num_sig_fit']]
@@ -1822,32 +1863,52 @@ div_nl_separate_add_num_sig = [data_dict_all['M1_dicts']['models']['div_nl_separ
 div_nl_separate_multiply_num_sig = [data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['concat']['num_sig_fit']]
 
 worksheet.write(0,0,'M1')
-worksheet.write_row(0,1,type_names)
-worksheet.write_row(1,1,lin_aics)
-worksheet.write_row(2,1,diff_aics)
-worksheet.write_row(3,1,div_nl_aics)
-worksheet.write_row(4,1,div_nl_noe_aics)
-worksheet.write_row(5,1,div_nl_Y_aics)
-worksheet.write_row(6,1,div_nl_separate_add_aics)
-worksheet.write_row(7,1,div_nl_separate_multiply_aics)
-worksheet.write_column(1,0,model_names)
+worksheet.write(1,0,'AIC avg')
+worksheet.write_row(1,1,type_names)
+worksheet.write_row(2,1,lin_aics)
+worksheet.write_row(3,1,diff_aics)
+worksheet.write_row(4,1,div_nl_aics)
+worksheet.write_row(5,1,div_nl_noe_aics)
+worksheet.write_row(6,1,div_nl_Y_aics)
+worksheet.write_row(7,1,div_nl_separate_add_aics)
+worksheet.write_row(8,1,div_nl_separate_multiply_aics)
+worksheet.write_column(2,0,model_names)
 
-worksheet.write(0,6,'num sig')
-worksheet.write_row(0,7,type_names)
-worksheet.write_row(1,7,lin_num_sig)
-worksheet.write_row(2,7,diff_num_sig)
-worksheet.write_row(3,7,div_nl_num_sig)
-worksheet.write_row(4,7,div_nl_noe_num_sig)
-worksheet.write_row(5,7,div_nl_Y_num_sig)
-worksheet.write_row(6,7,div_nl_separate_add_num_sig)
-worksheet.write_row(7,7,div_nl_separate_multiply_num_sig)
-#worksheet.write_column(1,6,model_names)
+worksheet.write(1,7,'AIC combined')
+worksheet.write_row(1,8,type_names)
+worksheet.write_row(2,8,lin_aics_comb)
+worksheet.write_row(3,8,diff_aics_comb)
+worksheet.write_row(4,8,div_nl_aics_comb)
+worksheet.write_row(5,8,div_nl_noe_aics_comb)
+worksheet.write_row(6,8,div_nl_Y_aics_comb)
+worksheet.write_row(7,8,div_nl_separate_add_aics_comb)
+worksheet.write_row(8,8,div_nl_separate_multiply_aics_comb)
+worksheet.write_column(2,7,model_names)
 
-worksheet.conditional_format('B2:B8', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('C2:C8', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('D2:D8', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('E2:E8', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('F2:F8', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.write(1,14,'num sig')
+worksheet.write_row(1,15,type_names)
+worksheet.write_row(2,15,lin_num_sig)
+worksheet.write_row(3,15,diff_num_sig)
+worksheet.write_row(4,15,div_nl_num_sig)
+worksheet.write_row(5,15,div_nl_noe_num_sig)
+worksheet.write_row(6,15,div_nl_Y_num_sig)
+worksheet.write_row(7,15,div_nl_separate_add_num_sig)
+worksheet.write_row(8,15,div_nl_separate_multiply_num_sig)
+worksheet.write_column(2,14,model_names)
+worksheet.write(9,14,'total units')
+worksheet.write(9,15,data_dict_all['M1_dicts']['avg_and_corr']['aft_cue']['total_unit_num'])
+
+worksheet.conditional_format('B3:B9', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('C3:C9', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('D3:D9', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('E3:E9', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('F3:F9', {'type': 'bottom', 'value':'1', 'format':format1})
+
+worksheet.conditional_format('I3:I9', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('J3:J9', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('K3:K9', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('L3:L9', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('M3:M9', {'type': 'bottom', 'value':'1', 'format':format1})
 
 lin_aics = [data_dict_all['S1_dicts']['models']['linear']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['linear']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['linear']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['linear']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['linear']['concat']['AIC_sig_avg']]
 diff_aics = [data_dict_all['S1_dicts']['models']['diff']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['diff']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['diff']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['diff']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['diff']['concat']['AIC_sig_avg']]
@@ -1857,6 +1918,15 @@ div_nl_Y_aics = [data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_cue']['AIC
 div_nl_separate_add_aics = [data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['concat']['AIC_sig_avg']]
 div_nl_separate_multiply_aics = [data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_sig_avg']]
 
+lin_aics_comb = [data_dict_all['S1_dicts']['models']['linear']['aft_cue']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['linear']['bfr_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['linear']['aft_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['linear']['res_win']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['linear']['concat']['AIC_sig_model']]
+diff_aics_comb = [data_dict_all['S1_dicts']['models']['diff']['aft_cue']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['diff']['bfr_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['diff']['aft_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['diff']['res_win']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['diff']['concat']['AIC_sig_model']]
+div_nl_aics_comb = [data_dict_all['S1_dicts']['models']['div_nl']['aft_cue']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl']['bfr_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl']['aft_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl']['res_win']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl']['concat']['AIC_sig_model']]
+div_nl_noe_aics_comb = [data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_cue']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_noe']['bfr_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_noe']['res_win']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_noe']['concat']['AIC_sig_model']]
+div_nl_Y_aics_comb = [data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_cue']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_Y']['bfr_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_Y']['res_win']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_Y']['concat']['AIC_sig_model']]
+div_nl_separate_add_aics_comb = [data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['res_win']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['concat']['AIC_sig_model']]
+div_nl_separate_multiply_aics_comb = [data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_sig_model']]
+
+
 lin_num_sig = [data_dict_all['S1_dicts']['models']['linear']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['linear']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['linear']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['linear']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['linear']['concat']['num_sig_fit']]
 diff_num_sig = [data_dict_all['S1_dicts']['models']['diff']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['diff']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['diff']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['diff']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['diff']['concat']['num_sig_fit']]
 div_nl_num_sig = [data_dict_all['S1_dicts']['models']['div_nl']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl']['concat']['num_sig_fit']]
@@ -1865,7 +1935,8 @@ div_nl_Y_num_sig = [data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_cue']['
 div_nl_separate_add_num_sig = [data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['concat']['num_sig_fit']]
 div_nl_separate_multiply_num_sig = [data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['concat']['num_sig_fit']]
 
-worksheet.write(12,0,'S1')
+worksheet.write(11,0,'S1')
+worksheet.write(12,1,'AIC avg')
 worksheet.write_row(12,1,type_names)
 worksheet.write_row(13,1,lin_aics)
 worksheet.write_row(14,1,diff_aics)
@@ -1876,11 +1947,41 @@ worksheet.write_row(18,1,div_nl_separate_add_aics)
 worksheet.write_row(19,1,div_nl_separate_multiply_aics)
 worksheet.write_column(13,0,model_names)
 
+worksheet.write(12,0,'AIC combined')
+worksheet.write_row(12,8,type_names)
+worksheet.write_row(13,8,lin_aics_comb)
+worksheet.write_row(14,8,diff_aics_comb)
+worksheet.write_row(15,8,div_nl_aics_comb)
+worksheet.write_row(16,8,div_nl_noe_aics_comb)
+worksheet.write_row(17,8,div_nl_Y_aics_comb)
+worksheet.write_row(18,8,div_nl_separate_add_aics_comb)
+worksheet.write_row(19,8,div_nl_separate_multiply_aics_comb)
+worksheet.write_column(13,7,model_names)
+
+worksheet.write(12,14,'num sig')
+worksheet.write_row(12,15,type_names)
+worksheet.write_row(13,15,lin_num_sig)
+worksheet.write_row(14,15,diff_num_sig)
+worksheet.write_row(15,15,div_nl_num_sig)
+worksheet.write_row(16,15,div_nl_noe_num_sig)
+worksheet.write_row(17,15,div_nl_Y_num_sig)
+worksheet.write_row(18,15,div_nl_separate_add_num_sig)
+worksheet.write_row(19,15,div_nl_separate_multiply_num_sig)
+worksheet.write_column(13,14,model_names)
+worksheet.write(20,14,'total units')
+worksheet.write(20,15,data_dict_all['S1_dicts']['avg_and_corr']['aft_cue']['total_unit_num'])
+
 worksheet.conditional_format('B14:B20', {'type': 'bottom', 'value':'1', 'format':format1})
 worksheet.conditional_format('C14:C20', {'type': 'bottom', 'value':'1', 'format':format1})
 worksheet.conditional_format('D14:D20', {'type': 'bottom', 'value':'1', 'format':format1})
 worksheet.conditional_format('E14:E20', {'type': 'bottom', 'value':'1', 'format':format1})
 worksheet.conditional_format('F14:F20', {'type': 'bottom', 'value':'1', 'format':format1})
+
+worksheet.conditional_format('I14:I20', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('J14:J20', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('K14:K20', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('L14:L20', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('M14:M20', {'type': 'bottom', 'value':'1', 'format':format1})
 
 lin_aics = [data_dict_all['PmD_dicts']['models']['linear']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['linear']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['linear']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['linear']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['linear']['concat']['AIC_sig_avg']]
 diff_aics = [data_dict_all['PmD_dicts']['models']['diff']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['diff']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['diff']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['diff']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['diff']['concat']['AIC_sig_avg']]
@@ -1889,6 +1990,14 @@ div_nl_noe_aics = [data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_cue']
 div_nl_Y_aics = [data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['concat']['AIC_sig_avg']]
 div_nl_separate_add_aics = [data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['concat']['AIC_sig_avg']]
 div_nl_separate_multiply_aics = [data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_sig_avg']]
+
+lin_aics_comb = [data_dict_all['PmD_dicts']['models']['linear']['aft_cue']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['linear']['bfr_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['linear']['aft_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['linear']['res_win']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['linear']['concat']['AIC_sig_model']]
+diff_aics_comb = [data_dict_all['PmD_dicts']['models']['diff']['aft_cue']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['diff']['bfr_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['diff']['aft_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['diff']['res_win']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['diff']['concat']['AIC_sig_model']]
+div_nl_aics_comb = [data_dict_all['PmD_dicts']['models']['div_nl']['aft_cue']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl']['bfr_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl']['aft_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl']['res_win']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl']['concat']['AIC_sig_model']]
+div_nl_noe_aics_comb = [data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_cue']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['bfr_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['res_win']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['concat']['AIC_sig_model']]
+div_nl_Y_aics_comb = [data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_cue']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['bfr_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['res_win']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['concat']['AIC_sig_model']]
+div_nl_separate_add_aics_comb = [data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['res_win']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['concat']['AIC_sig_model']]
+div_nl_separate_multiply_aics_comb = [data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_sig_model']]
 
 lin_num_sig = [data_dict_all['PmD_dicts']['models']['linear']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['linear']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['linear']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['linear']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['linear']['concat']['num_sig_fit']]
 diff_num_sig = [data_dict_all['PmD_dicts']['models']['diff']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['diff']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['diff']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['diff']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['diff']['concat']['num_sig_fit']]
@@ -1899,7 +2008,8 @@ div_nl_separate_add_num_sig = [data_dict_all['PmD_dicts']['models']['div_nl_sepa
 div_nl_separate_multiply_num_sig = [data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['concat']['num_sig_fit']]
 
 
-worksheet.write(24,0,'PMd')
+worksheet.write(23,0,'PMd')
+worksheet.write(24,0,'AIC avg')
 worksheet.write_row(24,1,type_names)
 worksheet.write_row(25,1,lin_aics)
 worksheet.write_row(26,1,diff_aics)
@@ -1910,11 +2020,137 @@ worksheet.write_row(30,1,div_nl_separate_add_aics)
 worksheet.write_row(31,1,div_nl_separate_multiply_aics)
 worksheet.write_column(25,0,model_names)
 
+worksheet.write(24,7,'AIC combined')
+worksheet.write_row(24,8,type_names)
+worksheet.write_row(25,8,lin_aics_comb)
+worksheet.write_row(26,8,diff_aics_comb)
+worksheet.write_row(27,8,div_nl_aics_comb)
+worksheet.write_row(28,8,div_nl_noe_aics_comb)
+worksheet.write_row(29,8,div_nl_Y_aics_comb)
+worksheet.write_row(30,8,div_nl_separate_add_aics_comb)
+worksheet.write_row(31,8,div_nl_separate_multiply_aics_comb)
+worksheet.write_column(25,7,model_names)
+
+worksheet.write(24,14,'num sig')
+worksheet.write_row(24,15,type_names)
+worksheet.write_row(25,15,lin_num_sig)
+worksheet.write_row(26,15,diff_num_sig)
+worksheet.write_row(27,15,div_nl_num_sig)
+worksheet.write_row(28,15,div_nl_noe_num_sig)
+worksheet.write_row(29,15,div_nl_Y_num_sig)
+worksheet.write_row(30,15,div_nl_separate_add_num_sig)
+worksheet.write_row(31,15,div_nl_separate_multiply_num_sig)
+worksheet.write_column(25,14,model_names)
+worksheet.write(32,14,'total units')
+worksheet.write(32,15,data_dict_all['PmD_dicts']['avg_and_corr']['aft_cue']['total_unit_num'])
+
 worksheet.conditional_format('B26:B32', {'type': 'bottom', 'value':'1', 'format':format1})
 worksheet.conditional_format('C26:C32', {'type': 'bottom', 'value':'1', 'format':format1})
 worksheet.conditional_format('D26:D32', {'type': 'bottom', 'value':'1', 'format':format1})
 worksheet.conditional_format('E26:E32', {'type': 'bottom', 'value':'1', 'format':format1})
 worksheet.conditional_format('F26:F32', {'type': 'bottom', 'value':'1', 'format':format1})
+
+worksheet.conditional_format('I26:I32', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('J26:J32', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('K26:K32', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('L26:L32', {'type': 'bottom', 'value':'1', 'format':format1})
+worksheet.conditional_format('M26:M32', {'type': 'bottom', 'value':'1', 'format':format1})
+
+
+###################
+#mean r2 vals
+
+worksheet = aic_workbook.add_worksheet('mean_r2')
+lin_r_sq = [data_dict_all['M1_dicts']['models']['linear']['aft_cue']['r_sq_avg'],data_dict_all['M1_dicts']['models']['linear']['bfr_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['linear']['aft_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['linear']['res_win']['r_sq_avg'],data_dict_all['M1_dicts']['models']['linear']['concat']['r_sq_avg']]
+diff_r_sq = [data_dict_all['M1_dicts']['models']['diff']['aft_cue']['r_sq_avg'],data_dict_all['M1_dicts']['models']['diff']['bfr_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['diff']['aft_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['diff']['res_win']['r_sq_avg'],data_dict_all['M1_dicts']['models']['diff']['concat']['r_sq_avg']]
+div_nl_r_sq = [data_dict_all['M1_dicts']['models']['div_nl']['aft_cue']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl']['bfr_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl']['aft_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl']['res_win']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl']['concat']['r_sq_avg']]
+div_nl_noe_r_sq = [data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_cue']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['bfr_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['res_win']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['concat']['r_sq_avg']]
+div_nl_Y_r_sq = [data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_cue']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['bfr_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['res_win']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['concat']['r_sq_avg']]
+div_nl_separate_add_r_sq = [data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_cue']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['bfr_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['res_win']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['concat']['r_sq_avg']]
+div_nl_separate_multiply_r_sq = [data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['res_win']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['concat']['r_sq_avg']]
+
+worksheet.write(0,0,'M1')
+worksheet.write_row(0,1,type_names)
+worksheet.write_row(1,1,lin_r_sq)
+worksheet.write_row(2,1,diff_r_sq)
+worksheet.write_row(3,1,div_nl_r_sq)
+worksheet.write_row(4,1,div_nl_noe_r_sq)
+worksheet.write_row(5,1,div_nl_Y_r_sq)
+worksheet.write_row(6,1,div_nl_separate_add_r_sq)
+worksheet.write_row(7,1,div_nl_separate_multiply_r_sq)
+worksheet.write_column(1,0,model_names)
+
+worksheet.conditional_format('B2:B8', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('C2:C8', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('D2:D8', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('E2:E8', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('F2:F8', {'type': 'top', 'value':'1', 'format':format1})
+
+lin_r_sq = [data_dict_all['S1_dicts']['models']['linear']['aft_cue']['r_sq_avg'],data_dict_all['S1_dicts']['models']['linear']['bfr_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['linear']['aft_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['linear']['res_win']['r_sq_avg'],data_dict_all['S1_dicts']['models']['linear']['concat']['r_sq_avg']]
+diff_r_sq = [data_dict_all['S1_dicts']['models']['diff']['aft_cue']['r_sq_avg'],data_dict_all['S1_dicts']['models']['diff']['bfr_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['diff']['aft_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['diff']['res_win']['r_sq_avg'],data_dict_all['S1_dicts']['models']['diff']['concat']['r_sq_avg']]
+div_nl_r_sq = [data_dict_all['S1_dicts']['models']['div_nl']['aft_cue']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl']['bfr_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl']['aft_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl']['res_win']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl']['concat']['r_sq_avg']]
+div_nl_noe_r_sq = [data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_cue']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['bfr_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['res_win']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['concat']['r_sq_avg']]
+div_nl_Y_r_sq = [data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_cue']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['bfr_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['res_win']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['concat']['r_sq_avg']]
+div_nl_separate_add_r_sq = [data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_cue']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['bfr_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['res_win']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['concat']['r_sq_avg']]
+div_nl_separate_multiply_r_sq = [data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['res_win']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['concat']['r_sq_avg']]
+
+worksheet.write(12,0,'S1')
+worksheet.write_row(12,1,type_names)
+worksheet.write_row(13,1,lin_r_sq)
+worksheet.write_row(14,1,diff_r_sq)
+worksheet.write_row(15,1,div_nl_r_sq)
+worksheet.write_row(16,1,div_nl_noe_r_sq)
+worksheet.write_row(17,1,div_nl_Y_r_sq)
+worksheet.write_row(18,1,div_nl_separate_add_r_sq)
+worksheet.write_row(19,1,div_nl_separate_multiply_r_sq)
+worksheet.write_column(13,0,model_names)
+
+worksheet.conditional_format('B14:B20', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('C14:C20', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('D14:D20', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('E14:E20', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('F14:F20', {'type': 'top', 'value':'1', 'format':format1})
+
+lin_r_sq = [data_dict_all['PmD_dicts']['models']['linear']['aft_cue']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['linear']['bfr_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['linear']['aft_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['linear']['res_win']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['linear']['concat']['r_sq_avg']]
+diff_r_sq = [data_dict_all['PmD_dicts']['models']['diff']['aft_cue']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['diff']['bfr_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['diff']['aft_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['diff']['res_win']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['diff']['concat']['r_sq_avg']]
+div_nl_r_sq = [data_dict_all['PmD_dicts']['models']['div_nl']['aft_cue']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['bfr_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['aft_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['res_win']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['concat']['r_sq_avg']]
+div_nl_noe_r_sq = [data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_cue']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['bfr_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['res_win']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['concat']['r_sq_avg']]
+div_nl_Y_r_sq = [data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_cue']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['bfr_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['res_win']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['concat']['r_sq_avg']]
+div_nl_separate_add_r_sq = [data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_cue']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['bfr_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['res_win']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['concat']['r_sq_avg']]
+div_nl_separate_multiply_r_sq = [data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_cue']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['bfr_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['res_win']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['concat']['r_sq_avg']]
+
+worksheet.write(24,0,'PMd')
+worksheet.write_row(24,1,type_names)
+worksheet.write_row(25,1,lin_r_sq)
+worksheet.write_row(26,1,diff_r_sq)
+worksheet.write_row(27,1,div_nl_r_sq)
+worksheet.write_row(28,1,div_nl_noe_r_sq)
+worksheet.write_row(29,1,div_nl_Y_r_sq)
+worksheet.write_row(30,1,div_nl_separate_add_r_sq)
+worksheet.write_row(31,1,div_nl_separate_multiply_r_sq)
+worksheet.write_column(25,0,model_names)
+
+worksheet.conditional_format('B26:B32', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('C26:C32', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('D26:D32', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('E26:E32', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('F26:F32', {'type': 'top', 'value':'1', 'format':format1})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
