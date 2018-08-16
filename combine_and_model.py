@@ -303,6 +303,7 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,tot
         AIC_lr_total = np.zeros((total_unit_num))
         AICc_total = np.zeros((total_unit_num))
         mse_total = np.zeros((total_unit_num))
+        n_total = np.zeros((file_length))
 
         for i in range(file_length):
             condensed = fr_data_dict[i][region_key]['condensed']
@@ -367,14 +368,15 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,tot
                 p_val_total[unit_ct] = p_val
                 F_val_total[unit_ct] = F_val
                 r_sq_total[unit_ct] = r_sq
-
-                #
                 AIC_new = 2*k + n*np.log(ss_res/n)
                 r_sq_adj = 1 - (1 - r_sq)*(n-1)/(n-k-1)
         
                 likelihood_func = np.sum(stats.norm.logpdf(avg_frs,loc=model_out,scale=np.std(avg_frs)))                
                 AIC_lr = 2*k - 2 * np.log(likelihood_func)
-                AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                try:
+                    AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                except:
+                    AICc = np.nan
                 mse = np.mean(residuals**2)
 
                 AIC_new_total[unit_ct] = AIC_new
@@ -397,6 +399,8 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,tot
                 r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
                 p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
                 fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
+                
+            n_total[i] = n
 
         params,covs = curve_fit(lin_func,[r_flat_total,p_flat_total],fr_flat_total)
         
@@ -418,6 +422,8 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,tot
         #print '%s linear overall AIC %s' %(type_key,AIC_overall)
 
         num_sig_fit = np.sum(p_val_total < 0.05)
+        avg_n = np.mean(n_total)
+        avg_n_k = round(float(avg_n) / k, 2)
         if num_sig_fit > 0:
             AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
             AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
@@ -435,8 +441,6 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,tot
                         except:
                             pdb.set_trace()
             if plot_hist_bool:
-                ax = plt.gca()
-
                 AIC_temp = AIC_total[~np.isnan(AIC_total)]
                 AIC_sig = AIC_total[p_val_total < 0.05]
                 AIC_new_temp = AIC_new_total[~np.isnan(AIC_new_total)]
@@ -444,36 +448,64 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,tot
                 AIC_lr_temp = AIC_lr_total[~np.isnan(AIC_lr_total)]
                 AIC_lr_sig = AIC_lr_total[p_val_total < 0.05]
                 AIC_lr_sig = AIC_lr_sig[~np.isnan(AIC_lr_sig)]
+                AICc_temp = AICc_total[~np.isnan(AICc_total)]
+                AICc_sig = AICc_total[p_val_total < 0.05]
 
-                plt.subplot(3,2,1)
-                plt.hist(AIC_temp[~is_outlier(AIC_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC',fontsize='small')
-
-                plt.subplot(3,2,2)
-                plt.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC',fontsize='small')
-
-                plt.subplot(3,2,3)
-                plt.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC n adjust',fontsize='small')
-
-                plt.subplot(3,2,4)
-                plt.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC n adjust',fontsize='small')
-
-                plt.subplot(3,2,5)
-                plt.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC L',fontsize='small')
-
-                plt.subplot(3,2,6)
-                plt.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC L',fontsize='small')
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6),(ax7,ax8)) = plt.subplots(4,2,sharex='row')
+                
+                ax1.hist(AIC_temp[~is_outlier(AIC_temp)],color='teal',lw=0,alpha=0.85)  
+                if np.min(AIC_temp[~is_outlier(AIC_temp)]) < np.mean(AIC_temp) < np.max(AIC_temp[~is_outlier(AIC_temp)]):
+                    ax1.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
+                ax1.set_title('All AIC',fontsize='small')
+                try:
+                    ax2.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant AIC',fontsize='small')
+                try:
+                    ax3.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85) 
+                    if np.min(AIC_new_temp[~is_outlier(AIC_new_temp)]) < np.mean(AIC_new_temp) < np.max(AIC_new_temp[~is_outlier(AIC_new_temp)]):
+                        ax3.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All AIC n adjust',fontsize='small')
+                try:
+                    ax4.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant AIC n adjust',fontsize='small')
+                try:
+                    ax5.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AIC_lr_temp[~is_outlier(AIC_lr_temp)]) < np.mean(AIC_lr_temp) < np.max(AIC_lr_temp[~is_outlier(AIC_lr_temp)]):
+                        ax5.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All AIC L',fontsize='small')
+                try:
+                    ax6.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant AIC L',fontsize='small')
+                try:
+                    ax7.hist(AICc_temp[~is_outlier(AICc_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AICc_temp[~is_outlier(AICc_temp)]) < np.mean(AICc_temp) < np.max(AICc_temp[~is_outlier(AICc_temp)]):
+                        ax7.axvline(np.mean(AICc_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                #
+                ax7.set_title('All AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
+                #generally look at AICc if avg n/k < 40
+                try:
+                    ax8.hist(AICc_sig,color='coral',lw=0,alpha=0.85)  
+                    ax8.axvline(np.mean(AICc_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                
+                #
+                ax8.set_title('Significant AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
 
                 plt.tight_layout()
                 plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
@@ -485,8 +517,6 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,tot
                 plt.clf()
 
                 ##
-                ax = plt.gca()
-
                 r_sq_temp = r_sq_total[~np.isnan(r_sq_total)]
                 r_sq_sig = r_sq_total[p_val_total < 0.05]
                 r_sq_adj_temp = r_sq_adj_total[~np.isnan(r_sq_adj_total)]
@@ -494,35 +524,47 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,tot
                 mse_temp = mse_total[~np.isnan(mse_total)]
                 mse_sig = mse_total[p_val_total < 0.05]
 
-                plt.subplot(3,2,1)
-                plt.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
-                plt.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All r2',fontsize='small')
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3,2,sharex='row')
 
-                plt.subplot(3,2,2)
-                plt.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant r2',fontsize='small')
-
-                plt.subplot(3,2,3)
-                plt.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All adjusted r2',fontsize='small')
-
-                plt.subplot(3,2,4)
-                plt.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant adjusted r2',fontsize='small')
-
-                plt.subplot(3,2,5)
-                plt.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All MSE',fontsize='small')
-
-                plt.subplot(3,2,6)
-                plt.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant MSE',fontsize='small')
+                try:
+                    ax1.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
+                    if np.min(r_sq_temp[~is_outlier(r_sq_temp)]) < np.mean(r_sq_temp) < np.max(r_sq_temp[~is_outlier(r_sq_temp)]):
+                       ax1.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax1.set_title('All r2',fontsize='small')
+                try:
+                    ax2.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant r2',fontsize='small')
+                try:
+                    ax3.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
+                    if np.min(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]) < np.mean(r_sq_adj_temp) < np.max(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]):
+                        ax3.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All adjusted r2',fontsize='small')
+                try:
+                    ax4.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant adjusted r2',fontsize='small')
+                try:
+                    ax5.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
+                    if np.min(mse_temp[~is_outlier(mse_temp)]) < np.mean(mse_temp) < np.max(mse_temp[~is_outlier(mse_temp)]):
+                        ax5.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All MSE',fontsize='small')
+                try:
+                    ax6.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant MSE',fontsize='small')
 
                 plt.tight_layout()
                 plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
@@ -568,6 +610,7 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,to
         AIC_lr_total = np.zeros((total_unit_num))
         AICc_total = np.zeros((total_unit_num))
         mse_total = np.zeros((total_unit_num))
+        n_total = np.zeros((file_length))
 
 
         for i in range(file_length):
@@ -639,7 +682,10 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,to
         
                 likelihood_func = np.sum(stats.norm.logpdf(avg_frs,loc=model_out,scale=np.std(avg_frs)))                
                 AIC_lr = 2*k - 2 * np.log(likelihood_func)
-                AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                try:
+                    AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                except:
+                    AICc = np.nan
                 mse = np.mean(residuals**2)
 
                 AIC_new_total[unit_ct] = AIC_new
@@ -662,6 +708,8 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,to
                 p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
                 fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
 
+            n_total[i] = n
+
         params,covs = curve_fit(diff_func,[r_flat_total,p_flat_total],fr_flat_total)
         
         if np.size(covs) > 1:
@@ -682,6 +730,8 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,to
         #print '%s diff overall AIC %s' %(type_key,AIC_overall)
 
         num_sig_fit = np.sum(p_val_total < 0.05)
+        avg_n = np.mean(n_total)
+        avg_n_k = round(float(avg_n) / k, 2)
 
         if num_sig_fit > 0:
             AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
@@ -698,8 +748,6 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,to
                         plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'diff',region_key,type_key)
 
             if plot_hist_bool:
-                ax = plt.gca()
-
                 AIC_temp = AIC_total[~np.isnan(AIC_total)]
                 AIC_sig = AIC_total[p_val_total < 0.05]
                 AIC_new_temp = AIC_new_total[~np.isnan(AIC_new_total)]
@@ -707,36 +755,61 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,to
                 AIC_lr_temp = AIC_lr_total[~np.isnan(AIC_lr_total)]
                 AIC_lr_sig = AIC_lr_total[p_val_total < 0.05]
                 AIC_lr_sig = AIC_lr_sig[~np.isnan(AIC_lr_sig)]
+                AICc_temp = AICc_total[~np.isnan(AICc_total)]
+                AICc_sig = AICc_total[p_val_total < 0.05]
 
-                plt.subplot(3,2,1)
-                plt.hist(AIC_temp[~is_outlier(AIC_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC',fontsize='small')
-
-                plt.subplot(3,2,2)
-                plt.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC',fontsize='small')
-
-                plt.subplot(3,2,3)
-                plt.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC n adjust',fontsize='small')
-
-                plt.subplot(3,2,4)
-                plt.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC n adjust',fontsize='small')
-
-                plt.subplot(3,2,5)
-                plt.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC L',fontsize='small')
-
-                plt.subplot(3,2,6)
-                plt.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC L',fontsize='small')
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6),(ax7,ax8)) = plt.subplots(4,2,sharex='row')
+                
+                ax1.hist(AIC_temp[~is_outlier(AIC_temp)],color='teal',lw=0,alpha=0.85)  
+                if np.min(AIC_temp[~is_outlier(AIC_temp)]) < np.mean(AIC_temp) < np.max(AIC_temp[~is_outlier(AIC_temp)]):
+                    ax1.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
+                ax1.set_title('All AIC',fontsize='small')
+                try:
+                    ax2.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant AIC',fontsize='small')
+                try:
+                    ax3.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85) 
+                    if np.min(AIC_new_temp[~is_outlier(AIC_new_temp)]) < np.mean(AIC_new_temp) < np.max(AIC_new_temp[~is_outlier(AIC_new_temp)]):
+                        ax3.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All AIC n adjust',fontsize='small')
+                try:
+                    ax4.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant AIC n adjust',fontsize='small')
+                try:
+                    ax5.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AIC_lr_temp[~is_outlier(AIC_lr_temp)]) < np.mean(AIC_lr_temp) < np.max(AIC_lr_temp[~is_outlier(AIC_lr_temp)]):
+                        ax5.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All AIC L',fontsize='small')
+                try:
+                    ax6.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant AIC L',fontsize='small')
+                try:
+                    ax7.hist(AICc_temp[~is_outlier(AICc_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AICc_temp[~is_outlier(AICc_temp)]) < np.mean(AICc_temp) < np.max(AICc_temp[~is_outlier(AICc_temp)]):
+                        ax7.axvline(np.mean(AICc_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax7.set_title('All AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
+                #generally look at AICc if avg n/k < 40
+                try:
+                    ax8.hist(AICc_sig,color='coral',lw=0,alpha=0.85)  
+                    ax8.axvline(np.mean(AICc_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax8.set_title('Significant AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
 
                 plt.tight_layout()
                 plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
@@ -748,8 +821,6 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,to
                 plt.clf()
 
                 ##
-                ax = plt.gca()
-
                 r_sq_temp = r_sq_total[~np.isnan(r_sq_total)]
                 r_sq_sig = r_sq_total[p_val_total < 0.05]
                 r_sq_adj_temp = r_sq_adj_total[~np.isnan(r_sq_adj_total)]
@@ -757,35 +828,47 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,to
                 mse_temp = mse_total[~np.isnan(mse_total)]
                 mse_sig = mse_total[p_val_total < 0.05]
 
-                plt.subplot(3,2,1)
-                plt.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
-                plt.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All r2',fontsize='small')
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3,2,sharex='row')
 
-                plt.subplot(3,2,2)
-                plt.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant r2',fontsize='small')
-
-                plt.subplot(3,2,3)
-                plt.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All adjusted r2',fontsize='small')
-
-                plt.subplot(3,2,4)
-                plt.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant adjusted r2',fontsize='small')
-
-                plt.subplot(3,2,5)
-                plt.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All MSE',fontsize='small')
-
-                plt.subplot(3,2,6)
-                plt.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant MSE',fontsize='small')
+                try:
+                    ax1.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
+                    if np.min(r_sq_temp[~is_outlier(r_sq_temp)]) < np.mean(r_sq_temp) < np.max(r_sq_temp[~is_outlier(r_sq_temp)]):
+                       ax1.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax1.set_title('All r2',fontsize='small')
+                try:
+                    ax2.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant r2',fontsize='small')
+                try:
+                    ax3.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
+                    if np.min(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]) < np.mean(r_sq_adj_temp) < np.max(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]):
+                        ax3.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All adjusted r2',fontsize='small')
+                try:
+                    ax4.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant adjusted r2',fontsize='small')
+                try:
+                    ax5.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
+                    if np.min(mse_temp[~is_outlier(mse_temp)]) < np.mean(mse_temp) < np.max(mse_temp[~is_outlier(mse_temp)]):
+                        ax5.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All MSE',fontsize='small')
+                try:
+                    ax6.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant MSE',fontsize='small')
 
                 plt.tight_layout()
                 plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
@@ -828,6 +911,7 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,
         AIC_lr_total = np.zeros((total_unit_num))
         AICc_total = np.zeros((total_unit_num))
         mse_total = np.zeros((total_unit_num))
+        n_total = np.zeros((file_length))
 
         for i in range(file_length):
             condensed = fr_data_dict[i][region_key]['condensed']
@@ -918,7 +1002,10 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,
         
                 likelihood_func = np.sum(stats.norm.logpdf(avg_frs,loc=model_out,scale=np.std(avg_frs)))                
                 AIC_lr = 2*k - 2 * np.log(likelihood_func)
-                AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                try:
+                    AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                except:
+                    AICc = np.nan
                 mse = np.mean(residuals**2)
 
                 AIC_new_total[unit_ct] = AIC_new
@@ -941,6 +1028,7 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,
                 r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
                 p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
                 fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
+            n_total[i] = n
 
         params,covs = curve_fit(div_nl_func,[r_flat_total,p_flat_total],fr_flat_total)
         
@@ -962,6 +1050,8 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,
         #print '%s div nl overall AIC %s' %(type_key,AIC_overall)
 
         num_sig_fit = np.sum(p_val_total < 0.05)
+        avg_n = np.mean(n_total)
+        avg_n_k = round(float(avg_n) / k, 2)
         if num_sig_fit > 0:
             AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
             AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
@@ -977,8 +1067,6 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,
                         plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'div_nl',region_key,type_key)
 
             if plot_hist_bool:
-                ax = plt.gca()
-
                 AIC_temp = AIC_total[~np.isnan(AIC_total)]
                 AIC_sig = AIC_total[p_val_total < 0.05]
                 AIC_new_temp = AIC_new_total[~np.isnan(AIC_new_total)]
@@ -986,36 +1074,61 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,
                 AIC_lr_temp = AIC_lr_total[~np.isnan(AIC_lr_total)]
                 AIC_lr_sig = AIC_lr_total[p_val_total < 0.05]
                 AIC_lr_sig = AIC_lr_sig[~np.isnan(AIC_lr_sig)]
+                AICc_temp = AICc_total[~np.isnan(AICc_total)]
+                AICc_sig = AICc_total[p_val_total < 0.05]
 
-                plt.subplot(3,2,1)
-                plt.hist(AIC_temp[~is_outlier(AIC_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC',fontsize='small')
-
-                plt.subplot(3,2,2)
-                plt.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC',fontsize='small')
-
-                plt.subplot(3,2,3)
-                plt.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC n adjust',fontsize='small')
-
-                plt.subplot(3,2,4)
-                plt.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC n adjust',fontsize='small')
-
-                plt.subplot(3,2,5)
-                plt.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC L',fontsize='small')
-
-                plt.subplot(3,2,6)
-                plt.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC L',fontsize='small')
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6),(ax7,ax8)) = plt.subplots(4,2,sharex='row')
+                
+                ax1.hist(AIC_temp[~is_outlier(AIC_temp)],color='teal',lw=0,alpha=0.85)  
+                if np.min(AIC_temp[~is_outlier(AIC_temp)]) < np.mean(AIC_temp) < np.max(AIC_temp[~is_outlier(AIC_temp)]):
+                    ax1.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
+                ax1.set_title('All AIC',fontsize='small')
+                try:
+                    ax2.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant AIC',fontsize='small')
+                try:
+                    ax3.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85) 
+                    if np.min(AIC_new_temp[~is_outlier(AIC_new_temp)]) < np.mean(AIC_new_temp) < np.max(AIC_new_temp[~is_outlier(AIC_new_temp)]):
+                        ax3.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All AIC n adjust',fontsize='small')
+                try:
+                    ax4.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant AIC n adjust',fontsize='small')
+                try:
+                    ax5.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AIC_lr_temp[~is_outlier(AIC_lr_temp)]) < np.mean(AIC_lr_temp) < np.max(AIC_lr_temp[~is_outlier(AIC_lr_temp)]):
+                        ax5.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All AIC L',fontsize='small')
+                try:
+                    ax6.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant AIC L',fontsize='small')
+                try:
+                    ax7.hist(AICc_temp[~is_outlier(AICc_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AICc_temp[~is_outlier(AICc_temp)]) < np.mean(AICc_temp) < np.max(AICc_temp[~is_outlier(AICc_temp)]):
+                        ax7.axvline(np.mean(AICc_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax7.set_title('All AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
+                #generally look at AICc if avg n/k < 40
+                try:
+                    ax8.hist(AICc_sig,color='coral',lw=0,alpha=0.85)  
+                    ax8.axvline(np.mean(AICc_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax8.set_title('Significant AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
 
                 plt.tight_layout()
                 plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
@@ -1027,8 +1140,6 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,
                 plt.clf()
 
                 ##
-                ax = plt.gca()
-
                 r_sq_temp = r_sq_total[~np.isnan(r_sq_total)]
                 r_sq_sig = r_sq_total[p_val_total < 0.05]
                 r_sq_adj_temp = r_sq_adj_total[~np.isnan(r_sq_adj_total)]
@@ -1036,35 +1147,47 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,
                 mse_temp = mse_total[~np.isnan(mse_total)]
                 mse_sig = mse_total[p_val_total < 0.05]
 
-                plt.subplot(3,2,1)
-                plt.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
-                plt.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All r2',fontsize='small')
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3,2,sharex='row')
 
-                plt.subplot(3,2,2)
-                plt.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant r2',fontsize='small')
-
-                plt.subplot(3,2,3)
-                plt.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All adjusted r2',fontsize='small')
-
-                plt.subplot(3,2,4)
-                plt.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant adjusted r2',fontsize='small')
-
-                plt.subplot(3,2,5)
-                plt.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All MSE',fontsize='small')
-
-                plt.subplot(3,2,6)
-                plt.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant MSE',fontsize='small')
+                try:
+                    ax1.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
+                    if np.min(r_sq_temp[~is_outlier(r_sq_temp)]) < np.mean(r_sq_temp) < np.max(r_sq_temp[~is_outlier(r_sq_temp)]):
+                       ax1.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax1.set_title('All r2',fontsize='small')
+                try:
+                    ax2.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant r2',fontsize='small')
+                try:
+                    ax3.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
+                    if np.min(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]) < np.mean(r_sq_adj_temp) < np.max(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]):
+                        ax3.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All adjusted r2',fontsize='small')
+                try:
+                    ax4.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant adjusted r2',fontsize='small')
+                try:
+                    ax5.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
+                    if np.min(mse_temp[~is_outlier(mse_temp)]) < np.mean(mse_temp) < np.max(mse_temp[~is_outlier(mse_temp)]):
+                        ax5.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All MSE',fontsize='small')
+                try:
+                    ax6.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant MSE',fontsize='small')
 
                 plt.tight_layout()
                 plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
@@ -1107,6 +1230,7 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
         AIC_lr_total = np.zeros((total_unit_num))
         AICc_total = np.zeros((total_unit_num))
         mse_total = np.zeros((total_unit_num))
+        n_total = np.zeros((file_length))
 
         for i in range(file_length):
             condensed = fr_data_dict[i][region_key]['condensed']
@@ -1197,7 +1321,10 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
         
                 likelihood_func = np.sum(stats.norm.logpdf(avg_frs,loc=model_out,scale=np.std(avg_frs)))                
                 AIC_lr = 2*k - 2 * np.log(likelihood_func)
-                AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                try:
+                    AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                except:
+                    AICc = np.nan
                 mse = np.mean(residuals**2)
 
                 AIC_new_total[unit_ct] = AIC_new
@@ -1219,6 +1346,7 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
                 r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
                 p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
                 fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
+            n_total[i] = n
 
         params,covs = curve_fit(div_nl_noe_func,[r_flat_total,p_flat_total],fr_flat_total)
         
@@ -1240,6 +1368,8 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
         #print '%s div_nl_noe overall AIC %s' %(type_key,AIC_overall)
 
         num_sig_fit = np.sum(p_val_total < 0.05)
+        avg_n = np.mean(n_total)
+        avg_n_k = round(float(avg_n) / k, 2)
         if num_sig_fit > 0:
             AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
             AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
@@ -1255,8 +1385,6 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
                         plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'div_nl_noe',region_key,type_key)
 
             if plot_hist_bool:
-                ax = plt.gca()
-
                 AIC_temp = AIC_total[~np.isnan(AIC_total)]
                 AIC_sig = AIC_total[p_val_total < 0.05]
                 AIC_new_temp = AIC_new_total[~np.isnan(AIC_new_total)]
@@ -1264,36 +1392,61 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
                 AIC_lr_temp = AIC_lr_total[~np.isnan(AIC_lr_total)]
                 AIC_lr_sig = AIC_lr_total[p_val_total < 0.05]
                 AIC_lr_sig = AIC_lr_sig[~np.isnan(AIC_lr_sig)]
+                AICc_temp = AICc_total[~np.isnan(AICc_total)]
+                AICc_sig = AICc_total[p_val_total < 0.05]
 
-                plt.subplot(3,2,1)
-                plt.hist(AIC_temp[~is_outlier(AIC_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC',fontsize='small')
-
-                plt.subplot(3,2,2)
-                plt.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC',fontsize='small')
-
-                plt.subplot(3,2,3)
-                plt.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC n adjust',fontsize='small')
-
-                plt.subplot(3,2,4)
-                plt.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC n adjust',fontsize='small')
-
-                plt.subplot(3,2,5)
-                plt.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC L',fontsize='small')
-
-                plt.subplot(3,2,6)
-                plt.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC L',fontsize='small')
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6),(ax7,ax8)) = plt.subplots(4,2,sharex='row')
+                
+                ax1.hist(AIC_temp[~is_outlier(AIC_temp)],color='teal',lw=0,alpha=0.85)  
+                if np.min(AIC_temp[~is_outlier(AIC_temp)]) < np.mean(AIC_temp) < np.max(AIC_temp[~is_outlier(AIC_temp)]):
+                    ax1.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
+                ax1.set_title('All AIC',fontsize='small')
+                try:
+                    ax2.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant AIC',fontsize='small')
+                try:
+                    ax3.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85) 
+                    if np.min(AIC_new_temp[~is_outlier(AIC_new_temp)]) < np.mean(AIC_new_temp) < np.max(AIC_new_temp[~is_outlier(AIC_new_temp)]):
+                        ax3.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All AIC n adjust',fontsize='small')
+                try:
+                    ax4.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant AIC n adjust',fontsize='small')
+                try:
+                    ax5.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AIC_lr_temp[~is_outlier(AIC_lr_temp)]) < np.mean(AIC_lr_temp) < np.max(AIC_lr_temp[~is_outlier(AIC_lr_temp)]):
+                        ax5.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All AIC L',fontsize='small')
+                try:
+                    ax6.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant AIC L',fontsize='small')
+                try:
+                    ax7.hist(AICc_temp[~is_outlier(AICc_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AICc_temp[~is_outlier(AICc_temp)]) < np.mean(AICc_temp) < np.max(AICc_temp[~is_outlier(AICc_temp)]):
+                        ax7.axvline(np.mean(AICc_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax7.set_title('All AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
+                #generally look at AICc if avg n/k < 40
+                try:
+                    ax8.hist(AICc_sig,color='coral',lw=0,alpha=0.85)  
+                    ax8.axvline(np.mean(AICc_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax8.set_title('Significant AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
 
                 plt.tight_layout()
                 plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
@@ -1301,12 +1454,10 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
                 plt.rcParams['xtick.labelsize'] = 8
                 plt.rcParams['ytick.labelsize'] = 8
 
-                plt.savefig('AIC_%s_%s_noe' %(region_key,type_key))
+                plt.savefig('AIC_%s_%s_noe'  %(region_key,type_key))
                 plt.clf()
 
                 ##
-                ax = plt.gca()
-
                 r_sq_temp = r_sq_total[~np.isnan(r_sq_total)]
                 r_sq_sig = r_sq_total[p_val_total < 0.05]
                 r_sq_adj_temp = r_sq_adj_total[~np.isnan(r_sq_adj_total)]
@@ -1314,35 +1465,47 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
                 mse_temp = mse_total[~np.isnan(mse_total)]
                 mse_sig = mse_total[p_val_total < 0.05]
 
-                plt.subplot(3,2,1)
-                plt.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
-                plt.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All r2',fontsize='small')
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3,2,sharex='row')
 
-                plt.subplot(3,2,2)
-                plt.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant r2',fontsize='small')
-
-                plt.subplot(3,2,3)
-                plt.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All adjusted r2',fontsize='small')
-
-                plt.subplot(3,2,4)
-                plt.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant adjusted r2',fontsize='small')
-
-                plt.subplot(3,2,5)
-                plt.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All MSE',fontsize='small')
-
-                plt.subplot(3,2,6)
-                plt.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant MSE',fontsize='small')
+                try:
+                    ax1.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
+                    if np.min(r_sq_temp[~is_outlier(r_sq_temp)]) < np.mean(r_sq_temp) < np.max(r_sq_temp[~is_outlier(r_sq_temp)]):
+                       ax1.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax1.set_title('All r2',fontsize='small')
+                try:
+                    ax2.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant r2',fontsize='small')
+                try:
+                    ax3.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
+                    if np.min(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]) < np.mean(r_sq_adj_temp) < np.max(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]):
+                        ax3.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All adjusted r2',fontsize='small')
+                try:
+                    ax4.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant adjusted r2',fontsize='small')
+                try:
+                    ax5.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
+                    if np.min(mse_temp[~is_outlier(mse_temp)]) < np.mean(mse_temp) < np.max(mse_temp[~is_outlier(mse_temp)]):
+                        ax5.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All MSE',fontsize='small')
+                try:
+                    ax6.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant MSE',fontsize='small')
 
                 plt.tight_layout()
                 plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
@@ -1385,6 +1548,7 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
         AIC_lr_total = np.zeros((total_unit_num))
         AICc_total = np.zeros((total_unit_num))
         mse_total = np.zeros((total_unit_num))
+        n_total = np.zeros((file_length))
 
         for i in range(file_length):
             condensed = fr_data_dict[i][region_key]['condensed']
@@ -1475,7 +1639,10 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
         
                 likelihood_func = np.sum(stats.norm.logpdf(avg_frs,loc=model_out,scale=np.std(avg_frs)))                
                 AIC_lr = 2*k - 2 * np.log(likelihood_func)
-                AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                try:
+                    AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                except:
+                    AICc = np.nan
                 mse = np.mean(residuals**2)
 
                 AIC_new_total[unit_ct] = AIC_new
@@ -1499,6 +1666,7 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
                 r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
                 p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
                 fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
+            n_total[i] = n
 
         try:
             params,covs = curve_fit(div_nl_Y_func,[r_flat_total,p_flat_total],fr_flat_total)
@@ -1527,6 +1695,8 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
         #print '%s div nl Y overall AIC %s' %(type_key,AIC_overall)
 
         num_sig_fit = np.sum(p_val_total < 0.05)
+        avg_n = np.mean(n_total)
+        avg_n_k = round(float(avg_n) / k, 2)
         if num_sig_fit > 0:
             AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
             AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
@@ -1544,8 +1714,6 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
                         except:
                             pdb.set_trace()
             if plot_hist_bool:
-                ax = plt.gca()
-
                 AIC_temp = AIC_total[~np.isnan(AIC_total)]
                 AIC_sig = AIC_total[p_val_total < 0.05]
                 AIC_new_temp = AIC_new_total[~np.isnan(AIC_new_total)]
@@ -1553,36 +1721,61 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
                 AIC_lr_temp = AIC_lr_total[~np.isnan(AIC_lr_total)]
                 AIC_lr_sig = AIC_lr_total[p_val_total < 0.05]
                 AIC_lr_sig = AIC_lr_sig[~np.isnan(AIC_lr_sig)]
+                AICc_temp = AICc_total[~np.isnan(AICc_total)]
+                AICc_sig = AICc_total[p_val_total < 0.05]
 
-                plt.subplot(3,2,1)
-                plt.hist(AIC_temp[~is_outlier(AIC_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC',fontsize='small')
-
-                plt.subplot(3,2,2)
-                plt.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC',fontsize='small')
-
-                plt.subplot(3,2,3)
-                plt.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC n adjust',fontsize='small')
-
-                plt.subplot(3,2,4)
-                plt.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC n adjust',fontsize='small')
-
-                plt.subplot(3,2,5)
-                plt.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC L',fontsize='small')
-
-                plt.subplot(3,2,6)
-                plt.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC L',fontsize='small')
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6),(ax7,ax8)) = plt.subplots(4,2,sharex='row')
+                
+                ax1.hist(AIC_temp[~is_outlier(AIC_temp)],color='teal',lw=0,alpha=0.85)  
+                if np.min(AIC_temp[~is_outlier(AIC_temp)]) < np.mean(AIC_temp) < np.max(AIC_temp[~is_outlier(AIC_temp)]):
+                    ax1.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
+                ax1.set_title('All AIC',fontsize='small')
+                try:
+                    ax2.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant AIC',fontsize='small')
+                try:
+                    ax3.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85) 
+                    if np.min(AIC_new_temp[~is_outlier(AIC_new_temp)]) < np.mean(AIC_new_temp) < np.max(AIC_new_temp[~is_outlier(AIC_new_temp)]):
+                        ax3.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All AIC n adjust',fontsize='small')
+                try:
+                    ax4.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant AIC n adjust',fontsize='small')
+                try:
+                    ax5.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AIC_lr_temp[~is_outlier(AIC_lr_temp)]) < np.mean(AIC_lr_temp) < np.max(AIC_lr_temp[~is_outlier(AIC_lr_temp)]):
+                        ax5.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All AIC L',fontsize='small')
+                try:
+                    ax6.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant AIC L',fontsize='small')
+                try:
+                    ax7.hist(AICc_temp[~is_outlier(AICc_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AICc_temp[~is_outlier(AICc_temp)]) < np.mean(AICc_temp) < np.max(AICc_temp[~is_outlier(AICc_temp)]):
+                        ax7.axvline(np.mean(AICc_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax7.set_title('All AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
+                #generally look at AICc if avg n/k < 40
+                try:
+                    ax8.hist(AICc_sig,color='coral',lw=0,alpha=0.85)  
+                    ax8.axvline(np.mean(AICc_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax8.set_title('Significant AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
 
                 plt.tight_layout()
                 plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
@@ -1594,8 +1787,6 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
                 plt.clf()
 
                 ##
-                ax = plt.gca()
-
                 r_sq_temp = r_sq_total[~np.isnan(r_sq_total)]
                 r_sq_sig = r_sq_total[p_val_total < 0.05]
                 r_sq_adj_temp = r_sq_adj_total[~np.isnan(r_sq_adj_total)]
@@ -1603,35 +1794,47 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
                 mse_temp = mse_total[~np.isnan(mse_total)]
                 mse_sig = mse_total[p_val_total < 0.05]
 
-                plt.subplot(3,2,1)
-                plt.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
-                plt.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All r2',fontsize='small')
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3,2,sharex='row')
 
-                plt.subplot(3,2,2)
-                plt.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant r2',fontsize='small')
-
-                plt.subplot(3,2,3)
-                plt.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All adjusted r2',fontsize='small')
-
-                plt.subplot(3,2,4)
-                plt.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant adjusted r2',fontsize='small')
-
-                plt.subplot(3,2,5)
-                plt.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All MSE',fontsize='small')
-
-                plt.subplot(3,2,6)
-                plt.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant MSE',fontsize='small')
+                try:
+                    ax1.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
+                    if np.min(r_sq_temp[~is_outlier(r_sq_temp)]) < np.mean(r_sq_temp) < np.max(r_sq_temp[~is_outlier(r_sq_temp)]):
+                       ax1.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax1.set_title('All r2',fontsize='small')
+                try:
+                    ax2.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant r2',fontsize='small')
+                try:
+                    ax3.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
+                    if np.min(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]) < np.mean(r_sq_adj_temp) < np.max(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]):
+                        ax3.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All adjusted r2',fontsize='small')
+                try:
+                    ax4.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant adjusted r2',fontsize='small')
+                try:
+                    ax5.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
+                    if np.min(mse_temp[~is_outlier(mse_temp)]) < np.mean(mse_temp) < np.max(mse_temp[~is_outlier(mse_temp)]):
+                        ax5.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All MSE',fontsize='small')
+                try:
+                    ax6.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant MSE',fontsize='small')
 
                 plt.tight_layout()
                 plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
@@ -1674,6 +1877,7 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
         AIC_lr_total = np.zeros((total_unit_num))
         AICc_total = np.zeros((total_unit_num))
         mse_total = np.zeros((total_unit_num))
+        n_total = np.zeros((file_length))
 
         for i in range(file_length):
             condensed = fr_data_dict[i][region_key]['condensed']
@@ -1763,7 +1967,10 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
         
                 likelihood_func = np.sum(stats.norm.logpdf(avg_frs,loc=model_out,scale=np.std(avg_frs)))                
                 AIC_lr = 2*k - 2 * np.log(likelihood_func)
-                AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                try:
+                    AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                except:
+                    AICc = np.nan
                 mse = np.mean(residuals**2)
 
                 AIC_new_total[unit_ct] = AIC_new
@@ -1786,6 +1993,7 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
                 r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
                 p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
                 fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
+            n_total[i] = n
 
         params,covs = curve_fit(div_nl_separate_add_func,[r_flat_total,p_flat_total],fr_flat_total)
         
@@ -1807,6 +2015,8 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
         #print '%s div nl separate add overall AIC %s' %(type_key,AIC_overall)
 
         num_sig_fit = np.sum(p_val_total < 0.05)
+        avg_n = np.mean(n_total)
+        avg_n_k = round(float(avg_n) / k, 2)
         if num_sig_fit > 0:
             AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
             AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
@@ -1821,8 +2031,6 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
                     if plot_bool:
                         plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'div_nl_separate_add',region_key,type_key)
             if plot_hist_bool:
-                ax = plt.gca()
-
                 AIC_temp = AIC_total[~np.isnan(AIC_total)]
                 AIC_sig = AIC_total[p_val_total < 0.05]
                 AIC_new_temp = AIC_new_total[~np.isnan(AIC_new_total)]
@@ -1830,36 +2038,61 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
                 AIC_lr_temp = AIC_lr_total[~np.isnan(AIC_lr_total)]
                 AIC_lr_sig = AIC_lr_total[p_val_total < 0.05]
                 AIC_lr_sig = AIC_lr_sig[~np.isnan(AIC_lr_sig)]
+                AICc_temp = AICc_total[~np.isnan(AICc_total)]
+                AICc_sig = AICc_total[p_val_total < 0.05]
 
-                plt.subplot(3,2,1)
-                plt.hist(AIC_temp[~is_outlier(AIC_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC',fontsize='small')
-
-                plt.subplot(3,2,2)
-                plt.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC',fontsize='small')
-
-                plt.subplot(3,2,3)
-                plt.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC n adjust',fontsize='small')
-
-                plt.subplot(3,2,4)
-                plt.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC n adjust',fontsize='small')
-
-                plt.subplot(3,2,5)
-                plt.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All AIC L',fontsize='small')
-
-                plt.subplot(3,2,6)
-                plt.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant AIC L',fontsize='small')
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6),(ax7,ax8)) = plt.subplots(4,2,sharex='row')
+                
+                ax1.hist(AIC_temp[~is_outlier(AIC_temp)],color='teal',lw=0,alpha=0.85)  
+                if np.min(AIC_temp[~is_outlier(AIC_temp)]) < np.mean(AIC_temp) < np.max(AIC_temp[~is_outlier(AIC_temp)]):
+                    ax1.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
+                ax1.set_title('All AIC',fontsize='small')
+                try:
+                    ax2.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant AIC',fontsize='small')
+                try:
+                    ax3.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85) 
+                    if np.min(AIC_new_temp[~is_outlier(AIC_new_temp)]) < np.mean(AIC_new_temp) < np.max(AIC_new_temp[~is_outlier(AIC_new_temp)]):
+                        ax3.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All AIC n adjust',fontsize='small')
+                try:
+                    ax4.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant AIC n adjust',fontsize='small')
+                try:
+                    ax5.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AIC_lr_temp[~is_outlier(AIC_lr_temp)]) < np.mean(AIC_lr_temp) < np.max(AIC_lr_temp[~is_outlier(AIC_lr_temp)]):
+                        ax5.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All AIC L',fontsize='small')
+                try:
+                    ax6.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant AIC L',fontsize='small')
+                try:
+                    ax7.hist(AICc_temp[~is_outlier(AICc_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AICc_temp[~is_outlier(AICc_temp)]) < np.mean(AICc_temp) < np.max(AICc_temp[~is_outlier(AICc_temp)]):
+                        ax7.axvline(np.mean(AICc_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax7.set_title('All AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
+                #generally look at AICc if avg n/k < 40
+                try:
+                    ax8.hist(AICc_sig,color='coral',lw=0,alpha=0.85)  
+                    ax8.axvline(np.mean(AICc_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax8.set_title('Significant AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
 
                 plt.tight_layout()
                 plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
@@ -1871,8 +2104,6 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
                 plt.clf()
 
                 ##
-                ax = plt.gca()
-
                 r_sq_temp = r_sq_total[~np.isnan(r_sq_total)]
                 r_sq_sig = r_sq_total[p_val_total < 0.05]
                 r_sq_adj_temp = r_sq_adj_total[~np.isnan(r_sq_adj_total)]
@@ -1880,35 +2111,47 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
                 mse_temp = mse_total[~np.isnan(mse_total)]
                 mse_sig = mse_total[p_val_total < 0.05]
 
-                plt.subplot(3,2,1)
-                plt.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
-                plt.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All r2',fontsize='small')
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3,2,sharex='row')
 
-                plt.subplot(3,2,2)
-                plt.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant r2',fontsize='small')
-
-                plt.subplot(3,2,3)
-                plt.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All adjusted r2',fontsize='small')
-
-                plt.subplot(3,2,4)
-                plt.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant adjusted r2',fontsize='small')
-
-                plt.subplot(3,2,5)
-                plt.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
-                plt.title('All MSE',fontsize='small')
-
-                plt.subplot(3,2,6)
-                plt.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
-                plt.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
-                plt.title('Significant MSE',fontsize='small')
+                try:
+                    ax1.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
+                    if np.min(r_sq_temp[~is_outlier(r_sq_temp)]) < np.mean(r_sq_temp) < np.max(r_sq_temp[~is_outlier(r_sq_temp)]):
+                       ax1.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax1.set_title('All r2',fontsize='small')
+                try:
+                    ax2.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant r2',fontsize='small')
+                try:
+                    ax3.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
+                    if np.min(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]) < np.mean(r_sq_adj_temp) < np.max(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]):
+                        ax3.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All adjusted r2',fontsize='small')
+                try:
+                    ax4.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant adjusted r2',fontsize='small')
+                try:
+                    ax5.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
+                    if np.min(mse_temp[~is_outlier(mse_temp)]) < np.mean(mse_temp) < np.max(mse_temp[~is_outlier(mse_temp)]):
+                        ax5.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All MSE',fontsize='small')
+                try:
+                    ax6.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant MSE',fontsize='small')
 
                 plt.tight_layout()
                 plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
@@ -1951,6 +2194,7 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
         AIC_lr_total = np.zeros((total_unit_num))
         AICc_total = np.zeros((total_unit_num))
         mse_total = np.zeros((total_unit_num))
+        n_total = np.zeros((file_length))
 
         for i in range(file_length):
             fr_data = fr_data_dict[i][region_key][type_key]
@@ -2048,7 +2292,10 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
         
                 likelihood_func = np.sum(stats.norm.logpdf(avg_frs,loc=model_out,scale=np.std(avg_frs)))                
                 AIC_lr = 2*k - 2 * np.log(likelihood_func)
-                AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                try:
+                    AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                except:
+                    AICc = np.nan
                 mse = np.mean(residuals**2)
 
                 AIC_new_total[unit_ct] = AIC_new
@@ -2071,6 +2318,7 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
                 r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
                 p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
                 fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
+            n_total[i] = n
 
         params,covs = curve_fit(div_nl_separate_multiply_func,[r_flat_total,p_flat_total],fr_flat_total)
         
@@ -2092,6 +2340,8 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
         #print '%s div nl separate multiply overall AIC %s' %(type_key,AIC_overall)
         
         num_sig_fit = np.sum(p_val_total < 0.05)
+        avg_n = np.mean(n_total)
+        avg_n_k = round(float(avg_n) / k, 2)
         if num_sig_fit > 0:
             AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
             AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
@@ -2107,7 +2357,6 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
                         plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'div_nl_separate_multiply',region_key,type_key)
 
             if plot_hist_bool:
-                
                 AIC_temp = AIC_total[~np.isnan(AIC_total)]
                 AIC_sig = AIC_total[p_val_total < 0.05]
                 AIC_new_temp = AIC_new_total[~np.isnan(AIC_new_total)]
@@ -2115,32 +2364,61 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
                 AIC_lr_temp = AIC_lr_total[~np.isnan(AIC_lr_total)]
                 AIC_lr_sig = AIC_lr_total[p_val_total < 0.05]
                 AIC_lr_sig = AIC_lr_sig[~np.isnan(AIC_lr_sig)]
+                AICc_temp = AICc_total[~np.isnan(AICc_total)]
+                AICc_sig = AICc_total[p_val_total < 0.05]
 
-                f,((ax1,ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3,2,sharex='row')
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6),(ax7,ax8)) = plt.subplots(4,2,sharex='row')
                 
                 ax1.hist(AIC_temp[~is_outlier(AIC_temp)],color='teal',lw=0,alpha=0.85)  
-                ax1.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
+                if np.min(AIC_temp[~is_outlier(AIC_temp)]) < np.mean(AIC_temp) < np.max(AIC_temp[~is_outlier(AIC_temp)]):
+                    ax1.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
                 ax1.set_title('All AIC',fontsize='small')
-
-                ax2.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
-                ax2.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
+                try:
+                    ax2.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
                 ax2.set_title('Significant AIC',fontsize='small')
-
-                ax3.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85) 
-                ax3.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
+                try:
+                    ax3.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85) 
+                    if np.min(AIC_new_temp[~is_outlier(AIC_new_temp)]) < np.mean(AIC_new_temp) < np.max(AIC_new_temp[~is_outlier(AIC_new_temp)]):
+                        ax3.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
                 ax3.set_title('All AIC n adjust',fontsize='small')
-
-                ax4.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
-                ax4.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
+                try:
+                    ax4.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
                 ax4.set_title('Significant AIC n adjust',fontsize='small')
-
-                ax5.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
-                ax5.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
+                try:
+                    ax5.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AIC_lr_temp[~is_outlier(AIC_lr_temp)]) < np.mean(AIC_lr_temp) < np.max(AIC_lr_temp[~is_outlier(AIC_lr_temp)]):
+                        ax5.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
                 ax5.set_title('All AIC L',fontsize='small')
-
-                ax6.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
-                ax6.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
+                try:
+                    ax6.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
                 ax6.set_title('Significant AIC L',fontsize='small')
+                try:
+                    ax7.hist(AICc_temp[~is_outlier(AICc_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AICc_temp[~is_outlier(AICc_temp)]) < np.mean(AICc_temp) < np.max(AICc_temp[~is_outlier(AICc_temp)]):
+                        ax7.axvline(np.mean(AICc_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax7.set_title('All AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
+                #generally look at AICc if avg n/k < 40
+                try:
+                    ax8.hist(AICc_sig,color='coral',lw=0,alpha=0.85)  
+                    ax8.axvline(np.mean(AICc_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax8.set_title('Significant AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
 
                 plt.tight_layout()
                 plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
@@ -2161,28 +2439,44 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
 
                 f,((ax1,ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3,2,sharex='row')
 
-                ax1.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
-                ax1.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
+                try:
+                    ax1.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
+                    if np.min(r_sq_temp[~is_outlier(r_sq_temp)]) < np.mean(r_sq_temp) < np.max(r_sq_temp[~is_outlier(r_sq_temp)]):
+                       ax1.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
                 ax1.set_title('All r2',fontsize='small')
-
-                ax2.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
-                ax2.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
+                try:
+                    ax2.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
                 ax2.set_title('Significant r2',fontsize='small')
-
-                ax3.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
-                ax3.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
+                try:
+                    ax3.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
+                    if np.min(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]) < np.mean(r_sq_adj_temp) < np.max(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]):
+                        ax3.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
                 ax3.set_title('All adjusted r2',fontsize='small')
-
-                ax4.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
-                ax4.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
+                try:
+                    ax4.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
                 ax4.set_title('Significant adjusted r2',fontsize='small')
-
-                ax5.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
-                ax5.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
+                try:
+                    ax5.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
+                    if np.min(mse_temp[~is_outlier(mse_temp)]) < np.mean(mse_temp) < np.max(mse_temp[~is_outlier(mse_temp)]):
+                        ax5.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
                 ax5.set_title('All MSE',fontsize='small')
-
-                ax6.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
-                ax6.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
+                try:
+                    ax6.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
                 ax6.set_title('Significant MSE',fontsize='small')
 
                 plt.tight_layout()
@@ -2234,7 +2528,14 @@ def make_delta_AIC(AICs,p_vals):
     for i in range(np.shape(sig_only_AICs)[0]):
         dAICs_sig_only[i,:] = sig_only_AICs[i,:] - mins[i]
 
-    return_dict = {'dAICs_sig_any':dAICs_sig_any,'dAICs_all':dAICs_all,'dAICs_sig_only':dAICs_sig_only}
+    akaike_weights = np.zeros((np.shape(dAICs_all)))
+    for i in range(np.shape(dAICs_all)[0]):
+        unit_dAIC = dAICs_all[i,:]
+        # wi = exp(delAICi/2)/sum(exp(delAIC/2))
+        exp_term = np.exp(-1*unit_dAIC/2)
+        akaike_weights[i,:] = exp_term / np.sum(exp_term)
+
+    return_dict = {'dAICs_sig_any':dAICs_sig_any,'dAICs_all':dAICs_all,'dAICs_sig_only':dAICs_sig_only,'akaike_weights':akaike_weights}
         
     return (return_dict)
 
@@ -2285,7 +2586,7 @@ for file in glob.glob('*timestamps.mat'):
     condensed[:,3] = trial_breakdown[:,5]
     condensed[:,4] = trial_breakdown[:,7]
     condensed[:,5] = trial_breakdown[:,10]
-    
+
     #delete end trials if not fully finished
     if condensed[-1,1] == condensed[-1,2] == 0:
 	new_condensed = condensed[0:-1,:]
@@ -2300,6 +2601,12 @@ for file in glob.glob('*timestamps.mat'):
     #col 5 all 0s now, replace with succ/fail vector: succ = 1, fail = -1
     condensed[condensed[:,1] != 0, 5] = 1
     condensed[condensed[:,2] != 0, 5] = -1
+
+    #succ only
+    #condensed = condensed[condensed[:,5] == 1]
+
+    #fail only
+    #condensed = condensed[condensed[:,5] == -1]
 
     #Break spikes into M1 S1 pmd 
     M1_spikes = Spikes[0,0][0,1];
@@ -2563,109 +2870,323 @@ for region_key,region_val in data_dict_all.iteritems():
 
             #plotting
 
-            f,axarr = plt.subplots(7,sharex=True)
-
-            ceil_val = np.ceil(np.max(delAIC['dAICs_all'][~np.isnan(delAIC['dAICs_all'])]))
-            f.suptitle('delta %s all units: %s %s' %(AIC_type,region_key,win_key))
-            axarr[0].hist(delAIC['dAICs_all'][:,0][~np.isnan(delAIC['dAICs_all'][:,0])],color='teal',lw=0,range=[-1,ceil_val+1])
-            axarr[0].set_title('linear',fontsize='small')
-            axarr[1].hist(delAIC['dAICs_all'][:,1][~np.isnan(delAIC['dAICs_all'][:,1])],color='teal',lw=0)
-            axarr[1].set_title('difference',fontsize='small')
-            axarr[2].hist(delAIC['dAICs_all'][:,2][~np.isnan(delAIC['dAICs_all'][:,2])],color='teal',lw=0)
-            axarr[2].set_title('div nl',fontsize='small')
-            axarr[3].hist(delAIC['dAICs_all'][:,3][~np.isnan(delAIC['dAICs_all'][:,3])],color='teal',lw=0)
-            axarr[3].set_title('div nl noe',fontsize='small')
-            axarr[4].hist(delAIC['dAICs_all'][:,4][~np.isnan(delAIC['dAICs_all'][:,4])],color='teal',lw=0)
-            axarr[4].set_title('div nl Y',fontsize='small')
-            axarr[5].hist(delAIC['dAICs_all'][:,5][~np.isnan(delAIC['dAICs_all'][:,5])],color='teal',lw=0)
-            axarr[5].set_title('separate add',fontsize='small')
-            axarr[6].hist(delAIC['dAICs_all'][:,6][~np.isnan(delAIC['dAICs_all'][:,6])],color='teal',lw=0)
-            axarr[6].set_title('separate multiply',fontsize='small')
-            for axi in axarr.reshape(-1):
-                axi.yaxis.set_major_locator(plt.MaxNLocator(3))
-            plt.tight_layout()
-            plt.subplots_adjust(top=0.9)
-            plt.savefig('d%s_all_%s_%s' %(AIC_type,region_key,win_key))
-            plt.clf()
-
-            #
-            f,axarr = plt.subplots(7,sharex=True)
-            ceil_val = np.ceil(np.max(delAIC['dAICs_sig_any'][~np.isnan(delAIC['dAICs_sig_any'])]))
-            f.suptitle('delta %s any model significant: %s %s' %(AIC_type,region_key,win_key))
-            axarr[0].hist(delAIC['dAICs_sig_any'][:,0][~np.isnan(delAIC['dAICs_sig_any'][:,0])],color='slateblue',lw=0,range=[-1,ceil_val+1])
-            axarr[0].set_title('linear',fontsize='small')
-            axarr[1].hist(delAIC['dAICs_sig_any'][:,1][~np.isnan(delAIC['dAICs_sig_any'][:,1])],color='slateblue',lw=0)
-            axarr[1].set_title('difference',fontsize='small')
-            axarr[2].hist(delAIC['dAICs_sig_any'][:,2][~np.isnan(delAIC['dAICs_sig_any'][:,2])],color='slateblue',lw=0)
-            axarr[2].set_title('div nl',fontsize='small')
-            axarr[3].hist(delAIC['dAICs_sig_any'][:,3][~np.isnan(delAIC['dAICs_sig_any'][:,3])],color='slateblue',lw=0)
-            axarr[3].set_title('div nl noe',fontsize='small')
-            axarr[4].hist(delAIC['dAICs_sig_any'][:,4][~np.isnan(delAIC['dAICs_sig_any'][:,4])],color='slateblue',lw=0)
-            axarr[4].set_title('div nl Y',fontsize='small')
-            axarr[5].hist(delAIC['dAICs_sig_any'][:,5][~np.isnan(delAIC['dAICs_sig_any'][:,5])],color='slateblue',lw=0)
-            axarr[5].set_title('separate add',fontsize='small')
-            axarr[6].hist(delAIC['dAICs_sig_any'][:,6][~np.isnan(delAIC['dAICs_sig_any'][:,6])],color='slateblue',lw=0)
-            axarr[6].set_title('separate multiply',fontsize='small')
-            for axi in axarr.reshape(-1):
-                axi.yaxis.set_major_locator(plt.MaxNLocator(3))
-            plt.tight_layout()
-            plt.subplots_adjust(top=0.9)
-            plt.savefig('d%s_any_sig_%s_%s' %(AIC_type,region_key,win_key))
-            plt.clf()
-
-            #
-            f,axarr = plt.subplots(7,sharex=True)
-
-            ceil_val = np.ceil(np.max(delAIC['dAICs_sig_only'][~np.isnan(delAIC['dAICs_sig_only'])]))
-
-            f.suptitle('delta %s only significant model fit: %s %s' %(AIC_type,region_key,win_key))
             try:
-                axarr[0].hist(delAIC['dAICs_sig_only'][:,0][~np.isnan(delAIC['dAICs_sig_only'][:,0])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
+                ceil_val = np.ceil(np.max(delAIC['dAICs_all'][~np.isnan(delAIC['dAICs_all'])]))
+            except:
+                ceil_val = 0
+        
+            if ceil_val != 0:
+                f,axarr = plt.subplots(7,sharex=True,sharey=True)
+
+                f.suptitle('delta %s all units: %s %s' %(AIC_type,region_key,win_key))
+                axarr[0].hist(delAIC['dAICs_all'][:,0][~np.isnan(delAIC['dAICs_all'][:,0])],color='teal',lw=0,range=[-1,ceil_val+1])
                 axarr[0].set_title('linear',fontsize='small')
-            except:
-                pass
-            try:
-                axarr[1].hist(delAIC['dAICs_sig_only'][:,1][~np.isnan(delAIC['dAICs_sig_only'][:,1])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
-                axarr[1].set_title('difference',fontsize='small')
-            except:
-                pass
-            try:
-                axarr[2].hist(delAIC['dAICs_sig_only'][:,2][~np.isnan(delAIC['dAICs_sig_only'][:,2])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
-                axarr[2].set_title('div nl',fontsize='small')
-            except:
-                pass
-            try:
-                axarr[3].hist(delAIC['dAICs_sig_only'][:,3][~np.isnan(delAIC['dAICs_sig_only'][:,3])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
-                axarr[3].set_title('div nl noe',fontsize='small')
-            except:
-                pass
-            try:
-                axarr[4].hist(delAIC['dAICs_sig_only'][:,4][~np.isnan(delAIC['dAICs_sig_only'][:,4])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
-                axarr[4].set_title('div nl Y',fontsize='small')
-            except:
-                pass
-            try:
-                axarr[5].hist(delAIC['dAICs_sig_only'][:,5][~np.isnan(delAIC['dAICs_sig_only'][:,5])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
-                axarr[5].set_title('separate add',fontsize='small')
-            except:
-                pass
-            try:
-                axarr[6].hist(delAIC['dAICs_sig_only'][:,6][~np.isnan(delAIC['dAICs_sig_only'][:,6])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
-                axarr[6].set_title('separate multiply',fontsize='small')
-            except:
-                pass
-            for axi in axarr.reshape(-1):
                 try:
-                    axi.yaxis.set_major_locator(plt.MaxNLocator(3))
-                    #axi.xlim(-1,ceil_val)
+                    axarr[1].hist(delAIC['dAICs_all'][:,1][~np.isnan(delAIC['dAICs_all'][:,1])],color='teal',lw=0)
                 except:
                     pass
+                axarr[1].set_title('difference',fontsize='small')
+                try:
+                    axarr[2].hist(delAIC['dAICs_all'][:,2][~np.isnan(delAIC['dAICs_all'][:,2])],color='teal',lw=0)
+                except:
+                    pass
+                axarr[2].set_title('div nl',fontsize='small')
+                try:
+                    axarr[3].hist(delAIC['dAICs_all'][:,3][~np.isnan(delAIC['dAICs_all'][:,3])],color='teal',lw=0)
+                except:
+                    pass
+                axarr[3].set_title('div nl noe',fontsize='small')
+                try:
+                    axarr[4].hist(delAIC['dAICs_all'][:,4][~np.isnan(delAIC['dAICs_all'][:,4])],color='teal',lw=0)
+                except:
+                    pass
+                axarr[4].set_title('div nl Y',fontsize='small')
+                try:
+                    axarr[5].hist(delAIC['dAICs_all'][:,5][~np.isnan(delAIC['dAICs_all'][:,5])],color='teal',lw=0)
+                except:
+                    pass
+                axarr[5].set_title('separate add',fontsize='small')
+                try:
+                    axarr[6].hist(delAIC['dAICs_all'][:,6][~np.isnan(delAIC['dAICs_all'][:,6])],color='teal',lw=0)
+                except:
+                    pass
+                axarr[6].set_title('separate multiply',fontsize='small')
+                for axi in axarr.reshape(-1):
+                    axi.yaxis.set_major_locator(plt.MaxNLocator(3))
+                plt.tight_layout()
+                plt.subplots_adjust(top=0.9)
+                plt.savefig('d%s_all_%s_%s' %(AIC_type,region_key,win_key))
+                plt.clf()
+
+            #
+            try:
+                ceil_val = np.ceil(np.max(delAIC['dAICs_sig_any'][~np.isnan(delAIC['dAICs_sig_any'])]))
+            except:
+                ceil_val = 0
+            if ceil_val != 0:
+                f,axarr = plt.subplots(7,sharex=True,sharey=True)
+                f.suptitle('delta %s any model significant: %s %s' %(AIC_type,region_key,win_key))
+                axarr[0].hist(delAIC['dAICs_sig_any'][:,0][~np.isnan(delAIC['dAICs_sig_any'][:,0])],color='slateblue',lw=0,range=[-1,ceil_val+1])
+                axarr[0].set_title('linear',fontsize='small')
+                try:
+                    axarr[1].hist(delAIC['dAICs_sig_any'][:,1][~np.isnan(delAIC['dAICs_sig_any'][:,1])],color='slateblue',lw=0)
+                except:
+                   pass
+                axarr[1].set_title('difference',fontsize='small')
+                try:
+                    axarr[2].hist(delAIC['dAICs_sig_any'][:,2][~np.isnan(delAIC['dAICs_sig_any'][:,2])],color='slateblue',lw=0)
+                except:
+                    pass
+                axarr[2].set_title('div nl',fontsize='small')
+                try:
+                    axarr[3].hist(delAIC['dAICs_sig_any'][:,3][~np.isnan(delAIC['dAICs_sig_any'][:,3])],color='slateblue',lw=0)
+                except:
+                    pass
+                axarr[3].set_title('div nl noe',fontsize='small')
+                try:
+                    axarr[4].hist(delAIC['dAICs_sig_any'][:,4][~np.isnan(delAIC['dAICs_sig_any'][:,4])],color='slateblue',lw=0)
+                except:
+                    pass
+                axarr[4].set_title('div nl Y',fontsize='small')
+                try:
+                    axarr[5].hist(delAIC['dAICs_sig_any'][:,5][~np.isnan(delAIC['dAICs_sig_any'][:,5])],color='slateblue',lw=0)
+                except:
+                    pass
+                axarr[5].set_title('separate add',fontsize='small')
+                try:
+                    axarr[6].hist(delAIC['dAICs_sig_any'][:,6][~np.isnan(delAIC['dAICs_sig_any'][:,6])],color='slateblue',lw=0)
+                except:
+                    pass
+                axarr[6].set_title('separate multiply',fontsize='small')
+                
+                for axi in axarr.reshape(-1):
+                    axi.yaxis.set_major_locator(plt.MaxNLocator(3))
+                plt.tight_layout()
+                plt.subplots_adjust(top=0.9)
+                plt.savefig('d%s_any_sig_%s_%s' %(AIC_type,region_key,win_key))
+                plt.clf()
+
+            #
+            try:
+                ceil_val = np.ceil(np.max(delAIC['dAICs_sig_only'][~np.isnan(delAIC['dAICs_sig_only'])]))
+            except:
+                ceil_val = 0
+            if ceil_val != 0:
+                f,axarr = plt.subplots(7,sharex=True,sharey=True)
+                f.suptitle('delta %s only significant model fit: %s %s' %(AIC_type,region_key,win_key))
+                try:
+                    y0,x,_ = axarr[0].hist(delAIC['dAICs_sig_only'][:,0][~np.isnan(delAIC['dAICs_sig_only'][:,0])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
+                    axarr[0].set_title('linear',fontsize='small')
+                except:
+                    y0 = 0
+                    pass
+                try:
+                    y1,x,_ = axarr[1].hist(delAIC['dAICs_sig_only'][:,1][~np.isnan(delAIC['dAICs_sig_only'][:,1])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
+                    axarr[1].set_title('difference',fontsize='small')
+                except:
+                    y1 = 0
+                    pass
+                try:
+                    y2,x,_ = axarr[2].hist(delAIC['dAICs_sig_only'][:,2][~np.isnan(delAIC['dAICs_sig_only'][:,2])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
+                    axarr[2].set_title('div nl',fontsize='small')
+                except:
+                    y2 = 0
+                    pass
+                try:
+                    y3,x,_ = axarr[3].hist(delAIC['dAICs_sig_only'][:,3][~np.isnan(delAIC['dAICs_sig_only'][:,3])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
+                    axarr[3].set_title('div nl noe',fontsize='small')
+                except:
+                    y3 = 0
+                    pass
+                try:
+                    y4,x,_ = axarr[4].hist(delAIC['dAICs_sig_only'][:,4][~np.isnan(delAIC['dAICs_sig_only'][:,4])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
+                    axarr[4].set_title('div nl Y',fontsize='small')
+                except:
+                    y4 = 0
+                    pass
+                try:
+                    y5,x,_ = axarr[5].hist(delAIC['dAICs_sig_only'][:,5][~np.isnan(delAIC['dAICs_sig_only'][:,5])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
+                    axarr[5].set_title('separate add',fontsize='small')
+                except:
+                    y5 = 0
+                    pass
+                try:    
+                    y6,x,_ = axarr[6].hist(delAIC['dAICs_sig_only'][:,6][~np.isnan(delAIC['dAICs_sig_only'][:,6])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
+                    axarr[6].set_title('separate multiply',fontsize='small')
+                except:
+                    y6 = 0
+                    pass
+    
+                max_y = int(np.max(np.append(np.append(np.append(np.append(np.append(np.append(y0,y1),y2),y3),y4),y5),y6)))
+                for axi in axarr.reshape(-1):
+                    try:
+                        if max_y > 3:
+                            axi.yaxis.set_major_locator(plt.MaxNLocator(3))
+                        else:
+                            axi.yaxis.set_major_locator(plt.MaxNLocator(1))
+                        pass
+                        #axi.xlim(-1,ceil_val)
+                    except:
+                        pass
+                plt.tight_layout()
+                plt.subplots_adjust(top=0.9)
+                plt.savefig('d%s_only_sig_%s_%s' %(AIC_type,region_key,win_key))
+                plt.clf()
+                
+            ####
+            f,axarr = plt.subplots(7,sharex=True,sharey=True)
+
+            f.suptitle('akaike weights %s all units: %s %s' %(AIC_type,region_key,win_key))
+            axarr[0].hist(delAIC['akaike_weights'][:,0][~np.isnan(delAIC['akaike_weights'][:,0])],color='crimson',lw=0,range=[0,1],bins=8)
+            axarr[0].axvline(np.nanmean(delAIC['akaike_weights'][:,0]),color='k',linestyle='dashed',linewidth=1)
+            axarr[0].set_title('linear',fontsize='small')
+            try:
+                axarr[1].hist(delAIC['akaike_weights'][:,1][~np.isnan(delAIC['akaike_weights'][:,1])],color='crimson',lw=0,bins=8)
+                axarr[1].axvline(np.nanmean(delAIC['akaike_weights'][:,1]),color='k',linestyle='dashed',linewidth=1)
+            except:
+                pass
+            axarr[1].set_title('difference',fontsize='small')
+            try:
+                axarr[2].hist(delAIC['akaike_weights'][:,2][~np.isnan(delAIC['akaike_weights'][:,2])],color='crimson',lw=0,bins=8)
+                axarr[2].axvline(np.nanmean(delAIC['akaike_weights'][:,2]),color='k',linestyle='dashed',linewidth=1)
+            except:
+                pass
+            axarr[2].set_title('div nl',fontsize='small')
+            try:
+                axarr[3].hist(delAIC['akaike_weights'][:,3][~np.isnan(delAIC['akaike_weights'][:,3])],color='crimson',lw=0,bins=8)
+                axarr[3].axvline(np.nanmean(delAIC['akaike_weights'][:,3]),color='k',linestyle='dashed',linewidth=1)
+            except:
+                pass
+            axarr[3].set_title('div nl noe',fontsize='small')
+            try:
+                axarr[4].hist(delAIC['akaike_weights'][:,4][~np.isnan(delAIC['akaike_weights'][:,4])],color='crimson',lw=0,bins=8)
+                axarr[4].axvline(np.nanmean(delAIC['akaike_weights'][:,4]),color='k',linestyle='dashed',linewidth=1)
+            except:
+                pass
+            axarr[4].set_title('div nl Y',fontsize='small')
+            try:
+                axarr[5].hist(delAIC['akaike_weights'][:,5][~np.isnan(delAIC['akaike_weights'][:,5])],color='crimson',lw=0,bins=8)
+                axarr[5].axvline(np.nanmean(delAIC['akaike_weights'][:,5]),color='k',linestyle='dashed',linewidth=1)
+            except:
+                pass
+            axarr[5].set_title('separate add',fontsize='small')
+            try:
+                axarr[6].hist(delAIC['akaike_weights'][:,6][~np.isnan(delAIC['akaike_weights'][:,6])],color='crimson',lw=0,bins=8)
+                axarr[6].axvline(np.nanmean(delAIC['akaike_weights'][:,6]),color='k',linestyle='dashed',linewidth=1)
+            except:
+                pass
+            axarr[6].set_title('separate multiply',fontsize='small')
+            for axi in axarr.reshape(-1):
+                axi.yaxis.set_major_locator(plt.MaxNLocator(3))
             plt.tight_layout()
             plt.subplots_adjust(top=0.9)
-            plt.savefig('d%s_only_sig_%s_%s' %(AIC_type,region_key,win_key))
+            plt.savefig('d%s_akaike_weights_%s_%s' %(AIC_type,region_key,win_key))
             plt.clf()
-
+            
+            ##save
             delAIC_dict[win_key] = delAIC
+            
+    #####comparative r2 and mse plots
+    for win_key,win_val_x in div_nl_separate_multiply_model_return.iteritems():
+        comp_r2_all = list((linear_model_return[win_key]['r_sq_total'],diff_model_return[win_key]['r_sq_total'],div_nl_model_return[win_key]['r_sq_total'],div_nl_noe_model_return[win_key]['r_sq_total'],div_nl_Y_model_return[win_key]['r_sq_total'],div_nl_separate_add_model_return[win_key]['r_sq_total'],div_nl_separate_multiply_model_return[win_key]['r_sq_total']))
+        comp_r2_sig = list((linear_model_return[win_key]['r_sq_total'][linear_model_return[win_key]['p_val_total'] < 0.05],diff_model_return[win_key]['r_sq_total'][diff_model_return[win_key]['p_val_total'] < 0.05],div_nl_model_return[win_key]['r_sq_total'][div_nl_model_return[win_key]['p_val_total'] < 0.05],div_nl_noe_model_return[win_key]['r_sq_total'][div_nl_noe_model_return[win_key]['p_val_total'] < 0.05],div_nl_Y_model_return[win_key]['r_sq_total'][div_nl_Y_model_return[win_key]['p_val_total'] < 0.05],div_nl_separate_add_model_return[win_key]['r_sq_total'][div_nl_separate_add_model_return[win_key]['p_val_total'] < 0.05],div_nl_separate_multiply_model_return[win_key]['r_sq_total'][div_nl_separate_multiply_model_return[win_key]['p_val_total'] < 0.05]))
+
+        comp_r2_adj_all = list((linear_model_return[win_key]['r_sq_adj_total'],diff_model_return[win_key]['r_sq_adj_total'],div_nl_model_return[win_key]['r_sq_adj_total'],div_nl_noe_model_return[win_key]['r_sq_adj_total'],div_nl_Y_model_return[win_key]['r_sq_adj_total'],div_nl_separate_add_model_return[win_key]['r_sq_adj_total'],div_nl_separate_multiply_model_return[win_key]['r_sq_adj_total']))
+        comp_r2_adj_sig = list((linear_model_return[win_key]['r_sq_adj_total'][linear_model_return[win_key]['p_val_total'] < 0.05],diff_model_return[win_key]['r_sq_adj_total'][diff_model_return[win_key]['p_val_total'] < 0.05],div_nl_model_return[win_key]['r_sq_adj_total'][div_nl_model_return[win_key]['p_val_total'] < 0.05],div_nl_noe_model_return[win_key]['r_sq_adj_total'][div_nl_noe_model_return[win_key]['p_val_total'] < 0.05],div_nl_Y_model_return[win_key]['r_sq_adj_total'][div_nl_Y_model_return[win_key]['p_val_total'] < 0.05],div_nl_separate_add_model_return[win_key]['r_sq_adj_total'][div_nl_separate_add_model_return[win_key]['p_val_total'] < 0.05],div_nl_separate_multiply_model_return[win_key]['r_sq_adj_total'][div_nl_separate_multiply_model_return[win_key]['p_val_total'] < 0.05]))
+
+        comp_mse_all = list((linear_model_return[win_key]['mse_total'],diff_model_return[win_key]['mse_total'],div_nl_model_return[win_key]['mse_total'],div_nl_noe_model_return[win_key]['mse_total'],div_nl_Y_model_return[win_key]['mse_total'],div_nl_separate_add_model_return[win_key]['mse_total'],div_nl_separate_multiply_model_return[win_key]['mse_total']))
+        comp_mse_sig = list((linear_model_return[win_key]['mse_total'][linear_model_return[win_key]['p_val_total'] < 0.05],diff_model_return[win_key]['mse_total'][diff_model_return[win_key]['p_val_total'] < 0.05],div_nl_model_return[win_key]['mse_total'][div_nl_model_return[win_key]['p_val_total'] < 0.05],div_nl_noe_model_return[win_key]['mse_total'][div_nl_noe_model_return[win_key]['p_val_total'] < 0.05],div_nl_Y_model_return[win_key]['mse_total'][div_nl_Y_model_return[win_key]['p_val_total'] < 0.05],div_nl_separate_add_model_return[win_key]['mse_total'][div_nl_separate_add_model_return[win_key]['p_val_total'] < 0.05],div_nl_separate_multiply_model_return[win_key]['mse_total'][div_nl_separate_multiply_model_return[win_key]['p_val_total'] < 0.05]))
+
+
+        f,axarr = plt.subplots(7,sharex=True,sharey=True)
+
+        f.suptitle('r2 %s all units: %s' %(region_key,win_key))
+        axarr[0].hist(comp_r2_all[0],color='midnightblue',lw=0)
+        axarr[0].set_title('linear',fontsize='small')
+        try:
+            axarr[1].hist(comp_r2_all[1],color='midnightblue',lw=0)
+        except:
+            pass
+        axarr[1].set_title('difference',fontsize='small')
+        try:
+            axarr[2].hist(comp_r2_all[2],color='midnightblue',lw=0)
+        except:
+            pass
+        axarr[2].set_title('div nl',fontsize='small')
+        try:
+            axarr[3].hist(comp_r2_all[3],color='midnightblue',lw=0)
+        except:
+            pass
+        axarr[3].set_title('div nl noe',fontsize='small')
+        try:
+            axarr[4].hist(comp_r2_all[4],color='midnightblue',lw=0)
+        except:
+            pass
+        axarr[4].set_title('div nl Y',fontsize='small')
+        try:
+            axarr[5].hist(comp_r2_all[5],color='midnightblue',lw=0)
+        except:
+            pass
+        axarr[5].set_title('separate add',fontsize='small')
+        try:
+            axarr[6].hist(comp_r2_all[6],color='midnightblue',lw=0)
+        except:
+            pass
+        axarr[6].set_title('separate multiply',fontsize='small')
+        for axi in axarr.reshape(-1):
+            axi.yaxis.set_major_locator(plt.MaxNLocator(3))
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.9)
+        plt.savefig('r2_all_%s_%s' %(region_key,win_key))
+        plt.clf()
+            
+        #
+        f,axarr = plt.subplots(7,sharex=True,sharey=True)
+
+        f.suptitle('r2 %s sig units: %s' %(region_key,win_key))
+        axarr[0].hist(comp_r2_sig[0],color='seagreen',lw=0)
+        axarr[0].set_title('linear',fontsize='small')
+        try:
+            axarr[1].hist(comp_r2_sig[1],color='seagreen',lw=0)
+        except:
+            pass
+        axarr[1].set_title('difference',fontsize='small')
+        try:
+            axarr[2].hist(comp_r2_sig[2],color='seagreen',lw=0)
+        except:
+            pass
+        axarr[2].set_title('div nl',fontsize='small')
+        try:
+            axarr[3].hist(comp_r2_sig[3],color='seagreen',lw=0)
+        except:
+            pass
+        axarr[3].set_title('div nl noe',fontsize='small')
+        try:
+            axarr[4].hist(comp_r2_sig[4],color='seagreen',lw=0)
+        except:
+            pass
+        axarr[4].set_title('div nl Y',fontsize='small')
+        try:
+            axarr[5].hist(comp_r2_sig[5],color='seagreen',lw=0)
+        except:
+            pass
+        axarr[5].set_title('separate add',fontsize='small')
+        try:
+            axarr[6].hist(comp_r2_sig[6],color='seagreen',lw=0)
+        except:
+            pass
+        axarr[6].set_title('separate multiply',fontsize='small')
+        for axi in axarr.reshape(-1):
+            axi.yaxis.set_major_locator(plt.MaxNLocator(3))
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.9)
+        plt.savefig('r2_sig_%s_%s' %(region_key,win_key))
+        plt.clf()
+            
+
+
+
+
         delAIC_type_dict[AIC_type] = delAIC_dict
     data_dict_all[region_key]['delAIC'] = delAIC_type_dict
 
@@ -3257,6 +3778,7 @@ worksheet.conditional_format('D26:D32', {'type': 'top', 'value':'1', 'format':fo
 worksheet.conditional_format('E26:E32', {'type': 'top', 'value':'1', 'format':format1})
 worksheet.conditional_format('F26:F32', {'type': 'top', 'value':'1', 'format':format1})
 
+aic_workbook.close()
 
 ###########
 if sig_only_bool:
@@ -3447,6 +3969,8 @@ worksheet.write_row(25,61,param_names)
 worksheet.write_column(26,0,model_names)
 for i in range(temp.shape[0]):
     worksheet.write_row(i + 26,1,temp[i,:])
+
+param_workbook.close()
 
 plt.close('all')
 
