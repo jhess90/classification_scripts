@@ -34,7 +34,7 @@ uncued_bool = False
 
 sig_only_bool = False
 
-plot_bool = True
+plot_bool = False
 plot_hist_bool = True
 
 bin_size = 10 #in ms
@@ -156,6 +156,7 @@ def div_nl_new_func(x,a,b,c,d,e):
         r,p = x
         return (a*r) / (a*r + b*p + c) + (d*b) 
 
+#1
 def div_nl_avg_response_separate_func(x,a,b,c,d,e):
         r,p,sum_r,sum_p = x
         
@@ -165,6 +166,30 @@ def div_nl_avg_response_together_func(x,a,b,c,d):
         r,p,sum_r,sum_p = x
         
         return (r + a*p + b) / (sum_r + b*sum_p + c) + d
+
+#2
+#def div_nl_avg_response_separate_func(x,a,b,c,d,e):
+#        r,p,sum_r,sum_p = x
+#        
+#        return (a * r) / (sum_r + a *r + b) + (c * p) / (sum_p + c* p + d) + e
+#
+#def div_nl_avg_response_together_func(x,a,b,c,d):
+#        r,p,sum_r,sum_p = x
+#        
+#        return (a *r + b*p) / (a * sum_r + b*sum_p + c) + d
+
+
+#3
+#def div_nl_avg_response_separate_func(x,a,b,c,d,e):
+#        r,p,sum_r,sum_p = x
+#        
+#        #TODO fix for alt cues
+#        return (a * r) / ((0+1+2+3)* b) + (p * c) / ((0+1+2+3) * d) + e
+#
+#def div_nl_avg_response_together_func(x,a,b,c,d):
+#        r,p,sum_r,sum_p = x
+#        
+#        return (a*r + b*p) / (a*(0+1+2+3) + b*(0+1+2+3) + c) + d
 
 
 
@@ -3588,6 +3613,8 @@ for region_key,region_val in data_dict_all.iteritems():
     AIC_type_names = ['AIC_total','AIC_new_total','AICc_total','AIC_lr_total']
 
     delAIC_type_dict = {}
+    #
+    comp_r2_mse_dict = {}
     for AIC_type in AIC_type_names:
 
         delAIC_dict = {}
@@ -4106,11 +4133,12 @@ for region_key,region_val in data_dict_all.iteritems():
         plt.clf()
 
 
-
-
-
         delAIC_type_dict[AIC_type] = delAIC_dict
+        #
+        comp_r2_mse_dict[win_key] = {'comp_r2_all':comp_r2_all,'comp_r2_sig':comp_r2_sig,'comp_r2_adj_all':comp_r2_adj_all,'comp_r2_adj_sig':comp_r2_adj_sig,'comp_mse_all':comp_mse_all,'comp_mse_sig':comp_mse_sig}
+
     data_dict_all[region_key]['delAIC'] = delAIC_type_dict
+    data_dict_all[region_key]['comp_r2_mse_dicts'] = comp_r2_mse_dict
 
 ##saving 
 if sig_only_bool:
@@ -4122,7 +4150,7 @@ data_dict_all['file_dict'] = file_dict
 
 #for region_key,region_val in data_dict_all.iteritems():
 type_names = ['aft cue','bfr res','aft res','res win','concat']
-model_names = ['linear','difference','div nl','div nl noe','div nl Y','separate add','separate multiply']
+model_names = ['linear','difference','div nl','avg response together','div nl Y','separate add','avg response separate']
 
 if sig_only_bool:
     aic_workbook = xlsxwriter.Workbook('model_aic_sig.xlsx',options={'nan_inf_to_errors':True})
@@ -4214,8 +4242,15 @@ type_names_together = ['aft_cue', 'bfr_res', 'aft_res', 'res_win', 'concat']
 for region_key,region_val in data_dict_all.iteritems():
     if not region_key == 'file_dict':
         #for type_key,type_val in data_dict_all[region_key]['models']['linear'].iteritems():
+        
 
         all_percs = np.zeros((np.shape(type_names)[0],np.shape(model_names)[0]))    
+        #
+        sig_percs = np.zeros((np.shape(type_names)[0],np.shape(model_names)[0]))
+        all_percs_r2 = np.zeros((np.shape(type_names)[0],np.shape(model_names)[0]))
+        sig_percs_r2 = np.zeros((np.shape(type_names)[0],np.shape(model_names)[0]))
+        num_any_sig_window = np.zeros((np.shape(type_names)[0]))
+ 
         all_no_fit = np.zeros((np.shape(type_names)[0],np.shape(model_names)[0]))
         total_num_units_window = np.zeros((np.shape(type_names)[0]))
 
@@ -4225,10 +4260,15 @@ for region_key,region_val in data_dict_all.iteritems():
     
             all_model_AICs = np.column_stack((data_dict_all[region_key]['models']['linear'][type_key]['AIC_total'],data_dict_all[region_key]['models']['diff'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_noe'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_Y'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_separate_add'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_separate_multiply'][type_key]['AIC_total']))
 
+            #all_model_adj_r2
+            all_model_adj_r2 = np.column_stack((data_dict_all[region_key]['models']['linear'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['diff'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['div_nl'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['div_nl_noe'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['div_nl_Y'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['div_nl_separate_add'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['div_nl_separate_multiply'][type_key]['r_sq_adj_total']))
+
             ###
             all_model_p_vals = np.column_stack((data_dict_all[region_key]['models']['linear'][type_key]['p_val_total'],data_dict_all[region_key]['models']['diff'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_noe'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_Y'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_separate_add'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_separate_multiply'][type_key]['p_val_total']))
             
             all_p_bool = all_model_p_vals < 0.05
+            #
+            any_sig = np.sum(all_p_bool,axis=1) > 0            
             sig_multiple_models = np.sum(all_p_bool,axis=1)
             num_sig_multiple_models = np.sum(sig_multiple_models > 0)
             perc_sig_multiple_models = num_sig_multiple_models / float(np.shape(sig_multiple_models)[0])
@@ -4244,22 +4284,43 @@ for region_key,region_val in data_dict_all.iteritems():
                     #TODO finish this part
 
             arg_mins = np.argmin(all_model_AICs,axis=1)
+            #
+            sig_arg_mins = arg_mins[any_sig]
+            arg_max_r2_adj = np.argmax(all_model_adj_r2,axis=1)
+            sig_arg_max_r2_adj = arg_max_r2_adj[any_sig]
+
             perc_min = np.zeros((np.shape(all_model_AICs)[1]))
+            #
+            sig_perc_min = np.zeros((np.shape(all_model_AICs)[1]))
+            perc_max = np.zeros((np.shape(all_model_adj_r2)[1]))
+            sig_perc_max = np.zeros((np.shape(all_model_adj_r2)[1]))
             for j in range(np.shape(all_model_AICs)[1]):
                 perc_min[j] = np.sum(arg_mins == j) / float(np.shape(all_model_AICs)[0])
-
+                #
+                sig_perc_min[j] = np.sum(sig_arg_mins == j) / float(np.shape(sig_arg_mins)[0])
+                perc_max[j] = np.sum(arg_max_r2_adj == j) / float(np.shape(all_model_adj_r2)[0])
+                sig_perc_max[j] = np.sum(sig_arg_max_r2_adj == j) / float(np.shape(sig_arg_max_r2_adj)[0])
+                
             all_percs[i,:] = perc_min
+            #
+            sig_percs[i,:] = sig_perc_min
+            all_percs_r2[i,:] = perc_max
+            sig_percs_r2[i,:] = sig_perc_max
             
             all_no_fit[i,:] = [data_dict_all[region_key]['models']['linear'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['diff'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['div_nl'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['div_nl_noe'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['div_nl_Y'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['div_nl_separate_add'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['div_nl_separate_multiply'][type_key]['perc_units_no_fit']]
 
             total_num_units_window[i] = data_dict_all[region_key]['models']['linear'][type_key]['total_num_units']
+            
+            #
+            num_any_sig_window[i] = np.sum(any_sig)
 
-        data_dict_all[region_key]['model_summary'] = {'all_percs':all_percs,'all_no_fit':all_no_fit,'total_num_units_window':total_num_units_window}
+        #
+        data_dict_all[region_key]['model_summary'] = {'all_percs':all_percs,'all_no_fit':all_no_fit,'total_num_units_window':total_num_units_window,'all_percs_r2':all_percs_r2,'sig_percs_r2':sig_percs_r2,'num_any_sig':num_any_sig_window,'sig_percs':sig_percs}
 
 
 
 worksheet = aic_workbook.add_worksheet('perc_unit_best_fit')
-worksheet.write(0,0,'M1')
+worksheet.write(0,0,'M1: all')
 worksheet.write_row(0,1,model_names)
 worksheet.write_column(1,0,type_names)
 percs = data_dict_all['M1_dicts']['model_summary']['all_percs']
@@ -4268,6 +4329,107 @@ for i in range(np.shape(percs)[0]):
     worksheet.write_row(i+1,1,percs[i,:])
 worksheet.write(0,8,'total units')
 worksheet.write_column(1,8,total_units)
+percs = data_dict_all['M1_dicts']['model_summary']['sig_percs']
+total_units = data_dict_all['M1_dicts']['model_summary']['num_any_sig']
+worksheet.write_row(0,11,model_names)
+worksheet.write_column(1,10,type_names)
+worksheet.write(0,10,'M1: sig')
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+1,11,percs[i,:])
+worksheet.write(0,18,'total units')
+worksheet.write_column(1,18,total_units)
+
+worksheet.write(7,0,'S1: all')
+worksheet.write_row(7,1,model_names)
+worksheet.write_column(8,0,type_names)
+percs = data_dict_all['S1_dicts']['model_summary']['all_percs']
+total_units = data_dict_all['S1_dicts']['model_summary']['total_num_units_window']
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+8,1,percs[i,:])
+worksheet.write(7,8,'total units')
+worksheet.write_column(8,8,total_units)
+percs = data_dict_all['S1_dicts']['model_summary']['sig_percs']
+total_units = data_dict_all['S1_dicts']['model_summary']['num_any_sig']
+worksheet.write_row(7,11,model_names)
+worksheet.write_column(8,10,type_names)
+worksheet.write(8,10,'S1: sig')
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+8,11,percs[i,:])
+worksheet.write(7,18,'total units')
+worksheet.write_column(8,18,total_units)
+
+worksheet.write(14,0,'PMd: all')
+worksheet.write_row(14,1,model_names)
+worksheet.write_column(15,0,type_names)
+percs = data_dict_all['PmD_dicts']['model_summary']['all_percs']
+total_units = data_dict_all['S1_dicts']['model_summary']['total_num_units_window']
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+15,1,percs[i,:])
+worksheet.write(14,8,'total units')
+worksheet.write_column(15,8,total_units)
+percs = data_dict_all['PmD_dicts']['model_summary']['sig_percs']
+total_units = data_dict_all['PmD_dicts']['model_summary']['num_any_sig']
+worksheet.write_row(14,11,model_names)
+worksheet.write_column(15,10,type_names)
+worksheet.write(14,10,'PmD: sig')
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+15,11,percs[i,:])
+worksheet.write(14,18,'total units')
+worksheet.write_column(15,18,total_units)
+
+worksheet.conditional_format('B2:H2', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B3:H3', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B4:H4', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B5:H5', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B6:H6', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L2:R2', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L3:R3', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L4:R4', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L5:R5', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L6:R6', {'type': 'top', 'value':'1', 'format':format1})
+
+worksheet.conditional_format('B9:H9', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B10:H10', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B11:H11', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B12:H12', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B13:H13', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L9:R9', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L10:R10', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L11:R11', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L12:R12', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L13:R13', {'type': 'top', 'value':'1', 'format':format1})
+
+worksheet.conditional_format('B16:H16', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B17:H17', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B18:H18', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B19:H19', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B20:H20', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L16:R16', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L17:R17', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L18:R18', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L19:R19', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L20:R20', {'type': 'top', 'value':'1', 'format':format1})
+
+#
+worksheet = aic_workbook.add_worksheet('perc_unit_best_fit_adj_r2')
+worksheet.write(0,0,'M1: all')
+worksheet.write_row(0,1,model_names)
+worksheet.write_column(1,0,type_names)
+percs = data_dict_all['M1_dicts']['model_summary']['all_percs_r2']
+total_units = data_dict_all['M1_dicts']['model_summary']['total_num_units_window']
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+1,1,percs[i,:])
+worksheet.write(0,8,'total units')
+worksheet.write_column(1,8,total_units)
+percs = data_dict_all['M1_dicts']['model_summary']['sig_percs_r2']
+total_units = data_dict_all['M1_dicts']['model_summary']['num_any_sig']
+worksheet.write_row(0,11,model_names)
+worksheet.write_column(1,10,type_names)
+worksheet.write(0,10,'M1: sig')
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+1,11,percs[i,:])
+worksheet.write(0,18,'total units')
+worksheet.write_column(1,18,total_units)
 
 worksheet.write(7,0,'S1')
 worksheet.write_row(7,1,model_names)
@@ -4278,6 +4440,15 @@ for i in range(np.shape(percs)[0]):
     worksheet.write_row(i+8,1,percs[i,:])
 worksheet.write(7,8,'total units')
 worksheet.write_column(8,8,total_units)
+percs = data_dict_all['S1_dicts']['model_summary']['sig_percs_r2']
+total_units = data_dict_all['S1_dicts']['model_summary']['num_any_sig']
+worksheet.write_row(7,11,model_names)
+worksheet.write_column(8,10,type_names)
+worksheet.write(8,10,'S1: sig')
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+8,11,percs[i,:])
+worksheet.write(7,18,'total units')
+worksheet.write_column(8,18,total_units)
 
 worksheet.write(14,0,'PMd')
 worksheet.write_row(14,1,model_names)
@@ -4288,6 +4459,50 @@ for i in range(np.shape(percs)[0]):
     worksheet.write_row(i+15,1,percs[i,:])
 worksheet.write(14,8,'total units')
 worksheet.write_column(15,8,total_units)
+percs = data_dict_all['PmD_dicts']['model_summary']['sig_percs_r2']
+total_units = data_dict_all['PmD_dicts']['model_summary']['num_any_sig']
+worksheet.write_row(14,11,model_names)
+worksheet.write_column(15,10,type_names)
+worksheet.write(14,10,'PmD: sig')
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+15,11,percs[i,:])
+worksheet.write(14,18,'total units')
+worksheet.write_column(15,18,total_units)
+
+worksheet.conditional_format('B2:H2', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B3:H3', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B4:H4', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B5:H5', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B6:H6', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L2:R2', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L3:R3', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L4:R4', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L5:R5', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L6:R6', {'type': 'top', 'value':'1', 'format':format1})
+
+worksheet.conditional_format('B9:H9', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B10:H10', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B11:H11', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B12:H12', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B13:H13', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L9:R9', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L10:R10', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L11:R11', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L12:R12', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L13:R13', {'type': 'top', 'value':'1', 'format':format1})
+
+worksheet.conditional_format('B16:H16', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B17:H17', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B18:H18', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B19:H19', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B20:H20', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L16:R16', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L17:R17', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L18:R18', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L19:R19', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L20:R20', {'type': 'top', 'value':'1', 'format':format1})
+
+
 
 #################
 
