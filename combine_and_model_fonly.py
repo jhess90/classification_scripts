@@ -22,7 +22,6 @@ from math import isinf
 import os
 from scipy.stats.stats import pearsonr
 from mpl_toolkits.mplot3d import Axes3D
-import math
 
 ########################
 # params to set ########
@@ -2529,14 +2528,7 @@ def make_delta_AIC(AICs,p_vals):
     for i in range(np.shape(sig_only_AICs)[0]):
         dAICs_sig_only[i,:] = sig_only_AICs[i,:] - mins[i]
 
-    akaike_weights = np.zeros((np.shape(dAICs_all)))
-    for i in range(np.shape(dAICs_all)[0]):
-        unit_dAIC = dAICs_all[i,:]
-        # wi = exp(delAICi/2)/sum(exp(delAIC/2))
-        exp_term = np.exp(-1*unit_dAIC/2)
-        akaike_weights[i,:] = exp_term / np.sum(exp_term)
-
-    return_dict = {'dAICs_sig_any':dAICs_sig_any,'dAICs_all':dAICs_all,'dAICs_sig_only':dAICs_sig_only,'akaike_weights':akaike_weights}
+    return_dict = {'dAICs_sig_any':dAICs_sig_any,'dAICs_all':dAICs_all,'dAICs_sig_only':dAICs_sig_only}
         
     return (return_dict)
 
@@ -2588,6 +2580,7 @@ for file in glob.glob('*timestamps.mat'):
     condensed[:,4] = trial_breakdown[:,7]
     condensed[:,5] = trial_breakdown[:,10]
 
+
     #delete end trials if not fully finished
     if condensed[-1,1] == condensed[-1,2] == 0:
 	new_condensed = condensed[0:-1,:]
@@ -2607,7 +2600,7 @@ for file in glob.glob('*timestamps.mat'):
     #condensed = condensed[condensed[:,5] == 1]
 
     #fail only
-    #condensed = condensed[condensed[:,5] == -1]
+    condensed = condensed[condensed[:,5] == -1]
 
     #Break spikes into M1 S1 pmd 
     M1_spikes = Spikes[0,0][0,1];
@@ -2877,38 +2870,38 @@ for region_key,region_val in data_dict_all.iteritems():
                 ceil_val = 0
         
             if ceil_val != 0:
-                f,axarr = plt.subplots(7,sharex=True)
+                f,axarr = plt.subplots(7,sharex=True,sharey=True)
 
                 f.suptitle('delta %s all units: %s %s' %(AIC_type,region_key,win_key))
-                axarr[0].hist(delAIC['dAICs_all'][:,0][~np.isnan(delAIC['dAICs_all'][:,0])],color='teal',lw=0,range=[-1,ceil_val+1],bins=12)
+                axarr[0].hist(delAIC['dAICs_all'][:,0][~np.isnan(delAIC['dAICs_all'][:,0])],color='teal',lw=0,range=[-1,ceil_val+1])
                 axarr[0].set_title('linear',fontsize='small')
                 try:
-                    axarr[1].hist(delAIC['dAICs_all'][:,1][~np.isnan(delAIC['dAICs_all'][:,1])],color='teal',lw=0,bins=12)
+                    axarr[1].hist(delAIC['dAICs_all'][:,1][~np.isnan(delAIC['dAICs_all'][:,1])],color='teal',lw=0)
                 except:
                     pass
                 axarr[1].set_title('difference',fontsize='small')
                 try:
-                    axarr[2].hist(delAIC['dAICs_all'][:,2][~np.isnan(delAIC['dAICs_all'][:,2])],color='teal',lw=0,bins=12)
+                    axarr[2].hist(delAIC['dAICs_all'][:,2][~np.isnan(delAIC['dAICs_all'][:,2])],color='teal',lw=0)
                 except:
                     pass
                 axarr[2].set_title('div nl',fontsize='small')
                 try:
-                    axarr[3].hist(delAIC['dAICs_all'][:,3][~np.isnan(delAIC['dAICs_all'][:,3])],color='teal',lw=0,bins=12)
+                    axarr[3].hist(delAIC['dAICs_all'][:,3][~np.isnan(delAIC['dAICs_all'][:,3])],color='teal',lw=0)
                 except:
                     pass
                 axarr[3].set_title('div nl noe',fontsize='small')
                 try:
-                    axarr[4].hist(delAIC['dAICs_all'][:,4][~np.isnan(delAIC['dAICs_all'][:,4])],color='teal',lw=0,bins=12)
+                    axarr[4].hist(delAIC['dAICs_all'][:,4][~np.isnan(delAIC['dAICs_all'][:,4])],color='teal',lw=0)
                 except:
                     pass
                 axarr[4].set_title('div nl Y',fontsize='small')
                 try:
-                    axarr[5].hist(delAIC['dAICs_all'][:,5][~np.isnan(delAIC['dAICs_all'][:,5])],color='teal',lw=0,bins=12)
+                    axarr[5].hist(delAIC['dAICs_all'][:,5][~np.isnan(delAIC['dAICs_all'][:,5])],color='teal',lw=0)
                 except:
                     pass
                 axarr[5].set_title('separate add',fontsize='small')
                 try:
-                    axarr[6].hist(delAIC['dAICs_all'][:,6][~np.isnan(delAIC['dAICs_all'][:,6])],color='teal',lw=0,bins=12)
+                    axarr[6].hist(delAIC['dAICs_all'][:,6][~np.isnan(delAIC['dAICs_all'][:,6])],color='teal',lw=0)
                 except:
                     pass
                 axarr[6].set_title('separate multiply',fontsize='small')
@@ -2925,37 +2918,37 @@ for region_key,region_val in data_dict_all.iteritems():
             except:
                 ceil_val = 0
             if ceil_val != 0:
-                f,axarr = plt.subplots(7,sharex=True)
+                f,axarr = plt.subplots(7,sharex=True,sharey=True)
                 f.suptitle('delta %s any model significant: %s %s' %(AIC_type,region_key,win_key))
-                axarr[0].hist(delAIC['dAICs_sig_any'][:,0][~np.isnan(delAIC['dAICs_sig_any'][:,0])],color='slateblue',lw=0,range=[-1,ceil_val+1],bins=12)
+                axarr[0].hist(delAIC['dAICs_sig_any'][:,0][~np.isnan(delAIC['dAICs_sig_any'][:,0])],color='slateblue',lw=0,range=[-1,ceil_val+1])
                 axarr[0].set_title('linear',fontsize='small')
                 try:
-                    axarr[1].hist(delAIC['dAICs_sig_any'][:,1][~np.isnan(delAIC['dAICs_sig_any'][:,1])],color='slateblue',lw=0,bins=12)
+                    axarr[1].hist(delAIC['dAICs_sig_any'][:,1][~np.isnan(delAIC['dAICs_sig_any'][:,1])],color='slateblue',lw=0)
                 except:
                    pass
                 axarr[1].set_title('difference',fontsize='small')
                 try:
-                    axarr[2].hist(delAIC['dAICs_sig_any'][:,2][~np.isnan(delAIC['dAICs_sig_any'][:,2])],color='slateblue',lw=0,bins=12)
+                    axarr[2].hist(delAIC['dAICs_sig_any'][:,2][~np.isnan(delAIC['dAICs_sig_any'][:,2])],color='slateblue',lw=0)
                 except:
                     pass
                 axarr[2].set_title('div nl',fontsize='small')
                 try:
-                    axarr[3].hist(delAIC['dAICs_sig_any'][:,3][~np.isnan(delAIC['dAICs_sig_any'][:,3])],color='slateblue',lw=0,bins=12)
+                    axarr[3].hist(delAIC['dAICs_sig_any'][:,3][~np.isnan(delAIC['dAICs_sig_any'][:,3])],color='slateblue',lw=0)
                 except:
                     pass
                 axarr[3].set_title('div nl noe',fontsize='small')
                 try:
-                    axarr[4].hist(delAIC['dAICs_sig_any'][:,4][~np.isnan(delAIC['dAICs_sig_any'][:,4])],color='slateblue',lw=0,bins=12)
+                    axarr[4].hist(delAIC['dAICs_sig_any'][:,4][~np.isnan(delAIC['dAICs_sig_any'][:,4])],color='slateblue',lw=0)
                 except:
                     pass
                 axarr[4].set_title('div nl Y',fontsize='small')
                 try:
-                    axarr[5].hist(delAIC['dAICs_sig_any'][:,5][~np.isnan(delAIC['dAICs_sig_any'][:,5])],color='slateblue',lw=0,bins=12)
+                    axarr[5].hist(delAIC['dAICs_sig_any'][:,5][~np.isnan(delAIC['dAICs_sig_any'][:,5])],color='slateblue',lw=0)
                 except:
                     pass
                 axarr[5].set_title('separate add',fontsize='small')
                 try:
-                    axarr[6].hist(delAIC['dAICs_sig_any'][:,6][~np.isnan(delAIC['dAICs_sig_any'][:,6])],color='slateblue',lw=0,bins=12)
+                    axarr[6].hist(delAIC['dAICs_sig_any'][:,6][~np.isnan(delAIC['dAICs_sig_any'][:,6])],color='slateblue',lw=0)
                 except:
                     pass
                 axarr[6].set_title('separate multiply',fontsize='small')
@@ -2973,46 +2966,46 @@ for region_key,region_val in data_dict_all.iteritems():
             except:
                 ceil_val = 0
             if ceil_val != 0:
-                f,axarr = plt.subplots(7,sharex=True)
+                f,axarr = plt.subplots(7,sharex=True,sharey=True)
                 f.suptitle('delta %s only significant model fit: %s %s' %(AIC_type,region_key,win_key))
                 try:
-                    y0,x,_ = axarr[0].hist(delAIC['dAICs_sig_only'][:,0][~np.isnan(delAIC['dAICs_sig_only'][:,0])],color='darkmagenta',lw=0,range=[-1,ceil_val+1],bins=12)
+                    y0,x,_ = axarr[0].hist(delAIC['dAICs_sig_only'][:,0][~np.isnan(delAIC['dAICs_sig_only'][:,0])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
                     axarr[0].set_title('linear',fontsize='small')
                 except:
                     y0 = 0
                     pass
                 try:
-                    y1,x,_ = axarr[1].hist(delAIC['dAICs_sig_only'][:,1][~np.isnan(delAIC['dAICs_sig_only'][:,1])],color='darkmagenta',lw=0,range=[-1,ceil_val+1],bins=12)
+                    y1,x,_ = axarr[1].hist(delAIC['dAICs_sig_only'][:,1][~np.isnan(delAIC['dAICs_sig_only'][:,1])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
                     axarr[1].set_title('difference',fontsize='small')
                 except:
                     y1 = 0
                     pass
                 try:
-                    y2,x,_ = axarr[2].hist(delAIC['dAICs_sig_only'][:,2][~np.isnan(delAIC['dAICs_sig_only'][:,2])],color='darkmagenta',lw=0,range=[-1,ceil_val+1],bins=12)
+                    y2,x,_ = axarr[2].hist(delAIC['dAICs_sig_only'][:,2][~np.isnan(delAIC['dAICs_sig_only'][:,2])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
                     axarr[2].set_title('div nl',fontsize='small')
                 except:
                     y2 = 0
                     pass
                 try:
-                    y3,x,_ = axarr[3].hist(delAIC['dAICs_sig_only'][:,3][~np.isnan(delAIC['dAICs_sig_only'][:,3])],color='darkmagenta',lw=0,range=[-1,ceil_val+1],bins=12)
+                    y3,x,_ = axarr[3].hist(delAIC['dAICs_sig_only'][:,3][~np.isnan(delAIC['dAICs_sig_only'][:,3])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
                     axarr[3].set_title('div nl noe',fontsize='small')
                 except:
                     y3 = 0
                     pass
                 try:
-                    y4,x,_ = axarr[4].hist(delAIC['dAICs_sig_only'][:,4][~np.isnan(delAIC['dAICs_sig_only'][:,4])],color='darkmagenta',lw=0,range=[-1,ceil_val+1],bins=12)
+                    y4,x,_ = axarr[4].hist(delAIC['dAICs_sig_only'][:,4][~np.isnan(delAIC['dAICs_sig_only'][:,4])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
                     axarr[4].set_title('div nl Y',fontsize='small')
                 except:
                     y4 = 0
                     pass
                 try:
-                    y5,x,_ = axarr[5].hist(delAIC['dAICs_sig_only'][:,5][~np.isnan(delAIC['dAICs_sig_only'][:,5])],color='darkmagenta',lw=0,range=[-1,ceil_val+1],bins=12)
+                    y5,x,_ = axarr[5].hist(delAIC['dAICs_sig_only'][:,5][~np.isnan(delAIC['dAICs_sig_only'][:,5])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
                     axarr[5].set_title('separate add',fontsize='small')
                 except:
                     y5 = 0
                     pass
                 try:    
-                    y6,x,_ = axarr[6].hist(delAIC['dAICs_sig_only'][:,6][~np.isnan(delAIC['dAICs_sig_only'][:,6])],color='darkmagenta',lw=0,range=[-1,ceil_val+1],bins=12)
+                    y6,x,_ = axarr[6].hist(delAIC['dAICs_sig_only'][:,6][~np.isnan(delAIC['dAICs_sig_only'][:,6])],color='darkmagenta',lw=0,range=[-1,ceil_val+1])
                     axarr[6].set_title('separate multiply',fontsize='small')
                 except:
                     y6 = 0
@@ -3033,357 +3026,8 @@ for region_key,region_val in data_dict_all.iteritems():
                 plt.subplots_adjust(top=0.9)
                 plt.savefig('d%s_only_sig_%s_%s' %(AIC_type,region_key,win_key))
                 plt.clf()
-                
-            ####
-            f,axarr = plt.subplots(7,sharex=True)
 
-            f.suptitle('akaike weights %s all units: %s %s' %(AIC_type,region_key,win_key))
-            axarr[0].hist(delAIC['akaike_weights'][:,0][~np.isnan(delAIC['akaike_weights'][:,0])],color='crimson',lw=0,range=[0,1],bins=12)
-            axarr[0].axvline(np.nanmean(delAIC['akaike_weights'][:,0]),color='k',linestyle='dashed',linewidth=1)
-            axarr[0].set_title('linear',fontsize='small')
-            try:
-                axarr[1].hist(delAIC['akaike_weights'][:,1][~np.isnan(delAIC['akaike_weights'][:,1])],color='crimson',lw=0,bins=12)
-                axarr[1].axvline(np.nanmean(delAIC['akaike_weights'][:,1]),color='k',linestyle='dashed',linewidth=1)
-            except:
-                pass
-            axarr[1].set_title('difference',fontsize='small')
-            try:
-                axarr[2].hist(delAIC['akaike_weights'][:,2][~np.isnan(delAIC['akaike_weights'][:,2])],color='crimson',lw=0,bins=12)
-                axarr[2].axvline(np.nanmean(delAIC['akaike_weights'][:,2]),color='k',linestyle='dashed',linewidth=1)
-            except:
-                pass
-            axarr[2].set_title('div nl',fontsize='small')
-            try:
-                axarr[3].hist(delAIC['akaike_weights'][:,3][~np.isnan(delAIC['akaike_weights'][:,3])],color='crimson',lw=0,bins=12)
-                axarr[3].axvline(np.nanmean(delAIC['akaike_weights'][:,3]),color='k',linestyle='dashed',linewidth=1)
-            except:
-                pass
-            axarr[3].set_title('div nl noe',fontsize='small')
-            try:
-                axarr[4].hist(delAIC['akaike_weights'][:,4][~np.isnan(delAIC['akaike_weights'][:,4])],color='crimson',lw=0,bins=12)
-                axarr[4].axvline(np.nanmean(delAIC['akaike_weights'][:,4]),color='k',linestyle='dashed',linewidth=1)
-            except:
-                pass
-            axarr[4].set_title('div nl Y',fontsize='small')
-            try:
-                axarr[5].hist(delAIC['akaike_weights'][:,5][~np.isnan(delAIC['akaike_weights'][:,5])],color='crimson',lw=0,bins=12)
-                axarr[5].axvline(np.nanmean(delAIC['akaike_weights'][:,5]),color='k',linestyle='dashed',linewidth=1)
-            except:
-                pass
-            axarr[5].set_title('separate add',fontsize='small')
-            try:
-                axarr[6].hist(delAIC['akaike_weights'][:,6][~np.isnan(delAIC['akaike_weights'][:,6])],color='crimson',lw=0,bins=12)
-                axarr[6].axvline(np.nanmean(delAIC['akaike_weights'][:,6]),color='k',linestyle='dashed',linewidth=1)
-            except:
-                pass
-            axarr[6].set_title('separate multiply',fontsize='small')
-            for axi in axarr.reshape(-1):
-                axi.yaxis.set_major_locator(plt.MaxNLocator(3))
-            plt.tight_layout()
-            plt.subplots_adjust(top=0.9)
-            plt.savefig('d%s_akaike_weights_%s_%s' %(AIC_type,region_key,win_key))
-            plt.clf()
-            
-            ##save
             delAIC_dict[win_key] = delAIC
-            
-    #####comparative r2 and mse plots
-    for win_key,win_val_x in div_nl_separate_multiply_model_return.iteritems():
-        comp_r2_all = list((linear_model_return[win_key]['r_sq_total'],diff_model_return[win_key]['r_sq_total'],div_nl_model_return[win_key]['r_sq_total'],div_nl_noe_model_return[win_key]['r_sq_total'],div_nl_Y_model_return[win_key]['r_sq_total'],div_nl_separate_add_model_return[win_key]['r_sq_total'],div_nl_separate_multiply_model_return[win_key]['r_sq_total']))
-        comp_r2_sig = list((linear_model_return[win_key]['r_sq_total'][linear_model_return[win_key]['p_val_total'] < 0.05],diff_model_return[win_key]['r_sq_total'][diff_model_return[win_key]['p_val_total'] < 0.05],div_nl_model_return[win_key]['r_sq_total'][div_nl_model_return[win_key]['p_val_total'] < 0.05],div_nl_noe_model_return[win_key]['r_sq_total'][div_nl_noe_model_return[win_key]['p_val_total'] < 0.05],div_nl_Y_model_return[win_key]['r_sq_total'][div_nl_Y_model_return[win_key]['p_val_total'] < 0.05],div_nl_separate_add_model_return[win_key]['r_sq_total'][div_nl_separate_add_model_return[win_key]['p_val_total'] < 0.05],div_nl_separate_multiply_model_return[win_key]['r_sq_total'][div_nl_separate_multiply_model_return[win_key]['p_val_total'] < 0.05]))
-
-        comp_r2_adj_all = list((linear_model_return[win_key]['r_sq_adj_total'],diff_model_return[win_key]['r_sq_adj_total'],div_nl_model_return[win_key]['r_sq_adj_total'],div_nl_noe_model_return[win_key]['r_sq_adj_total'],div_nl_Y_model_return[win_key]['r_sq_adj_total'],div_nl_separate_add_model_return[win_key]['r_sq_adj_total'],div_nl_separate_multiply_model_return[win_key]['r_sq_adj_total']))
-        comp_r2_adj_sig = list((linear_model_return[win_key]['r_sq_adj_total'][linear_model_return[win_key]['p_val_total'] < 0.05],diff_model_return[win_key]['r_sq_adj_total'][diff_model_return[win_key]['p_val_total'] < 0.05],div_nl_model_return[win_key]['r_sq_adj_total'][div_nl_model_return[win_key]['p_val_total'] < 0.05],div_nl_noe_model_return[win_key]['r_sq_adj_total'][div_nl_noe_model_return[win_key]['p_val_total'] < 0.05],div_nl_Y_model_return[win_key]['r_sq_adj_total'][div_nl_Y_model_return[win_key]['p_val_total'] < 0.05],div_nl_separate_add_model_return[win_key]['r_sq_adj_total'][div_nl_separate_add_model_return[win_key]['p_val_total'] < 0.05],div_nl_separate_multiply_model_return[win_key]['r_sq_adj_total'][div_nl_separate_multiply_model_return[win_key]['p_val_total'] < 0.05]))
-
-        comp_mse_all = list((linear_model_return[win_key]['mse_total'],diff_model_return[win_key]['mse_total'],div_nl_model_return[win_key]['mse_total'],div_nl_noe_model_return[win_key]['mse_total'],div_nl_Y_model_return[win_key]['mse_total'],div_nl_separate_add_model_return[win_key]['mse_total'],div_nl_separate_multiply_model_return[win_key]['mse_total']))
-        comp_mse_sig = list((linear_model_return[win_key]['mse_total'][linear_model_return[win_key]['p_val_total'] < 0.05],diff_model_return[win_key]['mse_total'][diff_model_return[win_key]['p_val_total'] < 0.05],div_nl_model_return[win_key]['mse_total'][div_nl_model_return[win_key]['p_val_total'] < 0.05],div_nl_noe_model_return[win_key]['mse_total'][div_nl_noe_model_return[win_key]['p_val_total'] < 0.05],div_nl_Y_model_return[win_key]['mse_total'][div_nl_Y_model_return[win_key]['p_val_total'] < 0.05],div_nl_separate_add_model_return[win_key]['mse_total'][div_nl_separate_add_model_return[win_key]['p_val_total'] < 0.05],div_nl_separate_multiply_model_return[win_key]['mse_total'][div_nl_separate_multiply_model_return[win_key]['p_val_total'] < 0.05]))
-
-        comp_r2_all_max_min = np.zeros((7,2))
-        comp_r2_sig_max_min = np.zeros((7,2))
-        comp_r2_adj_all_max_min = np.zeros((7,2))
-        comp_r2_adj_sig_max_min = np.zeros((7,2))
-        comp_mse_all_max_min = np.zeros((7,2))
-        comp_mse_sig_max_min = np.zeros((7,2))
-
-        for j in range(np.shape(comp_r2_sig)[0]):
-            comp_r2_all_max_min[j,:] = [np.nanmax(comp_r2_all[j]),np.nanmin(comp_r2_all[j])]
-            if np.shape(comp_r2_sig[j])[0] != 0:
-                comp_r2_sig_max_min[j,:] = [np.nanmax(comp_r2_sig[j]),np.nanmin(comp_r2_sig[j])]
-            comp_r2_adj_all_max_min[j,:] = [np.nanmax(comp_r2_adj_all[j]),np.nanmin(comp_r2_adj_all[j])]
-            if np.shape(comp_r2_adj_sig[j])[0] != 0:
-                comp_r2_adj_sig_max_min[j,:] = [np.nanmax(comp_r2_adj_sig[j]),np.nanmin(comp_r2_adj_sig[j])]
-            comp_mse_all_max_min[j,:] = [np.nanmax(comp_mse_all[j]),np.nanmin(comp_mse_all[j])]
-            if np.shape(comp_mse_sig[j])[0] != 0:
-                comp_mse_sig_max_min[j,:] = [np.nanmax(comp_mse_sig[j]),np.nanmin(comp_mse_sig[j])]
-            
-        comp_r2_all_range = [math.floor(np.min(comp_r2_all_max_min[:,1])*10)/10,math.ceil(np.max(comp_r2_all_max_min[:,0])*10)/10]
-        comp_r2_sig_range = [math.floor(np.min(comp_r2_sig_max_min[:,1])*10)/10,math.ceil(np.max(comp_r2_sig_max_min[:,0])*10)/10]
-        comp_r2_adj_all_range = [math.floor(np.min(comp_r2_adj_all_max_min[:,1])*10)/10,math.ceil(np.max(comp_r2_adj_all_max_min[:,0])*10)/10]
-        comp_r2_adj_sig_range = [math.floor(np.min(comp_r2_adj_sig_max_min[:,1])*10)/10,math.ceil(np.max(comp_r2_adj_sig_max_min[:,0])*10)/10]
-        comp_mse_all_range = [math.floor(np.min(comp_mse_all_max_min[:,1])*10)/10,math.ceil(np.max(comp_mse_all_max_min[:,0])*10)/10]
-        comp_mse_sig_range = [math.floor(np.min(comp_mse_sig_max_min[:,1])*10)/10,math.ceil(np.max(comp_mse_sig_max_min[:,0])*10)/10]
-
-        f,axarr = plt.subplots(7,sharex=True)
-
-        f.suptitle('r2 %s all units: %s' %(region_key,win_key))
-        axarr[0].hist(comp_r2_all[0],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
-        axarr[0].set_title('linear',fontsize='small')
-        try:
-            axarr[1].hist(comp_r2_all[1],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
-        except:
-            pass
-        axarr[1].set_title('difference',fontsize='small')
-        try:
-            axarr[2].hist(comp_r2_all[2],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
-        except:
-            pass
-        axarr[2].set_title('div nl',fontsize='small')
-        try:
-            axarr[3].hist(comp_r2_all[3],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
-        except:
-            pass
-        axarr[3].set_title('div nl noe',fontsize='small')
-        try:
-            axarr[4].hist(comp_r2_all[4],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
-        except:
-            pass
-        axarr[4].set_title('div nl Y',fontsize='small')
-        try:
-            axarr[5].hist(comp_r2_all[5],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
-        except:
-            pass
-        axarr[5].set_title('separate add',fontsize='small')
-        try:
-            axarr[6].hist(comp_r2_all[6],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
-        except:
-            pass
-        axarr[6].set_title('separate multiply',fontsize='small')
-        for axi in axarr.reshape(-1):
-            axi.yaxis.set_major_locator(plt.MaxNLocator(3))
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.9)
-        plt.savefig('r2_all_%s_%s' %(region_key,win_key))
-        plt.clf()
-         
-        #
-        f,axarr = plt.subplots(7,sharex=True)
-
-        f.suptitle('r2 %s sig units: %s' %(region_key,win_key))
-        axarr[0].hist(comp_r2_sig[0],color='seagreen',lw=0,range=comp_r2_sig_range,bins=12)
-        axarr[0].set_title('linear',fontsize='small')
-        try:
-            axarr[1].hist(comp_r2_sig[1],color='seagreen',lw=0,range=comp_r2_sig_range,bins=12)
-        except:
-            pass
-        axarr[1].set_title('difference',fontsize='small')
-        try:
-            axarr[2].hist(comp_r2_sig[2],color='seagreen',lw=0,range=comp_r2_sig_range,bins=12)
-        except:
-            pass
-        axarr[2].set_title('div nl',fontsize='small')
-        try:
-            axarr[3].hist(comp_r2_sig[3],color='seagreen',lw=0,range=comp_r2_sig_range,bins=12)
-        except:
-            pass
-        axarr[3].set_title('div nl noe',fontsize='small')
-        try:
-            axarr[4].hist(comp_r2_sig[4],color='seagreen',lw=0,range=comp_r2_sig_range,bins=12)
-        except:
-            pass
-        axarr[4].set_title('div nl Y',fontsize='small')
-        try:
-            axarr[5].hist(comp_r2_sig[5],color='seagreen',lw=0,range=comp_r2_sig_range,bins=12)
-        except:
-            pass
-        axarr[5].set_title('separate add',fontsize='small')
-        try:
-            axarr[6].hist(comp_r2_sig[6],color='seagreen',lw=0,range=comp_r2_sig_range,bins=12)
-        except:
-            pass
-        axarr[6].set_title('separate multiply',fontsize='small')
-        for axi in axarr.reshape(-1):
-            axi.yaxis.set_major_locator(plt.MaxNLocator(3))
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.9)
-        plt.savefig('r2_sig_%s_%s' %(region_key,win_key))
-        plt.clf()
-
-        #
-        f,axarr = plt.subplots(7,sharex=True)
-
-        f.suptitle('r2 adj %s all units: %s' %(region_key,win_key))
-        axarr[0].hist(comp_r2_adj_all[0],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
-        axarr[0].set_title('linear',fontsize='small')
-        try:
-            axarr[1].hist(comp_r2_adj_all[1],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
-        except:
-            pass
-        axarr[1].set_title('difference',fontsize='small')
-        try:
-            axarr[2].hist(comp_r2_adj_all[2],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
-        except:
-            pass
-        axarr[2].set_title('div nl',fontsize='small')
-        try:
-            axarr[3].hist(comp_r2_adj_all[3],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
-        except:
-            pass
-        axarr[3].set_title('div nl noe',fontsize='small')
-        try:
-            axarr[4].hist(comp_r2_adj_all[4],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
-        except:
-            pass
-        axarr[4].set_title('div nl Y',fontsize='small')
-        try:
-            axarr[5].hist(comp_r2_adj_all[5],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
-        except:
-            pass
-        axarr[5].set_title('separate add',fontsize='small')
-        try:
-            axarr[6].hist(comp_r2_adj_all[6],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
-        except:
-            pass
-        axarr[6].set_title('separate multiply',fontsize='small')
-        for axi in axarr.reshape(-1):
-            axi.yaxis.set_major_locator(plt.MaxNLocator(3))
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.9)
-        plt.savefig('r2_adj_all_%s_%s' %(region_key,win_key))
-        plt.clf()
-         
-        #
-        f,axarr = plt.subplots(7,sharex=True)
-
-        f.suptitle('r2 adj %s sig units: %s' %(region_key,win_key))
-        axarr[0].hist(comp_r2_adj_sig[0],color='seagreen',lw=0,range=comp_r2_adj_sig_range,bins=12)
-        axarr[0].set_title('linear',fontsize='small')
-        try:
-            axarr[1].hist(comp_r2_adj_sig[1],color='seagreen',lw=0,range=comp_r2_adj_sig_range,bins=12)
-        except:
-            pass
-        axarr[1].set_title('difference',fontsize='small')
-        try:
-            axarr[2].hist(comp_r2_adj_sig[2],color='seagreen',lw=0,range=comp_r2_adj_sig_range,bins=12)
-        except:
-            pass
-        axarr[2].set_title('div nl',fontsize='small')
-        try:
-            axarr[3].hist(comp_r2_adj_sig[3],color='seagreen',lw=0,range=comp_r2_adj_sig_range,bins=12)
-        except:
-            pass
-        axarr[3].set_title('div nl noe',fontsize='small')
-        try:
-            axarr[4].hist(comp_r2_adj_sig[4],color='seagreen',lw=0,range=comp_r2_adj_sig_range,bins=12)
-        except:
-            pass
-        axarr[4].set_title('div nl Y',fontsize='small')
-        try:
-            axarr[5].hist(comp_r2_adj_sig[5],color='seagreen',lw=0,range=comp_r2_adj_sig_range,bins=12)
-        except:
-            pass
-        axarr[5].set_title('separate add',fontsize='small')
-        try:
-            axarr[6].hist(comp_r2_adj_sig[6],color='seagreen',lw=0,range=comp_r2_adj_sig_range,bins=12)
-        except:
-            pass
-        axarr[6].set_title('separate multiply',fontsize='small')
-        for axi in axarr.reshape(-1):
-            axi.yaxis.set_major_locator(plt.MaxNLocator(3))
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.9)
-        plt.savefig('r2_adj_sig_%s_%s' %(region_key,win_key))
-        plt.clf()
-
-        #
-        f,axarr = plt.subplots(7,sharex=True)
-
-        f.suptitle('mse %s all units: %s' %(region_key,win_key))
-        axarr[0].hist(comp_mse_all[0],color='midnightblue',lw=0,range=comp_mse_all_range,bins=12)
-        axarr[0].set_title('linear',fontsize='small')
-        try:
-            axarr[1].hist(comp_mse_all[1],color='midnightblue',lw=0,range=comp_mse_all_range,bins=12)
-        except:
-            pass
-        axarr[1].set_title('difference',fontsize='small')
-        try:
-            axarr[2].hist(comp_mse_all[2],color='midnightblue',lw=0,range=comp_mse_all_range,bins=12)
-        except:
-            pass
-        axarr[2].set_title('div nl',fontsize='small')
-        try:
-            axarr[3].hist(comp_mse_all[3],color='midnightblue',lw=0,range=comp_mse_all_range,bins=12)
-        except:
-            pass
-        axarr[3].set_title('div nl noe',fontsize='small')
-        try:
-            axarr[4].hist(comp_mse_all[4],color='midnightblue',lw=0,range=comp_mse_all_range,bins=12)
-        except:
-            pass
-        axarr[4].set_title('div nl Y',fontsize='small')
-        try:
-            axarr[5].hist(comp_mse_all[5],color='midnightblue',lw=0,range=comp_mse_all_range,bins=12)
-        except:
-            pass
-        axarr[5].set_title('separate add',fontsize='small')
-        try:
-            axarr[6].hist(comp_mse_all[6],color='midnightblue',lw=0,range=comp_mse_all_range,bins=12)
-        except:
-            pass
-        axarr[6].set_title('separate multiply',fontsize='small')
-        for axi in axarr.reshape(-1):
-            axi.yaxis.set_major_locator(plt.MaxNLocator(3))
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.9)
-        plt.savefig('mse_all_%s_%s' %(region_key,win_key))
-        plt.clf()
-         
-        #
-        f,axarr = plt.subplots(7,sharex=True)
-
-        f.suptitle('mse %s sig units: %s' %(region_key,win_key))
-        axarr[0].hist(comp_mse_sig[0],color='seagreen',lw=0,range=comp_mse_sig_range,bins=12)
-        axarr[0].set_title('linear',fontsize='small')
-        try:
-            axarr[1].hist(comp_mse_sig[1],color='seagreen',lw=0,range=comp_mse_sig_range,bins=12)
-        except:
-            pass
-        axarr[1].set_title('difference',fontsize='small')
-        try:
-            axarr[2].hist(comp_mse_sig[2],color='seagreen',lw=0,range=comp_mse_sig_range,bins=12)
-        except:
-            pass
-        axarr[2].set_title('div nl',fontsize='small')
-        try:
-            axarr[3].hist(comp_mse_sig[3],color='seagreen',lw=0,range=comp_mse_sig_range,bins=12)
-        except:
-            pass
-        axarr[3].set_title('div nl noe',fontsize='small')
-        try:
-            axarr[4].hist(comp_mse_sig[4],color='seagreen',lw=0,range=comp_mse_sig_range,bins=12)
-        except:
-            pass
-        axarr[4].set_title('div nl Y',fontsize='small')
-        try:
-            axarr[5].hist(comp_mse_sig[5],color='seagreen',lw=0,range=comp_mse_sig_range,bins=12)
-        except:
-            pass
-        axarr[5].set_title('separate add',fontsize='small')
-        try:
-            axarr[6].hist(comp_mse_sig[6],color='seagreen',lw=0,range=comp_mse_sig_range,bins=12)
-        except:
-            pass
-        axarr[6].set_title('separate multiply',fontsize='small')
-        for axi in axarr.reshape(-1):
-            axi.yaxis.set_major_locator(plt.MaxNLocator(3))
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.9)
-        plt.savefig('mse_sig_%s_%s' %(region_key,win_key))
-        plt.clf()
-
-
-
-
-
         delAIC_type_dict[AIC_type] = delAIC_dict
     data_dict_all[region_key]['delAIC'] = delAIC_type_dict
 

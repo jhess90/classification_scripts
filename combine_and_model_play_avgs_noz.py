@@ -42,6 +42,8 @@ time_before = -0.5 #negative value
 time_after = 1.0
 res_window = [0.3,0.8]
 
+z_score_bool = False
+
 #########################
 # functions  ############
 #########################
@@ -70,7 +72,10 @@ def make_hist_all(spike_data):
 
 def calc_firing_rates(hists,data_key,condensed):
         bin_size_sec = bin_size / 1000.0
-        hists = stats.zscore(hists,axis=1)
+        if z_score_bool:
+                hists = stats.zscore(hists,axis=1)
+        else:
+                hists = hists / (bin_size / float(1000))
 
         bfr_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
         aft_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
@@ -156,6 +161,49 @@ def div_nl_new_func(x,a,b,c,d,e):
         r,p = x
         return (a*r) / (a*r + b*p + c) + (d*b) 
 
+#1
+def div_nl_avg_response_separate_func(x,a,b,c,d,e):
+        r,p,sum_r,sum_p = x
+        
+        return (r + a) / (sum_r + r + b) + (p + c) / (sum_p + p + d) + e
+
+def div_nl_avg_response_together_func(x,a,b,c,d):
+        r,p,sum_r,sum_p = x
+        
+        return (r + a*p + b) / (sum_r + b*sum_p + c) + d
+
+#2
+#def div_nl_avg_response_separate_func(x,a,b,c,d,e):
+#        r,p,sum_r,sum_p = x
+#        
+#        return (a * r) / (sum_r + a *r + b) + (c * p) / (sum_p + c* p + d) + e
+#
+#def div_nl_avg_response_together_func(x,a,b,c,d):
+#        r,p,sum_r,sum_p = x
+#        
+#        return (a *r + b*p) / (a * sum_r + b*sum_p + c) + d
+
+
+#3
+#def div_nl_avg_response_separate_func(x,a,b,c,d,e):
+#        r,p,sum_r,sum_p = x
+#        
+#        #TODO fix for alt cues
+#        return (a * r) / ((0+1+2+3)* b) + (p * c) / ((0+1+2+3) * d) + e
+#
+#def div_nl_avg_response_together_func(x,a,b,c,d):
+#        r,p,sum_r,sum_p = x
+#        
+#        return (a*r + b*p) / (a*(0+1+2+3) + b*(0+1+2+3) + c) + d
+
+
+
+
+#####
+#divide by sum of activity for different r/p types. One together, one seperate and added
+#remove separate multipy
+#remove noe
+
 
 def plot_fr_and_model(unit_num,fr_r_p,params,model_type,region_key,type_key):
 
@@ -203,6 +251,7 @@ def plot_fr_and_model(unit_num,fr_r_p,params,model_type,region_key,type_key):
 
         x,y = np.meshgrid(x_linspace,y_linspace)
         
+
         if model_type == 'linear':
             z = lin_func([x,y],params[0],params[1],params[2])
         elif model_type == 'diff':
@@ -216,7 +265,13 @@ def plot_fr_and_model(unit_num,fr_r_p,params,model_type,region_key,type_key):
         elif model_type == 'div_nl_separate_add':
             z = div_nl_separate_add_func([x,y],params[0],params[1],params[2],params[3],params[4])
         elif model_type == 'div_nl_separate_multiply':
-             z = div_nl_separate_multiply_func([x,y],params[0],params[1],params[2],params[3],params[4])
+            z = div_nl_separate_multiply_func([x,y],params[0],params[1],params[2],params[3],params[4])
+        elif model_type == 'div_nl_avg_response_together':
+            z = div_nl_avg_response_together_func([x,y,params[4],params[5]],params[0],params[1],params[2],params[3])
+        elif model_type == 'div_nl_avg_response_separate':
+            z = div_nl_avg_response_separate_func([x,y,params[5],params[6]],params[0],params[1],params[2],params[3],params[4])
+
+
 
         surf = ax.plot_surface(x, y, z,cmap='RdBu_r',alpha=0.4,linewidth=0)
 
@@ -224,7 +279,11 @@ def plot_fr_and_model(unit_num,fr_r_p,params,model_type,region_key,type_key):
 
         ax.set_xlabel('R value')
         ax.set_ylabel('P value')
-        ax.set_zlabel('avg z-score firing rate')
+
+        if z_score_bool:
+            ax.set_zlabel('z-score firing rate')
+        else:
+            ax.set_zlabel('firing rate')
 
         #flipping z axis to left
         tmp_planes = ax.zaxis._PLANES
@@ -325,10 +384,29 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,tot
 
             for unit_num in range(avg_fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
-        
+
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
+
                 #firing rate = a*R + b*P + c
                 params,covs = curve_fit(lin_func,[r_vals,p_vals],avg_frs)
-                
+
                 if np.size(covs) > 1:
                         perr = np.sqrt(np.diag(covs))
                 elif isinf(covs):
@@ -392,35 +470,7 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,tot
 
                 unit_ct +=1
 
-            if i == 0:
-                r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
-                p_flat_total = np.tile(p_vals,avg_fr_data.shape[1])
-                fr_flat_total = np.ndarray.flatten(avg_fr_data)
-            else:
-                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
-                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
-                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
-                
             n_total[i] = n
-
-        params,covs = curve_fit(lin_func,[r_flat_total,p_flat_total],fr_flat_total)
-        
-        if np.size(covs) > 1:
-            perr = np.sqrt(np.diag(covs))
-        elif isinf(covs):
-            perr = float('nan')
-        else:
-            pdb.set_trace()
-
-        model_out_total = lin_func([r_flat_total,p_flat_total],params[0],params[1],params[2])
-        residuals = fr_flat_total - model_out_total
-        ss_res = np.sum(residuals**2)
-        k = num_params
-        AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
-        
-        AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
-
-        #print '%s linear overall AIC %s' %(type_key,AIC_overall)
 
         num_sig_fit = np.sum(p_val_total < 0.05)
         avg_n = np.mean(n_total)
@@ -586,7 +636,7 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,tot
         #Or calc AICs for each unit then average? What's kosher
         
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':0,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
 
         return(return_dict)
 
@@ -633,6 +683,25 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,to
 
             for unit_num in range(avg_fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
+
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
         
                 #firing rate = a + b(R - P)
                 params,covs = curve_fit(diff_func,[r_vals,p_vals],avg_frs)
@@ -700,35 +769,7 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,to
 
                 unit_ct +=1
 
-            if i == 0:
-                r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
-                p_flat_total = np.tile(p_vals,avg_fr_data.shape[1])
-                fr_flat_total = np.ndarray.flatten(avg_fr_data)
-            else:
-                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
-                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
-                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
-
             n_total[i] = n
-
-        params,covs = curve_fit(diff_func,[r_flat_total,p_flat_total],fr_flat_total)
-        
-        if np.size(covs) > 1:
-            perr = np.sqrt(np.diag(covs))
-        elif isinf(covs):
-            perr = float('nan')
-        else:
-            pdb.set_trace()
-
-        model_out_total = diff_func([r_flat_total,p_flat_total],params[0],params[1])
-        residuals = fr_flat_total - model_out_total
-        ss_res = np.sum(residuals**2)
-        k = num_params
-        AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
-        
-        AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
-
-        #print '%s diff overall AIC %s' %(type_key,AIC_overall)
 
         num_sig_fit = np.sum(p_val_total < 0.05)
         avg_n = np.mean(n_total)
@@ -887,7 +928,7 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,to
             r_sq_adj_avg = np.nan
             
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':0,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
                 
         return(return_dict)
 
@@ -933,6 +974,24 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,
 
             for unit_num in range(avg_fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
 
                 try:
                     #firing rate  = (R * a + b * P) / (a + c * b + d) + e
@@ -1021,34 +1080,7 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,
  
                 unit_ct +=1
 
-            if i == 0:
-                r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
-                p_flat_total = np.tile(p_vals,avg_fr_data.shape[1])
-                fr_flat_total = np.ndarray.flatten(avg_fr_data)
-            else:
-                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
-                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
-                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
             n_total[i] = n
-
-        params,covs = curve_fit(div_nl_func,[r_flat_total,p_flat_total],fr_flat_total)
-        
-        if np.size(covs) > 1:
-            perr = np.sqrt(np.diag(covs))
-        elif isinf(covs):
-            perr = float('nan')
-        else:
-            pdb.set_trace()
-            
-        model_out_total = div_nl_func([r_flat_total,p_flat_total],params[0],params[1],params[2],params[3],params[4])
-        residuals = fr_flat_total - model_out_total
-        ss_res = np.sum(residuals**2)
-        k = num_params
-        AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
-        
-        AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
-
-        #print '%s div nl overall AIC %s' %(type_key,AIC_overall)
 
         num_sig_fit = np.sum(p_val_total < 0.05)
         avg_n = np.mean(n_total)
@@ -1206,7 +1238,7 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,
             r_sq_adj_avg = np.nan
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':0,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
                 
         return(return_dict)
 
@@ -1252,6 +1284,24 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
 
             for unit_num in range(avg_fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
         
                 try:
                     #firing rate  = (R * a + b * P) / (a + c * b + d)
@@ -1339,34 +1389,7 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
                 fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
                 unit_ct +=1
 
-            if i == 0:
-                r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
-                p_flat_total = np.tile(p_vals,avg_fr_data.shape[1])
-                fr_flat_total = np.ndarray.flatten(avg_fr_data)
-            else:
-                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
-                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
-                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
             n_total[i] = n
-
-        params,covs = curve_fit(div_nl_noe_func,[r_flat_total,p_flat_total],fr_flat_total)
-        
-        if np.size(covs) > 1:
-            perr = np.sqrt(np.diag(covs))
-        elif isinf(covs):
-            perr = float('nan')
-        else:
-            pdb.set_trace()
-
-        model_out_total = div_nl_noe_func([r_flat_total,p_flat_total],params[0],params[1],params[2],params[3])
-        residuals = fr_flat_total - model_out_total
-        ss_res = np.sum(residuals**2)
-        k = num_params
-        AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
-        
-        AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
-
-        #print '%s div_nl_noe overall AIC %s' %(type_key,AIC_overall)
 
         num_sig_fit = np.sum(p_val_total < 0.05)
         avg_n = np.mean(n_total)
@@ -1524,7 +1547,7 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
             r_sq_adj_avg = np.nan
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':0,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
                 
         return(return_dict)
 
@@ -1570,6 +1593,25 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
 
             for unit_num in range(avg_fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
+
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
         
                 # model = a*(r + b*P) / (c + r + b * p) + d
                 try:
@@ -1659,41 +1701,7 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
                 unit_ct +=1
                 #err_bool = False
 
-            if i == 0:
-                r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
-                p_flat_total = np.tile(p_vals,avg_fr_data.shape[1])
-                fr_flat_total = np.ndarray.flatten(avg_fr_data)
-            else:
-                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
-                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
-                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
             n_total[i] = n
-
-        try:
-            params,covs = curve_fit(div_nl_Y_func,[r_flat_total,p_flat_total],fr_flat_total)
-        except:
-            print 'failure to fit div nl Y on all data %s %s' %(region_key,type_key)
-
-            combined_dict = {'params':0,'covs':0,'perr':0,'ss_res':0,'AIC':0}        
-            return_dict = {'fit_params':fit_params,'cov_total':cov_total,'perr_total':perr_total,'AIC_combined':0,'ss_res_total':ss_res_total,'combined':combined_dict,'AIC_overall':0}
-
-
-        if np.size(covs) > 1:
-            perr = np.sqrt(np.diag(covs))
-        elif isinf(covs):
-            perr = float('nan')
-        else:
-            pdb.set_trace()
-
-        model_out_total = div_nl_Y_func([r_flat_total,p_flat_total],params[0],params[1],params[2],params[3])
-        residuals = fr_flat_total - model_out_total
-        ss_res = np.sum(residuals**2)
-        k = num_params
-        AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
-        
-        AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
-
-        #print '%s div nl Y overall AIC %s' %(type_key,AIC_overall)
 
         num_sig_fit = np.sum(p_val_total < 0.05)
         avg_n = np.mean(n_total)
@@ -1853,7 +1861,7 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
             r_sq_adj_avg = np.nan
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':0,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
                 
         return(return_dict)
 
@@ -1899,6 +1907,25 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
 
             for unit_num in range(avg_fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
+
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
                 
                 try:
                     params,covs = curve_fit(div_nl_separate_add_func,[r_vals,p_vals],avg_frs)
@@ -1986,34 +2013,7 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
 
                 unit_ct +=1
 
-            if i == 0:
-                r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
-                p_flat_total = np.tile(p_vals,avg_fr_data.shape[1])
-                fr_flat_total = np.ndarray.flatten(avg_fr_data)
-            else:
-                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
-                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
-                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
             n_total[i] = n
-
-        params,covs = curve_fit(div_nl_separate_add_func,[r_flat_total,p_flat_total],fr_flat_total)
-        
-        if np.size(covs) > 1:
-            perr = np.sqrt(np.diag(covs))
-        elif isinf(covs):
-            perr = float('nan')
-        else:
-            pdb.set_trace()
-
-        model_out_total = div_nl_separate_add_func([r_flat_total,p_flat_total],params[0],params[1],params[2],params[3],params[4])
-        residuals = fr_flat_total - model_out_total
-        ss_res = np.sum(residuals**2)
-        k = num_params
-        AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
-        
-        AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
-
-        #print '%s div nl separate add overall AIC %s' %(type_key,AIC_overall)
 
         num_sig_fit = np.sum(p_val_total < 0.05)
         avg_n = np.mean(n_total)
@@ -2170,7 +2170,7 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
             r_sq_adj_avg = np.nan
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':0,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
                 
         return(return_dict)
 
@@ -2223,6 +2223,25 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
 
             for unit_num in range(avg_fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
+
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
 
                 try:
                     params,covs = curve_fit(div_nl_separate_multiply_func,[r_vals,p_vals],avg_frs)
@@ -2311,34 +2330,7 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
 
                 unit_ct +=1
 
-            if i == 0:
-                r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
-                p_flat_total = np.tile(p_vals,avg_fr_data.shape[1])
-                fr_flat_total = np.ndarray.flatten(avg_fr_data)
-            else:
-                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
-                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
-                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
             n_total[i] = n
-
-        params,covs = curve_fit(div_nl_separate_multiply_func,[r_flat_total,p_flat_total],fr_flat_total)
-        
-        if np.size(covs) > 1:
-            perr = np.sqrt(np.diag(covs))
-        elif isinf(covs):
-            perr = float('nan')
-        else:
-            pdb.set_trace()
-
-        model_out_total = div_nl_separate_multiply_func([r_flat_total,p_flat_total],params[0],params[1],params[2],params[3],params[4])
-        residuals = fr_flat_total - model_out_total
-        ss_res = np.sum(residuals**2)
-        k = num_params
-        AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
-        
-        AIC_overall = 2*k - 2*np.log(sum(ss_res_total))
-
-        #print '%s div nl separate multiply overall AIC %s' %(type_key,AIC_overall)
         
         num_sig_fit = np.sum(p_val_total < 0.05)
         avg_n = np.mean(n_total)
@@ -2496,9 +2488,688 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
             r_sq_adj_avg = np.nan
 
         combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
-        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':AIC_overall,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':0,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
 
         return(return_dict)
+
+####################
+def make_div_nl_avg_response_together_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,total_unit_num):
+        #set each model
+        num_params = 4
+
+        unit_ct = 0
+        fit_params = np.zeros((total_unit_num,num_params))
+        cov_total = np.zeros((total_unit_num,num_params,num_params))
+        perr_total = np.zeros((total_unit_num,num_params))
+        AIC_total = np.zeros((total_unit_num))
+        ss_res_total = np.zeros((total_unit_num))
+        sig_unit_length = 0
+        num_units_no_fit = 0
+        p_val_total = np.zeros((total_unit_num))
+        F_val_total = np.zeros((total_unit_num))
+        r_sq_total = np.zeros((total_unit_num))
+        fr_r_p_list = []
+        AIC_new_total = np.zeros((total_unit_num))
+        r_sq_adj_total = np.zeros((total_unit_num))
+        AIC_lr_total = np.zeros((total_unit_num))
+        AICc_total = np.zeros((total_unit_num))
+        mse_total = np.zeros((total_unit_num))
+        n_total = np.zeros((file_length))
+        #
+        all_r_p_responses = np.zeros((total_unit_num,2))
+
+        for i in range(file_length):
+            fr_data = fr_data_dict[i][region_key][type_key]
+            condensed = fr_data_dict[i][region_key]['condensed']
+            avg_fr_data = np.mean(fr_data,axis=2)
+
+            r_vals = condensed[:,3]
+            p_vals = condensed[:,4]
+
+            condensed = fr_data_dict[i][region_key]['condensed']
+            avg_fr_data = avg_and_corr[type_key]['avg_fr_dict'][i]
+            
+            r_vals = condensed[:,3]
+            p_vals = condensed[:,4]
+
+            if sig_only_bool:
+                #[r_coeff,r_pval,p_coeff,p_pval]
+                sig_vals = avg_and_corr[type_key]['sig_vals_by_file'][i]
+                
+                either_sig = np.logical_or(sig_vals[:,1] < 0.05,sig_vals[:,3] < 0.05)
+                sig_unit_length += np.sum(either_sig)                
+                avg_fr_data = avg_fr_data[:,either_sig]
+            else:
+                sig_unit_length += np.shape(avg_fr_data)[1]
+
+            for unit_num in range(avg_fr_data.shape[1]):
+                avg_frs = avg_fr_data[:,unit_num]
+
+                if 2 in r_vals:
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1),np.sum(avg_frs[r_vals == 2]) / np.sum(r_vals == 2),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1),np.sum(avg_frs[p_vals == 2]) / np.sum(p_vals == 2),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
+                else:
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
+
+                #
+                all_r_p_responses[unit_ct,:] = [avg_fr_by_r,avg_fr_by_p]
+
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
+
+
+                try:
+                    params,covs = curve_fit(div_nl_avg_response_together_func,[r_vals,p_vals,avg_fr_by_r,avg_fr_by_p],avg_frs)
+                except:
+                    #fake very high values
+                    AIC_total[unit_ct] = np.nan
+                    ss_res_total[unit_ct] = np.nan
+                    num_units_no_fit += 1
+                    fr_r_p_list.append(np.array((0,0,0)))
+
+                    p_val_total[unit_ct] = np.nan
+                    F_val_total[unit_ct] = np.nan
+                    r_sq_total[unit_ct] = np.nan
+                    AIC_new_total[unit_ct] = np.nan
+                    r_sq_adj_total[unit_ct] = np.nan
+                    AIC_lr_total[unit_ct] = np.nan
+                    AICc_total[unit_ct] = np.nan
+                    mse_total[unit_ct] = np.nan
+                    
+                    unit_ct += 1
+                        
+                    #print 'failure to fit separate mult nl %s %s unit %s' %(region_key,type_key,unit_num)
+                    continue
+
+                if np.size(covs) > 1:
+                        perr = np.sqrt(np.diag(covs))
+                elif isinf(covs):
+                        perr = float('nan')
+                else:
+                        pdb.set_trace()
+
+                #
+                fit_params[unit_ct,:] = params
+                cov_total[unit_ct,:,:] = covs
+                perr_total[unit_ct,:] = perr
+                
+                #
+                #all_r_p_responses = [avg_fr_by_r,avg_fr_by_p]
+                model_out = div_nl_avg_response_together_func([r_vals,p_vals,avg_fr_by_r,avg_fr_by_p],params[0],params[1],params[2],params[3])
+
+                residuals = avg_frs - model_out
+                ss_res = np.sum(residuals**2)
+                k = num_params
+                AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
+                
+                ss_tot = np.sum((avg_frs-np.mean(avg_frs))**2)
+                r_sq = 1 - (ss_res / ss_tot)
+
+                ss_model = ss_tot - ss_res
+                n = np.shape(avg_frs)[0]
+                k = num_params #repeat for now
+                #degrees of freedom
+                df_total = n - 1
+                df_residual = n - k
+                df_model = k - 1
+
+                #mean squares
+                ms_residual = ss_res / float(df_residual)
+                ms_model = ss_model / float(df_model)
+
+                F_val = ms_model / ms_residual
+                p_val = 1.0 - stats.f.cdf(F_val,df_residual,df_model)
+
+                AIC_total[unit_ct] = AIC
+                ss_res_total[unit_ct] = ss_res
+                p_val_total[unit_ct] = p_val
+                F_val_total[unit_ct] = F_val
+                r_sq_total[unit_ct] = r_sq
+
+                AIC_new = 2*k + n*np.log(ss_res/n)
+                r_sq_adj = 1 - (1 - r_sq)*(n-1)/(n-k-1)
+        
+                likelihood_func = np.sum(stats.norm.logpdf(avg_frs,loc=model_out,scale=np.std(avg_frs)))                
+                AIC_lr = 2*k - 2 * np.log(likelihood_func)
+                try:
+                    AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                except:
+                    AICc = np.nan
+                mse = np.mean(residuals**2)
+
+                AIC_new_total[unit_ct] = AIC_new
+                r_sq_adj_total[unit_ct] = r_sq_adj
+                AIC_lr_total[unit_ct] = AIC_lr
+                AICc_total[unit_ct] = AICc
+                mse_total[unit_ct] = mse
+                #correlation (rel to Rsq)
+
+                #here add summation array: avg fr, r, and p, by unit
+                fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
+
+                unit_ct +=1
+        
+        num_sig_fit = np.sum(p_val_total < 0.05)
+        avg_n = np.mean(n_total)
+        avg_n_k = round(float(avg_n) / k, 2)
+        if num_sig_fit > 0:
+            AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
+            AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
+            r_sq_avg = np.mean(r_sq_total[p_val_total < 0.05])
+            r_sq_adj_avg = np.mean(r_sq_adj_total[p_val_total < 0.05])
+
+            for i in range(num_sig_fit):
+                sig_units = np.where((p_val_total < 0.05))
+                unit = sig_units[0][i]
+
+                if unit < unit_ct:
+                    if plot_bool:
+                        try:
+                            plot_fr_and_model(unit,fr_r_p_list[unit],np.append(fit_params[unit],all_r_p_responses[unit,:]),'div_nl_avg_response_together',region_key,type_key)
+                        except:
+                            pdb.set_trace()
+
+            if plot_hist_bool:
+                AIC_temp = AIC_total[~np.isnan(AIC_total)]
+                AIC_sig = AIC_total[p_val_total < 0.05]
+                AIC_new_temp = AIC_new_total[~np.isnan(AIC_new_total)]
+                AIC_new_sig = AIC_new_total[p_val_total < 0.05]
+                AIC_lr_temp = AIC_lr_total[~np.isnan(AIC_lr_total)]
+                AIC_lr_sig = AIC_lr_total[p_val_total < 0.05]
+                AIC_lr_sig = AIC_lr_sig[~np.isnan(AIC_lr_sig)]
+                AICc_temp = AICc_total[~np.isnan(AICc_total)]
+                AICc_sig = AICc_total[p_val_total < 0.05]
+
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6),(ax7,ax8)) = plt.subplots(4,2,sharex='row')
+                
+                ax1.hist(AIC_temp[~is_outlier(AIC_temp)],color='teal',lw=0,alpha=0.85)  
+                if np.min(AIC_temp[~is_outlier(AIC_temp)]) < np.mean(AIC_temp) < np.max(AIC_temp[~is_outlier(AIC_temp)]):
+                    ax1.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
+                ax1.set_title('All AIC',fontsize='small')
+                try:
+                    ax2.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant AIC',fontsize='small')
+                try:
+                    ax3.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85) 
+                    if np.min(AIC_new_temp[~is_outlier(AIC_new_temp)]) < np.mean(AIC_new_temp) < np.max(AIC_new_temp[~is_outlier(AIC_new_temp)]):
+                        ax3.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All AIC n adjust',fontsize='small')
+                try:
+                    ax4.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant AIC n adjust',fontsize='small')
+                try:
+                    ax5.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AIC_lr_temp[~is_outlier(AIC_lr_temp)]) < np.mean(AIC_lr_temp) < np.max(AIC_lr_temp[~is_outlier(AIC_lr_temp)]):
+                        ax5.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All AIC L',fontsize='small')
+                try:
+                    ax6.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant AIC L',fontsize='small')
+                try:
+                    ax7.hist(AICc_temp[~is_outlier(AICc_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AICc_temp[~is_outlier(AICc_temp)]) < np.mean(AICc_temp) < np.max(AICc_temp[~is_outlier(AICc_temp)]):
+                        ax7.axvline(np.mean(AICc_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax7.set_title('All AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
+                #generally look at AICc if avg n/k < 40
+                try:
+                    ax8.hist(AICc_sig,color='coral',lw=0,alpha=0.85)  
+                    ax8.axvline(np.mean(AICc_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax8.set_title('Significant AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
+
+                plt.tight_layout()
+                plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
+                plt.suptitle('Avg Response Together: %s %s' %(region_key,type_key))
+                plt.rcParams['xtick.labelsize'] = 8
+                plt.rcParams['ytick.labelsize'] = 8
+
+                plt.savefig('AIC_%s_%s_avg_response_together'  %(region_key,type_key))
+                plt.clf()
+
+                ##
+                r_sq_temp = r_sq_total[~np.isnan(r_sq_total)]
+                r_sq_sig = r_sq_total[p_val_total < 0.05]
+                r_sq_adj_temp = r_sq_adj_total[~np.isnan(r_sq_adj_total)]
+                r_sq_adj_sig = r_sq_adj_total[p_val_total < 0.05]
+                mse_temp = mse_total[~np.isnan(mse_total)]
+                mse_sig = mse_total[p_val_total < 0.05]
+
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3,2,sharex='row')
+
+                try:
+                    ax1.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
+                    if np.min(r_sq_temp[~is_outlier(r_sq_temp)]) < np.mean(r_sq_temp) < np.max(r_sq_temp[~is_outlier(r_sq_temp)]):
+                       ax1.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax1.set_title('All r2',fontsize='small')
+                try:
+                    ax2.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant r2',fontsize='small')
+                try:
+                    ax3.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
+                    if np.min(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]) < np.mean(r_sq_adj_temp) < np.max(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]):
+                        ax3.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All adjusted r2',fontsize='small')
+                try:
+                    ax4.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant adjusted r2',fontsize='small')
+                try:
+                    ax5.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
+                    if np.min(mse_temp[~is_outlier(mse_temp)]) < np.mean(mse_temp) < np.max(mse_temp[~is_outlier(mse_temp)]):
+                        ax5.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All MSE',fontsize='small')
+                try:
+                    ax6.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant MSE',fontsize='small')
+
+                plt.tight_layout()
+                plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
+                plt.suptitle('Avg Response Together: %s %s' %(region_key,type_key))
+                plt.rcParams['xtick.labelsize'] = 8
+                plt.rcParams['ytick.labelsize'] = 8
+
+                plt.savefig('R2_MSE_%s_%s_avg_response_together'  %(region_key,type_key))
+                plt.clf()
+
+        else:
+            AIC_sig_model = np.nan
+            AIC_sig_avg = np.nan
+            r_sq_avg = np.nan
+            r_sq_adj_avg = np.nan
+
+        combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':0,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
+
+        return(return_dict)
+
+def make_div_nl_avg_response_separate_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,total_unit_num):
+        #set each model
+        num_params = 5
+
+        unit_ct = 0
+        fit_params = np.zeros((total_unit_num,num_params))
+        cov_total = np.zeros((total_unit_num,num_params,num_params))
+        perr_total = np.zeros((total_unit_num,num_params))
+        AIC_total = np.zeros((total_unit_num))
+        ss_res_total = np.zeros((total_unit_num))
+        sig_unit_length = 0
+        num_units_no_fit = 0
+        p_val_total = np.zeros((total_unit_num))
+        F_val_total = np.zeros((total_unit_num))
+        r_sq_total = np.zeros((total_unit_num))
+        fr_r_p_list = []
+        AIC_new_total = np.zeros((total_unit_num))
+        r_sq_adj_total = np.zeros((total_unit_num))
+        AIC_lr_total = np.zeros((total_unit_num))
+        AICc_total = np.zeros((total_unit_num))
+        mse_total = np.zeros((total_unit_num))
+        n_total = np.zeros((file_length))
+        all_r_p_responses = np.zeros((total_unit_num,2))
+
+        for i in range(file_length):
+            fr_data = fr_data_dict[i][region_key][type_key]
+            condensed = fr_data_dict[i][region_key]['condensed']
+            avg_fr_data = np.mean(fr_data,axis=2)
+
+            r_vals = condensed[:,3]
+            p_vals = condensed[:,4]
+
+            condensed = fr_data_dict[i][region_key]['condensed']
+            avg_fr_data = avg_and_corr[type_key]['avg_fr_dict'][i]
+            
+            r_vals = condensed[:,3]
+            p_vals = condensed[:,4]
+
+            if sig_only_bool:
+                #[r_coeff,r_pval,p_coeff,p_pval]
+                sig_vals = avg_and_corr[type_key]['sig_vals_by_file'][i]
+                
+                either_sig = np.logical_or(sig_vals[:,1] < 0.05,sig_vals[:,3] < 0.05)
+                sig_unit_length += np.sum(either_sig)                
+                avg_fr_data = avg_fr_data[:,either_sig]
+            else:
+                sig_unit_length += np.shape(avg_fr_data)[1]
+
+            for unit_num in range(avg_fr_data.shape[1]):
+                avg_frs = avg_fr_data[:,unit_num]
+
+                if 2 in r_vals:
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1),np.sum(avg_frs[r_vals == 2]) / np.sum(r_vals == 2),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1),np.sum(avg_frs[p_vals == 2]) / np.sum(p_vals == 2),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
+                else:
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
+
+                #
+                all_r_p_responses[unit_ct,:] = [avg_fr_by_r,avg_fr_by_p]
+
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
+
+                try:
+                    params,covs = curve_fit(div_nl_avg_response_separate_func,[r_vals,p_vals,avg_fr_by_r,avg_fr_by_p],avg_frs)
+                except:
+                    #fake very high values
+                    AIC_total[unit_ct] = np.nan
+                    ss_res_total[unit_ct] = np.nan
+                    num_units_no_fit += 1
+                    fr_r_p_list.append(np.array((0,0,0)))
+
+                    p_val_total[unit_ct] = np.nan
+                    F_val_total[unit_ct] = np.nan
+                    r_sq_total[unit_ct] = np.nan
+                    AIC_new_total[unit_ct] = np.nan
+                    r_sq_adj_total[unit_ct] = np.nan
+                    AIC_lr_total[unit_ct] = np.nan
+                    AICc_total[unit_ct] = np.nan
+                    mse_total[unit_ct] = np.nan
+                    
+                    unit_ct += 1
+                        
+                    #print 'failure to fit separate mult nl %s %s unit %s' %(region_key,type_key,unit_num)
+                    continue
+
+                if np.size(covs) > 1:
+                        perr = np.sqrt(np.diag(covs))
+                elif isinf(covs):
+                        perr = float('nan')
+                else:
+                        pdb.set_trace()
+
+                #
+                fit_params[unit_ct,:] = params
+                cov_total[unit_ct,:,:] = covs
+                perr_total[unit_ct,:] = perr
+                
+                #
+                #all_r_p_responses = [avg_fr_by_r,avg_fr_by_p]
+                model_out = div_nl_avg_response_separate_func([r_vals,p_vals,avg_fr_by_r,avg_fr_by_p],params[0],params[1],params[2],params[3],params[4])
+
+                residuals = avg_frs - model_out
+                ss_res = np.sum(residuals**2)
+                k = num_params
+                AIC = 2*k - 2*np.log(ss_res)  #np.log(x) = ln(x)
+                
+                ss_tot = np.sum((avg_frs-np.mean(avg_frs))**2)
+                r_sq = 1 - (ss_res / ss_tot)
+
+                ss_model = ss_tot - ss_res
+                n = np.shape(avg_frs)[0]
+                k = num_params #repeat for now
+                #degrees of freedom
+                df_total = n - 1
+                df_residual = n - k
+                df_model = k - 1
+
+                #mean squares
+                ms_residual = ss_res / float(df_residual)
+                ms_model = ss_model / float(df_model)
+
+                F_val = ms_model / ms_residual
+                p_val = 1.0 - stats.f.cdf(F_val,df_residual,df_model)
+
+                AIC_total[unit_ct] = AIC
+                ss_res_total[unit_ct] = ss_res
+                p_val_total[unit_ct] = p_val
+                F_val_total[unit_ct] = F_val
+                r_sq_total[unit_ct] = r_sq
+
+                AIC_new = 2*k + n*np.log(ss_res/n)
+                r_sq_adj = 1 - (1 - r_sq)*(n-1)/(n-k-1)
+        
+                likelihood_func = np.sum(stats.norm.logpdf(avg_frs,loc=model_out,scale=np.std(avg_frs)))                
+                AIC_lr = 2*k - 2 * np.log(likelihood_func)
+                try:
+                    AICc = AIC_new + 2 * k * (k + 1) / (n - k - 1)
+                except:
+                    AICc = np.nan
+                mse = np.mean(residuals**2)
+
+                AIC_new_total[unit_ct] = AIC_new
+                r_sq_adj_total[unit_ct] = r_sq_adj
+                AIC_lr_total[unit_ct] = AIC_lr
+                AICc_total[unit_ct] = AICc
+                mse_total[unit_ct] = mse
+                #correlation (rel to Rsq)
+
+                #here add summation array: avg fr, r, and p, by unit
+                fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
+
+                unit_ct +=1
+        
+        num_sig_fit = np.sum(p_val_total < 0.05)
+        avg_n = np.mean(n_total)
+        avg_n_k = round(float(avg_n) / k, 2)
+        if num_sig_fit > 0:
+            AIC_sig_model = 2*k - 2*np.log(sum(ss_res_total[p_val_total < 0.05]))
+            AIC_sig_avg = np.mean(AIC_total[p_val_total < 0.05])
+            r_sq_avg = np.mean(r_sq_total[p_val_total < 0.05])
+            r_sq_adj_avg = np.mean(r_sq_adj_total[p_val_total < 0.05])
+
+            for i in range(num_sig_fit):
+                sig_units = np.where((p_val_total < 0.05))
+                unit = sig_units[0][i]
+
+                if unit < unit_ct:
+                    if plot_bool:
+                        try:
+                            plot_fr_and_model(unit,fr_r_p_list[unit],np.append(fit_params[unit],all_r_p_responses[unit,:]),'div_nl_avg_response_separate',region_key,type_key)
+                        except:
+                            pdb.set_trace()
+
+            if plot_hist_bool:
+                AIC_temp = AIC_total[~np.isnan(AIC_total)]
+                AIC_sig = AIC_total[p_val_total < 0.05]
+                AIC_new_temp = AIC_new_total[~np.isnan(AIC_new_total)]
+                AIC_new_sig = AIC_new_total[p_val_total < 0.05]
+                AIC_lr_temp = AIC_lr_total[~np.isnan(AIC_lr_total)]
+                AIC_lr_sig = AIC_lr_total[p_val_total < 0.05]
+                AIC_lr_sig = AIC_lr_sig[~np.isnan(AIC_lr_sig)]
+                AICc_temp = AICc_total[~np.isnan(AICc_total)]
+                AICc_sig = AICc_total[p_val_total < 0.05]
+
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6),(ax7,ax8)) = plt.subplots(4,2,sharex='row')
+                
+                ax1.hist(AIC_temp[~is_outlier(AIC_temp)],color='teal',lw=0,alpha=0.85)  
+                if np.min(AIC_temp[~is_outlier(AIC_temp)]) < np.mean(AIC_temp) < np.max(AIC_temp[~is_outlier(AIC_temp)]):
+                    ax1.axvline(np.mean(AIC_temp),color='k',linestyle='dashed',linewidth=1)
+                ax1.set_title('All AIC',fontsize='small')
+                try:
+                    ax2.hist(AIC_sig,color='coral',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(AIC_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant AIC',fontsize='small')
+                try:
+                    ax3.hist(AIC_new_temp[~is_outlier(AIC_new_temp)],color='teal',lw=0,alpha=0.85) 
+                    if np.min(AIC_new_temp[~is_outlier(AIC_new_temp)]) < np.mean(AIC_new_temp) < np.max(AIC_new_temp[~is_outlier(AIC_new_temp)]):
+                        ax3.axvline(np.mean(AIC_new_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All AIC n adjust',fontsize='small')
+                try:
+                    ax4.hist(AIC_new_sig,color='coral',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(AIC_new_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant AIC n adjust',fontsize='small')
+                try:
+                    ax5.hist(AIC_lr_temp[~is_outlier(AIC_lr_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AIC_lr_temp[~is_outlier(AIC_lr_temp)]) < np.mean(AIC_lr_temp) < np.max(AIC_lr_temp[~is_outlier(AIC_lr_temp)]):
+                        ax5.axvline(np.mean(AIC_lr_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All AIC L',fontsize='small')
+                try:
+                    ax6.hist(AIC_lr_sig,color='coral',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(AIC_lr_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant AIC L',fontsize='small')
+                try:
+                    ax7.hist(AICc_temp[~is_outlier(AICc_temp)],color='teal',lw=0,alpha=0.85)  
+                    if np.min(AICc_temp[~is_outlier(AICc_temp)]) < np.mean(AICc_temp) < np.max(AICc_temp[~is_outlier(AICc_temp)]):
+                        ax7.axvline(np.mean(AICc_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax7.set_title('All AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
+                #generally look at AICc if avg n/k < 40
+                try:
+                    ax8.hist(AICc_sig,color='coral',lw=0,alpha=0.85)  
+                    ax8.axvline(np.mean(AICc_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax8.set_title('Significant AICc. avg n/k = %s' %(avg_n_k),fontsize='small')
+
+                plt.tight_layout()
+                plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
+                plt.suptitle('Avg Response Separate: %s %s' %(region_key,type_key))
+                plt.rcParams['xtick.labelsize'] = 8
+                plt.rcParams['ytick.labelsize'] = 8
+
+                plt.savefig('AIC_%s_%s_avg_response_separate'  %(region_key,type_key))
+                plt.clf()
+
+                ##
+                r_sq_temp = r_sq_total[~np.isnan(r_sq_total)]
+                r_sq_sig = r_sq_total[p_val_total < 0.05]
+                r_sq_adj_temp = r_sq_adj_total[~np.isnan(r_sq_adj_total)]
+                r_sq_adj_sig = r_sq_adj_total[p_val_total < 0.05]
+                mse_temp = mse_total[~np.isnan(mse_total)]
+                mse_sig = mse_total[p_val_total < 0.05]
+
+                f,((ax1,ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3,2,sharex='row')
+
+                try:
+                    ax1.hist(r_sq_temp[~is_outlier(r_sq_temp)],color='midnightblue',lw=0,alpha=0.85)
+                    if np.min(r_sq_temp[~is_outlier(r_sq_temp)]) < np.mean(r_sq_temp) < np.max(r_sq_temp[~is_outlier(r_sq_temp)]):
+                       ax1.axvline(np.mean(r_sq_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax1.set_title('All r2',fontsize='small')
+                try:
+                    ax2.hist(r_sq_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax2.axvline(np.mean(r_sq_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax2.set_title('Significant r2',fontsize='small')
+                try:
+                    ax3.hist(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)],color='midnightblue',lw=0,alpha=0.85)  
+                    if np.min(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]) < np.mean(r_sq_adj_temp) < np.max(r_sq_adj_temp[~is_outlier(r_sq_adj_temp)]):
+                        ax3.axvline(np.mean(r_sq_adj_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax3.set_title('All adjusted r2',fontsize='small')
+                try:
+                    ax4.hist(r_sq_adj_sig,color='seagreen',lw=0,alpha=0.85)  
+                    ax4.axvline(np.mean(r_sq_adj_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax4.set_title('Significant adjusted r2',fontsize='small')
+                try:
+                    ax5.hist(mse_temp[~is_outlier(mse_temp)],color='slategrey',lw=0,alpha=0.85)  
+                    if np.min(mse_temp[~is_outlier(mse_temp)]) < np.mean(mse_temp) < np.max(mse_temp[~is_outlier(mse_temp)]):
+                        ax5.axvline(np.mean(mse_temp),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax5.set_title('All MSE',fontsize='small')
+                try:
+                    ax6.hist(mse_sig,color='goldenrod',lw=0,alpha=0.85)  
+                    ax6.axvline(np.mean(mse_sig),color='k',linestyle='dashed',linewidth=1)
+                except:
+                    pass
+                ax6.set_title('Significant MSE',fontsize='small')
+
+                plt.tight_layout()
+                plt.subplots_adjust(top=0.9,bottom=0.05,left=0.05)
+                plt.suptitle('Avg Response Separate: %s %s' %(region_key,type_key))
+                plt.rcParams['xtick.labelsize'] = 8
+                plt.rcParams['ytick.labelsize'] = 8
+
+                plt.savefig('R2_MSE_%s_%s_avg_response_separate'  %(region_key,type_key))
+                plt.clf()
+
+        else:
+            AIC_sig_model = np.nan
+            AIC_sig_avg = np.nan
+            r_sq_avg = np.nan
+            r_sq_adj_avg = np.nan
+
+        combined_dict = {'params':params,'covs':covs,'perr':perr,'ss_res':ss_res,'AIC':AIC}        
+        return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'AIC_combined':AIC,'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'combined':combined_dict,'AIC_overall':0,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
+
+        return(return_dict)
+
+
+
+
+
+########################
+
+
 
 def make_delta_AIC(AICs,p_vals):
     sig_p_vals = p_vals < 0.05
@@ -2813,12 +3484,13 @@ for region_key,region_val in data_dict_all.iteritems():
     
     data_dict_all[region_key]['models']['div_nl'] = div_nl_model_return
 
-    print 'div nl noe'   
-    div_nl_noe_aft_cue_model = make_div_nl_noe_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr,total_unit_num)
-    div_nl_noe_bfr_res_model = make_div_nl_noe_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr,total_unit_num)
-    div_nl_noe_aft_res_model = make_div_nl_noe_model(file_dict,region_key,'aft_res',file_length,avg_and_corr,total_unit_num)
-    div_nl_noe_res_win_model = make_div_nl_noe_model(file_dict,region_key,'res_win',file_length,avg_and_corr,total_unit_num)
-    div_nl_noe_concat_model = make_div_nl_noe_model(file_dict,region_key,'concat',file_length,avg_and_corr,total_unit_num)
+    #TODO
+    print 'div nl noe JKJK avg response separate together'   
+    div_nl_noe_aft_cue_model = make_div_nl_avg_response_together_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr,total_unit_num)
+    div_nl_noe_bfr_res_model = make_div_nl_avg_response_together_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr,total_unit_num)
+    div_nl_noe_aft_res_model = make_div_nl_avg_response_together_model(file_dict,region_key,'aft_res',file_length,avg_and_corr,total_unit_num)
+    div_nl_noe_res_win_model = make_div_nl_avg_response_together_model(file_dict,region_key,'res_win',file_length,avg_and_corr,total_unit_num)
+    div_nl_noe_concat_model = make_div_nl_avg_response_together_model(file_dict,region_key,'concat',file_length,avg_and_corr,total_unit_num)
 
     div_nl_noe_model_return= {'aft_cue':div_nl_noe_aft_cue_model,'bfr_res':div_nl_noe_bfr_res_model,'aft_res':div_nl_noe_aft_res_model,'res_win':div_nl_noe_res_win_model,'concat':div_nl_noe_concat_model}
     
@@ -2846,12 +3518,13 @@ for region_key,region_val in data_dict_all.iteritems():
     
     data_dict_all[region_key]['models']['div_nl_separate_add'] = div_nl_separate_add_model_return
 
-    print 'div nl separate multiply'   
-    div_nl_separate_multiply_aft_cue_model = make_div_nl_separate_multiply_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr,total_unit_num)
-    div_nl_separate_multiply_bfr_res_model = make_div_nl_separate_multiply_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr,total_unit_num)
-    div_nl_separate_multiply_aft_res_model = make_div_nl_separate_multiply_model(file_dict,region_key,'aft_res',file_length,avg_and_corr,total_unit_num)
-    div_nl_separate_multiply_res_win_model = make_div_nl_separate_multiply_model(file_dict,region_key,'res_win',file_length,avg_and_corr,total_unit_num)
-    div_nl_separate_multiply_concat_model = make_div_nl_separate_multiply_model(file_dict,region_key,'concat',file_length,avg_and_corr,total_unit_num)
+    #TODO
+    print 'div nl separate multiply JKJK avg response separate'   
+    div_nl_separate_multiply_aft_cue_model = make_div_nl_avg_response_separate_model(file_dict,region_key,'aft_cue',file_length,avg_and_corr,total_unit_num)
+    div_nl_separate_multiply_bfr_res_model = make_div_nl_avg_response_separate_model(file_dict,region_key,'bfr_res',file_length,avg_and_corr,total_unit_num)
+    div_nl_separate_multiply_aft_res_model = make_div_nl_avg_response_separate_model(file_dict,region_key,'aft_res',file_length,avg_and_corr,total_unit_num)
+    div_nl_separate_multiply_res_win_model = make_div_nl_avg_response_separate_model(file_dict,region_key,'res_win',file_length,avg_and_corr,total_unit_num)
+    div_nl_separate_multiply_concat_model = make_div_nl_avg_response_separate_model(file_dict,region_key,'concat',file_length,avg_and_corr,total_unit_num)
 
     div_nl_separate_multiply_model_return= {'aft_cue':div_nl_separate_multiply_aft_cue_model,'bfr_res':div_nl_separate_multiply_bfr_res_model,'aft_res':div_nl_separate_multiply_aft_res_model,'res_win':div_nl_separate_multiply_res_win_model,'concat':div_nl_separate_multiply_concat_model}
     
@@ -2863,6 +3536,8 @@ for region_key,region_val in data_dict_all.iteritems():
     AIC_type_names = ['AIC_total','AIC_new_total','AICc_total','AIC_lr_total']
 
     delAIC_type_dict = {}
+    #
+    comp_r2_mse_dict = {}
     for AIC_type in AIC_type_names:
 
         delAIC_dict = {}
@@ -2896,7 +3571,7 @@ for region_key,region_val in data_dict_all.iteritems():
                     axarr[3].hist(delAIC['dAICs_all'][:,3][~np.isnan(delAIC['dAICs_all'][:,3])],color='teal',lw=0,bins=12)
                 except:
                     pass
-                axarr[3].set_title('div nl noe',fontsize='small')
+                axarr[3].set_title('div nl avg response together',fontsize='small')
                 try:
                     axarr[4].hist(delAIC['dAICs_all'][:,4][~np.isnan(delAIC['dAICs_all'][:,4])],color='teal',lw=0,bins=12)
                 except:
@@ -2911,7 +3586,7 @@ for region_key,region_val in data_dict_all.iteritems():
                     axarr[6].hist(delAIC['dAICs_all'][:,6][~np.isnan(delAIC['dAICs_all'][:,6])],color='teal',lw=0,bins=12)
                 except:
                     pass
-                axarr[6].set_title('separate multiply',fontsize='small')
+                axarr[6].set_title('div nl avg response separate',fontsize='small')
                 for axi in axarr.reshape(-1):
                     axi.yaxis.set_major_locator(plt.MaxNLocator(3))
                 plt.tight_layout()
@@ -2943,7 +3618,7 @@ for region_key,region_val in data_dict_all.iteritems():
                     axarr[3].hist(delAIC['dAICs_sig_any'][:,3][~np.isnan(delAIC['dAICs_sig_any'][:,3])],color='slateblue',lw=0,bins=12)
                 except:
                     pass
-                axarr[3].set_title('div nl noe',fontsize='small')
+                axarr[3].set_title('div nl avg response together',fontsize='small')
                 try:
                     axarr[4].hist(delAIC['dAICs_sig_any'][:,4][~np.isnan(delAIC['dAICs_sig_any'][:,4])],color='slateblue',lw=0,bins=12)
                 except:
@@ -2953,7 +3628,7 @@ for region_key,region_val in data_dict_all.iteritems():
                     axarr[5].hist(delAIC['dAICs_sig_any'][:,5][~np.isnan(delAIC['dAICs_sig_any'][:,5])],color='slateblue',lw=0,bins=12)
                 except:
                     pass
-                axarr[5].set_title('separate add',fontsize='small')
+                axarr[5].set_title('div nl avg response separate',fontsize='small')
                 try:
                     axarr[6].hist(delAIC['dAICs_sig_any'][:,6][~np.isnan(delAIC['dAICs_sig_any'][:,6])],color='slateblue',lw=0,bins=12)
                 except:
@@ -2995,7 +3670,7 @@ for region_key,region_val in data_dict_all.iteritems():
                     pass
                 try:
                     y3,x,_ = axarr[3].hist(delAIC['dAICs_sig_only'][:,3][~np.isnan(delAIC['dAICs_sig_only'][:,3])],color='darkmagenta',lw=0,range=[-1,ceil_val+1],bins=12)
-                    axarr[3].set_title('div nl noe',fontsize='small')
+                    axarr[3].set_title('div nl avg response rogether',fontsize='small')
                 except:
                     y3 = 0
                     pass
@@ -3013,7 +3688,7 @@ for region_key,region_val in data_dict_all.iteritems():
                     pass
                 try:    
                     y6,x,_ = axarr[6].hist(delAIC['dAICs_sig_only'][:,6][~np.isnan(delAIC['dAICs_sig_only'][:,6])],color='darkmagenta',lw=0,range=[-1,ceil_val+1],bins=12)
-                    axarr[6].set_title('separate multiply',fontsize='small')
+                    axarr[6].set_title('div nl avg response separate',fontsize='small')
                 except:
                     y6 = 0
                     pass
@@ -3058,7 +3733,7 @@ for region_key,region_val in data_dict_all.iteritems():
                 axarr[3].axvline(np.nanmean(delAIC['akaike_weights'][:,3]),color='k',linestyle='dashed',linewidth=1)
             except:
                 pass
-            axarr[3].set_title('div nl noe',fontsize='small')
+            axarr[3].set_title('div nl avg response together',fontsize='small')
             try:
                 axarr[4].hist(delAIC['akaike_weights'][:,4][~np.isnan(delAIC['akaike_weights'][:,4])],color='crimson',lw=0,bins=12)
                 axarr[4].axvline(np.nanmean(delAIC['akaike_weights'][:,4]),color='k',linestyle='dashed',linewidth=1)
@@ -3076,7 +3751,7 @@ for region_key,region_val in data_dict_all.iteritems():
                 axarr[6].axvline(np.nanmean(delAIC['akaike_weights'][:,6]),color='k',linestyle='dashed',linewidth=1)
             except:
                 pass
-            axarr[6].set_title('separate multiply',fontsize='small')
+            axarr[6].set_title('div nl avg response separate',fontsize='small')
             for axi in axarr.reshape(-1):
                 axi.yaxis.set_major_locator(plt.MaxNLocator(3))
             plt.tight_layout()
@@ -3142,7 +3817,7 @@ for region_key,region_val in data_dict_all.iteritems():
             axarr[3].hist(comp_r2_all[3],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         except:
             pass
-        axarr[3].set_title('div nl noe',fontsize='small')
+        axarr[3].set_title('div nl avg response together',fontsize='small')
         try:
             axarr[4].hist(comp_r2_all[4],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         except:
@@ -3157,7 +3832,7 @@ for region_key,region_val in data_dict_all.iteritems():
             axarr[6].hist(comp_r2_all[6],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         except:
             pass
-        axarr[6].set_title('separate multiply',fontsize='small')
+        axarr[6].set_title('div nl avg response separate',fontsize='small')
         for axi in axarr.reshape(-1):
             axi.yaxis.set_major_locator(plt.MaxNLocator(3))
         plt.tight_layout()
@@ -3185,7 +3860,7 @@ for region_key,region_val in data_dict_all.iteritems():
             axarr[3].hist(comp_r2_sig[3],color='seagreen',lw=0,range=comp_r2_sig_range,bins=12)
         except:
             pass
-        axarr[3].set_title('div nl noe',fontsize='small')
+        axarr[3].set_title('div nl avg response together',fontsize='small')
         try:
             axarr[4].hist(comp_r2_sig[4],color='seagreen',lw=0,range=comp_r2_sig_range,bins=12)
         except:
@@ -3200,7 +3875,7 @@ for region_key,region_val in data_dict_all.iteritems():
             axarr[6].hist(comp_r2_sig[6],color='seagreen',lw=0,range=comp_r2_sig_range,bins=12)
         except:
             pass
-        axarr[6].set_title('separate multiply',fontsize='small')
+        axarr[6].set_title('div nl avg response separate',fontsize='small')
         for axi in axarr.reshape(-1):
             axi.yaxis.set_major_locator(plt.MaxNLocator(3))
         plt.tight_layout()
@@ -3228,7 +3903,7 @@ for region_key,region_val in data_dict_all.iteritems():
             axarr[3].hist(comp_r2_adj_all[3],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         except:
             pass
-        axarr[3].set_title('div nl noe',fontsize='small')
+        axarr[3].set_title('div nl avg response together',fontsize='small')
         try:
             axarr[4].hist(comp_r2_adj_all[4],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         except:
@@ -3243,7 +3918,7 @@ for region_key,region_val in data_dict_all.iteritems():
             axarr[6].hist(comp_r2_adj_all[6],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         except:
             pass
-        axarr[6].set_title('separate multiply',fontsize='small')
+        axarr[6].set_title('div nl avg response separate',fontsize='small')
         for axi in axarr.reshape(-1):
             axi.yaxis.set_major_locator(plt.MaxNLocator(3))
         plt.tight_layout()
@@ -3271,7 +3946,7 @@ for region_key,region_val in data_dict_all.iteritems():
             axarr[3].hist(comp_r2_adj_sig[3],color='seagreen',lw=0,range=comp_r2_adj_sig_range,bins=12)
         except:
             pass
-        axarr[3].set_title('div nl noe',fontsize='small')
+        axarr[3].set_title('div nl avg response together',fontsize='small')
         try:
             axarr[4].hist(comp_r2_adj_sig[4],color='seagreen',lw=0,range=comp_r2_adj_sig_range,bins=12)
         except:
@@ -3286,7 +3961,7 @@ for region_key,region_val in data_dict_all.iteritems():
             axarr[6].hist(comp_r2_adj_sig[6],color='seagreen',lw=0,range=comp_r2_adj_sig_range,bins=12)
         except:
             pass
-        axarr[6].set_title('separate multiply',fontsize='small')
+        axarr[6].set_title('div nl avg response separate',fontsize='small')
         for axi in axarr.reshape(-1):
             axi.yaxis.set_major_locator(plt.MaxNLocator(3))
         plt.tight_layout()
@@ -3314,7 +3989,7 @@ for region_key,region_val in data_dict_all.iteritems():
             axarr[3].hist(comp_mse_all[3],color='midnightblue',lw=0,range=comp_mse_all_range,bins=12)
         except:
             pass
-        axarr[3].set_title('div nl noe',fontsize='small')
+        axarr[3].set_title('div nl avg response together',fontsize='small')
         try:
             axarr[4].hist(comp_mse_all[4],color='midnightblue',lw=0,range=comp_mse_all_range,bins=12)
         except:
@@ -3329,7 +4004,7 @@ for region_key,region_val in data_dict_all.iteritems():
             axarr[6].hist(comp_mse_all[6],color='midnightblue',lw=0,range=comp_mse_all_range,bins=12)
         except:
             pass
-        axarr[6].set_title('separate multiply',fontsize='small')
+        axarr[6].set_title('div nl avg response separate',fontsize='small')
         for axi in axarr.reshape(-1):
             axi.yaxis.set_major_locator(plt.MaxNLocator(3))
         plt.tight_layout()
@@ -3357,7 +4032,7 @@ for region_key,region_val in data_dict_all.iteritems():
             axarr[3].hist(comp_mse_sig[3],color='seagreen',lw=0,range=comp_mse_sig_range,bins=12)
         except:
             pass
-        axarr[3].set_title('div nl noe',fontsize='small')
+        axarr[3].set_title('div nl avg response together',fontsize='small')
         try:
             axarr[4].hist(comp_mse_sig[4],color='seagreen',lw=0,range=comp_mse_sig_range,bins=12)
         except:
@@ -3372,7 +4047,7 @@ for region_key,region_val in data_dict_all.iteritems():
             axarr[6].hist(comp_mse_sig[6],color='seagreen',lw=0,range=comp_mse_sig_range,bins=12)
         except:
             pass
-        axarr[6].set_title('separate multiply',fontsize='small')
+        axarr[6].set_title('div nl avg response separate',fontsize='small')
         for axi in axarr.reshape(-1):
             axi.yaxis.set_major_locator(plt.MaxNLocator(3))
         plt.tight_layout()
@@ -3381,11 +4056,12 @@ for region_key,region_val in data_dict_all.iteritems():
         plt.clf()
 
 
-
-
-
         delAIC_type_dict[AIC_type] = delAIC_dict
+        #
+        comp_r2_mse_dict[win_key] = {'comp_r2_all':comp_r2_all,'comp_r2_sig':comp_r2_sig,'comp_r2_adj_all':comp_r2_adj_all,'comp_r2_adj_sig':comp_r2_adj_sig,'comp_mse_all':comp_mse_all,'comp_mse_sig':comp_mse_sig}
+
     data_dict_all[region_key]['delAIC'] = delAIC_type_dict
+    data_dict_all[region_key]['comp_r2_mse_dicts'] = comp_r2_mse_dict
 
 ##saving 
 if sig_only_bool:
@@ -3397,7 +4073,7 @@ data_dict_all['file_dict'] = file_dict
 
 #for region_key,region_val in data_dict_all.iteritems():
 type_names = ['aft cue','bfr res','aft res','res win','concat']
-model_names = ['linear','difference','div nl','div nl noe','div nl Y','separate add','separate multiply']
+model_names = ['linear','difference','div nl','avg response together','div nl Y','separate add','avg response separate']
 
 if sig_only_bool:
     aic_workbook = xlsxwriter.Workbook('model_aic_sig.xlsx',options={'nan_inf_to_errors':True})
@@ -3489,8 +4165,15 @@ type_names_together = ['aft_cue', 'bfr_res', 'aft_res', 'res_win', 'concat']
 for region_key,region_val in data_dict_all.iteritems():
     if not region_key == 'file_dict':
         #for type_key,type_val in data_dict_all[region_key]['models']['linear'].iteritems():
+        
 
         all_percs = np.zeros((np.shape(type_names)[0],np.shape(model_names)[0]))    
+        #
+        sig_percs = np.zeros((np.shape(type_names)[0],np.shape(model_names)[0]))
+        all_percs_r2 = np.zeros((np.shape(type_names)[0],np.shape(model_names)[0]))
+        sig_percs_r2 = np.zeros((np.shape(type_names)[0],np.shape(model_names)[0]))
+        num_any_sig_window = np.zeros((np.shape(type_names)[0]))
+ 
         all_no_fit = np.zeros((np.shape(type_names)[0],np.shape(model_names)[0]))
         total_num_units_window = np.zeros((np.shape(type_names)[0]))
 
@@ -3500,10 +4183,15 @@ for region_key,region_val in data_dict_all.iteritems():
     
             all_model_AICs = np.column_stack((data_dict_all[region_key]['models']['linear'][type_key]['AIC_total'],data_dict_all[region_key]['models']['diff'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_noe'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_Y'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_separate_add'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_separate_multiply'][type_key]['AIC_total']))
 
+            #all_model_adj_r2
+            all_model_adj_r2 = np.column_stack((data_dict_all[region_key]['models']['linear'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['diff'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['div_nl'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['div_nl_noe'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['div_nl_Y'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['div_nl_separate_add'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['div_nl_separate_multiply'][type_key]['r_sq_adj_total']))
+
             ###
             all_model_p_vals = np.column_stack((data_dict_all[region_key]['models']['linear'][type_key]['p_val_total'],data_dict_all[region_key]['models']['diff'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_noe'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_Y'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_separate_add'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_separate_multiply'][type_key]['p_val_total']))
             
             all_p_bool = all_model_p_vals < 0.05
+            #
+            any_sig = np.sum(all_p_bool,axis=1) > 0            
             sig_multiple_models = np.sum(all_p_bool,axis=1)
             num_sig_multiple_models = np.sum(sig_multiple_models > 0)
             perc_sig_multiple_models = num_sig_multiple_models / float(np.shape(sig_multiple_models)[0])
@@ -3519,22 +4207,43 @@ for region_key,region_val in data_dict_all.iteritems():
                     #TODO finish this part
 
             arg_mins = np.argmin(all_model_AICs,axis=1)
+            #
+            sig_arg_mins = arg_mins[any_sig]
+            arg_max_r2_adj = np.argmax(all_model_adj_r2,axis=1)
+            sig_arg_max_r2_adj = arg_max_r2_adj[any_sig]
+
             perc_min = np.zeros((np.shape(all_model_AICs)[1]))
+            #
+            sig_perc_min = np.zeros((np.shape(all_model_AICs)[1]))
+            perc_max = np.zeros((np.shape(all_model_adj_r2)[1]))
+            sig_perc_max = np.zeros((np.shape(all_model_adj_r2)[1]))
             for j in range(np.shape(all_model_AICs)[1]):
                 perc_min[j] = np.sum(arg_mins == j) / float(np.shape(all_model_AICs)[0])
-
+                #
+                sig_perc_min[j] = np.sum(sig_arg_mins == j) / float(np.shape(sig_arg_mins)[0])
+                perc_max[j] = np.sum(arg_max_r2_adj == j) / float(np.shape(all_model_adj_r2)[0])
+                sig_perc_max[j] = np.sum(sig_arg_max_r2_adj == j) / float(np.shape(sig_arg_max_r2_adj)[0])
+                
             all_percs[i,:] = perc_min
+            #
+            sig_percs[i,:] = sig_perc_min
+            all_percs_r2[i,:] = perc_max
+            sig_percs_r2[i,:] = sig_perc_max
             
             all_no_fit[i,:] = [data_dict_all[region_key]['models']['linear'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['diff'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['div_nl'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['div_nl_noe'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['div_nl_Y'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['div_nl_separate_add'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['div_nl_separate_multiply'][type_key]['perc_units_no_fit']]
 
             total_num_units_window[i] = data_dict_all[region_key]['models']['linear'][type_key]['total_num_units']
+            
+            #
+            num_any_sig_window[i] = np.sum(any_sig)
 
-        data_dict_all[region_key]['model_summary'] = {'all_percs':all_percs,'all_no_fit':all_no_fit,'total_num_units_window':total_num_units_window}
+        #
+        data_dict_all[region_key]['model_summary'] = {'all_percs':all_percs,'all_no_fit':all_no_fit,'total_num_units_window':total_num_units_window,'all_percs_r2':all_percs_r2,'sig_percs_r2':sig_percs_r2,'num_any_sig':num_any_sig_window,'sig_percs':sig_percs}
 
 
 
 worksheet = aic_workbook.add_worksheet('perc_unit_best_fit')
-worksheet.write(0,0,'M1')
+worksheet.write(0,0,'M1: all')
 worksheet.write_row(0,1,model_names)
 worksheet.write_column(1,0,type_names)
 percs = data_dict_all['M1_dicts']['model_summary']['all_percs']
@@ -3543,6 +4252,107 @@ for i in range(np.shape(percs)[0]):
     worksheet.write_row(i+1,1,percs[i,:])
 worksheet.write(0,8,'total units')
 worksheet.write_column(1,8,total_units)
+percs = data_dict_all['M1_dicts']['model_summary']['sig_percs']
+total_units = data_dict_all['M1_dicts']['model_summary']['num_any_sig']
+worksheet.write_row(0,11,model_names)
+worksheet.write_column(1,10,type_names)
+worksheet.write(0,10,'M1: sig')
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+1,11,percs[i,:])
+worksheet.write(0,18,'total units')
+worksheet.write_column(1,18,total_units)
+
+worksheet.write(7,0,'S1: all')
+worksheet.write_row(7,1,model_names)
+worksheet.write_column(8,0,type_names)
+percs = data_dict_all['S1_dicts']['model_summary']['all_percs']
+total_units = data_dict_all['S1_dicts']['model_summary']['total_num_units_window']
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+8,1,percs[i,:])
+worksheet.write(7,8,'total units')
+worksheet.write_column(8,8,total_units)
+percs = data_dict_all['S1_dicts']['model_summary']['sig_percs']
+total_units = data_dict_all['S1_dicts']['model_summary']['num_any_sig']
+worksheet.write_row(7,11,model_names)
+worksheet.write_column(8,10,type_names)
+worksheet.write(8,10,'S1: sig')
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+8,11,percs[i,:])
+worksheet.write(7,18,'total units')
+worksheet.write_column(8,18,total_units)
+
+worksheet.write(14,0,'PMd: all')
+worksheet.write_row(14,1,model_names)
+worksheet.write_column(15,0,type_names)
+percs = data_dict_all['PmD_dicts']['model_summary']['all_percs']
+total_units = data_dict_all['S1_dicts']['model_summary']['total_num_units_window']
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+15,1,percs[i,:])
+worksheet.write(14,8,'total units')
+worksheet.write_column(15,8,total_units)
+percs = data_dict_all['PmD_dicts']['model_summary']['sig_percs']
+total_units = data_dict_all['PmD_dicts']['model_summary']['num_any_sig']
+worksheet.write_row(14,11,model_names)
+worksheet.write_column(15,10,type_names)
+worksheet.write(14,10,'PmD: sig')
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+15,11,percs[i,:])
+worksheet.write(14,18,'total units')
+worksheet.write_column(15,18,total_units)
+
+worksheet.conditional_format('B2:H2', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B3:H3', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B4:H4', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B5:H5', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B6:H6', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L2:R2', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L3:R3', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L4:R4', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L5:R5', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L6:R6', {'type': 'top', 'value':'1', 'format':format1})
+
+worksheet.conditional_format('B9:H9', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B10:H10', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B11:H11', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B12:H12', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B13:H13', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L9:R9', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L10:R10', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L11:R11', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L12:R12', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L13:R13', {'type': 'top', 'value':'1', 'format':format1})
+
+worksheet.conditional_format('B16:H16', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B17:H17', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B18:H18', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B19:H19', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B20:H20', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L16:R16', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L17:R17', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L18:R18', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L19:R19', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L20:R20', {'type': 'top', 'value':'1', 'format':format1})
+
+#
+worksheet = aic_workbook.add_worksheet('perc_unit_best_fit_adj_r2')
+worksheet.write(0,0,'M1: all')
+worksheet.write_row(0,1,model_names)
+worksheet.write_column(1,0,type_names)
+percs = data_dict_all['M1_dicts']['model_summary']['all_percs_r2']
+total_units = data_dict_all['M1_dicts']['model_summary']['total_num_units_window']
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+1,1,percs[i,:])
+worksheet.write(0,8,'total units')
+worksheet.write_column(1,8,total_units)
+percs = data_dict_all['M1_dicts']['model_summary']['sig_percs_r2']
+total_units = data_dict_all['M1_dicts']['model_summary']['num_any_sig']
+worksheet.write_row(0,11,model_names)
+worksheet.write_column(1,10,type_names)
+worksheet.write(0,10,'M1: sig')
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+1,11,percs[i,:])
+worksheet.write(0,18,'total units')
+worksheet.write_column(1,18,total_units)
 
 worksheet.write(7,0,'S1')
 worksheet.write_row(7,1,model_names)
@@ -3553,6 +4363,15 @@ for i in range(np.shape(percs)[0]):
     worksheet.write_row(i+8,1,percs[i,:])
 worksheet.write(7,8,'total units')
 worksheet.write_column(8,8,total_units)
+percs = data_dict_all['S1_dicts']['model_summary']['sig_percs_r2']
+total_units = data_dict_all['S1_dicts']['model_summary']['num_any_sig']
+worksheet.write_row(7,11,model_names)
+worksheet.write_column(8,10,type_names)
+worksheet.write(8,10,'S1: sig')
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+8,11,percs[i,:])
+worksheet.write(7,18,'total units')
+worksheet.write_column(8,18,total_units)
 
 worksheet.write(14,0,'PMd')
 worksheet.write_row(14,1,model_names)
@@ -3563,6 +4382,50 @@ for i in range(np.shape(percs)[0]):
     worksheet.write_row(i+15,1,percs[i,:])
 worksheet.write(14,8,'total units')
 worksheet.write_column(15,8,total_units)
+percs = data_dict_all['PmD_dicts']['model_summary']['sig_percs_r2']
+total_units = data_dict_all['PmD_dicts']['model_summary']['num_any_sig']
+worksheet.write_row(14,11,model_names)
+worksheet.write_column(15,10,type_names)
+worksheet.write(14,10,'PmD: sig')
+for i in range(np.shape(percs)[0]):
+    worksheet.write_row(i+15,11,percs[i,:])
+worksheet.write(14,18,'total units')
+worksheet.write_column(15,18,total_units)
+
+worksheet.conditional_format('B2:H2', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B3:H3', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B4:H4', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B5:H5', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B6:H6', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L2:R2', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L3:R3', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L4:R4', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L5:R5', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L6:R6', {'type': 'top', 'value':'1', 'format':format1})
+
+worksheet.conditional_format('B9:H9', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B10:H10', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B11:H11', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B12:H12', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B13:H13', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L9:R9', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L10:R10', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L11:R11', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L12:R12', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L13:R13', {'type': 'top', 'value':'1', 'format':format1})
+
+worksheet.conditional_format('B16:H16', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B17:H17', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B18:H18', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B19:H19', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('B20:H20', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L16:R16', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L17:R17', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L18:R18', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L19:R19', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.conditional_format('L20:R20', {'type': 'top', 'value':'1', 'format':format1})
+
+
 
 #################
 
