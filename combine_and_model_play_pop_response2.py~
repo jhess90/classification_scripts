@@ -3862,8 +3862,6 @@ for region_key,region_val in data_dict_all.iteritems():
             if np.shape(comp_r2_sig[j])[0] != 0:
                 comp_r2_sig_max_min[j,:] = [np.nanmax(comp_r2_sig[j]),np.nanmin(comp_r2_sig[j])]
             comp_r2_adj_all_max_min[j,:] = [np.nanmax(comp_r2_adj_all[j]),np.nanmin(comp_r2_adj_all[j])]
-            if comp_r2_adj_all_max_min[j,1] < -1:
-                comp_r2_adj_all_max_min[j,1] = -0.1
             if np.shape(comp_r2_adj_sig[j])[0] != 0:
                 comp_r2_adj_sig_max_min[j,:] = [np.nanmax(comp_r2_adj_sig[j]),np.nanmin(comp_r2_adj_sig[j])]
             comp_mse_all_max_min[j,:] = [np.nanmax(comp_mse_all[j]),np.nanmin(comp_mse_all[j])]
@@ -3880,35 +3878,35 @@ for region_key,region_val in data_dict_all.iteritems():
         f,axarr = plt.subplots(7,sharex=True)
 
         f.suptitle('r2 %s all units: %s' %(region_key,win_key))
-        axarr[0].hist(comp_r2_all[0][~is_outlier(comp_r2_all[0])],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
+        axarr[0].hist(comp_r2_all[0],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         axarr[0].set_title('linear',fontsize='small')
         try:
-            axarr[1].hist(comp_r2_all[1][~is_outlier(comp_r2_all[1])],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
+            axarr[1].hist(comp_r2_all[1],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         except:
             pass
         axarr[1].set_title('difference',fontsize='small')
         try:
-            axarr[2].hist(comp_r2_all[2][~is_outlier(comp_r2_all[2])],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
+            axarr[2].hist(comp_r2_all[2],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         except:
             pass
         axarr[2].set_title('div nl',fontsize='small')
         try:
-            axarr[3].hist(comp_r2_all[3][~is_outlier(comp_r2_all[3])],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
+            axarr[3].hist(comp_r2_all[3],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         except:
             pass
         axarr[3].set_title('div nl avg response together',fontsize='small')
         try:
-            axarr[4].hist(comp_r2_all[4][~is_outlier(comp_r2_all[4])],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
+            axarr[4].hist(comp_r2_all[4],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         except:
             pass
         axarr[4].set_title('div nl Y',fontsize='small')
         try:
-            axarr[5].hist(comp_r2_all[5][~is_outlier(comp_r2_all[5])],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
+            axarr[5].hist(comp_r2_all[5],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         except:
             pass
         axarr[5].set_title('separate add',fontsize='small')
         try:
-            axarr[6].hist(comp_r2_all[6][~is_outlier(comp_r2_all[6])],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
+            axarr[6].hist(comp_r2_all[6],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         except:
             pass
         axarr[6].set_title('div nl avg response separate',fontsize='small')
@@ -3966,35 +3964,35 @@ for region_key,region_val in data_dict_all.iteritems():
         f,axarr = plt.subplots(7,sharex=True)
 
         f.suptitle('r2 adj %s all units: %s' %(region_key,win_key))
-        axarr[0].hist(comp_r2_adj_all[0][~is_outlier(comp_r2_adj_all[0])],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
+        axarr[0].hist(comp_r2_adj_all[0],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         axarr[0].set_title('linear',fontsize='small')
         try:
-            axarr[1].hist(comp_r2_adj_all[1][~is_outlier(comp_r2_adj_all[1])],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
+            axarr[1].hist(comp_r2_adj_all[1],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         except:
             pass
         axarr[1].set_title('difference',fontsize='small')
         try:
-            axarr[2].hist(comp_r2_adj_all[2][~is_outlier(comp_r2_adj_all[2])],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
+            axarr[2].hist(comp_r2_adj_all[2],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         except:
             pass
         axarr[2].set_title('div nl',fontsize='small')
         try:
-            axarr[3].hist(comp_r2_adj_all[3][~is_outlier(comp_r2_adj_all[3])],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
+            axarr[3].hist(comp_r2_adj_all[3],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         except:
             pass
         axarr[3].set_title('div nl avg response together',fontsize='small')
         try:
-            axarr[4].hist(comp_r2_adj_all[4][~is_outlier(comp_r2_adj_all[4])],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
+            axarr[4].hist(comp_r2_adj_all[4],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         except:
             pass
         axarr[4].set_title('div nl Y',fontsize='small')
         try:
-            axarr[5].hist(comp_r2_adj_all[5][~is_outlier(comp_r2_adj_all[5])],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
+            axarr[5].hist(comp_r2_adj_all[5],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         except:
             pass
         axarr[5].set_title('separate add',fontsize='small')
         try:
-            axarr[6].hist(comp_r2_adj_all[6][~is_outlier(comp_r2_adj_all[6])],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
+            axarr[6].hist(comp_r2_adj_all[6],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         except:
             pass
         axarr[6].set_title('div nl avg response separate',fontsize='small')

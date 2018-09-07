@@ -3868,6 +3868,8 @@ for region_key,region_val in data_dict_all.iteritems():
             if np.shape(comp_r2_sig[j])[0] != 0:
                 comp_r2_sig_max_min[j,:] = [np.nanmax(comp_r2_sig[j]),np.nanmin(comp_r2_sig[j])]
             comp_r2_adj_all_max_min[j,:] = [np.nanmax(comp_r2_adj_all[j]),np.nanmin(comp_r2_adj_all[j])]
+            if comp_r2_adj_all_max_min[j,1] < -1:
+                comp_r2_adj_all_max_min[j,1] = -0.1
             if np.shape(comp_r2_adj_sig[j])[0] != 0:
                 comp_r2_adj_sig_max_min[j,:] = [np.nanmax(comp_r2_adj_sig[j]),np.nanmin(comp_r2_adj_sig[j])]
             comp_mse_all_max_min[j,:] = [np.nanmax(comp_mse_all[j]),np.nanmin(comp_mse_all[j])]

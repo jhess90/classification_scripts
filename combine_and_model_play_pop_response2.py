@@ -2604,11 +2604,11 @@ def make_div_nl_avg_response_together_model(fr_data_dict,region_key,type_key,fil
                 avg_frs = avg_fr_data[:,unit_num]
 
                 if 2 in r_vals:
-                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1),np.sum(avg_frs[r_vals == 2]) / np.sum(r_vals == 2),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
-                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1),np.sum(avg_frs[p_vals == 2]) / np.sum(p_vals == 2),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
+                    avg_fr_by_r = np.sum([np.sum(avg_fr_data[r_vals == 0]) / (np.shape(avg_fr_data[r_vals == 0])[0]*np.shape(avg_fr_data[r_vals == 0])[1]),np.sum(avg_fr_data[r_vals == 1]) / (np.shape(avg_fr_data[r_vals == 1])[0]*np.shape(avg_fr_data[r_vals == 1])[1]),np.sum(avg_fr_data[r_vals == 2]) / (np.shape(avg_fr_data[r_vals == 2])[0]*np.shape(avg_fr_data[r_vals == 2])[1]),np.sum(avg_fr_data[r_vals == 3]) / (np.shape(avg_fr_data[r_vals == 3])[0]*np.shape(avg_fr_data[r_vals == 3])[1])])
+                    avg_fr_by_p = np.sum([np.sum(avg_fr_data[p_vals == 0]) / (np.shape(avg_fr_data[p_vals == 0])[0]*np.shape(avg_fr_data[p_vals == 0])[1]),np.sum(avg_fr_data[p_vals == 1]) / (np.shape(avg_fr_data[p_vals == 1])[0]*np.shape(avg_fr_data[p_vals == 1])[1]),np.sum(avg_fr_data[p_vals == 2]) / (np.shape(avg_fr_data[p_vals == 2])[0]*np.shape(avg_fr_data[p_vals == 2])[1]),np.sum(avg_fr_data[p_vals == 3]) / (np.shape(avg_fr_data[p_vals == 3])[0]*np.shape(avg_fr_data[p_vals == 3])[1])])
                 else:
-                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
-                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
+                    avg_fr_by_r = np.sum([np.sum(avg_fr_data[r_vals == 0]) /(np.shape(avg_fr_data[r_vals == 0])[0]*np.shape(avg_fr_data[r_vals == 0])[1]),np.sum(avg_fr_data[r_vals == 3]) / (np.shape(avg_fr_data[r_vals == 3])[0]*np.shape(avg_fr_data[r_vals == 3])[1])])
+                    avg_fr_by_p = np.sum([np.sum(avg_fr_data[p_vals == 0]) / (np.shape(avg_fr_data[p_vals == 0])[0]*np.shape(avg_fr_data[p_vals == 0])[1]),np.sum(avg_fr_data[p_vals == 3]) / (np.shape(avg_fr_data[p_vals == 3])[0]*np.shape(avg_fr_data[p_vals == 3])[1])])
 
                 #
                 all_r_p_responses[unit_ct,:] = [avg_fr_by_r,avg_fr_by_p]
@@ -2948,11 +2948,11 @@ def make_div_nl_avg_response_separate_model(fr_data_dict,region_key,type_key,fil
                 avg_frs = avg_fr_data[:,unit_num]
 
                 if 2 in r_vals:
-                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1),np.sum(avg_frs[r_vals == 2]) / np.sum(r_vals == 2),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
-                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1),np.sum(avg_frs[p_vals == 2]) / np.sum(p_vals == 2),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
+                    avg_fr_by_r = np.sum([np.sum(avg_fr_data[r_vals == 0]) / (np.shape(avg_fr_data[r_vals == 0])[0]*np.shape(avg_fr_data[r_vals == 0])[1]),np.sum(avg_fr_data[r_vals == 1]) / (np.shape(avg_fr_data[r_vals == 1])[0]*np.shape(avg_fr_data[r_vals == 1])[1]),np.sum(avg_fr_data[r_vals == 2]) / (np.shape(avg_fr_data[r_vals == 2])[0]*np.shape(avg_fr_data[r_vals == 2])[1]),np.sum(avg_fr_data[r_vals == 3]) / (np.shape(avg_fr_data[r_vals == 3])[0]*np.shape(avg_fr_data[r_vals == 3])[1])])
+                    avg_fr_by_p = np.sum([np.sum(avg_fr_data[p_vals == 0]) / (np.shape(avg_fr_data[p_vals == 0])[0]*np.shape(avg_fr_data[p_vals == 0])[1]),np.sum(avg_fr_data[p_vals == 1]) / (np.shape(avg_fr_data[p_vals == 1])[0]*np.shape(avg_fr_data[p_vals == 1])[1]),np.sum(avg_fr_data[p_vals == 2]) / (np.shape(avg_fr_data[p_vals == 2])[0]*np.shape(avg_fr_data[p_vals == 2])[1]),np.sum(avg_fr_data[p_vals == 3]) / (np.shape(avg_fr_data[p_vals == 3])[0]*np.shape(avg_fr_data[p_vals == 3])[1])])
                 else:
-                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
-                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
+                    avg_fr_by_r = np.sum([np.sum(avg_fr_data[r_vals == 0]) /(np.shape(avg_fr_data[r_vals == 0])[0]*np.shape(avg_fr_data[r_vals == 0])[1]),np.sum(avg_fr_data[r_vals == 3]) / (np.shape(avg_fr_data[r_vals == 3])[0]*np.shape(avg_fr_data[r_vals == 3])[1])])
+                    avg_fr_by_p = np.sum([np.sum(avg_fr_data[p_vals == 0]) / (np.shape(avg_fr_data[p_vals == 0])[0]*np.shape(avg_fr_data[p_vals == 0])[1]),np.sum(avg_fr_data[p_vals == 3]) / (np.shape(avg_fr_data[p_vals == 3])[0]*np.shape(avg_fr_data[p_vals == 3])[1])])
 
                 #
                 all_r_p_responses[unit_ct,:] = [avg_fr_by_r,avg_fr_by_p]
@@ -3862,8 +3862,6 @@ for region_key,region_val in data_dict_all.iteritems():
             if np.shape(comp_r2_sig[j])[0] != 0:
                 comp_r2_sig_max_min[j,:] = [np.nanmax(comp_r2_sig[j]),np.nanmin(comp_r2_sig[j])]
             comp_r2_adj_all_max_min[j,:] = [np.nanmax(comp_r2_adj_all[j]),np.nanmin(comp_r2_adj_all[j])]
-            if comp_r2_adj_all_max_min[j,1] < -1:
-                comp_r2_adj_all_max_min[j,1] = -0.1
             if np.shape(comp_r2_adj_sig[j])[0] != 0:
                 comp_r2_adj_sig_max_min[j,:] = [np.nanmax(comp_r2_adj_sig[j]),np.nanmin(comp_r2_adj_sig[j])]
             comp_mse_all_max_min[j,:] = [np.nanmax(comp_mse_all[j]),np.nanmin(comp_mse_all[j])]
@@ -3880,35 +3878,35 @@ for region_key,region_val in data_dict_all.iteritems():
         f,axarr = plt.subplots(7,sharex=True)
 
         f.suptitle('r2 %s all units: %s' %(region_key,win_key))
-        axarr[0].hist(comp_r2_all[0][~is_outlier(comp_r2_all[0])],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
+        axarr[0].hist(comp_r2_all[0],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         axarr[0].set_title('linear',fontsize='small')
         try:
-            axarr[1].hist(comp_r2_all[1][~is_outlier(comp_r2_all[1])],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
+            axarr[1].hist(comp_r2_all[1],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         except:
             pass
         axarr[1].set_title('difference',fontsize='small')
         try:
-            axarr[2].hist(comp_r2_all[2][~is_outlier(comp_r2_all[2])],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
+            axarr[2].hist(comp_r2_all[2],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         except:
             pass
         axarr[2].set_title('div nl',fontsize='small')
         try:
-            axarr[3].hist(comp_r2_all[3][~is_outlier(comp_r2_all[3])],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
+            axarr[3].hist(comp_r2_all[3],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         except:
             pass
         axarr[3].set_title('div nl avg response together',fontsize='small')
         try:
-            axarr[4].hist(comp_r2_all[4][~is_outlier(comp_r2_all[4])],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
+            axarr[4].hist(comp_r2_all[4],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         except:
             pass
         axarr[4].set_title('div nl Y',fontsize='small')
         try:
-            axarr[5].hist(comp_r2_all[5][~is_outlier(comp_r2_all[5])],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
+            axarr[5].hist(comp_r2_all[5],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         except:
             pass
         axarr[5].set_title('separate add',fontsize='small')
         try:
-            axarr[6].hist(comp_r2_all[6][~is_outlier(comp_r2_all[6])],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
+            axarr[6].hist(comp_r2_all[6],color='midnightblue',lw=0,range=comp_r2_all_range,bins=12)
         except:
             pass
         axarr[6].set_title('div nl avg response separate',fontsize='small')
@@ -3966,35 +3964,35 @@ for region_key,region_val in data_dict_all.iteritems():
         f,axarr = plt.subplots(7,sharex=True)
 
         f.suptitle('r2 adj %s all units: %s' %(region_key,win_key))
-        axarr[0].hist(comp_r2_adj_all[0][~is_outlier(comp_r2_adj_all[0])],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
+        axarr[0].hist(comp_r2_adj_all[0],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         axarr[0].set_title('linear',fontsize='small')
         try:
-            axarr[1].hist(comp_r2_adj_all[1][~is_outlier(comp_r2_adj_all[1])],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
+            axarr[1].hist(comp_r2_adj_all[1],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         except:
             pass
         axarr[1].set_title('difference',fontsize='small')
         try:
-            axarr[2].hist(comp_r2_adj_all[2][~is_outlier(comp_r2_adj_all[2])],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
+            axarr[2].hist(comp_r2_adj_all[2],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         except:
             pass
         axarr[2].set_title('div nl',fontsize='small')
         try:
-            axarr[3].hist(comp_r2_adj_all[3][~is_outlier(comp_r2_adj_all[3])],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
+            axarr[3].hist(comp_r2_adj_all[3],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         except:
             pass
         axarr[3].set_title('div nl avg response together',fontsize='small')
         try:
-            axarr[4].hist(comp_r2_adj_all[4][~is_outlier(comp_r2_adj_all[4])],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
+            axarr[4].hist(comp_r2_adj_all[4],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         except:
             pass
         axarr[4].set_title('div nl Y',fontsize='small')
         try:
-            axarr[5].hist(comp_r2_adj_all[5][~is_outlier(comp_r2_adj_all[5])],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
+            axarr[5].hist(comp_r2_adj_all[5],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         except:
             pass
         axarr[5].set_title('separate add',fontsize='small')
         try:
-            axarr[6].hist(comp_r2_adj_all[6][~is_outlier(comp_r2_adj_all[6])],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
+            axarr[6].hist(comp_r2_adj_all[6],color='midnightblue',lw=0,range=comp_r2_adj_all_range,bins=12)
         except:
             pass
         axarr[6].set_title('div nl avg response separate',fontsize='small')
