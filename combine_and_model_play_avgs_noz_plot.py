@@ -34,13 +34,15 @@ uncued_bool = False
 
 sig_only_bool = False
 
-plot_bool = False
+plot_bool = True
 plot_hist_bool = True
 
 bin_size = 10 #in ms
 time_before = -0.5 #negative value
 time_after = 1.0
 res_window = [0.3,0.8]
+
+z_score_bool = False
 
 #########################
 # functions  ############
@@ -70,7 +72,10 @@ def make_hist_all(spike_data):
 
 def calc_firing_rates(hists,data_key,condensed):
         bin_size_sec = bin_size / 1000.0
-        hists = stats.zscore(hists,axis=1)
+        if z_score_bool:
+                hists = stats.zscore(hists,axis=1)
+        else:
+                hists = hists / (bin_size / float(1000))
 
         bfr_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
         aft_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
@@ -274,7 +279,11 @@ def plot_fr_and_model(unit_num,fr_r_p,params,model_type,region_key,type_key):
 
         ax.set_xlabel('R value')
         ax.set_ylabel('P value')
-        ax.set_zlabel('avg z-score firing rate')
+
+        if z_score_bool:
+            ax.set_zlabel('z-score firing rate')
+        else:
+            ax.set_zlabel('firing rate')
 
         #flipping z axis to left
         tmp_planes = ax.zaxis._PLANES
@@ -375,10 +384,29 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,tot
 
             for unit_num in range(avg_fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
-        
+
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
+
                 #firing rate = a*R + b*P + c
                 params,covs = curve_fit(lin_func,[r_vals,p_vals],avg_frs)
-                
+
                 if np.size(covs) > 1:
                         perr = np.sqrt(np.diag(covs))
                 elif isinf(covs):
@@ -442,15 +470,6 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,tot
 
                 unit_ct +=1
 
-            if i == 0:
-                r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
-                p_flat_total = np.tile(p_vals,avg_fr_data.shape[1])
-                fr_flat_total = np.ndarray.flatten(avg_fr_data)
-            else:
-                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
-                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
-                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
-                
             n_total[i] = n
 
         num_sig_fit = np.sum(p_val_total < 0.05)
@@ -615,7 +634,7 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,tot
 
         #this will give different values though depending on number of sig fits. That ok?
         #Or calc AICs for each unit then average? What's kosher
-        
+
         return_dict = {'fit_params':fit_params[0:sig_unit_length,:],'cov_total':cov_total[0:sig_unit_length,:],'perr_total':perr_total[0:sig_unit_length,:],'ss_res_total':np.trim_zeros(ss_res_total,'b'),'AIC_total':AIC_total[0:sig_unit_length],'AIC_overall':0,'num_units_no_fit':num_units_no_fit,'perc_units_no_fit':num_units_no_fit/float(sig_unit_length),'total_num_units':sig_unit_length,'p_val_total':p_val_total[0:sig_unit_length],'F_val_total':F_val_total[0:sig_unit_length],'r_sq_total':r_sq_total[0:sig_unit_length],'AIC_sig_model':AIC_sig_model,'AIC_sig_avg':AIC_sig_avg,'num_sig_fit':num_sig_fit,'r_sq_avg':r_sq_avg,'AIC_new_total':AIC_new_total,'r_sq_adj_total':r_sq_adj_total,'AIC_lr_total':AIC_lr_total,'AICc_total':AICc_total,'mse_total':mse_total,'r_sq_adj_avg':r_sq_adj_avg}
 
         return(return_dict)
@@ -663,6 +682,25 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,to
 
             for unit_num in range(avg_fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
+
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
         
                 #firing rate = a + b(R - P)
                 params,covs = curve_fit(diff_func,[r_vals,p_vals],avg_frs)
@@ -729,15 +767,6 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,to
                 fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
 
                 unit_ct +=1
-
-            if i == 0:
-                r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
-                p_flat_total = np.tile(p_vals,avg_fr_data.shape[1])
-                fr_flat_total = np.ndarray.flatten(avg_fr_data)
-            else:
-                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
-                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
-                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
 
             n_total[i] = n
 
@@ -943,6 +972,24 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,
 
             for unit_num in range(avg_fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
 
                 try:
                     #firing rate  = (R * a + b * P) / (a + c * b + d) + e
@@ -1033,14 +1080,6 @@ def make_div_nl_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,
  
                 unit_ct +=1
 
-            if i == 0:
-                r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
-                p_flat_total = np.tile(p_vals,avg_fr_data.shape[1])
-                fr_flat_total = np.ndarray.flatten(avg_fr_data)
-            else:
-                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
-                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
-                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
             n_total[i] = n
 
         num_sig_fit = np.sum(p_val_total < 0.05)
@@ -1244,6 +1283,24 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
 
             for unit_num in range(avg_fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
         
                 try:
                     #firing rate  = (R * a + b * P) / (a + c * b + d)
@@ -1333,14 +1390,6 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
                 fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
                 unit_ct +=1
 
-            if i == 0:
-                r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
-                p_flat_total = np.tile(p_vals,avg_fr_data.shape[1])
-                fr_flat_total = np.ndarray.flatten(avg_fr_data)
-            else:
-                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
-                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
-                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
             n_total[i] = n
 
         num_sig_fit = np.sum(p_val_total < 0.05)
@@ -1544,6 +1593,25 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
 
             for unit_num in range(avg_fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
+
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
         
                 # model = a*(r + b*P) / (c + r + b * p) + d
                 try:
@@ -1635,14 +1703,6 @@ def make_div_nl_Y_model(fr_data_dict,region_key,type_key,file_length,avg_and_cor
                 unit_ct +=1
                 #err_bool = False
 
-            if i == 0:
-                r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
-                p_flat_total = np.tile(p_vals,avg_fr_data.shape[1])
-                fr_flat_total = np.ndarray.flatten(avg_fr_data)
-            else:
-                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
-                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
-                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
             n_total[i] = n
 
         num_sig_fit = np.sum(p_val_total < 0.05)
@@ -1848,6 +1908,25 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
 
             for unit_num in range(avg_fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
+
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
                 
                 try:
                     params,covs = curve_fit(div_nl_separate_add_func,[r_vals,p_vals],avg_frs)
@@ -1937,14 +2016,6 @@ def make_div_nl_separate_add_model(fr_data_dict,region_key,type_key,file_length,
 
                 unit_ct +=1
 
-            if i == 0:
-                r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
-                p_flat_total = np.tile(p_vals,avg_fr_data.shape[1])
-                fr_flat_total = np.ndarray.flatten(avg_fr_data)
-            else:
-                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
-                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
-                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
             n_total[i] = n
 
         num_sig_fit = np.sum(p_val_total < 0.05)
@@ -2155,6 +2226,25 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
             for unit_num in range(avg_fr_data.shape[1]):
                 avg_frs = avg_fr_data[:,unit_num]
 
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
+
                 try:
                     params,covs = curve_fit(div_nl_separate_multiply_func,[r_vals,p_vals],avg_frs)
                 except:
@@ -2245,7 +2335,7 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
                 unit_ct +=1
 
             n_total[i] = n
-
+        
         num_sig_fit = np.sum(p_val_total < 0.05)
         avg_n = np.mean(n_total)
         avg_n_k = round(float(avg_n) / k, 2)
@@ -2459,14 +2549,34 @@ def make_div_nl_avg_response_together_model(fr_data_dict,region_key,type_key,fil
                 avg_frs = avg_fr_data[:,unit_num]
 
                 if 2 in r_vals:
-                    avg_fr_by_r = np.sum([np.sum(avg_fr_data[r_vals == 0]) / (np.shape(avg_fr_data[r_vals == 0])[0]*np.shape(avg_fr_data[r_vals == 0])[1]),np.sum(avg_fr_data[r_vals == 1]) / (np.shape(avg_fr_data[r_vals == 1])[0]*np.shape(avg_fr_data[r_vals == 1])[1]),np.sum(avg_fr_data[r_vals == 2]) / (np.shape(avg_fr_data[r_vals == 2])[0]*np.shape(avg_fr_data[r_vals == 2])[1]),np.sum(avg_fr_data[r_vals == 3]) / (np.shape(avg_fr_data[r_vals == 3])[0]*np.shape(avg_fr_data[r_vals == 3])[1])])
-                    avg_fr_by_p = np.sum([np.sum(avg_fr_data[p_vals == 0]) / (np.shape(avg_fr_data[p_vals == 0])[0]*np.shape(avg_fr_data[p_vals == 0])[1]),np.sum(avg_fr_data[p_vals == 1]) / (np.shape(avg_fr_data[p_vals == 1])[0]*np.shape(avg_fr_data[p_vals == 1])[1]),np.sum(avg_fr_data[p_vals == 2]) / (np.shape(avg_fr_data[p_vals == 2])[0]*np.shape(avg_fr_data[p_vals == 2])[1]),np.sum(avg_fr_data[p_vals == 3]) / (np.shape(avg_fr_data[p_vals == 3])[0]*np.shape(avg_fr_data[p_vals == 3])[1])])
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1),np.sum(avg_frs[r_vals == 2]) / np.sum(r_vals == 2),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1),np.sum(avg_frs[p_vals == 2]) / np.sum(p_vals == 2),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
                 else:
-                    avg_fr_by_r = np.sum([np.sum(avg_fr_data[r_vals == 0]) /(np.shape(avg_fr_data[r_vals == 0])[0]*np.shape(avg_fr_data[r_vals == 0])[1]),np.sum(avg_fr_data[r_vals == 3]) / (np.shape(avg_fr_data[r_vals == 3])[0]*np.shape(avg_fr_data[r_vals == 3])[1])])
-                    avg_fr_by_p = np.sum([np.sum(avg_fr_data[p_vals == 0]) / (np.shape(avg_fr_data[p_vals == 0])[0]*np.shape(avg_fr_data[p_vals == 0])[1]),np.sum(avg_fr_data[p_vals == 3]) / (np.shape(avg_fr_data[p_vals == 3])[0]*np.shape(avg_fr_data[p_vals == 3])[1])])
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
 
                 #
                 all_r_p_responses[unit_ct,:] = [avg_fr_by_r,avg_fr_by_p]
+
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
+
 
                 try:
                     params,covs = curve_fit(div_nl_avg_response_together_func,[r_vals,p_vals,avg_fr_by_r,avg_fr_by_p],avg_frs)
@@ -2560,7 +2670,7 @@ def make_div_nl_avg_response_together_model(fr_data_dict,region_key,type_key,fil
                 fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
 
                 unit_ct +=1
-
+        
         num_sig_fit = np.sum(p_val_total < 0.05)
         avg_n = np.mean(n_total)
         avg_n_k = round(float(avg_n) / k, 2)
@@ -2775,14 +2885,33 @@ def make_div_nl_avg_response_separate_model(fr_data_dict,region_key,type_key,fil
                 avg_frs = avg_fr_data[:,unit_num]
 
                 if 2 in r_vals:
-                    avg_fr_by_r = np.sum([np.sum(avg_fr_data[r_vals == 0]) / (np.shape(avg_fr_data[r_vals == 0])[0]*np.shape(avg_fr_data[r_vals == 0])[1]),np.sum(avg_fr_data[r_vals == 1]) / (np.shape(avg_fr_data[r_vals == 1])[0]*np.shape(avg_fr_data[r_vals == 1])[1]),np.sum(avg_fr_data[r_vals == 2]) / (np.shape(avg_fr_data[r_vals == 2])[0]*np.shape(avg_fr_data[r_vals == 2])[1]),np.sum(avg_fr_data[r_vals == 3]) / (np.shape(avg_fr_data[r_vals == 3])[0]*np.shape(avg_fr_data[r_vals == 3])[1])])
-                    avg_fr_by_p = np.sum([np.sum(avg_fr_data[p_vals == 0]) / (np.shape(avg_fr_data[p_vals == 0])[0]*np.shape(avg_fr_data[p_vals == 0])[1]),np.sum(avg_fr_data[p_vals == 1]) / (np.shape(avg_fr_data[p_vals == 1])[0]*np.shape(avg_fr_data[p_vals == 1])[1]),np.sum(avg_fr_data[p_vals == 2]) / (np.shape(avg_fr_data[p_vals == 2])[0]*np.shape(avg_fr_data[p_vals == 2])[1]),np.sum(avg_fr_data[p_vals == 3]) / (np.shape(avg_fr_data[p_vals == 3])[0]*np.shape(avg_fr_data[p_vals == 3])[1])])
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1),np.sum(avg_frs[r_vals == 2]) / np.sum(r_vals == 2),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1),np.sum(avg_frs[p_vals == 2]) / np.sum(p_vals == 2),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
                 else:
-                    avg_fr_by_r = np.sum([np.sum(avg_fr_data[r_vals == 0]) /(np.shape(avg_fr_data[r_vals == 0])[0]*np.shape(avg_fr_data[r_vals == 0])[1]),np.sum(avg_fr_data[r_vals == 3]) / (np.shape(avg_fr_data[r_vals == 3])[0]*np.shape(avg_fr_data[r_vals == 3])[1])])
-                    avg_fr_by_p = np.sum([np.sum(avg_fr_data[p_vals == 0]) / (np.shape(avg_fr_data[p_vals == 0])[0]*np.shape(avg_fr_data[p_vals == 0])[1]),np.sum(avg_fr_data[p_vals == 3]) / (np.shape(avg_fr_data[p_vals == 3])[0]*np.shape(avg_fr_data[p_vals == 3])[1])])
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
 
                 #
                 all_r_p_responses[unit_ct,:] = [avg_fr_by_r,avg_fr_by_p]
+
+                if 2 in r_vals:
+                    r_vals_new = [0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3]
+                    p_vals_new = [0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3]
+                else:
+                    r_vals_new = [0,0,3,3]
+                    p_vals_new = [0,3,0,3]
+                
+                avg_fr_new = np.zeros((np.shape(r_vals_new)[0]))
+                for comb_ind in range(np.shape(r_vals_new)[0]):
+                    r_trials = np.where(r_vals == r_vals_new[comb_ind])[0]
+                    p_trials = np.where(p_vals == p_vals_new[comb_ind])[0]
+                    comb_trials = np.intersect1d(r_trials,p_trials)
+
+                    avg_fr_new[comb_ind] = np.mean(avg_frs[comb_ind])
+
+                r_vals = np.array(r_vals_new)
+                p_vals = np.array(p_vals_new)
+                avg_frs = avg_fr_new
 
                 try:
                     params,covs = curve_fit(div_nl_avg_response_separate_func,[r_vals,p_vals,avg_fr_by_r,avg_fr_by_p],avg_frs)
@@ -2876,7 +3005,7 @@ def make_div_nl_avg_response_separate_model(fr_data_dict,region_key,type_key,fil
                 fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
 
                 unit_ct +=1
-
+        
         num_sig_fit = np.sum(p_val_total < 0.05)
         avg_n = np.mean(n_total)
         avg_n_k = round(float(avg_n) / k, 2)
@@ -3509,7 +3638,7 @@ for region_key,region_val in data_dict_all.iteritems():
                     axarr[6].hist(delAIC['dAICs_sig_any'][:,6][~np.isnan(delAIC['dAICs_sig_any'][:,6])],color='slateblue',lw=0,bins=12)
                 except:
                     pass
-                axarr[6].set_title('div nl avg response separate',fontsize='small')
+                axarr[6].set_title('div nl average response separate',fontsize='small')
                 
                 for axi in axarr.reshape(-1):
                     axi.yaxis.set_major_locator(plt.MaxNLocator(3))
@@ -3668,6 +3797,7 @@ for region_key,region_val in data_dict_all.iteritems():
             comp_mse_all_max_min[j,:] = [np.nanmax(comp_mse_all[j]),np.nanmin(comp_mse_all[j])]
             if np.shape(comp_mse_sig[j])[0] != 0:
                 comp_mse_sig_max_min[j,:] = [np.nanmax(comp_mse_sig[j]),np.nanmin(comp_mse_sig[j])]
+            
         comp_r2_all_max_min[:,0][np.isnan(comp_r2_all_max_min[:,0])] = 1
         comp_r2_all_max_min[:,1][np.isnan(comp_r2_all_max_min[:,1])] = 0
         comp_r2_sig_max_min[:,0][np.isnan(comp_r2_sig_max_min[:,0])] = 1

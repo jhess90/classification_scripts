@@ -162,7 +162,7 @@ def div_nl_avg_response_separate_func(x,a,b,c):
         
         return (r + a) / (sum_r + r) + (p + b) / (sum_p + p) + c
 
-def div_nl_avg_response_together_func(x,a,b,c):
+ def div_nl_avg_response_together_func(x,a,b,c):
         r,p,sum_r,sum_p = x
         
         return (r + a*p ) / (sum_r + b*sum_p) + c

@@ -34,7 +34,7 @@ uncued_bool = False
 
 sig_only_bool = False
 
-plot_bool = False
+plot_bool = True
 plot_hist_bool = True
 
 bin_size = 10 #in ms
@@ -453,6 +453,7 @@ def make_lin_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,tot
                 
             n_total[i] = n
 
+
         num_sig_fit = np.sum(p_val_total < 0.05)
         avg_n = np.mean(n_total)
         avg_n_k = round(float(avg_n) / k, 2)
@@ -740,6 +741,7 @@ def make_diff_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,to
                 fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
 
             n_total[i] = n
+
 
         num_sig_fit = np.sum(p_val_total < 0.05)
         avg_n = np.mean(n_total)
@@ -1332,16 +1334,6 @@ def make_div_nl_noe_model(fr_data_dict,region_key,type_key,file_length,avg_and_c
                 #here add summation array: avg fr, r, and p, by unit
                 fr_r_p_list.append(np.transpose(np.array((avg_frs,r_vals,p_vals))))
                 unit_ct +=1
-
-            if i == 0:
-                r_flat_total = np.tile(r_vals,avg_fr_data.shape[1])
-                p_flat_total = np.tile(p_vals,avg_fr_data.shape[1])
-                fr_flat_total = np.ndarray.flatten(avg_fr_data)
-            else:
-                r_flat_total = np.concatenate((r_flat_total,np.tile(r_vals,avg_fr_data.shape[1])))
-                p_flat_total = np.concatenate((p_flat_total,np.tile(p_vals,avg_fr_data.shape[1])))
-                fr_flat_total = np.concatenate((fr_flat_total,np.ndarray.flatten(avg_fr_data)))
-            n_total[i] = n
 
         num_sig_fit = np.sum(p_val_total < 0.05)
         avg_n = np.mean(n_total)
@@ -2244,8 +2236,6 @@ def make_div_nl_separate_multiply_model(fr_data_dict,region_key,type_key,file_le
 
                 unit_ct +=1
 
-            n_total[i] = n
-
         num_sig_fit = np.sum(p_val_total < 0.05)
         avg_n = np.mean(n_total)
         avg_n_k = round(float(avg_n) / k, 2)
@@ -2459,11 +2449,11 @@ def make_div_nl_avg_response_together_model(fr_data_dict,region_key,type_key,fil
                 avg_frs = avg_fr_data[:,unit_num]
 
                 if 2 in r_vals:
-                    avg_fr_by_r = np.sum([np.sum(avg_fr_data[r_vals == 0]) / (np.shape(avg_fr_data[r_vals == 0])[0]*np.shape(avg_fr_data[r_vals == 0])[1]),np.sum(avg_fr_data[r_vals == 1]) / (np.shape(avg_fr_data[r_vals == 1])[0]*np.shape(avg_fr_data[r_vals == 1])[1]),np.sum(avg_fr_data[r_vals == 2]) / (np.shape(avg_fr_data[r_vals == 2])[0]*np.shape(avg_fr_data[r_vals == 2])[1]),np.sum(avg_fr_data[r_vals == 3]) / (np.shape(avg_fr_data[r_vals == 3])[0]*np.shape(avg_fr_data[r_vals == 3])[1])])
-                    avg_fr_by_p = np.sum([np.sum(avg_fr_data[p_vals == 0]) / (np.shape(avg_fr_data[p_vals == 0])[0]*np.shape(avg_fr_data[p_vals == 0])[1]),np.sum(avg_fr_data[p_vals == 1]) / (np.shape(avg_fr_data[p_vals == 1])[0]*np.shape(avg_fr_data[p_vals == 1])[1]),np.sum(avg_fr_data[p_vals == 2]) / (np.shape(avg_fr_data[p_vals == 2])[0]*np.shape(avg_fr_data[p_vals == 2])[1]),np.sum(avg_fr_data[p_vals == 3]) / (np.shape(avg_fr_data[p_vals == 3])[0]*np.shape(avg_fr_data[p_vals == 3])[1])])
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1),np.sum(avg_frs[r_vals == 2]) / np.sum(r_vals == 2),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1),np.sum(avg_frs[p_vals == 2]) / np.sum(p_vals == 2),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
                 else:
-                    avg_fr_by_r = np.sum([np.sum(avg_fr_data[r_vals == 0]) /(np.shape(avg_fr_data[r_vals == 0])[0]*np.shape(avg_fr_data[r_vals == 0])[1]),np.sum(avg_fr_data[r_vals == 3]) / (np.shape(avg_fr_data[r_vals == 3])[0]*np.shape(avg_fr_data[r_vals == 3])[1])])
-                    avg_fr_by_p = np.sum([np.sum(avg_fr_data[p_vals == 0]) / (np.shape(avg_fr_data[p_vals == 0])[0]*np.shape(avg_fr_data[p_vals == 0])[1]),np.sum(avg_fr_data[p_vals == 3]) / (np.shape(avg_fr_data[p_vals == 3])[0]*np.shape(avg_fr_data[p_vals == 3])[1])])
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
 
                 #
                 all_r_p_responses[unit_ct,:] = [avg_fr_by_r,avg_fr_by_p]
@@ -2775,11 +2765,11 @@ def make_div_nl_avg_response_separate_model(fr_data_dict,region_key,type_key,fil
                 avg_frs = avg_fr_data[:,unit_num]
 
                 if 2 in r_vals:
-                    avg_fr_by_r = np.sum([np.sum(avg_fr_data[r_vals == 0]) / (np.shape(avg_fr_data[r_vals == 0])[0]*np.shape(avg_fr_data[r_vals == 0])[1]),np.sum(avg_fr_data[r_vals == 1]) / (np.shape(avg_fr_data[r_vals == 1])[0]*np.shape(avg_fr_data[r_vals == 1])[1]),np.sum(avg_fr_data[r_vals == 2]) / (np.shape(avg_fr_data[r_vals == 2])[0]*np.shape(avg_fr_data[r_vals == 2])[1]),np.sum(avg_fr_data[r_vals == 3]) / (np.shape(avg_fr_data[r_vals == 3])[0]*np.shape(avg_fr_data[r_vals == 3])[1])])
-                    avg_fr_by_p = np.sum([np.sum(avg_fr_data[p_vals == 0]) / (np.shape(avg_fr_data[p_vals == 0])[0]*np.shape(avg_fr_data[p_vals == 0])[1]),np.sum(avg_fr_data[p_vals == 1]) / (np.shape(avg_fr_data[p_vals == 1])[0]*np.shape(avg_fr_data[p_vals == 1])[1]),np.sum(avg_fr_data[p_vals == 2]) / (np.shape(avg_fr_data[p_vals == 2])[0]*np.shape(avg_fr_data[p_vals == 2])[1]),np.sum(avg_fr_data[p_vals == 3]) / (np.shape(avg_fr_data[p_vals == 3])[0]*np.shape(avg_fr_data[p_vals == 3])[1])])
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1),np.sum(avg_frs[r_vals == 2]) / np.sum(r_vals == 2),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1),np.sum(avg_frs[p_vals == 2]) / np.sum(p_vals == 2),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
                 else:
-                    avg_fr_by_r = np.sum([np.sum(avg_fr_data[r_vals == 0]) /(np.shape(avg_fr_data[r_vals == 0])[0]*np.shape(avg_fr_data[r_vals == 0])[1]),np.sum(avg_fr_data[r_vals == 3]) / (np.shape(avg_fr_data[r_vals == 3])[0]*np.shape(avg_fr_data[r_vals == 3])[1])])
-                    avg_fr_by_p = np.sum([np.sum(avg_fr_data[p_vals == 0]) / (np.shape(avg_fr_data[p_vals == 0])[0]*np.shape(avg_fr_data[p_vals == 0])[1]),np.sum(avg_fr_data[p_vals == 3]) / (np.shape(avg_fr_data[p_vals == 3])[0]*np.shape(avg_fr_data[p_vals == 3])[1])])
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
 
                 #
                 all_r_p_responses[unit_ct,:] = [avg_fr_by_r,avg_fr_by_p]
@@ -3668,6 +3658,7 @@ for region_key,region_val in data_dict_all.iteritems():
             comp_mse_all_max_min[j,:] = [np.nanmax(comp_mse_all[j]),np.nanmin(comp_mse_all[j])]
             if np.shape(comp_mse_sig[j])[0] != 0:
                 comp_mse_sig_max_min[j,:] = [np.nanmax(comp_mse_sig[j]),np.nanmin(comp_mse_sig[j])]
+
         comp_r2_all_max_min[:,0][np.isnan(comp_r2_all_max_min[:,0])] = 1
         comp_r2_all_max_min[:,1][np.isnan(comp_r2_all_max_min[:,1])] = 0
         comp_r2_sig_max_min[:,0][np.isnan(comp_r2_sig_max_min[:,0])] = 1
@@ -3983,6 +3974,7 @@ for region_key,region_val in data_dict_all.iteritems():
         plt.subplots_adjust(top=0.9)
         plt.savefig('mse_sig_%s_%s' %(region_key,win_key))
         plt.clf()
+
 
         delAIC_type_dict[AIC_type] = delAIC_dict
         #

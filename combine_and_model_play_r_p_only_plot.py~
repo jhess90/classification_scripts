@@ -35,6 +35,7 @@ uncued_bool = False
 sig_only_bool = False
 
 plot_bool = False
+plot_new_bool = True
 plot_hist_bool = True
 
 bin_size = 10 #in ms
@@ -3407,7 +3408,7 @@ def make_ronly_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,t
                 unit = sig_units[0][i]
             
                 if unit < unit_ct:
-                    if plot_bool:
+                    if plot_new_bool:
                         try:
                             plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'ronly',region_key,type_key)
                         except:
@@ -3712,7 +3713,7 @@ def make_ponly_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,t
                 unit = sig_units[0][i]
             
                 if unit < unit_ct:
-                    if plot_bool:
+                    if plot_new_bool:
                         try:
                             plot_fr_and_model(unit,fr_r_p_list[unit],fit_params[unit],'ponly',region_key,type_key)
                         except:
