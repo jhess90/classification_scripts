@@ -4864,7 +4864,7 @@ worksheet.write_column(1,18,total_units)
 worksheet.write(7,0,'S1')
 worksheet.write_row(7,1,model_names)
 worksheet.write_column(8,0,type_names)
-percs = data_dict_all['S1_dicts']['model_summary']['all_percs']
+percs = data_dict_all['S1_dicts']['model_summary']['all_percs_r2']
 total_units = data_dict_all['S1_dicts']['model_summary']['total_num_units_window']
 for i in range(np.shape(percs)[0]):
     worksheet.write_row(i+8,1,percs[i,:])
@@ -4883,7 +4883,7 @@ worksheet.write_column(8,18,total_units)
 worksheet.write(14,0,'PMd')
 worksheet.write_row(14,1,model_names)
 worksheet.write_column(15,0,type_names)
-percs = data_dict_all['PmD_dicts']['model_summary']['all_percs']
+percs = data_dict_all['PmD_dicts']['model_summary']['all_percs_r2']
 total_units = data_dict_all['S1_dicts']['model_summary']['total_num_units_window']
 for i in range(np.shape(percs)[0]):
     worksheet.write_row(i+15,1,percs[i,:])

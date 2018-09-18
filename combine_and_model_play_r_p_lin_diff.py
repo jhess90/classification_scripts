@@ -193,12 +193,12 @@ def div_nl_avg_response_together_func(x,a,b,c,d):
 
 def ronly_func(x,a,b,c):
 
-        r,p,sum_r = x
+        r,p = x
         return a*r / (r + b) + c
 
 
 def ponly_func(x,a,b,c):
-        r,p,sum_p = x
+        r,p = x
 
         return a*p / (p + b) + c
 
@@ -224,9 +224,12 @@ def plot_fr_and_model(unit_num,fr_r_p,params,model_type,region_key,type_key):
         if 2 in r_vals:
             r_range = [0,1,2,3]
             p_range = [0,1,2,3]
-        else:
+        elif 3 in r_vals:
             r_range = [0,3]
             p_range = [0,3]
+        else:
+            r_range = [0,1]
+            p_range = [0,1]
 
         avg_avg = np.zeros((np.shape(r_range)[0]*np.shape(p_range)[0],3))
         avg_std = np.zeros((np.shape(r_range)[0]*np.shape(p_range)[0],3))
@@ -2434,10 +2437,13 @@ def make_div_nl_avg_response_together_model(fr_data_dict,region_key,type_key,fil
                 if 2 in r_vals:
                     avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1),np.sum(avg_frs[r_vals == 2]) / np.sum(r_vals == 2),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
                     avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1),np.sum(avg_frs[p_vals == 2]) / np.sum(p_vals == 2),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
-                else:
+                elif 3 in r_vals:
                     avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
                     avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
 
+                else:
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1)])
                 #
                 all_r_p_responses[unit_ct,:] = [avg_fr_by_r,avg_fr_by_p]
 
@@ -2750,9 +2756,12 @@ def make_div_nl_avg_response_separate_model(fr_data_dict,region_key,type_key,fil
                 if 2 in r_vals:
                     avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1),np.sum(avg_frs[r_vals == 2]) / np.sum(r_vals == 2),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
                     avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1),np.sum(avg_frs[p_vals == 2]) / np.sum(p_vals == 2),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
-                else:
+                elif 3 in r_vals:
                     avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
                     avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
+                else:
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1)])
 
                 #
                 all_r_p_responses[unit_ct,:] = [avg_fr_by_r,avg_fr_by_p]
@@ -3061,9 +3070,12 @@ def make_ronly_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,t
                 if 2 in r_vals:
                     avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1),np.sum(avg_frs[r_vals == 2]) / np.sum(r_vals == 2),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
                     avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1),np.sum(avg_frs[p_vals == 2]) / np.sum(p_vals == 2),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
-                else:
+                elif 3 in r_vals:
                     avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
                     avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
+                else:
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1)])
 
                 all_r_p_responses[unit_ct,:] = [avg_fr_by_r,avg_fr_by_p]
 
@@ -3373,9 +3385,13 @@ def make_ponly_model(fr_data_dict,region_key,type_key,file_length,avg_and_corr,t
                 if 2 in r_vals:
                     avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1),np.sum(avg_frs[r_vals == 2]) / np.sum(r_vals == 2),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
                     avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1),np.sum(avg_frs[p_vals == 2]) / np.sum(p_vals == 2),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
-                else:
+                elif 3 in r_vals:
                     avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 3]) / np.sum(r_vals == 3)])
                     avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 3]) / np.sum(p_vals == 3)])
+                else:
+                    avg_fr_by_r = np.sum([np.sum(avg_frs[r_vals == 0]) / np.sum(r_vals == 0),np.sum(avg_frs[r_vals == 1]) / np.sum(r_vals == 1)])
+                    avg_fr_by_p = np.sum([np.sum(avg_frs[p_vals == 0]) / np.sum(p_vals == 0),np.sum(avg_frs[p_vals == 1]) / np.sum(p_vals == 1)])
+
 
                 all_r_p_responses[unit_ct,:] = [avg_fr_by_r,avg_fr_by_p]
 
@@ -4298,7 +4314,6 @@ for region_key,region_val in data_dict_all.iteritems():
             comp_r2_adj_all[x] = comp_r2_adj_all[x][~np.isnan(comp_r2_adj_all[x])]
             comp_r2_adj_sig[x] = comp_r2_adj_sig[x][~np.isnan(comp_r2_adj_sig[x])]
 
-
         f,axarr = plt.subplots(7,sharex=True)
 
         f.suptitle('r2 %s all units: %s' %(region_key,win_key))
@@ -4883,7 +4898,7 @@ worksheet.write_column(1,18,total_units)
 worksheet.write(7,0,'S1')
 worksheet.write_row(7,1,model_names)
 worksheet.write_column(8,0,type_names)
-percs = data_dict_all['S1_dicts']['model_summary']['all_percs']
+percs = data_dict_all['S1_dicts']['model_summary']['all_percs_r2']
 total_units = data_dict_all['S1_dicts']['model_summary']['total_num_units_window']
 for i in range(np.shape(percs)[0]):
     worksheet.write_row(i+8,1,percs[i,:])
@@ -4902,7 +4917,7 @@ worksheet.write_column(8,18,total_units)
 worksheet.write(14,0,'PMd')
 worksheet.write_row(14,1,model_names)
 worksheet.write_column(15,0,type_names)
-percs = data_dict_all['PmD_dicts']['model_summary']['all_percs']
+percs = data_dict_all['PmD_dicts']['model_summary']['all_percs_r2']
 total_units = data_dict_all['S1_dicts']['model_summary']['total_num_units_window']
 for i in range(np.shape(percs)[0]):
     worksheet.write_row(i+15,1,percs[i,:])
