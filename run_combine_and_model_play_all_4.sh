@@ -1,6 +1,6 @@
 #!/bin/sh
 
-
+#
 cd /home/jack/Dropbox/model_nl/rp_cue/0059/
 mv Extracted* play_avg/
 cd play_avg
@@ -23,12 +23,6 @@ python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_on
 mv Extracted* ../play_pop_avg/
 cd ../play_pop_avg/
 python /home/jack/workspace/classification_scripts/combine_and_model_play_pop_response.py
-mv Extracted* ../play_r_p_lin_diff/
-cd ../play_r_p_lin_diff/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff.py
-mv Extracted* ../r_p_pop_response/
-cd ../r_p_pop_response/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff_pop_response.py
 mv Extracted* ../
 
 cd /home/jack/Dropbox/model_nl/rp_cue/504/
@@ -54,13 +48,6 @@ mv Extracted* ../play_pop_avg/
 cd ../play_pop_avg/
 python /home/jack/workspace/classification_scripts/combine_and_model_play_pop_response.py
 mv Extracted* ../
-mv Extracted* ../play_r_p_lin_diff/
-cd ../play_r_p_lin_diff/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff.py
-mv Extracted* ../r_p_pop_response/
-cd ../r_p_pop_response/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff_pop_response.py
-mv Extracted* ../
 
 #
 cd /home/jack/Dropbox/model_nl/alt_cue/0059/
@@ -77,7 +64,7 @@ mv Extracted* ../play_subtract/
 cd ../play_subtract/
 python /home/jack/workspace/classification_scripts/combine_and_model_play_subtract.py
 mv Extracted* ../play/
-cd play/
+cd ../play/
 python /home/jack/workspace/classification_scripts/combine_and_model_play.py
 mv Extracted* ../play_r_p_only/
 cd ../play_r_p_only/
@@ -85,12 +72,6 @@ python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_on
 mv Extracted* ../play_pop_avg/
 cd ../play_pop_avg/
 python /home/jack/workspace/classification_scripts/combine_and_model_play_pop_response.py
-mv Extracted* ../play_r_p_lin_diff/
-cd ../play_r_p_lin_diff/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff.py
-mv Extracted* ../r_p_pop_response/
-cd ../r_p_pop_response/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff_pop_response.py
 mv Extracted* ../
 
 cd /home/jack/Dropbox/model_nl/alt_cue/504/
@@ -115,12 +96,6 @@ python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_on
 mv Extracted* ../play_pop_avg/
 cd ../play_pop_avg/
 python /home/jack/workspace/classification_scripts/combine_and_model_play_pop_response.py
-mv Extracted* ../play_r_p_lin_diff/
-cd ../play_r_p_lin_diff/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff.py
-mv Extracted* ../r_p_pop_response/
-cd ../r_p_pop_response/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff_pop_response.py
 mv Extracted* ../
 
 #
@@ -138,7 +113,7 @@ mv Extracted* ../play_subtract/
 cd ../play_subtract/
 python /home/jack/workspace/classification_scripts/combine_and_model_play_subtract.py
 mv Extracted* ../play/
-cd play/
+cd ../play/
 python /home/jack/workspace/classification_scripts/combine_and_model_play.py
 mv Extracted* ../play_r_p_only/
 cd ../play_r_p_only/
@@ -146,13 +121,8 @@ python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_on
 mv Extracted* ../play_pop_avg/
 cd ../play_pop_avg/
 python /home/jack/workspace/classification_scripts/combine_and_model_play_pop_response.py
-mv Extracted* ../play_r_p_lin_diff/
-cd ../play_r_p_lin_diff/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff.py
-mv Extracted* ../r_p_pop_response/
-cd ../r_p_pop_response/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff_pop_response.py
 mv Extracted* ../
+
 
 cd /home/jack/Dropbox/model_nl/single_cue/504/
 mv Extracted* play_avg/
@@ -176,13 +146,6 @@ python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_on
 mv Extracted* ../play_pop_avg/
 cd ../play_pop_avg/
 python /home/jack/workspace/classification_scripts/combine_and_model_play_pop_response.py
-mv Extracted* ../
-mv Extracted* ../play_r_p_lin_diff/
-cd ../play_r_p_lin_diff/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff.py
-mv Extracted* ../r_p_pop_response/
-cd ../r_p_pop_response/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff_pop_response.py
 mv Extracted* ../
 
 #
@@ -208,13 +171,8 @@ python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_on
 mv Extracted* ../play_pop_avg/
 cd ../play_pop_avg/
 python /home/jack/workspace/classification_scripts/combine_and_model_play_pop_response.py
-mv Extracted* ../play_r_p_lin_diff/
-cd ../play_r_p_lin_diff/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff.py
-mv Extracted* ../r_p_pop_response/
-cd ../r_p_pop_response/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff_pop_response.py
 mv Extracted* ../
+
 
 cd /home/jack/Dropbox/model_nl/single_uncued/504/
 mv Extracted* play_avg/
@@ -238,12 +196,6 @@ python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_on
 mv Extracted* ../play_pop_avg/
 cd ../play_pop_avg/
 python /home/jack/workspace/classification_scripts/combine_and_model_play_pop_response.py
-mv Extracted* ../play_r_p_lin_diff/
-cd ../play_r_p_lin_diff/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff.py
-mv Extracted* ../r_p_pop_response/
-cd ../r_p_pop_response/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff_pop_response.py
 mv Extracted* ../
 
 #
@@ -269,13 +221,8 @@ python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_on
 mv Extracted* ../play_pop_avg/
 cd ../play_pop_avg/
 python /home/jack/workspace/classification_scripts/combine_and_model_play_pop_response.py
-mv Extracted* ../play_r_p_lin_diff/
-cd ../play_r_p_lin_diff/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff.py
-mv Extracted* ../r_p_pop_response/
-cd ../r_p_pop_response/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff_pop_response.py
 mv Extracted* ../
+
 
 cd /home/jack/Dropbox/model_nl/uncued/504/
 mv Extracted* play_avg/
@@ -299,13 +246,6 @@ python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_on
 mv Extracted* ../play_pop_avg/
 cd ../play_pop_avg/
 python /home/jack/workspace/classification_scripts/combine_and_model_play_pop_response.py
-mv Extracted* ../
-mv Extracted* ../play_r_p_lin_diff/
-cd ../play_r_p_lin_diff/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff.py
-mv Extracted* ../r_p_pop_response/
-cd ../r_p_pop_response/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff_pop_response.py
 mv Extracted* ../
 
 #
@@ -331,13 +271,8 @@ python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_on
 mv Extracted* ../play_pop_avg/
 cd ../play_pop_avg/
 python /home/jack/workspace/classification_scripts/combine_and_model_play_pop_response.py
-mv Extracted* ../play_r_p_lin_diff/
-cd ../play_r_p_lin_diff/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff.py
-mv Extracted* ../r_p_pop_response/
-cd ../r_p_pop_response/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff_pop_response.py
 mv Extracted* ../
+
 
 cd /home/jack/Dropbox/model_nl/zero_or_three/504/
 mv Extracted* play_avg/
@@ -361,13 +296,10 @@ python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_on
 mv Extracted* ../play_pop_avg/
 cd ../play_pop_avg/
 python /home/jack/workspace/classification_scripts/combine_and_model_play_pop_response.py
-mv Extracted* ../play_r_p_lin_diff/
-cd ../play_r_p_lin_diff/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff.py
-mv Extracted* ../r_p_pop_response/
-cd ../r_p_pop_response/
-python /home/jack/workspace/classification_scripts/combine_and_model_play_r_p_lin_diff_pop_response.py
 mv Extracted* ../
+
+
+
 
 
 
