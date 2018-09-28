@@ -421,7 +421,10 @@ for region_key,region_val in file_dict[0].iteritems():
             save_dict = {'avg_fr_dict':avg_fr_dict,'r_p_all':r_p_all,'total_unit_num':total_unit_num,'total_trial_num':total_trial_num,'all_list':all_list}
             data_dict_all[region_key]['avg_and_corr'][type_key] = save_dict
 
+
+
 ################
+
 
 
 for region_key,region_val in data_dict_all.iteritems():
@@ -442,813 +445,271 @@ for region_key,region_val in data_dict_all.iteritems():
 
         #TODO figure out how many variations running, then chance shape of this.
         #general pattern: [accuracy_samme, accuracy_sammer, chance, shuffled, .....]  (for now shuffle = samme.r?)
-        accuracy_list_total = np.zeros((np.shape(all_list)[0],12))
+        
+        #shorter for devel
+        accuracy_list_total = np.zeros((np.shape(all_list)[0],32))
+        #accuracy_list_total = np.zeros((3,32))
         
         print 'window: %s' %(win_key)
 
+        
+        #shorter for devel
         for unit_num in range(np.shape(all_list)[0]):
+        #for unit_num in range(3):
             
             #TODO set up diff variations of target here
-            #TODO report percentage of accuracy above chance. Look at each unit, then pop as whole
-            #questions: better than chance, or determine chance by shuffling targets?
             #succ/fail high even aft cue- b/ of more succ? unequal distrib? 
             #how many times run? What best test/train split?
-            #use SAMME.R for now
+            #use SAMME.R for shuffled for now
 
             r_level_out = run_adaboost(all_list[unit_num][0],all_list[unit_num][1][0,:])
             p_level_out = run_adaboost(all_list[unit_num][0],all_list[unit_num][1][1,:])
             succ_out = run_adaboost(all_list[unit_num][0],all_list[unit_num][1][2,:])
-        
+
             #r nr, p np, m, v, r/nr comb w/ and w/o succ
 
-            accuracy_list_total[unit_num,:] = [r_level_out['accuracy_samme'],r_level_out['accuracy_sammer'],r_level_out['chance'],r_level_out['shuffle_accuracy_sammer'],p_level_out['accuracy_samme'],p_level_out['accuracy_sammer'],p_level_out['chance'],p_level_out['shuffle_accuracy_sammer'],succ_out['accuracy_samme'],succ_out['accuracy_sammer'],succ_out['chance'],succ_out['shuffle_accuracy_sammer']]
+            r_nr_targs = np.where(all_list[unit_num][1][0,:] > 0,1,0)
+            p_np_targs = np.where(all_list[unit_num][1][1,:] > 0,1,0)
+            
+            r_bin_out = run_adaboost(all_list[unit_num][0],r_nr_targs)
+            p_bin_out = run_adaboost(all_list[unit_num][0],p_np_targs)
+            
+            comb = np.zeros((np.shape(r_nr_targs)[0]))
+            for i in range(np.shape(r_nr_targs)[0]):
+                if r_nr_targs[i] == 0 and p_np_targs[i] == 0:
+                    comb[i] = 0
+                elif r_nr_targs[i] == 1 and p_np_targs[i] == 0:
+                    comb[i] = 1
+                elif r_nr_targs[i] == 0 and p_np_targs[i] == 1:
+                    comb[i] = 2
+                elif r_nr_targs[i] == 1 and p_np_targs[i] == 1:
+                    comb[i] = 3
+                
+            comb_out = run_adaboost(all_list[unit_num][0],comb)
 
+            r_bin_sf_targ = np.zeros((np.shape(r_nr_targs)[0]))
+            for i in range(np.shape(r_nr_targs)[0]):
+                if r_nr_targs[i] == 0 and all_list[unit_num][1][2,:][i] == 0:
+                    r_bin_sf_targ[i] = 0
+                elif r_nr_targs[i] == 1 and all_list[unit_num][1][2,:][i] == 0:
+                    r_bin_sf_targ[i] = 1
+                elif r_nr_targs[i] == 0 and all_list[unit_num][1][2,:][i] == 1:
+                    r_bin_sf_targ[i] = 2
+                elif r_nr_targs[i] == 1 and all_list[unit_num][1][2,:][i] == 1:
+                    r_bin_sf_targ[i] = 3
 
-            print 'r: %s, p: %s, succ: %s' %(r_level_out['accuracy_sammer'],p_level_out['accuracy_sammer'],succ_out['accuracy_sammer'])
+            p_bin_sf_targ = np.zeros((np.shape(p_np_targs)[0]))
+            for i in range(np.shape(p_np_targs)[0]):
+                if p_np_targs[i] == 0 and all_list[unit_num][1][2,:][i] == 0:
+                    p_bin_sf_targ[i] = 0
+                elif p_np_targs[i] == 1 and all_list[unit_num][1][2,:][i] == 0:
+                    p_bin_sf_targ[i] = 1
+                elif p_np_targs[i] == 0 and all_list[unit_num][1][2,:][i] == 1:
+                    p_bin_sf_targ[i] = 2
+                elif p_np_targs[i] == 1 and all_list[unit_num][1][2,:][i] == 1:
+                    p_bin_sf_targ[i] = 3
 
-        
+            r_bin_sf_out = run_adaboost(all_list[unit_num][0],r_bin_sf_targ)
+            p_bin_sf_out = run_adaboost(all_list[unit_num][0],p_bin_sf_targ)
+
+            accuracy_list_total[unit_num,:] = [r_level_out['accuracy_samme'],r_level_out['accuracy_sammer'],r_level_out['chance'],r_level_out['shuffle_accuracy_sammer'],p_level_out['accuracy_samme'],p_level_out['accuracy_sammer'],p_level_out['chance'],p_level_out['shuffle_accuracy_sammer'],succ_out['accuracy_samme'],succ_out['accuracy_sammer'],succ_out['chance'],succ_out['shuffle_accuracy_sammer'],comb_out['accuracy_samme'],comb_out['accuracy_sammer'],comb_out['chance'],comb_out['shuffle_accuracy_sammer'],r_bin_out['accuracy_samme'],r_bin_out['accuracy_sammer'],r_bin_out['chance'],r_bin_out['shuffle_accuracy_sammer'],p_bin_out['accuracy_samme'],p_bin_out['accuracy_sammer'],p_bin_out['chance'],p_bin_out['shuffle_accuracy_sammer'],r_bin_sf_out['accuracy_samme'],r_bin_sf_out['accuracy_sammer'],r_bin_sf_out['chance'],r_bin_sf_out['shuffle_accuracy_sammer'],p_bin_sf_out['accuracy_samme'],p_bin_sf_out['accuracy_sammer'],p_bin_sf_out['chance'],p_bin_sf_out['shuffle_accuracy_sammer']]
+
+            sys.stdout.write('.')
+            sys.stdout.flush()
+
         output_by_window[win_key] = accuracy_list_total
+        print ''
+
+        f,axarr = plt.subplots(8,sharex=True)
+
+        f.suptitle('unit accuracy distribution: %s %s (SAMME.R)' %(region_key,win_key))
+        axarr[0].hist(accuracy_list_total[:,1],color='mediumturquoise',lw=0)
+        axarr[0].axvline(accuracy_list_total[:,2][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[0].set_xlim([0,1])
+        axarr[0].set_title('reward level accuracy')
+        axarr[1].hist(accuracy_list_total[:,3],color='darkviolet',lw=0)
+        axarr[1].axvline(accuracy_list_total[:,2][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[1].set_title('reward level accuracy: shuffled')
+
+        axarr[2].hist(accuracy_list_total[:,5],color='mediumturquoise',lw=0)
+        axarr[2].axvline(accuracy_list_total[:,6][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[2].set_title('punishment level accuracy')
+        axarr[3].hist(accuracy_list_total[:,7],color='darkviolet',lw=0)
+        axarr[3].axvline(accuracy_list_total[:,6][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[3].set_title('punishment level accuracy: shuffled')
+
+        axarr[4].hist(accuracy_list_total[:,9],color='mediumturquoise',lw=0)
+        axarr[4].axvline(accuracy_list_total[:,10][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[4].set_title('succ/fail accuracy')
+        axarr[5].hist(accuracy_list_total[:,11],color='darkviolet',lw=0)
+        axarr[5].axvline(accuracy_list_total[:,10][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[5].set_title('succ/fail accuracy: shuffled')
+
+        axarr[6].hist(accuracy_list_total[:,13],color='mediumturquoise',lw=0)
+        axarr[6].axvline(accuracy_list_total[:,14][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[6].set_title('comb accuracy')
+        axarr[7].hist(accuracy_list_total[:,15],color='darkviolet',lw=0)
+        axarr[7].axvline(accuracy_list_total[:,14][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[7].set_title('comb accuracy: shuffled')
+
+        for axi in axarr.reshape(-1):
+            axi.yaxis.set_major_locator(plt.MaxNLocator(3))
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.9)
+        plt.savefig('unit_accuracy_hist_%s_%s' %(region_key,win_key))
+        plt.clf()
+
+        #
+        f,axarr = plt.subplots(8,sharex=True)
+
+        f.suptitle('unit accuracy distribution 2: %s %s (SAMME.R)' %(region_key,win_key))
+        axarr[0].hist(accuracy_list_total[:,1+16],color='mediumturquoise',lw=0)
+        axarr[0].axvline(accuracy_list_total[:,2+16][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[0].set_xlim([0,1])
+        axarr[0].set_title('reward binary accuracy')
+        axarr[1].hist(accuracy_list_total[:,3+16],color='darkviolet',lw=0)
+        axarr[1].axvline(accuracy_list_total[:,2+16][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[1].set_title('reward binary accuracy: shuffled')
+
+        axarr[2].hist(accuracy_list_total[:,5+16],color='mediumturquoise',lw=0)
+        axarr[2].axvline(accuracy_list_total[:,6+16][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[2].set_title('punishment binary accuracy')
+        axarr[3].hist(accuracy_list_total[:,7+16],color='darkviolet',lw=0)
+        axarr[3].axvline(accuracy_list_total[:,6+16][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[3].set_title('punishment binary accuracy: shuffled')
+
+        axarr[4].hist(accuracy_list_total[:,9+16],color='mediumturquoise',lw=0)
+        axarr[4].axvline(accuracy_list_total[:,10+16][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[4].set_title('reward binary succ fail accuracy')
+        axarr[5].hist(accuracy_list_total[:,11+16],color='darkviolet',lw=0)
+        axarr[5].axvline(accuracy_list_total[:,10+16][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[5].set_title('reward binary succ fail accuracy: shuffled')
+
+        axarr[6].hist(accuracy_list_total[:,13+16],color='mediumturquoise',lw=0)
+        axarr[6].axvline(accuracy_list_total[:,14+16][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[6].set_title('punishment binary succ fail accuracy')
+        axarr[7].hist(accuracy_list_total[:,15+16],color='darkviolet',lw=0)
+        axarr[7].axvline(accuracy_list_total[:,14+16][0],color='k',linestyle='dashed',linewidth=1)
+        axarr[7].set_title('punishment binary succ fail accuracy: shuffled')
+
+        for axi in axarr.reshape(-1):
+            axi.yaxis.set_major_locator(plt.MaxNLocator(3))
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.9)
+        plt.savefig('unit_accuracy_hist_2_%s_%s' %(region_key,win_key))
+        plt.clf()
             
     data_dict_all[region_key]['classification_output'] = output_by_window
-pdb.set_trace()
 
 
-##saving 
-if sig_only_bool:
-    np.save('model_save_sig.npy',data_dict_all)
-else:
-    np.save('model_save.npy',data_dict_all)
-data_dict_all['file_dict'] = file_dict
+np.save('backup.npy',data_dict_all)
 
 
-#for region_key,region_val in data_dict_all.iteritems():
+
+#################3
+
+
+#if xlsx currently exists delte, or else won't write properly
+if os.path.isfile('classifier_output.xlsx'):
+    os.remove('classifier_output.xlsx')
+
 type_names = ['aft cue','bfr res','aft res','res win','concat']
-model_names = ['r only','p only','linear','difference','div nl Y','separate add','avg response separate']
+comb_names = ['r levels','p levels','succ/fail','comb','r bin','p bin','r bin sf','p bin sf']
 
-if sig_only_bool:
-    aic_workbook = xlsxwriter.Workbook('model_aic_sig.xlsx',options={'nan_inf_to_errors':True})
-else:
-    aic_workbook = xlsxwriter.Workbook('model_aic.xlsx',options={'nan_inf_to_errors':True})
+accuracy_workbook = xlsxwriter.Workbook('classifier_output.xlsx',options={'nan_inf_to_errors':True})
+worksheet = accuracy_workbook.add_worksheet('unit_accuracy')
 
-worksheet = aic_workbook.add_worksheet('model_output')
-# Light red fill with dark red text.
-format1 = aic_workbook.add_format({'bg_color':'#FFC7CE','font_color': '#9C0006'})
+# > chance and > shuff
 
-lin_aics = [data_dict_all['M1_dicts']['models']['linear']['aft_cue']['AIC_overall'],data_dict_all['M1_dicts']['models']['linear']['bfr_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['linear']['aft_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['linear']['res_win']['AIC_overall'],data_dict_all['M1_dicts']['models']['linear']['concat']['AIC_overall']]
-diff_aics = [data_dict_all['M1_dicts']['models']['diff']['aft_cue']['AIC_overall'],data_dict_all['M1_dicts']['models']['diff']['bfr_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['diff']['aft_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['diff']['res_win']['AIC_overall'],data_dict_all['M1_dicts']['models']['diff']['concat']['AIC_overall']]
-div_nl_aics = [data_dict_all['M1_dicts']['models']['div_nl']['aft_cue']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl']['bfr_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl']['aft_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl']['res_win']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl']['concat']['AIC_overall']]
-div_nl_noe_aics = [data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_cue']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_noe']['bfr_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_noe']['res_win']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_noe']['concat']['AIC_overall']]
-div_nl_Y_aics = [data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_cue']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_Y']['bfr_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_Y']['res_win']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_Y']['concat']['AIC_overall']]
-div_nl_separate_add_aics = [data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['res_win']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['concat']['AIC_overall']]
-div_nl_separate_multiply_aics = [data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_overall'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_overall']]
+temp = data_dict_all['M1_dicts']['classification_output']
 
-worksheet.write(0,0,'M1')
-worksheet.write_row(0,1,type_names)
-worksheet.write_row(1,1,lin_aics)
-worksheet.write_row(2,1,diff_aics)
-worksheet.write_row(3,1,div_nl_aics)
-worksheet.write_row(4,1,div_nl_noe_aics)
-worksheet.write_row(5,1,div_nl_Y_aics)
-worksheet.write_row(6,1,div_nl_separate_add_aics)
-worksheet.write_row(7,1,div_nl_separate_multiply_aics)
-worksheet.write_column(1,0,model_names)
-
-worksheet.conditional_format('B2:B8', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('C2:C8', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('D2:D8', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('E2:E8', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('F2:F8', {'type': 'bottom', 'value':'1', 'format':format1})
-
-lin_aics = [data_dict_all['S1_dicts']['models']['linear']['aft_cue']['AIC_overall'],data_dict_all['S1_dicts']['models']['linear']['bfr_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['linear']['aft_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['linear']['res_win']['AIC_overall'],data_dict_all['S1_dicts']['models']['linear']['concat']['AIC_overall']]
-diff_aics = [data_dict_all['S1_dicts']['models']['diff']['aft_cue']['AIC_overall'],data_dict_all['S1_dicts']['models']['diff']['bfr_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['diff']['aft_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['diff']['res_win']['AIC_overall'],data_dict_all['S1_dicts']['models']['diff']['concat']['AIC_overall']]
-div_nl_aics = [data_dict_all['S1_dicts']['models']['div_nl']['aft_cue']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl']['bfr_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl']['aft_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl']['res_win']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl']['concat']['AIC_overall']]
-div_nl_noe_aics = [data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_cue']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_noe']['bfr_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_noe']['res_win']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_noe']['concat']['AIC_overall']]
-div_nl_Y_aics = [data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_cue']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_Y']['bfr_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_Y']['res_win']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_Y']['concat']['AIC_overall']]
-div_nl_separate_add_aics = [data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['res_win']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['concat']['AIC_overall']]
-div_nl_separate_multiply_aics = [data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_overall'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_overall']]
-
-worksheet.write(12,0,'S1')
-worksheet.write_row(12,1,type_names)
-worksheet.write_row(13,1,lin_aics)
-worksheet.write_row(14,1,diff_aics)
-worksheet.write_row(15,1,div_nl_aics)
-worksheet.write_row(16,1,div_nl_noe_aics)
-worksheet.write_row(17,1,div_nl_Y_aics)
-worksheet.write_row(18,1,div_nl_separate_add_aics)
-worksheet.write_row(19,1,div_nl_separate_multiply_aics)
-worksheet.write_column(13,0,model_names)
-
-worksheet.conditional_format('B14:B20', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('C14:C20', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('D14:D20', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('E14:E20', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('F14:F20', {'type': 'bottom', 'value':'1', 'format':format1})
-
-lin_aics = [data_dict_all['PmD_dicts']['models']['linear']['aft_cue']['AIC_overall'],data_dict_all['PmD_dicts']['models']['linear']['bfr_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['linear']['aft_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['linear']['res_win']['AIC_overall'],data_dict_all['PmD_dicts']['models']['linear']['concat']['AIC_overall']]
-diff_aics = [data_dict_all['PmD_dicts']['models']['diff']['aft_cue']['AIC_overall'],data_dict_all['PmD_dicts']['models']['diff']['bfr_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['diff']['aft_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['diff']['res_win']['AIC_overall'],data_dict_all['PmD_dicts']['models']['diff']['concat']['AIC_overall']]
-div_nl_aics = [data_dict_all['PmD_dicts']['models']['div_nl']['aft_cue']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl']['bfr_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl']['aft_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl']['res_win']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl']['concat']['AIC_overall']]
-div_nl_noe_aics = [data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_cue']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['bfr_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['res_win']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['concat']['AIC_overall']]
-div_nl_Y_aics = [data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_cue']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['bfr_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['res_win']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['concat']['AIC_overall']]
-div_nl_separate_add_aics = [data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['res_win']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['concat']['AIC_overall']]
-div_nl_separate_multiply_aics = [data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_overall'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_overall']]
-
-worksheet.write(24,0,'PMd')
-worksheet.write_row(24,1,type_names)
-worksheet.write_row(25,1,lin_aics)
-worksheet.write_row(26,1,diff_aics)
-worksheet.write_row(27,1,div_nl_aics)
-worksheet.write_row(28,1,div_nl_noe_aics)
-worksheet.write_row(29,1,div_nl_Y_aics)
-worksheet.write_row(30,1,div_nl_separate_add_aics)
-worksheet.write_row(31,1,div_nl_separate_multiply_aics)
-worksheet.write_column(25,0,model_names)
-
-worksheet.conditional_format('B26:B32', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('C26:C32', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('D26:D32', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('E26:E32', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('F26:F32', {'type': 'bottom', 'value':'1', 'format':format1})
-
-
-#perc of units best fit to each model
-type_names_together = ['aft_cue', 'bfr_res', 'aft_res', 'res_win', 'concat']
-for region_key,region_val in data_dict_all.iteritems():
-    if not region_key == 'file_dict':
-        #for type_key,type_val in data_dict_all[region_key]['models']['linear'].iteritems():
-        
-
-        all_percs = np.zeros((np.shape(type_names)[0],np.shape(model_names)[0]))    
-        #
-        sig_percs = np.zeros((np.shape(type_names)[0],np.shape(model_names)[0]))
-        all_percs_r2 = np.zeros((np.shape(type_names)[0],np.shape(model_names)[0]))
-        sig_percs_r2 = np.zeros((np.shape(type_names)[0],np.shape(model_names)[0]))
-        num_any_sig_window = np.zeros((np.shape(type_names)[0]))
- 
-        all_no_fit = np.zeros((np.shape(type_names)[0],np.shape(model_names)[0]))
-        total_num_units_window = np.zeros((np.shape(type_names)[0]))
-
-        data_dict_all[region_key]['model_summary'] = {}
-        for i in range(np.shape(type_names_together)[0]):
-            type_key = type_names_together[i]
-    
-            all_model_AICs = np.column_stack((data_dict_all[region_key]['models']['linear'][type_key]['AIC_total'],data_dict_all[region_key]['models']['diff'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_noe'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_Y'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_separate_add'][type_key]['AIC_total'],data_dict_all[region_key]['models']['div_nl_separate_multiply'][type_key]['AIC_total']))
-
-            #all_model_adj_r2
-            all_model_adj_r2 = np.column_stack((data_dict_all[region_key]['models']['linear'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['diff'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['div_nl'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['div_nl_noe'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['div_nl_Y'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['div_nl_separate_add'][type_key]['r_sq_adj_total'],data_dict_all[region_key]['models']['div_nl_separate_multiply'][type_key]['r_sq_adj_total']))
-
-            ###
-            all_model_p_vals = np.column_stack((data_dict_all[region_key]['models']['linear'][type_key]['p_val_total'],data_dict_all[region_key]['models']['diff'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_noe'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_Y'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_separate_add'][type_key]['p_val_total'],data_dict_all[region_key]['models']['div_nl_separate_multiply'][type_key]['p_val_total']))
-            
-            all_p_bool = all_model_p_vals < 0.05
-            #
-            any_sig = np.sum(all_p_bool,axis=1) > 0            
-            sig_multiple_models = np.sum(all_p_bool,axis=1)
-            num_sig_multiple_models = np.sum(sig_multiple_models > 0)
-            perc_sig_multiple_models = num_sig_multiple_models / float(np.shape(sig_multiple_models)[0])
-            
-            for j in range(np.shape(sig_multiple_models)[0]):
-                if sig_multiple_models[j]:
-                    p_vals = all_p_bool[j,:]
-                    AICs = np.array((all_model_AICs[j,:],range(np.shape(model_names)[0])))
-                    #keep model type (number) with AIC
-                    sig_AICs = AICs[:,p_vals]
-                    model_type = sig_AICs[1,np.argmin(sig_AICs[0,:])]
-            
-                    #TODO finish this part
-
-            arg_mins = np.argmin(all_model_AICs,axis=1)
-            #
-            sig_arg_mins = arg_mins[any_sig]
-            arg_max_r2_adj = np.argmax(all_model_adj_r2,axis=1)
-            sig_arg_max_r2_adj = arg_max_r2_adj[any_sig]
-
-            perc_min = np.zeros((np.shape(all_model_AICs)[1]))
-            #
-            sig_perc_min = np.zeros((np.shape(all_model_AICs)[1]))
-            perc_max = np.zeros((np.shape(all_model_adj_r2)[1]))
-            sig_perc_max = np.zeros((np.shape(all_model_adj_r2)[1]))
-            for j in range(np.shape(all_model_AICs)[1]):
-                perc_min[j] = np.sum(arg_mins == j) / float(np.shape(all_model_AICs)[0])
-                #
-                sig_perc_min[j] = np.sum(sig_arg_mins == j) / float(np.shape(sig_arg_mins)[0])
-                perc_max[j] = np.sum(arg_max_r2_adj == j) / float(np.shape(all_model_adj_r2)[0])
-                sig_perc_max[j] = np.sum(sig_arg_max_r2_adj == j) / float(np.shape(sig_arg_max_r2_adj)[0])
-                
-            all_percs[i,:] = perc_min
-            #
-            sig_percs[i,:] = sig_perc_min
-            all_percs_r2[i,:] = perc_max
-            sig_percs_r2[i,:] = sig_perc_max
-            
-            all_no_fit[i,:] = [data_dict_all[region_key]['models']['linear'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['diff'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['div_nl'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['div_nl_noe'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['div_nl_Y'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['div_nl_separate_add'][type_key]['perc_units_no_fit'],data_dict_all[region_key]['models']['div_nl_separate_multiply'][type_key]['perc_units_no_fit']]
-
-            total_num_units_window[i] = data_dict_all[region_key]['models']['linear'][type_key]['total_num_units']
-            
-            #
-            num_any_sig_window[i] = np.sum(any_sig)
-
-        #
-        data_dict_all[region_key]['model_summary'] = {'all_percs':all_percs,'all_no_fit':all_no_fit,'total_num_units_window':total_num_units_window,'all_percs_r2':all_percs_r2,'sig_percs_r2':sig_percs_r2,'num_any_sig':num_any_sig_window,'sig_percs':sig_percs}
+r_level_accuracies = [np.sum(temp['aft_cue'][:,1] > temp['aft_cue'][:,3])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,1] > temp['bfr_res'][:,3])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,1] > temp['aft_res'][:,3])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,1] > temp['res_win'][:,3])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,1] > temp['concat'][:,3])/float(np.shape(temp['concat'])[0])]
+p_level_accuracies = [np.sum(temp['aft_cue'][:,5] > temp['aft_cue'][:,7])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,5] > temp['bfr_res'][:,7])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,5] > temp['aft_res'][:,7])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,5] > temp['res_win'][:,7])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,5] > temp['concat'][:,7])/float(np.shape(temp['concat'])[0])]
+succ_accuracies = [np.sum(temp['aft_cue'][:,9] > temp['aft_cue'][:,11])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,9] > temp['bfr_res'][:,11])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,9] > temp['aft_res'][:,11])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,9] > temp['res_win'][:,11])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,9] > temp['concat'][:,11])/float(np.shape(temp['concat'])[0])]
 
 
 
-worksheet = aic_workbook.add_worksheet('perc_unit_best_fit')
-worksheet.write(0,0,'M1: all')
-worksheet.write_row(0,1,model_names)
+
+
+worksheet.write(0,0,'M1: percent better than shuffled')
+worksheet.write_row(0,1,comb_names)
 worksheet.write_column(1,0,type_names)
-percs = data_dict_all['M1_dicts']['model_summary']['all_percs']
-total_units = data_dict_all['M1_dicts']['model_summary']['total_num_units_window']
-for i in range(np.shape(percs)[0]):
-    worksheet.write_row(i+1,1,percs[i,:])
-worksheet.write(0,8,'total units')
-worksheet.write_column(1,8,total_units)
-percs = data_dict_all['M1_dicts']['model_summary']['sig_percs']
-total_units = data_dict_all['M1_dicts']['model_summary']['num_any_sig']
-worksheet.write_row(0,11,model_names)
-worksheet.write_column(1,10,type_names)
-worksheet.write(0,10,'M1: sig')
-for i in range(np.shape(percs)[0]):
-    worksheet.write_row(i+1,11,percs[i,:])
-worksheet.write(0,18,'total units')
-worksheet.write_column(1,18,total_units)
+worksheet.write_column(1,1,r_level_accuracies)
+worksheet.write_column(1,2,p_level_accuracies)
+worksheet.write_column(1,3,succ_accuracies)
 
-worksheet.write(7,0,'S1: all')
-worksheet.write_row(7,1,model_names)
-worksheet.write_column(8,0,type_names)
-percs = data_dict_all['S1_dicts']['model_summary']['all_percs']
-total_units = data_dict_all['S1_dicts']['model_summary']['total_num_units_window']
-for i in range(np.shape(percs)[0]):
-    worksheet.write_row(i+8,1,percs[i,:])
-worksheet.write(7,8,'total units')
-worksheet.write_column(8,8,total_units)
-percs = data_dict_all['S1_dicts']['model_summary']['sig_percs']
-total_units = data_dict_all['S1_dicts']['model_summary']['num_any_sig']
-worksheet.write_row(7,11,model_names)
-worksheet.write_column(8,10,type_names)
-worksheet.write(8,10,'S1: sig')
-for i in range(np.shape(percs)[0]):
-    worksheet.write_row(i+8,11,percs[i,:])
-worksheet.write(7,18,'total units')
-worksheet.write_column(8,18,total_units)
+r_level_accuracies = [np.sum(temp['aft_cue'][:,1] > temp['aft_cue'][:,2])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,1] > temp['bfr_res'][:,2])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,1] > temp['aft_res'][:,2])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,1] > temp['res_win'][:,2])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,1] > temp['concat'][:,2])/float(np.shape(temp['concat'])[0])]
+p_level_accuracies = [np.sum(temp['aft_cue'][:,5] > temp['aft_cue'][:,6])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,5] > temp['bfr_res'][:,6])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,5] > temp['aft_res'][:,6])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,5] > temp['res_win'][:,6])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,5] > temp['concat'][:,6])/float(np.shape(temp['concat'])[0])]
+succ_accuracies = [np.sum(temp['aft_cue'][:,9] > temp['aft_cue'][:,10])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,9] > temp['bfr_res'][:,10])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,9] > temp['aft_res'][:,10])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,9] > temp['res_win'][:,10])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,9] > temp['concat'][:,10])/float(np.shape(temp['concat'])[0])]
 
-worksheet.write(14,0,'PMd: all')
-worksheet.write_row(14,1,model_names)
-worksheet.write_column(15,0,type_names)
-percs = data_dict_all['PmD_dicts']['model_summary']['all_percs']
-total_units = data_dict_all['S1_dicts']['model_summary']['total_num_units_window']
-for i in range(np.shape(percs)[0]):
-    worksheet.write_row(i+15,1,percs[i,:])
-worksheet.write(14,8,'total units')
-worksheet.write_column(15,8,total_units)
-percs = data_dict_all['PmD_dicts']['model_summary']['sig_percs']
-total_units = data_dict_all['PmD_dicts']['model_summary']['num_any_sig']
-worksheet.write_row(14,11,model_names)
-worksheet.write_column(15,10,type_names)
-worksheet.write(14,10,'PmD: sig')
-for i in range(np.shape(percs)[0]):
-    worksheet.write_row(i+15,11,percs[i,:])
-worksheet.write(14,18,'total units')
-worksheet.write_column(15,18,total_units)
 
-worksheet.conditional_format('B2:H2', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B3:H3', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B4:H4', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B5:H5', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B6:H6', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L2:R2', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L3:R3', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L4:R4', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L5:R5', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L6:R6', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.write(0,8,'M1: percent better than chance')
+worksheet.write_row(0,9,comb_names)
+worksheet.write_column(1,8,type_names)
+worksheet.write_column(1,9,r_level_accuracies)
+worksheet.write_column(1,10,p_level_accuracies)
+worksheet.write_column(1,11,succ_accuracies)
 
-worksheet.conditional_format('B9:H9', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B10:H10', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B11:H11', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B12:H12', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B13:H13', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L9:R9', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L10:R10', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L11:R11', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L12:R12', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L13:R13', {'type': 'top', 'value':'1', 'format':format1})
+##
+temp = data_dict_all['S1_dicts']['classification_output']
 
-worksheet.conditional_format('B16:H16', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B17:H17', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B18:H18', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B19:H19', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B20:H20', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L16:R16', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L17:R17', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L18:R18', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L19:R19', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L20:R20', {'type': 'top', 'value':'1', 'format':format1})
+r_level_accuracies = [np.sum(temp['aft_cue'][:,1] > temp['aft_cue'][:,3])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,1] > temp['bfr_res'][:,3])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,1] > temp['aft_res'][:,3])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,1] > temp['res_win'][:,3])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,1] > temp['concat'][:,3])/float(np.shape(temp['concat'])[0])]
+p_level_accuracies = [np.sum(temp['aft_cue'][:,5] > temp['aft_cue'][:,7])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,5] > temp['bfr_res'][:,7])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,5] > temp['aft_res'][:,7])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,5] > temp['res_win'][:,7])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,5] > temp['concat'][:,7])/float(np.shape(temp['concat'])[0])]
+succ_accuracies = [np.sum(temp['aft_cue'][:,9] > temp['aft_cue'][:,11])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,9] > temp['bfr_res'][:,11])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,9] > temp['aft_res'][:,11])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,9] > temp['res_win'][:,11])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,9] > temp['concat'][:,11])/float(np.shape(temp['concat'])[0])]
 
-#
-worksheet = aic_workbook.add_worksheet('perc_unit_best_fit_adj_r2')
-worksheet.write(0,0,'M1: all')
-worksheet.write_row(0,1,model_names)
-worksheet.write_column(1,0,type_names)
-percs = data_dict_all['M1_dicts']['model_summary']['all_percs_r2']
-total_units = data_dict_all['M1_dicts']['model_summary']['total_num_units_window']
-for i in range(np.shape(percs)[0]):
-    worksheet.write_row(i+1,1,percs[i,:])
-worksheet.write(0,8,'total units')
-worksheet.write_column(1,8,total_units)
-percs = data_dict_all['M1_dicts']['model_summary']['sig_percs_r2']
-total_units = data_dict_all['M1_dicts']['model_summary']['num_any_sig']
-worksheet.write_row(0,11,model_names)
-worksheet.write_column(1,10,type_names)
-worksheet.write(0,10,'M1: sig')
-for i in range(np.shape(percs)[0]):
-    worksheet.write_row(i+1,11,percs[i,:])
-worksheet.write(0,18,'total units')
-worksheet.write_column(1,18,total_units)
 
-worksheet.write(7,0,'S1')
-worksheet.write_row(7,1,model_names)
-worksheet.write_column(8,0,type_names)
-percs = data_dict_all['S1_dicts']['model_summary']['all_percs_r2']
-total_units = data_dict_all['S1_dicts']['model_summary']['total_num_units_window']
-for i in range(np.shape(percs)[0]):
-    worksheet.write_row(i+8,1,percs[i,:])
-worksheet.write(7,8,'total units')
-worksheet.write_column(8,8,total_units)
-percs = data_dict_all['S1_dicts']['model_summary']['sig_percs_r2']
-total_units = data_dict_all['S1_dicts']['model_summary']['num_any_sig']
-worksheet.write_row(7,11,model_names)
-worksheet.write_column(8,10,type_names)
-worksheet.write(8,10,'S1: sig')
-for i in range(np.shape(percs)[0]):
-    worksheet.write_row(i+8,11,percs[i,:])
-worksheet.write(7,18,'total units')
-worksheet.write_column(8,18,total_units)
+worksheet.write(8,0,'S1: percent better than shuffled')
+worksheet.write_row(8,1,comb_names)
+worksheet.write_column(9,0,type_names)
+worksheet.write_column(9,1,r_level_accuracies)
+worksheet.write_column(9,2,p_level_accuracies)
+worksheet.write_column(9,3,succ_accuracies)
 
-worksheet.write(14,0,'PMd')
-worksheet.write_row(14,1,model_names)
-worksheet.write_column(15,0,type_names)
-percs = data_dict_all['PmD_dicts']['model_summary']['all_percs_r2']
-total_units = data_dict_all['S1_dicts']['model_summary']['total_num_units_window']
-for i in range(np.shape(percs)[0]):
-    worksheet.write_row(i+15,1,percs[i,:])
-worksheet.write(14,8,'total units')
-worksheet.write_column(15,8,total_units)
-percs = data_dict_all['PmD_dicts']['model_summary']['sig_percs_r2']
-total_units = data_dict_all['PmD_dicts']['model_summary']['num_any_sig']
-worksheet.write_row(14,11,model_names)
-worksheet.write_column(15,10,type_names)
-worksheet.write(14,10,'PmD: sig')
-for i in range(np.shape(percs)[0]):
-    worksheet.write_row(i+15,11,percs[i,:])
-worksheet.write(14,18,'total units')
-worksheet.write_column(15,18,total_units)
+r_level_accuracies = [np.sum(temp['aft_cue'][:,1] > temp['aft_cue'][:,2])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,1] > temp['bfr_res'][:,2])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,1] > temp['aft_res'][:,2])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,1] > temp['res_win'][:,2])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,1] > temp['concat'][:,2])/float(np.shape(temp['concat'])[0])]
+p_level_accuracies = [np.sum(temp['aft_cue'][:,5] > temp['aft_cue'][:,6])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,5] > temp['bfr_res'][:,6])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,5] > temp['aft_res'][:,6])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,5] > temp['res_win'][:,6])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,5] > temp['concat'][:,6])/float(np.shape(temp['concat'])[0])]
+succ_accuracies = [np.sum(temp['aft_cue'][:,9] > temp['aft_cue'][:,10])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,9] > temp['bfr_res'][:,10])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,9] > temp['aft_res'][:,10])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,9] > temp['res_win'][:,10])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,9] > temp['concat'][:,10])/float(np.shape(temp['concat'])[0])]
 
-worksheet.conditional_format('B2:H2', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B3:H3', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B4:H4', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B5:H5', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B6:H6', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L2:R2', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L3:R3', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L4:R4', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L5:R5', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L6:R6', {'type': 'top', 'value':'1', 'format':format1})
 
-worksheet.conditional_format('B9:H9', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B10:H10', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B11:H11', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B12:H12', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B13:H13', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L9:R9', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L10:R10', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L11:R11', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L12:R12', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L13:R13', {'type': 'top', 'value':'1', 'format':format1})
+worksheet.write(8,8,'S1: percent better than chance')
+worksheet.write_row(8,9,comb_names)
+worksheet.write_column(9,8,type_names)
+worksheet.write_column(9,9,r_level_accuracies)
+worksheet.write_column(9,10,p_level_accuracies)
+worksheet.write_column(9,11,succ_accuracies)
 
-worksheet.conditional_format('B16:H16', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B17:H17', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B18:H18', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B19:H19', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('B20:H20', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L16:R16', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L17:R17', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L18:R18', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L19:R19', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('L20:R20', {'type': 'top', 'value':'1', 'format':format1})
+##
+temp = data_dict_all['PmD_dicts']['classification_output']
 
+r_level_accuracies = [np.sum(temp['aft_cue'][:,1] > temp['aft_cue'][:,3])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,1] > temp['bfr_res'][:,3])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,1] > temp['aft_res'][:,3])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,1] > temp['res_win'][:,3])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,1] > temp['concat'][:,3])/float(np.shape(temp['concat'])[0])]
+p_level_accuracies = [np.sum(temp['aft_cue'][:,5] > temp['aft_cue'][:,7])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,5] > temp['bfr_res'][:,7])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,5] > temp['aft_res'][:,7])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,5] > temp['res_win'][:,7])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,5] > temp['concat'][:,7])/float(np.shape(temp['concat'])[0])]
+succ_accuracies = [np.sum(temp['aft_cue'][:,9] > temp['aft_cue'][:,11])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,9] > temp['bfr_res'][:,11])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,9] > temp['aft_res'][:,11])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,9] > temp['res_win'][:,11])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,9] > temp['concat'][:,11])/float(np.shape(temp['concat'])[0])]
 
 
-#################
+worksheet.write(16,0,'PMd: percent better than shuffled')
+worksheet.write_row(16,1,comb_names)
+worksheet.write_column(17,0,type_names)
+worksheet.write_column(17,1,r_level_accuracies)
+worksheet.write_column(17,2,p_level_accuracies)
+worksheet.write_column(17,3,succ_accuracies)
 
-worksheet = aic_workbook.add_worksheet('perc_no_fit')
-worksheet.write(0,0,'M1')
-worksheet.write_row(0,1,model_names)
-worksheet.write_column(1,0,type_names)
-no_fit = data_dict_all['M1_dicts']['model_summary']['all_no_fit']
-total_units = data_dict_all['M1_dicts']['model_summary']['total_num_units_window']
-for i in range(np.shape(no_fit)[0]):
-    worksheet.write_row(i+1,1,no_fit[i,:])
-worksheet.write(0,8,'total units')
-worksheet.write_column(1,8,total_units)
+r_level_accuracies = [np.sum(temp['aft_cue'][:,1] > temp['aft_cue'][:,2])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,1] > temp['bfr_res'][:,2])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,1] > temp['aft_res'][:,2])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,1] > temp['res_win'][:,2])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,1] > temp['concat'][:,2])/float(np.shape(temp['concat'])[0])]
+p_level_accuracies = [np.sum(temp['aft_cue'][:,5] > temp['aft_cue'][:,6])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,5] > temp['bfr_res'][:,6])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,5] > temp['aft_res'][:,6])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,5] > temp['res_win'][:,6])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,5] > temp['concat'][:,6])/float(np.shape(temp['concat'])[0])]
+succ_accuracies = [np.sum(temp['aft_cue'][:,9] > temp['aft_cue'][:,10])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,9] > temp['bfr_res'][:,10])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,9] > temp['aft_res'][:,10])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,9] > temp['res_win'][:,10])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,9] > temp['concat'][:,10])/float(np.shape(temp['concat'])[0])]
 
-worksheet.write(7,0,'S1')
-worksheet.write_row(7,1,model_names)
-worksheet.write_column(8,0,type_names)
-no_fit = data_dict_all['S1_dicts']['model_summary']['all_no_fit']
-total_units = data_dict_all['S1_dicts']['model_summary']['total_num_units_window']
-for i in range(np.shape(no_fit)[0]):
-    worksheet.write_row(i+8,1,no_fit[i,:])
-worksheet.write(7,8,'total units')
-worksheet.write_column(8,8,total_units)
 
-worksheet.write(14,0,'PMd')
-worksheet.write_row(14,1,model_names)
-worksheet.write_column(15,0,type_names)
-no_fit = data_dict_all['PmD_dicts']['model_summary']['all_no_fit']
-total_units = data_dict_all['PmD_dicts']['model_summary']['total_num_units_window']
-for i in range(np.shape(no_fit)[0]):
-    worksheet.write_row(i+15,1,no_fit[i,:])
-worksheet.write(14,8,'total units')
-worksheet.write_column(15,8,total_units)
+worksheet.write(16,8,'PMd: percent better than chance')
+worksheet.write_row(16,9,comb_names)
+worksheet.write_column(17,8,type_names)
+worksheet.write_column(17,9,r_level_accuracies)
+worksheet.write_column(17,10,p_level_accuracies)
+worksheet.write_column(17,11,succ_accuracies)
 
-#################
-worksheet = aic_workbook.add_worksheet('AIC_averaged_over_sig')
 
-lin_aics = [data_dict_all['M1_dicts']['models']['linear']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['linear']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['linear']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['linear']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['linear']['concat']['AIC_sig_avg']]
-diff_aics = [data_dict_all['M1_dicts']['models']['diff']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['diff']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['diff']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['diff']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['diff']['concat']['AIC_sig_avg']]
-div_nl_aics = [data_dict_all['M1_dicts']['models']['div_nl']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl']['concat']['AIC_sig_avg']]
-div_nl_noe_aics = [data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['concat']['AIC_sig_avg']]
-div_nl_Y_aics = [data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['concat']['AIC_sig_avg']]
-div_nl_separate_add_aics = [data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['concat']['AIC_sig_avg']]
-div_nl_separate_multiply_aics = [data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_sig_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_sig_avg']]
 
-lin_aics_comb = [data_dict_all['M1_dicts']['models']['linear']['aft_cue']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['linear']['bfr_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['linear']['aft_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['linear']['res_win']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['linear']['concat']['AIC_sig_model']]
-diff_aics_comb = [data_dict_all['M1_dicts']['models']['diff']['aft_cue']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['diff']['bfr_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['diff']['aft_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['diff']['res_win']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['diff']['concat']['AIC_sig_model']]
-div_nl_aics_comb = [data_dict_all['M1_dicts']['models']['div_nl']['aft_cue']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl']['bfr_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl']['aft_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl']['res_win']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl']['concat']['AIC_sig_model']]
-div_nl_noe_aics_comb = [data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_cue']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_noe']['bfr_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_noe']['res_win']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_noe']['concat']['AIC_sig_model']]
-div_nl_Y_aics_comb = [data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_cue']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_Y']['bfr_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_Y']['res_win']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_Y']['concat']['AIC_sig_model']]
-div_nl_separate_add_aics_comb = [data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['res_win']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['concat']['AIC_sig_model']]
-div_nl_separate_multiply_aics_comb = [data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_sig_model'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_sig_model']]
 
-lin_num_sig = [data_dict_all['M1_dicts']['models']['linear']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['linear']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['linear']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['linear']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['linear']['concat']['num_sig_fit']]
-diff_num_sig = [data_dict_all['M1_dicts']['models']['diff']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['diff']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['diff']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['diff']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['diff']['concat']['num_sig_fit']]
-div_nl_num_sig = [data_dict_all['M1_dicts']['models']['div_nl']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl']['concat']['num_sig_fit']]
-div_nl_noe_num_sig = [data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_noe']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_noe']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_noe']['concat']['num_sig_fit']]
-div_nl_Y_num_sig = [data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_Y']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_Y']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_Y']['concat']['num_sig_fit']]
-div_nl_separate_add_num_sig = [data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['concat']['num_sig_fit']]
-div_nl_separate_multiply_num_sig = [data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_res']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['res_win']['num_sig_fit'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['concat']['num_sig_fit']]
 
-worksheet.write(0,0,'M1')
-worksheet.write(1,0,'AIC avg')
-worksheet.write_row(1,1,type_names)
-worksheet.write_row(2,1,lin_aics)
-worksheet.write_row(3,1,diff_aics)
-worksheet.write_row(4,1,div_nl_aics)
-worksheet.write_row(5,1,div_nl_noe_aics)
-worksheet.write_row(6,1,div_nl_Y_aics)
-worksheet.write_row(7,1,div_nl_separate_add_aics)
-worksheet.write_row(8,1,div_nl_separate_multiply_aics)
-worksheet.write_column(2,0,model_names)
 
-worksheet.write(1,7,'AIC combined')
-worksheet.write_row(1,8,type_names)
-worksheet.write_row(2,8,lin_aics_comb)
-worksheet.write_row(3,8,diff_aics_comb)
-worksheet.write_row(4,8,div_nl_aics_comb)
-worksheet.write_row(5,8,div_nl_noe_aics_comb)
-worksheet.write_row(6,8,div_nl_Y_aics_comb)
-worksheet.write_row(7,8,div_nl_separate_add_aics_comb)
-worksheet.write_row(8,8,div_nl_separate_multiply_aics_comb)
-worksheet.write_column(2,7,model_names)
 
-worksheet.write(1,14,'num sig')
-worksheet.write_row(1,15,type_names)
-worksheet.write_row(2,15,lin_num_sig)
-worksheet.write_row(3,15,diff_num_sig)
-worksheet.write_row(4,15,div_nl_num_sig)
-worksheet.write_row(5,15,div_nl_noe_num_sig)
-worksheet.write_row(6,15,div_nl_Y_num_sig)
-worksheet.write_row(7,15,div_nl_separate_add_num_sig)
-worksheet.write_row(8,15,div_nl_separate_multiply_num_sig)
-worksheet.write_column(2,14,model_names)
-worksheet.write(9,14,'total units')
-worksheet.write(9,15,data_dict_all['M1_dicts']['avg_and_corr']['aft_cue']['total_unit_num'])
-
-worksheet.conditional_format('B3:B9', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('C3:C9', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('D3:D9', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('E3:E9', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('F3:F9', {'type': 'bottom', 'value':'1', 'format':format1})
-
-worksheet.conditional_format('I3:I9', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('J3:J9', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('K3:K9', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('L3:L9', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('M3:M9', {'type': 'bottom', 'value':'1', 'format':format1})
-
-lin_aics = [data_dict_all['S1_dicts']['models']['linear']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['linear']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['linear']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['linear']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['linear']['concat']['AIC_sig_avg']]
-diff_aics = [data_dict_all['S1_dicts']['models']['diff']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['diff']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['diff']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['diff']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['diff']['concat']['AIC_sig_avg']]
-div_nl_aics = [data_dict_all['S1_dicts']['models']['div_nl']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl']['concat']['AIC_sig_avg']]
-div_nl_noe_aics = [data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['concat']['AIC_sig_avg']]
-div_nl_Y_aics = [data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['concat']['AIC_sig_avg']]
-div_nl_separate_add_aics = [data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['concat']['AIC_sig_avg']]
-div_nl_separate_multiply_aics = [data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_sig_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_sig_avg']]
-
-lin_aics_comb = [data_dict_all['S1_dicts']['models']['linear']['aft_cue']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['linear']['bfr_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['linear']['aft_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['linear']['res_win']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['linear']['concat']['AIC_sig_model']]
-diff_aics_comb = [data_dict_all['S1_dicts']['models']['diff']['aft_cue']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['diff']['bfr_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['diff']['aft_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['diff']['res_win']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['diff']['concat']['AIC_sig_model']]
-div_nl_aics_comb = [data_dict_all['S1_dicts']['models']['div_nl']['aft_cue']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl']['bfr_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl']['aft_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl']['res_win']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl']['concat']['AIC_sig_model']]
-div_nl_noe_aics_comb = [data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_cue']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_noe']['bfr_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_noe']['res_win']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_noe']['concat']['AIC_sig_model']]
-div_nl_Y_aics_comb = [data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_cue']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_Y']['bfr_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_Y']['res_win']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_Y']['concat']['AIC_sig_model']]
-div_nl_separate_add_aics_comb = [data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['res_win']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['concat']['AIC_sig_model']]
-div_nl_separate_multiply_aics_comb = [data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_sig_model'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_sig_model']]
-
-
-lin_num_sig = [data_dict_all['S1_dicts']['models']['linear']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['linear']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['linear']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['linear']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['linear']['concat']['num_sig_fit']]
-diff_num_sig = [data_dict_all['S1_dicts']['models']['diff']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['diff']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['diff']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['diff']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['diff']['concat']['num_sig_fit']]
-div_nl_num_sig = [data_dict_all['S1_dicts']['models']['div_nl']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl']['concat']['num_sig_fit']]
-div_nl_noe_num_sig = [data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_noe']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_noe']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_noe']['concat']['num_sig_fit']]
-div_nl_Y_num_sig = [data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_Y']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_Y']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_Y']['concat']['num_sig_fit']]
-div_nl_separate_add_num_sig = [data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['concat']['num_sig_fit']]
-div_nl_separate_multiply_num_sig = [data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_res']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['res_win']['num_sig_fit'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['concat']['num_sig_fit']]
-
-worksheet.write(11,0,'S1')
-worksheet.write(12,1,'AIC avg')
-worksheet.write_row(12,1,type_names)
-worksheet.write_row(13,1,lin_aics)
-worksheet.write_row(14,1,diff_aics)
-worksheet.write_row(15,1,div_nl_aics)
-worksheet.write_row(16,1,div_nl_noe_aics)
-worksheet.write_row(17,1,div_nl_Y_aics)
-worksheet.write_row(18,1,div_nl_separate_add_aics)
-worksheet.write_row(19,1,div_nl_separate_multiply_aics)
-worksheet.write_column(13,0,model_names)
-
-worksheet.write(12,0,'AIC combined')
-worksheet.write_row(12,8,type_names)
-worksheet.write_row(13,8,lin_aics_comb)
-worksheet.write_row(14,8,diff_aics_comb)
-worksheet.write_row(15,8,div_nl_aics_comb)
-worksheet.write_row(16,8,div_nl_noe_aics_comb)
-worksheet.write_row(17,8,div_nl_Y_aics_comb)
-worksheet.write_row(18,8,div_nl_separate_add_aics_comb)
-worksheet.write_row(19,8,div_nl_separate_multiply_aics_comb)
-worksheet.write_column(13,7,model_names)
-
-worksheet.write(12,14,'num sig')
-worksheet.write_row(12,15,type_names)
-worksheet.write_row(13,15,lin_num_sig)
-worksheet.write_row(14,15,diff_num_sig)
-worksheet.write_row(15,15,div_nl_num_sig)
-worksheet.write_row(16,15,div_nl_noe_num_sig)
-worksheet.write_row(17,15,div_nl_Y_num_sig)
-worksheet.write_row(18,15,div_nl_separate_add_num_sig)
-worksheet.write_row(19,15,div_nl_separate_multiply_num_sig)
-worksheet.write_column(13,14,model_names)
-worksheet.write(20,14,'total units')
-worksheet.write(20,15,data_dict_all['S1_dicts']['avg_and_corr']['aft_cue']['total_unit_num'])
-
-worksheet.conditional_format('B14:B20', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('C14:C20', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('D14:D20', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('E14:E20', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('F14:F20', {'type': 'bottom', 'value':'1', 'format':format1})
-
-worksheet.conditional_format('I14:I20', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('J14:J20', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('K14:K20', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('L14:L20', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('M14:M20', {'type': 'bottom', 'value':'1', 'format':format1})
-
-lin_aics = [data_dict_all['PmD_dicts']['models']['linear']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['linear']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['linear']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['linear']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['linear']['concat']['AIC_sig_avg']]
-diff_aics = [data_dict_all['PmD_dicts']['models']['diff']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['diff']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['diff']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['diff']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['diff']['concat']['AIC_sig_avg']]
-div_nl_aics = [data_dict_all['PmD_dicts']['models']['div_nl']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['concat']['AIC_sig_avg']]
-div_nl_noe_aics = [data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['concat']['AIC_sig_avg']]
-div_nl_Y_aics = [data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['concat']['AIC_sig_avg']]
-div_nl_separate_add_aics = [data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['concat']['AIC_sig_avg']]
-div_nl_separate_multiply_aics = [data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_sig_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_sig_avg']]
-
-lin_aics_comb = [data_dict_all['PmD_dicts']['models']['linear']['aft_cue']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['linear']['bfr_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['linear']['aft_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['linear']['res_win']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['linear']['concat']['AIC_sig_model']]
-diff_aics_comb = [data_dict_all['PmD_dicts']['models']['diff']['aft_cue']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['diff']['bfr_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['diff']['aft_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['diff']['res_win']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['diff']['concat']['AIC_sig_model']]
-div_nl_aics_comb = [data_dict_all['PmD_dicts']['models']['div_nl']['aft_cue']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl']['bfr_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl']['aft_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl']['res_win']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl']['concat']['AIC_sig_model']]
-div_nl_noe_aics_comb = [data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_cue']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['bfr_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['res_win']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['concat']['AIC_sig_model']]
-div_nl_Y_aics_comb = [data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_cue']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['bfr_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['res_win']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['concat']['AIC_sig_model']]
-div_nl_separate_add_aics_comb = [data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_cue']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['bfr_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['res_win']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['concat']['AIC_sig_model']]
-div_nl_separate_multiply_aics_comb = [data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_cue']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['bfr_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_res']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['res_win']['AIC_sig_model'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['concat']['AIC_sig_model']]
-
-lin_num_sig = [data_dict_all['PmD_dicts']['models']['linear']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['linear']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['linear']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['linear']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['linear']['concat']['num_sig_fit']]
-diff_num_sig = [data_dict_all['PmD_dicts']['models']['diff']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['diff']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['diff']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['diff']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['diff']['concat']['num_sig_fit']]
-div_nl_num_sig = [data_dict_all['PmD_dicts']['models']['div_nl']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl']['concat']['num_sig_fit']]
-div_nl_noe_num_sig = [data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['concat']['num_sig_fit']]
-div_nl_Y_num_sig = [data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['concat']['num_sig_fit']]
-div_nl_separate_add_num_sig = [data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['concat']['num_sig_fit']]
-div_nl_separate_multiply_num_sig = [data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_cue']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['bfr_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_res']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['res_win']['num_sig_fit'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['concat']['num_sig_fit']]
-
-
-worksheet.write(23,0,'PMd')
-worksheet.write(24,0,'AIC avg')
-worksheet.write_row(24,1,type_names)
-worksheet.write_row(25,1,lin_aics)
-worksheet.write_row(26,1,diff_aics)
-worksheet.write_row(27,1,div_nl_aics)
-worksheet.write_row(28,1,div_nl_noe_aics)
-worksheet.write_row(29,1,div_nl_Y_aics)
-worksheet.write_row(30,1,div_nl_separate_add_aics)
-worksheet.write_row(31,1,div_nl_separate_multiply_aics)
-worksheet.write_column(25,0,model_names)
-
-worksheet.write(24,7,'AIC combined')
-worksheet.write_row(24,8,type_names)
-worksheet.write_row(25,8,lin_aics_comb)
-worksheet.write_row(26,8,diff_aics_comb)
-worksheet.write_row(27,8,div_nl_aics_comb)
-worksheet.write_row(28,8,div_nl_noe_aics_comb)
-worksheet.write_row(29,8,div_nl_Y_aics_comb)
-worksheet.write_row(30,8,div_nl_separate_add_aics_comb)
-worksheet.write_row(31,8,div_nl_separate_multiply_aics_comb)
-worksheet.write_column(25,7,model_names)
-
-worksheet.write(24,14,'num sig')
-worksheet.write_row(24,15,type_names)
-worksheet.write_row(25,15,lin_num_sig)
-worksheet.write_row(26,15,diff_num_sig)
-worksheet.write_row(27,15,div_nl_num_sig)
-worksheet.write_row(28,15,div_nl_noe_num_sig)
-worksheet.write_row(29,15,div_nl_Y_num_sig)
-worksheet.write_row(30,15,div_nl_separate_add_num_sig)
-worksheet.write_row(31,15,div_nl_separate_multiply_num_sig)
-worksheet.write_column(25,14,model_names)
-worksheet.write(32,14,'total units')
-worksheet.write(32,15,data_dict_all['PmD_dicts']['avg_and_corr']['aft_cue']['total_unit_num'])
-
-worksheet.conditional_format('B26:B32', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('C26:C32', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('D26:D32', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('E26:E32', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('F26:F32', {'type': 'bottom', 'value':'1', 'format':format1})
-
-worksheet.conditional_format('I26:I32', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('J26:J32', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('K26:K32', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('L26:L32', {'type': 'bottom', 'value':'1', 'format':format1})
-worksheet.conditional_format('M26:M32', {'type': 'bottom', 'value':'1', 'format':format1})
-
-
-###################
-#mean r2 vals
-
-worksheet = aic_workbook.add_worksheet('mean_r2')
-lin_r_sq = [data_dict_all['M1_dicts']['models']['linear']['aft_cue']['r_sq_avg'],data_dict_all['M1_dicts']['models']['linear']['bfr_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['linear']['aft_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['linear']['res_win']['r_sq_avg'],data_dict_all['M1_dicts']['models']['linear']['concat']['r_sq_avg']]
-diff_r_sq = [data_dict_all['M1_dicts']['models']['diff']['aft_cue']['r_sq_avg'],data_dict_all['M1_dicts']['models']['diff']['bfr_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['diff']['aft_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['diff']['res_win']['r_sq_avg'],data_dict_all['M1_dicts']['models']['diff']['concat']['r_sq_avg']]
-div_nl_r_sq = [data_dict_all['M1_dicts']['models']['div_nl']['aft_cue']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl']['bfr_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl']['aft_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl']['res_win']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl']['concat']['r_sq_avg']]
-div_nl_noe_r_sq = [data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_cue']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['bfr_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['res_win']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['concat']['r_sq_avg']]
-div_nl_Y_r_sq = [data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_cue']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['bfr_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['res_win']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['concat']['r_sq_avg']]
-div_nl_separate_add_r_sq = [data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_cue']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['bfr_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['res_win']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['concat']['r_sq_avg']]
-div_nl_separate_multiply_r_sq = [data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_res']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['res_win']['r_sq_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['concat']['r_sq_avg']]
-
-worksheet.write(0,0,'M1: avg r2')
-worksheet.write_row(0,1,type_names)
-worksheet.write_row(1,1,lin_r_sq)
-worksheet.write_row(2,1,diff_r_sq)
-worksheet.write_row(3,1,div_nl_r_sq)
-worksheet.write_row(4,1,div_nl_noe_r_sq)
-worksheet.write_row(5,1,div_nl_Y_r_sq)
-worksheet.write_row(6,1,div_nl_separate_add_r_sq)
-worksheet.write_row(7,1,div_nl_separate_multiply_r_sq)
-worksheet.write_column(1,0,model_names)
-
-worksheet.conditional_format('B2:B8', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('C2:C8', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('D2:D8', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('E2:E8', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('F2:F8', {'type': 'top', 'value':'1', 'format':format1})
-
-lin_r_sq = [data_dict_all['S1_dicts']['models']['linear']['aft_cue']['r_sq_avg'],data_dict_all['S1_dicts']['models']['linear']['bfr_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['linear']['aft_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['linear']['res_win']['r_sq_avg'],data_dict_all['S1_dicts']['models']['linear']['concat']['r_sq_avg']]
-diff_r_sq = [data_dict_all['S1_dicts']['models']['diff']['aft_cue']['r_sq_avg'],data_dict_all['S1_dicts']['models']['diff']['bfr_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['diff']['aft_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['diff']['res_win']['r_sq_avg'],data_dict_all['S1_dicts']['models']['diff']['concat']['r_sq_avg']]
-div_nl_r_sq = [data_dict_all['S1_dicts']['models']['div_nl']['aft_cue']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl']['bfr_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl']['aft_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl']['res_win']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl']['concat']['r_sq_avg']]
-div_nl_noe_r_sq = [data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_cue']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['bfr_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['res_win']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['concat']['r_sq_avg']]
-div_nl_Y_r_sq = [data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_cue']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['bfr_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['res_win']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['concat']['r_sq_avg']]
-div_nl_separate_add_r_sq = [data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_cue']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['bfr_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['res_win']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['concat']['r_sq_avg']]
-div_nl_separate_multiply_r_sq = [data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_res']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['res_win']['r_sq_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['concat']['r_sq_avg']]
-
-worksheet.write(12,0,'S1: avg r2')
-worksheet.write_row(12,1,type_names)
-worksheet.write_row(13,1,lin_r_sq)
-worksheet.write_row(14,1,diff_r_sq)
-worksheet.write_row(15,1,div_nl_r_sq)
-worksheet.write_row(16,1,div_nl_noe_r_sq)
-worksheet.write_row(17,1,div_nl_Y_r_sq)
-worksheet.write_row(18,1,div_nl_separate_add_r_sq)
-worksheet.write_row(19,1,div_nl_separate_multiply_r_sq)
-worksheet.write_column(13,0,model_names)
-
-worksheet.conditional_format('B14:B20', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('C14:C20', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('D14:D20', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('E14:E20', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('F14:F20', {'type': 'top', 'value':'1', 'format':format1})
-
-lin_r_sq = [data_dict_all['PmD_dicts']['models']['linear']['aft_cue']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['linear']['bfr_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['linear']['aft_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['linear']['res_win']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['linear']['concat']['r_sq_avg']]
-diff_r_sq = [data_dict_all['PmD_dicts']['models']['diff']['aft_cue']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['diff']['bfr_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['diff']['aft_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['diff']['res_win']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['diff']['concat']['r_sq_avg']]
-div_nl_r_sq = [data_dict_all['PmD_dicts']['models']['div_nl']['aft_cue']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['bfr_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['aft_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['res_win']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['concat']['r_sq_avg']]
-div_nl_noe_r_sq = [data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_cue']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['bfr_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['res_win']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['concat']['r_sq_avg']]
-div_nl_Y_r_sq = [data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_cue']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['bfr_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['res_win']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['concat']['r_sq_avg']]
-div_nl_separate_add_r_sq = [data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_cue']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['bfr_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['res_win']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['concat']['r_sq_avg']]
-div_nl_separate_multiply_r_sq = [data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_cue']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['bfr_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_res']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['res_win']['r_sq_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['concat']['r_sq_avg']]
-
-worksheet.write(24,0,'PMd: Avg r2')
-worksheet.write_row(24,1,type_names)
-worksheet.write_row(25,1,lin_r_sq)
-worksheet.write_row(26,1,diff_r_sq)
-worksheet.write_row(27,1,div_nl_r_sq)
-worksheet.write_row(28,1,div_nl_noe_r_sq)
-worksheet.write_row(29,1,div_nl_Y_r_sq)
-worksheet.write_row(30,1,div_nl_separate_add_r_sq)
-worksheet.write_row(31,1,div_nl_separate_multiply_r_sq)
-worksheet.write_column(25,0,model_names)
-
-worksheet.conditional_format('B26:B32', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('C26:C32', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('D26:D32', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('E26:E32', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('F26:F32', {'type': 'top', 'value':'1', 'format':format1})
-
-
-####
-lin_r_sq = [data_dict_all['M1_dicts']['models']['linear']['aft_cue']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['linear']['bfr_res']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['linear']['aft_res']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['linear']['res_win']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['linear']['concat']['r_sq_adj_avg']]
-diff_r_sq = [data_dict_all['M1_dicts']['models']['diff']['aft_cue']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['diff']['bfr_res']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['diff']['aft_res']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['diff']['res_win']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['diff']['concat']['r_sq_adj_avg']]
-div_nl_r_sq = [data_dict_all['M1_dicts']['models']['div_nl']['aft_cue']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl']['bfr_res']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl']['aft_res']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl']['res_win']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl']['concat']['r_sq_adj_avg']]
-div_nl_noe_r_sq = [data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_cue']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['bfr_res']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['aft_res']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['res_win']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_noe']['concat']['r_sq_adj_avg']]
-div_nl_Y_r_sq = [data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_cue']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['bfr_res']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['aft_res']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['res_win']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_Y']['concat']['r_sq_adj_avg']]
-div_nl_separate_add_r_sq = [data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_cue']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['bfr_res']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['aft_res']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['res_win']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_add']['concat']['r_sq_adj_avg']]
-div_nl_separate_multiply_r_sq = [data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['aft_res']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['res_win']['r_sq_adj_avg'],data_dict_all['M1_dicts']['models']['div_nl_separate_multiply']['concat']['r_sq_adj_avg']]
-
-worksheet.write(0,0,'M1: avg adj r2')
-worksheet.write_row(0,1,type_names)
-worksheet.write_row(1,1,lin_r_sq)
-worksheet.write_row(2,1,diff_r_sq)
-worksheet.write_row(3,1,div_nl_r_sq)
-worksheet.write_row(4,1,div_nl_noe_r_sq)
-worksheet.write_row(5,1,div_nl_Y_r_sq)
-worksheet.write_row(6,1,div_nl_separate_add_r_sq)
-worksheet.write_row(7,1,div_nl_separate_multiply_r_sq)
-worksheet.write_column(1,0,model_names)
-
-worksheet.conditional_format('B2:B8', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('C2:C8', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('D2:D8', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('E2:E8', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('F2:F8', {'type': 'top', 'value':'1', 'format':format1})
-
-lin_r_sq = [data_dict_all['S1_dicts']['models']['linear']['aft_cue']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['linear']['bfr_res']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['linear']['aft_res']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['linear']['res_win']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['linear']['concat']['r_sq_adj_avg']]
-diff_r_sq = [data_dict_all['S1_dicts']['models']['diff']['aft_cue']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['diff']['bfr_res']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['diff']['aft_res']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['diff']['res_win']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['diff']['concat']['r_sq_adj_avg']]
-div_nl_r_sq = [data_dict_all['S1_dicts']['models']['div_nl']['aft_cue']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl']['bfr_res']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl']['aft_res']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl']['res_win']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl']['concat']['r_sq_adj_avg']]
-div_nl_noe_r_sq = [data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_cue']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['bfr_res']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['aft_res']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['res_win']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_noe']['concat']['r_sq_adj_avg']]
-div_nl_Y_r_sq = [data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_cue']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['bfr_res']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['aft_res']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['res_win']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_Y']['concat']['r_sq_adj_avg']]
-div_nl_separate_add_r_sq = [data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_cue']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['bfr_res']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['aft_res']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['res_win']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_add']['concat']['r_sq_adj_avg']]
-div_nl_separate_multiply_r_sq = [data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_cue']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['bfr_res']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['aft_res']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['res_win']['r_sq_adj_avg'],data_dict_all['S1_dicts']['models']['div_nl_separate_multiply']['concat']['r_sq_adj_avg']]
-
-worksheet.write(12,0,'S1: avg adj r2')
-worksheet.write_row(12,1,type_names)
-worksheet.write_row(13,1,lin_r_sq)
-worksheet.write_row(14,1,diff_r_sq)
-worksheet.write_row(15,1,div_nl_r_sq)
-worksheet.write_row(16,1,div_nl_noe_r_sq)
-worksheet.write_row(17,1,div_nl_Y_r_sq)
-worksheet.write_row(18,1,div_nl_separate_add_r_sq)
-worksheet.write_row(19,1,div_nl_separate_multiply_r_sq)
-worksheet.write_column(13,0,model_names)
-
-worksheet.conditional_format('B14:B20', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('C14:C20', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('D14:D20', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('E14:E20', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('F14:F20', {'type': 'top', 'value':'1', 'format':format1})
-
-lin_r_sq = [data_dict_all['PmD_dicts']['models']['linear']['aft_cue']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['linear']['bfr_res']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['linear']['aft_res']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['linear']['res_win']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['linear']['concat']['r_sq_adj_avg']]
-diff_r_sq = [data_dict_all['PmD_dicts']['models']['diff']['aft_cue']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['diff']['bfr_res']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['diff']['aft_res']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['diff']['res_win']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['diff']['concat']['r_sq_adj_avg']]
-div_nl_r_sq = [data_dict_all['PmD_dicts']['models']['div_nl']['aft_cue']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['bfr_res']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['aft_res']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['res_win']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl']['concat']['r_sq_adj_avg']]
-div_nl_noe_r_sq = [data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_cue']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['bfr_res']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['aft_res']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['res_win']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_noe']['concat']['r_sq_adj_avg']]
-div_nl_Y_r_sq = [data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_cue']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['bfr_res']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['aft_res']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['res_win']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_Y']['concat']['r_sq_adj_avg']]
-div_nl_separate_add_r_sq = [data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_cue']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['bfr_res']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['aft_res']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['res_win']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_add']['concat']['r_sq_adj_avg']]
-div_nl_separate_multiply_r_sq = [data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_cue']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['bfr_res']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['aft_res']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['res_win']['r_sq_adj_avg'],data_dict_all['PmD_dicts']['models']['div_nl_separate_multiply']['concat']['r_sq_adj_avg']]
-
-worksheet.write(24,0,'PMd: Avg adj r2')
-worksheet.write_row(24,1,type_names)
-worksheet.write_row(25,1,lin_r_sq)
-worksheet.write_row(26,1,diff_r_sq)
-worksheet.write_row(27,1,div_nl_r_sq)
-worksheet.write_row(28,1,div_nl_noe_r_sq)
-worksheet.write_row(29,1,div_nl_Y_r_sq)
-worksheet.write_row(30,1,div_nl_separate_add_r_sq)
-worksheet.write_row(31,1,div_nl_separate_multiply_r_sq)
-worksheet.write_column(25,0,model_names)
-
-worksheet.conditional_format('B26:B32', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('C26:C32', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('D26:D32', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('E26:E32', {'type': 'top', 'value':'1', 'format':format1})
-worksheet.conditional_format('F26:F32', {'type': 'top', 'value':'1', 'format':format1})
-
-aic_workbook.close()
 
 ###########
 
