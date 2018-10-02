@@ -411,8 +411,6 @@ for region_key,region_val in file_dict[0].iteritems():
                 for unit_num in range(np.shape(frs)[1]):
                     all_list.append((frs[:,unit_num,:],np.array((r_vals,p_vals,succ_vals))))
 
-
-
                 unit_ct += frs.shape[1]
                 r_p_all[trial_ct : trial_ct + np.shape(r_vals)[0],:] = np.column_stack((r_vals,p_vals,succ_vals))
                 trial_ct += np.shape(r_vals)[0]
@@ -431,8 +429,8 @@ for region_key,region_val in data_dict_all.iteritems():
     print 'region: %s' %(region_key)
     
     data_dict_all[region_key]['classification_output'] = {}
+    data_dict_all[region_key]['classification_output_all'] = {}
 
-    #file_dict = data_dict_all[region_key]['file_dict']
     file_length = np.shape(file_dict.keys())[0]
     avg_and_corr = data_dict_all[region_key]['avg_and_corr']
 
@@ -440,6 +438,7 @@ for region_key,region_val in data_dict_all.iteritems():
     total_unit_num = avg_and_corr['aft_cue']['total_unit_num']
         
     output_by_window = {}
+    output_by_window_all = {}
     for win_key,win_val in data_dict_all[region_key]['avg_and_corr'].iteritems():
         all_list =  win_val['all_list']
 
@@ -447,20 +446,24 @@ for region_key,region_val in data_dict_all.iteritems():
         #general pattern: [accuracy_samme, accuracy_sammer, chance, shuffled, .....]  (for now shuffle = samme.r?)
         
         #shorter for devel
-        accuracy_list_total = np.zeros((np.shape(all_list)[0],32))
-        #accuracy_list_total = np.zeros((3,32))
+        #accuracy_list_total = np.zeros((np.shape(all_list)[0],32))
+        accuracy_list_total = np.zeros((1,32))
         
         print 'window: %s' %(win_key)
 
         
         #shorter for devel
-        for unit_num in range(np.shape(all_list)[0]):
-        #for unit_num in range(3):
+        #for unit_num in range(np.shape(all_list)[0]):
+        for unit_num in range(1):
             
             #TODO set up diff variations of target here
             #succ/fail high even aft cue- b/ of more succ? unequal distrib? 
             #how many times run? What best test/train split?
             #use SAMME.R for shuffled for now
+
+
+            #TODO add: succ delivered or not, punishment delivered or not (l/u)
+
 
             r_level_out = run_adaboost(all_list[unit_num][0],all_list[unit_num][1][0,:])
             p_level_out = run_adaboost(all_list[unit_num][0],all_list[unit_num][1][1,:])
@@ -598,15 +601,102 @@ for region_key,region_val in data_dict_all.iteritems():
         plt.subplots_adjust(top=0.9)
         plt.savefig('unit_accuracy_hist_2_%s_%s' %(region_key,win_key))
         plt.clf()
-            
-    data_dict_all[region_key]['classification_output'] = output_by_window
 
+        #run on whole data
+        file_overview = np.zeros((np.shape(file_dict.keys())[0],2))
+        for block_num in range(np.shape(file_dict.keys())[0]):
+            file_overview[block_num] = [np.shape(file_dict[block_num][region_key][win_key])[0],np.shape(file_dict[block_num][region_key][win_key])[1]]
+        
+        ind = 0
+        r_all = ()
+        p_all = ()
+        s_all = ()
+        unit = int(0)
+        for block_num in range(np.shape(file_dict.keys())[0]):
+            for temp in range(int(file_overview[block_num,1])):
+                r_all = np.append(r_all,all_list[unit][1][0,:])
+                p_all = np.append(p_all,all_list[unit][1][1,:])
+                s_all = np.append(s_all,all_list[unit][1][2,:])
+            unit += int(file_overview[block_num,1])
+
+        rps_all = [r_all,p_all,s_all]
+
+        frs_all = ()
+        for temp in range(np.shape(all_list)[0]):
+            if temp == 0:
+                frs_all = all_list[temp][0]
+            else:
+                frs_all = np.append(frs_all,all_list[temp][0],axis=0)
+
+
+        r_level_all_out = run_adaboost(frs_all,rps_all[0])
+        p_level_all_out = run_adaboost(frs_all,rps_all[1])
+        succ_all_out = run_adaboost(frs_all,rps_all[2])
+        
+        ##
+        r_nr_targs = np.where(rps_all[0] > 0,1,0)
+        p_np_targs = np.where(rps_all[1] > 0,1,0)
+            
+        r_bin_all_out = run_adaboost(frs_all,r_nr_targs)
+        p_bin_all_out = run_adaboost(frs_all,p_np_targs)
+            
+        comb = np.zeros((np.shape(r_nr_targs)[0]))
+        for i in range(np.shape(r_nr_targs)[0]):
+            if r_nr_targs[i] == 0 and p_np_targs[i] == 0:
+                comb[i] = 0
+            elif r_nr_targs[i] == 1 and p_np_targs[i] == 0:
+                comb[i] = 1
+            elif r_nr_targs[i] == 0 and p_np_targs[i] == 1:
+                comb[i] = 2
+            elif r_nr_targs[i] == 1 and p_np_targs[i] == 1:
+                comb[i] = 3
+                
+        comb_all_out = run_adaboost(frs_all,comb)
+
+        r_bin_sf_targ = np.zeros((np.shape(r_nr_targs)[0]))
+        for i in range(np.shape(r_nr_targs)[0]):
+            if r_nr_targs[i] == 0 and rps_all[2][i] == 0:
+                r_bin_sf_targ[i] = 0
+            elif r_nr_targs[i] == 1 and rps_all[2][i] == 0:
+                r_bin_sf_targ[i] = 1
+            elif r_nr_targs[i] == 0 and rps_all[2][i] == 1:
+                r_bin_sf_targ[i] = 2
+            elif r_nr_targs[i] == 1 and rps_all[2][i] == 1:
+                r_bin_sf_targ[i] = 3
+
+        p_bin_sf_targ = np.zeros((np.shape(p_np_targs)[0]))
+        for i in range(np.shape(p_np_targs)[0]):
+            if p_np_targs[i] == 0 and rps_all[2][i] == 0:
+                p_bin_sf_targ[i] = 0
+            elif p_np_targs[i] == 1 and rps_all[2][i] == 0:
+                p_bin_sf_targ[i] = 1
+            elif p_np_targs[i] == 0 and rps_all[2][i] == 1:
+                p_bin_sf_targ[i] = 2
+            elif p_np_targs[i] == 1 and rps_all[2][i] == 1:
+                p_bin_sf_targ[i] = 3
+
+        r_bin_sf_all_out = run_adaboost(frs_all,r_bin_sf_targ)
+        p_bin_sf_all_out = run_adaboost(frs_all,p_bin_sf_targ)
+
+        #r_level_all_out = {'accuracy_samme':1,'accuracy_sammer':2,'shuffle_accuracy_samme':1,'shuffle_accuracy_sammer':0,'chance':0}
+        #p_level_all_out = {'accuracy_samme':1,'accuracy_sammer':2,'shuffle_accuracy_samme':1,'shuffle_accuracy_sammer':0,'chance':0}
+        #succ_all_out = {'accuracy_samme':1,'accuracy_sammer':2,'shuffle_accuracy_samme':1,'shuffle_accuracy_sammer':0,'chance':0}
+        #r_bin_all_out = {'accuracy_samme':1,'accuracy_sammer':2,'shuffle_accuracy_samme':1,'shuffle_accuracy_sammer':0,'chance':0}
+        #p_bin_all_out = {'accuracy_samme':1,'accuracy_sammer':2,'shuffle_accuracy_samme':1,'shuffle_accuracy_sammer':0,'chance':0}
+        #comb_all_out = {'accuracy_samme':1,'accuracy_sammer':2,'shuffle_accuracy_samme':1,'shuffle_accuracy_sammer':0,'chance':0}
+        #r_bin_sf_all_out = {'accuracy_samme':1,'accuracy_sammer':2,'shuffle_accuracy_samme':1,'shuffle_accuracy_sammer':0,'chance':0}
+        #p_bin_sf_all_out = {'accuracy_samme':1,'accuracy_sammer':2,'shuffle_accuracy_samme':1,'shuffle_accuracy_sammer':0,'chance':0}
+
+        output_by_window_all[win_key] = {'r_level_all':r_level_all_out,'p_level_all':p_level_all_out,'succ_all':succ_all_out,'r_bin_all':r_bin_all_out,'p_bin_all':p_bin_all_out,'comb_all':comb_all_out,'r_bin_sf_all':r_bin_sf_all_out,'p_bin_sf_all':p_bin_sf_all_out}
+
+    data_dict_all[region_key]['classification_output'] = output_by_window
+    data_dict_all[region_key]['classification_output_all'] = output_by_window_all
 
 np.save('backup.npy',data_dict_all)
 
 
 
-#################3
+#################
 
 
 #if xlsx currently exists delte, or else won't write properly
@@ -627,8 +717,11 @@ r_level_accuracies = [np.sum(temp['aft_cue'][:,1] > temp['aft_cue'][:,3])/float(
 p_level_accuracies = [np.sum(temp['aft_cue'][:,5] > temp['aft_cue'][:,7])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,5] > temp['bfr_res'][:,7])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,5] > temp['aft_res'][:,7])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,5] > temp['res_win'][:,7])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,5] > temp['concat'][:,7])/float(np.shape(temp['concat'])[0])]
 succ_accuracies = [np.sum(temp['aft_cue'][:,9] > temp['aft_cue'][:,11])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,9] > temp['bfr_res'][:,11])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,9] > temp['aft_res'][:,11])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,9] > temp['res_win'][:,11])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,9] > temp['concat'][:,11])/float(np.shape(temp['concat'])[0])]
 
-
-
+comb_accuracies = [np.sum(temp['aft_cue'][:,13] > temp['aft_cue'][:,15])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,13] > temp['bfr_res'][:,15])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,13] > temp['aft_res'][:,15])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,13] > temp['res_win'][:,15])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,13] > temp['concat'][:,15])/float(np.shape(temp['concat'])[0])]
+r_bin_accuracies = [np.sum(temp['aft_cue'][:,17] > temp['aft_cue'][:,19])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,17] > temp['bfr_res'][:,19])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,17] > temp['aft_res'][:,19])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,17] > temp['res_win'][:,19])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,17] > temp['concat'][:,19])/float(np.shape(temp['concat'])[0])]
+p_bin_accuracies = [np.sum(temp['aft_cue'][:,21] > temp['aft_cue'][:,23])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,21] > temp['bfr_res'][:,23])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,21] > temp['aft_res'][:,23])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,21] > temp['res_win'][:,23])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,21] > temp['concat'][:,23])/float(np.shape(temp['concat'])[0])]
+r_bin_sf_accuracies =[np.sum(temp['aft_cue'][:,25] > temp['aft_cue'][:,27])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,25] > temp['bfr_res'][:,27])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,25] > temp['aft_res'][:,27])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,25] > temp['res_win'][:,27])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,25] > temp['concat'][:,27])/float(np.shape(temp['concat'])[0])]
+p_bin_sf_accuracies = [np.sum(temp['aft_cue'][:,29] > temp['aft_cue'][:,31])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,29] > temp['bfr_res'][:,31])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,29] > temp['aft_res'][:,31])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,29] > temp['res_win'][:,31])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,29] > temp['concat'][:,31])/float(np.shape(temp['concat'])[0])]
 
 
 worksheet.write(0,0,'M1: percent better than shuffled')
@@ -637,18 +730,34 @@ worksheet.write_column(1,0,type_names)
 worksheet.write_column(1,1,r_level_accuracies)
 worksheet.write_column(1,2,p_level_accuracies)
 worksheet.write_column(1,3,succ_accuracies)
+worksheet.write_column(1,4,comb_accuracies)
+worksheet.write_column(1,5,r_bin_accuracies)
+worksheet.write_column(1,6,p_bin_accuracies)
+worksheet.write_column(1,7,r_bin_sf_accuracies)
+worksheet.write_column(1,8,p_bin_sf_accuracies)
 
 r_level_accuracies = [np.sum(temp['aft_cue'][:,1] > temp['aft_cue'][:,2])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,1] > temp['bfr_res'][:,2])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,1] > temp['aft_res'][:,2])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,1] > temp['res_win'][:,2])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,1] > temp['concat'][:,2])/float(np.shape(temp['concat'])[0])]
 p_level_accuracies = [np.sum(temp['aft_cue'][:,5] > temp['aft_cue'][:,6])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,5] > temp['bfr_res'][:,6])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,5] > temp['aft_res'][:,6])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,5] > temp['res_win'][:,6])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,5] > temp['concat'][:,6])/float(np.shape(temp['concat'])[0])]
 succ_accuracies = [np.sum(temp['aft_cue'][:,9] > temp['aft_cue'][:,10])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,9] > temp['bfr_res'][:,10])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,9] > temp['aft_res'][:,10])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,9] > temp['res_win'][:,10])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,9] > temp['concat'][:,10])/float(np.shape(temp['concat'])[0])]
 
+comb_accuracies = [np.sum(temp['aft_cue'][:,13] > temp['aft_cue'][:,14])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,13] > temp['bfr_res'][:,14])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,13] > temp['aft_res'][:,14])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,13] > temp['res_win'][:,14])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,13] > temp['concat'][:,14])/float(np.shape(temp['concat'])[0])]
+r_bin_accuracies = [np.sum(temp['aft_cue'][:,17] > temp['aft_cue'][:,18])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,17] > temp['bfr_res'][:,18])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,17] > temp['aft_res'][:,18])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,17] > temp['res_win'][:,18])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,17] > temp['concat'][:,18])/float(np.shape(temp['concat'])[0])]
+p_bin_accuracies = [np.sum(temp['aft_cue'][:,21] > temp['aft_cue'][:,22])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,21] > temp['bfr_res'][:,22])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,21] > temp['aft_res'][:,22])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,21] > temp['res_win'][:,22])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,21] > temp['concat'][:,22])/float(np.shape(temp['concat'])[0])]
+r_bin_sf_accuracies =[np.sum(temp['aft_cue'][:,25] > temp['aft_cue'][:,26])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,25] > temp['bfr_res'][:,26])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,25] > temp['aft_res'][:,26])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,25] > temp['res_win'][:,26])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,25] > temp['concat'][:,26])/float(np.shape(temp['concat'])[0])]
+p_bin_sf_accuracies = [np.sum(temp['aft_cue'][:,29] > temp['aft_cue'][:,30])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,29] > temp['bfr_res'][:,30])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,29] > temp['aft_res'][:,30])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,29] > temp['res_win'][:,30])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,29] > temp['concat'][:,30])/float(np.shape(temp['concat'])[0])]
 
-worksheet.write(0,8,'M1: percent better than chance')
-worksheet.write_row(0,9,comb_names)
-worksheet.write_column(1,8,type_names)
-worksheet.write_column(1,9,r_level_accuracies)
-worksheet.write_column(1,10,p_level_accuracies)
-worksheet.write_column(1,11,succ_accuracies)
+
+worksheet.write(0,10,'M1: percent better than chance')
+worksheet.write_row(0,11,comb_names)
+worksheet.write_column(1,10,type_names)
+worksheet.write_column(1,11,r_level_accuracies)
+worksheet.write_column(1,12,p_level_accuracies)
+worksheet.write_column(1,13,succ_accuracies)
+worksheet.write_column(1,14,comb_accuracies)
+worksheet.write_column(1,15,r_bin_accuracies)
+worksheet.write_column(1,16,p_bin_accuracies)
+worksheet.write_column(1,17,r_bin_sf_accuracies)
+worksheet.write_column(1,18,p_bin_sf_accuracies)
 
 ##
 temp = data_dict_all['S1_dicts']['classification_output']
@@ -657,6 +766,12 @@ r_level_accuracies = [np.sum(temp['aft_cue'][:,1] > temp['aft_cue'][:,3])/float(
 p_level_accuracies = [np.sum(temp['aft_cue'][:,5] > temp['aft_cue'][:,7])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,5] > temp['bfr_res'][:,7])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,5] > temp['aft_res'][:,7])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,5] > temp['res_win'][:,7])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,5] > temp['concat'][:,7])/float(np.shape(temp['concat'])[0])]
 succ_accuracies = [np.sum(temp['aft_cue'][:,9] > temp['aft_cue'][:,11])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,9] > temp['bfr_res'][:,11])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,9] > temp['aft_res'][:,11])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,9] > temp['res_win'][:,11])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,9] > temp['concat'][:,11])/float(np.shape(temp['concat'])[0])]
 
+comb_accuracies = [np.sum(temp['aft_cue'][:,13] > temp['aft_cue'][:,15])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,13] > temp['bfr_res'][:,15])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,13] > temp['aft_res'][:,15])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,13] > temp['res_win'][:,15])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,13] > temp['concat'][:,15])/float(np.shape(temp['concat'])[0])]
+r_bin_accuracies = [np.sum(temp['aft_cue'][:,17] > temp['aft_cue'][:,19])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,17] > temp['bfr_res'][:,19])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,17] > temp['aft_res'][:,19])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,17] > temp['res_win'][:,19])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,17] > temp['concat'][:,19])/float(np.shape(temp['concat'])[0])]
+p_bin_accuracies = [np.sum(temp['aft_cue'][:,21] > temp['aft_cue'][:,23])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,21] > temp['bfr_res'][:,23])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,21] > temp['aft_res'][:,23])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,21] > temp['res_win'][:,23])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,21] > temp['concat'][:,23])/float(np.shape(temp['concat'])[0])]
+r_bin_sf_accuracies =[np.sum(temp['aft_cue'][:,25] > temp['aft_cue'][:,27])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,25] > temp['bfr_res'][:,27])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,25] > temp['aft_res'][:,27])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,25] > temp['res_win'][:,27])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,25] > temp['concat'][:,27])/float(np.shape(temp['concat'])[0])]
+p_bin_sf_accuracies = [np.sum(temp['aft_cue'][:,29] > temp['aft_cue'][:,31])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,29] > temp['bfr_res'][:,31])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,29] > temp['aft_res'][:,31])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,29] > temp['res_win'][:,31])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,29] > temp['concat'][:,31])/float(np.shape(temp['concat'])[0])]
+
 
 worksheet.write(8,0,'S1: percent better than shuffled')
 worksheet.write_row(8,1,comb_names)
@@ -664,18 +779,34 @@ worksheet.write_column(9,0,type_names)
 worksheet.write_column(9,1,r_level_accuracies)
 worksheet.write_column(9,2,p_level_accuracies)
 worksheet.write_column(9,3,succ_accuracies)
+worksheet.write_column(9,4,comb_accuracies)
+worksheet.write_column(9,5,r_bin_accuracies)
+worksheet.write_column(9,6,p_bin_accuracies)
+worksheet.write_column(9,7,r_bin_sf_accuracies)
+worksheet.write_column(9,8,p_bin_sf_accuracies)
 
 r_level_accuracies = [np.sum(temp['aft_cue'][:,1] > temp['aft_cue'][:,2])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,1] > temp['bfr_res'][:,2])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,1] > temp['aft_res'][:,2])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,1] > temp['res_win'][:,2])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,1] > temp['concat'][:,2])/float(np.shape(temp['concat'])[0])]
 p_level_accuracies = [np.sum(temp['aft_cue'][:,5] > temp['aft_cue'][:,6])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,5] > temp['bfr_res'][:,6])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,5] > temp['aft_res'][:,6])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,5] > temp['res_win'][:,6])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,5] > temp['concat'][:,6])/float(np.shape(temp['concat'])[0])]
 succ_accuracies = [np.sum(temp['aft_cue'][:,9] > temp['aft_cue'][:,10])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,9] > temp['bfr_res'][:,10])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,9] > temp['aft_res'][:,10])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,9] > temp['res_win'][:,10])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,9] > temp['concat'][:,10])/float(np.shape(temp['concat'])[0])]
 
+comb_accuracies = [np.sum(temp['aft_cue'][:,13] > temp['aft_cue'][:,14])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,13] > temp['bfr_res'][:,14])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,13] > temp['aft_res'][:,14])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,13] > temp['res_win'][:,14])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,13] > temp['concat'][:,14])/float(np.shape(temp['concat'])[0])]
+r_bin_accuracies = [np.sum(temp['aft_cue'][:,17] > temp['aft_cue'][:,18])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,17] > temp['bfr_res'][:,18])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,17] > temp['aft_res'][:,18])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,17] > temp['res_win'][:,18])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,17] > temp['concat'][:,18])/float(np.shape(temp['concat'])[0])]
+p_bin_accuracies = [np.sum(temp['aft_cue'][:,21] > temp['aft_cue'][:,22])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,21] > temp['bfr_res'][:,22])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,21] > temp['aft_res'][:,22])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,21] > temp['res_win'][:,22])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,21] > temp['concat'][:,22])/float(np.shape(temp['concat'])[0])]
+r_bin_sf_accuracies =[np.sum(temp['aft_cue'][:,25] > temp['aft_cue'][:,26])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,25] > temp['bfr_res'][:,26])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,25] > temp['aft_res'][:,26])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,25] > temp['res_win'][:,26])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,25] > temp['concat'][:,26])/float(np.shape(temp['concat'])[0])]
+p_bin_sf_accuracies = [np.sum(temp['aft_cue'][:,29] > temp['aft_cue'][:,30])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,29] > temp['bfr_res'][:,30])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,29] > temp['aft_res'][:,30])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,29] > temp['res_win'][:,30])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,29] > temp['concat'][:,30])/float(np.shape(temp['concat'])[0])]
 
-worksheet.write(8,8,'S1: percent better than chance')
-worksheet.write_row(8,9,comb_names)
-worksheet.write_column(9,8,type_names)
-worksheet.write_column(9,9,r_level_accuracies)
-worksheet.write_column(9,10,p_level_accuracies)
-worksheet.write_column(9,11,succ_accuracies)
+
+worksheet.write(8,10,'S1: percent better than chance')
+worksheet.write_row(8,11,comb_names)
+worksheet.write_column(9,10,type_names)
+worksheet.write_column(9,11,r_level_accuracies)
+worksheet.write_column(9,12,p_level_accuracies)
+worksheet.write_column(9,13,succ_accuracies)
+worksheet.write_column(9,14,comb_accuracies)
+worksheet.write_column(9,15,r_bin_accuracies)
+worksheet.write_column(9,16,p_bin_accuracies)
+worksheet.write_column(9,17,r_bin_sf_accuracies)
+worksheet.write_column(9,18,p_bin_sf_accuracies)
 
 ##
 temp = data_dict_all['PmD_dicts']['classification_output']
@@ -684,6 +815,13 @@ r_level_accuracies = [np.sum(temp['aft_cue'][:,1] > temp['aft_cue'][:,3])/float(
 p_level_accuracies = [np.sum(temp['aft_cue'][:,5] > temp['aft_cue'][:,7])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,5] > temp['bfr_res'][:,7])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,5] > temp['aft_res'][:,7])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,5] > temp['res_win'][:,7])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,5] > temp['concat'][:,7])/float(np.shape(temp['concat'])[0])]
 succ_accuracies = [np.sum(temp['aft_cue'][:,9] > temp['aft_cue'][:,11])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,9] > temp['bfr_res'][:,11])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,9] > temp['aft_res'][:,11])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,9] > temp['res_win'][:,11])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,9] > temp['concat'][:,11])/float(np.shape(temp['concat'])[0])]
 
+comb_accuracies = [np.sum(temp['aft_cue'][:,13] > temp['aft_cue'][:,15])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,13] > temp['bfr_res'][:,15])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,13] > temp['aft_res'][:,15])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,13] > temp['res_win'][:,15])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,13] > temp['concat'][:,15])/float(np.shape(temp['concat'])[0])]
+r_bin_accuracies = [np.sum(temp['aft_cue'][:,17] > temp['aft_cue'][:,19])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,17] > temp['bfr_res'][:,19])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,17] > temp['aft_res'][:,19])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,17] > temp['res_win'][:,19])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,17] > temp['concat'][:,19])/float(np.shape(temp['concat'])[0])]
+p_bin_accuracies = [np.sum(temp['aft_cue'][:,21] > temp['aft_cue'][:,23])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,21] > temp['bfr_res'][:,23])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,21] > temp['aft_res'][:,23])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,21] > temp['res_win'][:,23])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,21] > temp['concat'][:,23])/float(np.shape(temp['concat'])[0])]
+r_bin_sf_accuracies =[np.sum(temp['aft_cue'][:,25] > temp['aft_cue'][:,27])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,25] > temp['bfr_res'][:,27])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,25] > temp['aft_res'][:,27])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,25] > temp['res_win'][:,27])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,25] > temp['concat'][:,27])/float(np.shape(temp['concat'])[0])]
+p_bin_sf_accuracies = [np.sum(temp['aft_cue'][:,29] > temp['aft_cue'][:,31])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,29] > temp['bfr_res'][:,31])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,29] > temp['aft_res'][:,31])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,29] > temp['res_win'][:,31])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,29] > temp['concat'][:,31])/float(np.shape(temp['concat'])[0])]
+
+
 
 worksheet.write(16,0,'PMd: percent better than shuffled')
 worksheet.write_row(16,1,comb_names)
@@ -691,19 +829,271 @@ worksheet.write_column(17,0,type_names)
 worksheet.write_column(17,1,r_level_accuracies)
 worksheet.write_column(17,2,p_level_accuracies)
 worksheet.write_column(17,3,succ_accuracies)
+worksheet.write_column(17,4,comb_accuracies)
+worksheet.write_column(17,5,r_bin_accuracies)
+worksheet.write_column(17,6,p_bin_accuracies)
+worksheet.write_column(17,7,r_bin_sf_accuracies)
+worksheet.write_column(17,8,p_bin_sf_accuracies)
 
 r_level_accuracies = [np.sum(temp['aft_cue'][:,1] > temp['aft_cue'][:,2])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,1] > temp['bfr_res'][:,2])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,1] > temp['aft_res'][:,2])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,1] > temp['res_win'][:,2])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,1] > temp['concat'][:,2])/float(np.shape(temp['concat'])[0])]
 p_level_accuracies = [np.sum(temp['aft_cue'][:,5] > temp['aft_cue'][:,6])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,5] > temp['bfr_res'][:,6])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,5] > temp['aft_res'][:,6])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,5] > temp['res_win'][:,6])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,5] > temp['concat'][:,6])/float(np.shape(temp['concat'])[0])]
 succ_accuracies = [np.sum(temp['aft_cue'][:,9] > temp['aft_cue'][:,10])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,9] > temp['bfr_res'][:,10])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,9] > temp['aft_res'][:,10])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,9] > temp['res_win'][:,10])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,9] > temp['concat'][:,10])/float(np.shape(temp['concat'])[0])]
 
+comb_accuracies = [np.sum(temp['aft_cue'][:,13] > temp['aft_cue'][:,14])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,13] > temp['bfr_res'][:,14])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,13] > temp['aft_res'][:,14])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,13] > temp['res_win'][:,14])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,13] > temp['concat'][:,14])/float(np.shape(temp['concat'])[0])]
+r_bin_accuracies = [np.sum(temp['aft_cue'][:,17] > temp['aft_cue'][:,18])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,17] > temp['bfr_res'][:,18])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,17] > temp['aft_res'][:,18])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,17] > temp['res_win'][:,18])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,17] > temp['concat'][:,18])/float(np.shape(temp['concat'])[0])]
+p_bin_accuracies = [np.sum(temp['aft_cue'][:,21] > temp['aft_cue'][:,22])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,21] > temp['bfr_res'][:,22])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,21] > temp['aft_res'][:,22])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,21] > temp['res_win'][:,22])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,21] > temp['concat'][:,22])/float(np.shape(temp['concat'])[0])]
+r_bin_sf_accuracies =[np.sum(temp['aft_cue'][:,25] > temp['aft_cue'][:,26])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,25] > temp['bfr_res'][:,26])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,25] > temp['aft_res'][:,26])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,25] > temp['res_win'][:,26])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,25] > temp['concat'][:,26])/float(np.shape(temp['concat'])[0])]
+p_bin_sf_accuracies = [np.sum(temp['aft_cue'][:,29] > temp['aft_cue'][:,30])/float(np.shape(temp['aft_cue'])[0]),np.sum(temp['bfr_res'][:,29] > temp['bfr_res'][:,30])/float(np.shape(temp['bfr_res'])[0]),np.sum(temp['aft_res'][:,29] > temp['aft_res'][:,30])/float(np.shape(temp['aft_res'])[0]),np.sum(temp['res_win'][:,29] > temp['res_win'][:,30])/float(np.shape(temp['res_win'])[0]),np.sum(temp['concat'][:,29] > temp['concat'][:,30])/float(np.shape(temp['concat'])[0])]
 
-worksheet.write(16,8,'PMd: percent better than chance')
-worksheet.write_row(16,9,comb_names)
-worksheet.write_column(17,8,type_names)
-worksheet.write_column(17,9,r_level_accuracies)
-worksheet.write_column(17,10,p_level_accuracies)
-worksheet.write_column(17,11,succ_accuracies)
 
+worksheet.write(16,10,'PMd: percent better than chance')
+worksheet.write_row(16,11,comb_names)
+worksheet.write_column(17,10,type_names)
+worksheet.write_column(17,11,r_level_accuracies)
+worksheet.write_column(17,12,p_level_accuracies)
+worksheet.write_column(17,13,succ_accuracies)
+worksheet.write_column(1,14,comb_accuracies)
+worksheet.write_column(1,15,r_bin_accuracies)
+worksheet.write_column(1,16,p_bin_accuracies)
+worksheet.write_column(1,17,r_bin_sf_accuracies)
+worksheet.write_column(1,18,p_bin_sf_accuracies)
+
+
+
+
+worksheet = accuracy_workbook.add_worksheet('all_accuracy')
+
+out_names = ['samme accuracy','sammer accuracy','shuffle accuracy samme','shuffle accuracy sammer','chance']
+
+#
+temp = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['r_level_all']
+temp2 = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['p_level_all']
+temp3 = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['succ_all']
+temp4 = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['comb_all']
+temp5 = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['r_bin_all']
+temp6 = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['p_bin_all']
+temp7 = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['r_bin_sf_all']
+temp8 = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['p_bin_sf_all']
+ac = [temp['accuracy_samme'],temp['accuracy_sammer'],temp['shuffle_accuracy_samme'],temp['shuffle_accuracy_sammer'],temp['chance'],temp2['accuracy_samme'],temp2['accuracy_sammer'],temp2['shuffle_accuracy_samme'],temp2['shuffle_accuracy_sammer'],temp2['chance'],temp3['accuracy_samme'],temp3['accuracy_sammer'],temp3['shuffle_accuracy_samme'],temp3['shuffle_accuracy_sammer'],temp3['chance'],temp4['accuracy_samme'],temp4['accuracy_sammer'],temp4['shuffle_accuracy_samme'],temp4['shuffle_accuracy_sammer'],temp4['chance'],temp5['accuracy_samme'],temp5['accuracy_sammer'],temp5['shuffle_accuracy_samme'],temp5['shuffle_accuracy_sammer'],temp5['chance'],temp6['accuracy_samme'],temp6['accuracy_sammer'],temp6['shuffle_accuracy_samme'],temp6['shuffle_accuracy_sammer'],temp6['chance'],temp7['accuracy_samme'],temp7['accuracy_sammer'],temp7['shuffle_accuracy_samme'],temp7['shuffle_accuracy_sammer'],temp7['chance'],temp8['accuracy_samme'],temp8['accuracy_sammer'],temp8['shuffle_accuracy_samme'],temp8['shuffle_accuracy_sammer'],temp8['chance']]
+
+temp = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['r_level_all']
+temp2 = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['p_level_all']
+temp3 = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['succ_all']
+temp4 = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['comb_all']
+temp5 = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['r_bin_all']
+temp6 = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['p_bin_all']
+temp7 = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['r_bin_sf_all']
+temp8 = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['p_bin_sf_all']
+br = [temp['accuracy_samme'],temp['accuracy_sammer'],temp['shuffle_accuracy_samme'],temp['shuffle_accuracy_sammer'],temp['chance'],temp2['accuracy_samme'],temp2['accuracy_sammer'],temp2['shuffle_accuracy_samme'],temp2['shuffle_accuracy_sammer'],temp2['chance'],temp3['accuracy_samme'],temp3['accuracy_sammer'],temp3['shuffle_accuracy_samme'],temp3['shuffle_accuracy_sammer'],temp3['chance'],temp4['accuracy_samme'],temp4['accuracy_sammer'],temp4['shuffle_accuracy_samme'],temp4['shuffle_accuracy_sammer'],temp4['chance'],temp5['accuracy_samme'],temp5['accuracy_sammer'],temp5['shuffle_accuracy_samme'],temp5['shuffle_accuracy_sammer'],temp5['chance'],temp6['accuracy_samme'],temp6['accuracy_sammer'],temp6['shuffle_accuracy_samme'],temp6['shuffle_accuracy_sammer'],temp6['chance'],temp7['accuracy_samme'],temp7['accuracy_sammer'],temp7['shuffle_accuracy_samme'],temp7['shuffle_accuracy_sammer'],temp7['chance'],temp8['accuracy_samme'],temp8['accuracy_sammer'],temp8['shuffle_accuracy_samme'],temp8['shuffle_accuracy_sammer'],temp8['chance']]
+
+temp = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['r_level_all']
+temp2 = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['p_level_all']
+temp3 = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['succ_all']
+temp4 = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['comb_all']
+temp5 = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['r_bin_all']
+temp6 = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['p_bin_all']
+temp7 = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['r_bin_sf_all']
+temp8 = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['p_bin_sf_all']
+ar = [temp['accuracy_samme'],temp['accuracy_sammer'],temp['shuffle_accuracy_samme'],temp['shuffle_accuracy_sammer'],temp['chance'],temp2['accuracy_samme'],temp2['accuracy_sammer'],temp2['shuffle_accuracy_samme'],temp2['shuffle_accuracy_sammer'],temp2['chance'],temp3['accuracy_samme'],temp3['accuracy_sammer'],temp3['shuffle_accuracy_samme'],temp3['shuffle_accuracy_sammer'],temp3['chance'],temp4['accuracy_samme'],temp4['accuracy_sammer'],temp4['shuffle_accuracy_samme'],temp4['shuffle_accuracy_sammer'],temp4['chance'],temp5['accuracy_samme'],temp5['accuracy_sammer'],temp5['shuffle_accuracy_samme'],temp5['shuffle_accuracy_sammer'],temp5['chance'],temp6['accuracy_samme'],temp6['accuracy_sammer'],temp6['shuffle_accuracy_samme'],temp6['shuffle_accuracy_sammer'],temp6['chance'],temp7['accuracy_samme'],temp7['accuracy_sammer'],temp7['shuffle_accuracy_samme'],temp7['shuffle_accuracy_sammer'],temp7['chance'],temp8['accuracy_samme'],temp8['accuracy_sammer'],temp8['shuffle_accuracy_samme'],temp8['shuffle_accuracy_sammer'],temp8['chance']]
+
+temp = data_dict_all['M1_dicts']['classification_output_all']['res_win']['r_level_all']
+temp2 = data_dict_all['M1_dicts']['classification_output_all']['res_win']['p_level_all']
+temp3 = data_dict_all['M1_dicts']['classification_output_all']['res_win']['succ_all']
+temp4 = data_dict_all['M1_dicts']['classification_output_all']['res_win']['comb_all']
+temp5 = data_dict_all['M1_dicts']['classification_output_all']['res_win']['r_bin_all']
+temp6 = data_dict_all['M1_dicts']['classification_output_all']['res_win']['p_bin_all']
+temp7 = data_dict_all['M1_dicts']['classification_output_all']['res_win']['r_bin_sf_all']
+temp8 = data_dict_all['M1_dicts']['classification_output_all']['res_win']['p_bin_sf_all']
+rw = [temp['accuracy_samme'],temp['accuracy_sammer'],temp['shuffle_accuracy_samme'],temp['shuffle_accuracy_sammer'],temp['chance'],temp2['accuracy_samme'],temp2['accuracy_sammer'],temp2['shuffle_accuracy_samme'],temp2['shuffle_accuracy_sammer'],temp2['chance'],temp3['accuracy_samme'],temp3['accuracy_sammer'],temp3['shuffle_accuracy_samme'],temp3['shuffle_accuracy_sammer'],temp3['chance'],temp4['accuracy_samme'],temp4['accuracy_sammer'],temp4['shuffle_accuracy_samme'],temp4['shuffle_accuracy_sammer'],temp4['chance'],temp5['accuracy_samme'],temp5['accuracy_sammer'],temp5['shuffle_accuracy_samme'],temp5['shuffle_accuracy_sammer'],temp5['chance'],temp6['accuracy_samme'],temp6['accuracy_sammer'],temp6['shuffle_accuracy_samme'],temp6['shuffle_accuracy_sammer'],temp6['chance'],temp7['accuracy_samme'],temp7['accuracy_sammer'],temp7['shuffle_accuracy_samme'],temp7['shuffle_accuracy_sammer'],temp7['chance'],temp8['accuracy_samme'],temp8['accuracy_sammer'],temp8['shuffle_accuracy_samme'],temp8['shuffle_accuracy_sammer'],temp8['chance']]
+
+temp = data_dict_all['M1_dicts']['classification_output_all']['concat']['r_level_all']
+temp2 = data_dict_all['M1_dicts']['classification_output_all']['concat']['p_level_all']
+temp3 = data_dict_all['M1_dicts']['classification_output_all']['concat']['succ_all']
+temp4 = data_dict_all['M1_dicts']['classification_output_all']['concat']['comb_all']
+temp5 = data_dict_all['M1_dicts']['classification_output_all']['concat']['r_bin_all']
+temp6 = data_dict_all['M1_dicts']['classification_output_all']['concat']['p_bin_all']
+temp7 = data_dict_all['M1_dicts']['classification_output_all']['concat']['r_bin_sf_all']
+temp8 = data_dict_all['M1_dicts']['classification_output_all']['concat']['p_bin_sf_all']
+ct = [temp['accuracy_samme'],temp['accuracy_sammer'],temp['shuffle_accuracy_samme'],temp['shuffle_accuracy_sammer'],temp['chance'],temp2['accuracy_samme'],temp2['accuracy_sammer'],temp2['shuffle_accuracy_samme'],temp2['shuffle_accuracy_sammer'],temp2['chance'],temp3['accuracy_samme'],temp3['accuracy_sammer'],temp3['shuffle_accuracy_samme'],temp3['shuffle_accuracy_sammer'],temp3['chance'],temp4['accuracy_samme'],temp4['accuracy_sammer'],temp4['shuffle_accuracy_samme'],temp4['shuffle_accuracy_sammer'],temp4['chance'],temp5['accuracy_samme'],temp5['accuracy_sammer'],temp5['shuffle_accuracy_samme'],temp5['shuffle_accuracy_sammer'],temp5['chance'],temp6['accuracy_samme'],temp6['accuracy_sammer'],temp6['shuffle_accuracy_samme'],temp6['shuffle_accuracy_sammer'],temp6['chance'],temp7['accuracy_samme'],temp7['accuracy_sammer'],temp7['shuffle_accuracy_samme'],temp7['shuffle_accuracy_sammer'],temp7['chance'],temp8['accuracy_samme'],temp8['accuracy_sammer'],temp8['shuffle_accuracy_samme'],temp8['shuffle_accuracy_sammer'],temp8['chance']]
+
+worksheet.write(0,0,'M1')
+worksheet.write(0,1,comb_names[0])
+worksheet.write(0,6,comb_names[1])
+worksheet.write(0,11,comb_names[2])
+worksheet.write(0,16,comb_names[3])
+worksheet.write(0,21,comb_names[4])
+worksheet.write(0,26,comb_names[5])
+worksheet.write(0,31,comb_names[6])
+worksheet.write(0,36,comb_names[7])
+
+worksheet.write_row(1,6,out_names)
+worksheet.write_row(1,11,out_names)
+worksheet.write_row(1,16,out_names)
+worksheet.write_row(1,21,out_names)
+worksheet.write_row(1,26,out_names)
+worksheet.write_row(1,31,out_names)
+worksheet.write_row(1,36,out_names)
+
+worksheet.write_column(1,0,type_names)
+worksheet.write_row(2,1,ac)
+worksheet.write_row(3,1,br)
+worksheet.write_row(4,1,ar)
+worksheet.write_row(5,1,rw)
+worksheet.write_row(6,1,ct)
+
+
+#
+temp = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['r_level_all']
+temp2 = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['p_level_all']
+temp3 = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['succ_all']
+temp4 = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['comb_all']
+temp5 = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['r_bin_all']
+temp6 = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['p_bin_all']
+temp7 = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['r_bin_sf_all']
+temp8 = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['p_bin_sf_all']
+ac = [temp['accuracy_samme'],temp['accuracy_sammer'],temp['shuffle_accuracy_samme'],temp['shuffle_accuracy_sammer'],temp['chance'],temp2['accuracy_samme'],temp2['accuracy_sammer'],temp2['shuffle_accuracy_samme'],temp2['shuffle_accuracy_sammer'],temp2['chance'],temp3['accuracy_samme'],temp3['accuracy_sammer'],temp3['shuffle_accuracy_samme'],temp3['shuffle_accuracy_sammer'],temp3['chance'],temp4['accuracy_samme'],temp4['accuracy_sammer'],temp4['shuffle_accuracy_samme'],temp4['shuffle_accuracy_sammer'],temp4['chance'],temp5['accuracy_samme'],temp5['accuracy_sammer'],temp5['shuffle_accuracy_samme'],temp5['shuffle_accuracy_sammer'],temp5['chance'],temp6['accuracy_samme'],temp6['accuracy_sammer'],temp6['shuffle_accuracy_samme'],temp6['shuffle_accuracy_sammer'],temp6['chance'],temp7['accuracy_samme'],temp7['accuracy_sammer'],temp7['shuffle_accuracy_samme'],temp7['shuffle_accuracy_sammer'],temp7['chance'],temp8['accuracy_samme'],temp8['accuracy_sammer'],temp8['shuffle_accuracy_samme'],temp8['shuffle_accuracy_sammer'],temp8['chance']]
+
+temp = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['r_level_all']
+temp2 = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['p_level_all']
+temp3 = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['succ_all']
+temp4 = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['comb_all']
+temp5 = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['r_bin_all']
+temp6 = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['p_bin_all']
+temp7 = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['r_bin_sf_all']
+temp8 = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['p_bin_sf_all']
+br = [temp['accuracy_samme'],temp['accuracy_sammer'],temp['shuffle_accuracy_samme'],temp['shuffle_accuracy_sammer'],temp['chance'],temp2['accuracy_samme'],temp2['accuracy_sammer'],temp2['shuffle_accuracy_samme'],temp2['shuffle_accuracy_sammer'],temp2['chance'],temp3['accuracy_samme'],temp3['accuracy_sammer'],temp3['shuffle_accuracy_samme'],temp3['shuffle_accuracy_sammer'],temp3['chance'],temp4['accuracy_samme'],temp4['accuracy_sammer'],temp4['shuffle_accuracy_samme'],temp4['shuffle_accuracy_sammer'],temp4['chance'],temp5['accuracy_samme'],temp5['accuracy_sammer'],temp5['shuffle_accuracy_samme'],temp5['shuffle_accuracy_sammer'],temp5['chance'],temp6['accuracy_samme'],temp6['accuracy_sammer'],temp6['shuffle_accuracy_samme'],temp6['shuffle_accuracy_sammer'],temp6['chance'],temp7['accuracy_samme'],temp7['accuracy_sammer'],temp7['shuffle_accuracy_samme'],temp7['shuffle_accuracy_sammer'],temp7['chance'],temp8['accuracy_samme'],temp8['accuracy_sammer'],temp8['shuffle_accuracy_samme'],temp8['shuffle_accuracy_sammer'],temp8['chance']]
+
+temp = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['r_level_all']
+temp2 = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['p_level_all']
+temp3 = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['succ_all']
+temp4 = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['comb_all']
+temp5 = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['r_bin_all']
+temp6 = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['p_bin_all']
+temp7 = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['r_bin_sf_all']
+temp8 = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['p_bin_sf_all']
+ar = [temp['accuracy_samme'],temp['accuracy_sammer'],temp['shuffle_accuracy_samme'],temp['shuffle_accuracy_sammer'],temp['chance'],temp2['accuracy_samme'],temp2['accuracy_sammer'],temp2['shuffle_accuracy_samme'],temp2['shuffle_accuracy_sammer'],temp2['chance'],temp3['accuracy_samme'],temp3['accuracy_sammer'],temp3['shuffle_accuracy_samme'],temp3['shuffle_accuracy_sammer'],temp3['chance'],temp4['accuracy_samme'],temp4['accuracy_sammer'],temp4['shuffle_accuracy_samme'],temp4['shuffle_accuracy_sammer'],temp4['chance'],temp5['accuracy_samme'],temp5['accuracy_sammer'],temp5['shuffle_accuracy_samme'],temp5['shuffle_accuracy_sammer'],temp5['chance'],temp6['accuracy_samme'],temp6['accuracy_sammer'],temp6['shuffle_accuracy_samme'],temp6['shuffle_accuracy_sammer'],temp6['chance'],temp7['accuracy_samme'],temp7['accuracy_sammer'],temp7['shuffle_accuracy_samme'],temp7['shuffle_accuracy_sammer'],temp7['chance'],temp8['accuracy_samme'],temp8['accuracy_sammer'],temp8['shuffle_accuracy_samme'],temp8['shuffle_accuracy_sammer'],temp8['chance']]
+
+temp = data_dict_all['S1_dicts']['classification_output_all']['res_win']['r_level_all']
+temp2 = data_dict_all['S1_dicts']['classification_output_all']['res_win']['p_level_all']
+temp3 = data_dict_all['S1_dicts']['classification_output_all']['res_win']['succ_all']
+temp4 = data_dict_all['S1_dicts']['classification_output_all']['res_win']['comb_all']
+temp5 = data_dict_all['S1_dicts']['classification_output_all']['res_win']['r_bin_all']
+temp6 = data_dict_all['S1_dicts']['classification_output_all']['res_win']['p_bin_all']
+temp7 = data_dict_all['S1_dicts']['classification_output_all']['res_win']['r_bin_sf_all']
+temp8 = data_dict_all['S1_dicts']['classification_output_all']['res_win']['p_bin_sf_all']
+rw = [temp['accuracy_samme'],temp['accuracy_sammer'],temp['shuffle_accuracy_samme'],temp['shuffle_accuracy_sammer'],temp['chance'],temp2['accuracy_samme'],temp2['accuracy_sammer'],temp2['shuffle_accuracy_samme'],temp2['shuffle_accuracy_sammer'],temp2['chance'],temp3['accuracy_samme'],temp3['accuracy_sammer'],temp3['shuffle_accuracy_samme'],temp3['shuffle_accuracy_sammer'],temp3['chance'],temp4['accuracy_samme'],temp4['accuracy_sammer'],temp4['shuffle_accuracy_samme'],temp4['shuffle_accuracy_sammer'],temp4['chance'],temp5['accuracy_samme'],temp5['accuracy_sammer'],temp5['shuffle_accuracy_samme'],temp5['shuffle_accuracy_sammer'],temp5['chance'],temp6['accuracy_samme'],temp6['accuracy_sammer'],temp6['shuffle_accuracy_samme'],temp6['shuffle_accuracy_sammer'],temp6['chance'],temp7['accuracy_samme'],temp7['accuracy_sammer'],temp7['shuffle_accuracy_samme'],temp7['shuffle_accuracy_sammer'],temp7['chance'],temp8['accuracy_samme'],temp8['accuracy_sammer'],temp8['shuffle_accuracy_samme'],temp8['shuffle_accuracy_sammer'],temp8['chance']]
+
+temp = data_dict_all['S1_dicts']['classification_output_all']['concat']['r_level_all']
+temp2 = data_dict_all['S1_dicts']['classification_output_all']['concat']['p_level_all']
+temp3 = data_dict_all['S1_dicts']['classification_output_all']['concat']['succ_all']
+temp4 = data_dict_all['S1_dicts']['classification_output_all']['concat']['comb_all']
+temp5 = data_dict_all['S1_dicts']['classification_output_all']['concat']['r_bin_all']
+temp6 = data_dict_all['S1_dicts']['classification_output_all']['concat']['p_bin_all']
+temp7 = data_dict_all['S1_dicts']['classification_output_all']['concat']['r_bin_sf_all']
+temp8 = data_dict_all['S1_dicts']['classification_output_all']['concat']['p_bin_sf_all']
+ct = [temp['accuracy_samme'],temp['accuracy_sammer'],temp['shuffle_accuracy_samme'],temp['shuffle_accuracy_sammer'],temp['chance'],temp2['accuracy_samme'],temp2['accuracy_sammer'],temp2['shuffle_accuracy_samme'],temp2['shuffle_accuracy_sammer'],temp2['chance'],temp3['accuracy_samme'],temp3['accuracy_sammer'],temp3['shuffle_accuracy_samme'],temp3['shuffle_accuracy_sammer'],temp3['chance'],temp4['accuracy_samme'],temp4['accuracy_sammer'],temp4['shuffle_accuracy_samme'],temp4['shuffle_accuracy_sammer'],temp4['chance'],temp5['accuracy_samme'],temp5['accuracy_sammer'],temp5['shuffle_accuracy_samme'],temp5['shuffle_accuracy_sammer'],temp5['chance'],temp6['accuracy_samme'],temp6['accuracy_sammer'],temp6['shuffle_accuracy_samme'],temp6['shuffle_accuracy_sammer'],temp6['chance'],temp7['accuracy_samme'],temp7['accuracy_sammer'],temp7['shuffle_accuracy_samme'],temp7['shuffle_accuracy_sammer'],temp7['chance'],temp8['accuracy_samme'],temp8['accuracy_sammer'],temp8['shuffle_accuracy_samme'],temp8['shuffle_accuracy_sammer'],temp8['chance']]
+
+worksheet.write(8,0,'S1')
+worksheet.write(8,1,comb_names[0])
+worksheet.write(8,6,comb_names[1])
+worksheet.write(8,11,comb_names[2])
+worksheet.write(8,16,comb_names[3])
+worksheet.write(8,21,comb_names[4])
+worksheet.write(8,26,comb_names[5])
+worksheet.write(8,31,comb_names[6])
+worksheet.write(8,36,comb_names[7])
+
+worksheet.write_row(9,6,out_names)
+worksheet.write_row(9,11,out_names)
+worksheet.write_row(9,16,out_names)
+worksheet.write_row(9,21,out_names)
+worksheet.write_row(9,26,out_names)
+worksheet.write_row(9,31,out_names)
+worksheet.write_row(9,36,out_names)
+
+worksheet.write_column(9,0,type_names)
+worksheet.write_row(10,1,ac)
+worksheet.write_row(11,1,br)
+worksheet.write_row(12,1,ar)
+worksheet.write_row(13,1,rw)
+worksheet.write_row(14,1,ct)
+
+
+#
+temp = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['r_level_all']
+temp2 = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['p_level_all']
+temp3 = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['succ_all']
+temp4 = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['comb_all']
+temp5 = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['r_bin_all']
+temp6 = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['p_bin_all']
+temp7 = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['r_bin_sf_all']
+temp8 = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['p_bin_sf_all']
+ac = [temp['accuracy_samme'],temp['accuracy_sammer'],temp['shuffle_accuracy_samme'],temp['shuffle_accuracy_sammer'],temp['chance'],temp2['accuracy_samme'],temp2['accuracy_sammer'],temp2['shuffle_accuracy_samme'],temp2['shuffle_accuracy_sammer'],temp2['chance'],temp3['accuracy_samme'],temp3['accuracy_sammer'],temp3['shuffle_accuracy_samme'],temp3['shuffle_accuracy_sammer'],temp3['chance'],temp4['accuracy_samme'],temp4['accuracy_sammer'],temp4['shuffle_accuracy_samme'],temp4['shuffle_accuracy_sammer'],temp4['chance'],temp5['accuracy_samme'],temp5['accuracy_sammer'],temp5['shuffle_accuracy_samme'],temp5['shuffle_accuracy_sammer'],temp5['chance'],temp6['accuracy_samme'],temp6['accuracy_sammer'],temp6['shuffle_accuracy_samme'],temp6['shuffle_accuracy_sammer'],temp6['chance'],temp7['accuracy_samme'],temp7['accuracy_sammer'],temp7['shuffle_accuracy_samme'],temp7['shuffle_accuracy_sammer'],temp7['chance'],temp8['accuracy_samme'],temp8['accuracy_sammer'],temp8['shuffle_accuracy_samme'],temp8['shuffle_accuracy_sammer'],temp8['chance']]
+
+temp = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['r_level_all']
+temp2 = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['p_level_all']
+temp3 = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['succ_all']
+temp4 = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['comb_all']
+temp5 = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['r_bin_all']
+temp6 = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['p_bin_all']
+temp7 = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['r_bin_sf_all']
+temp8 = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['p_bin_sf_all']
+br = [temp['accuracy_samme'],temp['accuracy_sammer'],temp['shuffle_accuracy_samme'],temp['shuffle_accuracy_sammer'],temp['chance'],temp2['accuracy_samme'],temp2['accuracy_sammer'],temp2['shuffle_accuracy_samme'],temp2['shuffle_accuracy_sammer'],temp2['chance'],temp3['accuracy_samme'],temp3['accuracy_sammer'],temp3['shuffle_accuracy_samme'],temp3['shuffle_accuracy_sammer'],temp3['chance'],temp4['accuracy_samme'],temp4['accuracy_sammer'],temp4['shuffle_accuracy_samme'],temp4['shuffle_accuracy_sammer'],temp4['chance'],temp5['accuracy_samme'],temp5['accuracy_sammer'],temp5['shuffle_accuracy_samme'],temp5['shuffle_accuracy_sammer'],temp5['chance'],temp6['accuracy_samme'],temp6['accuracy_sammer'],temp6['shuffle_accuracy_samme'],temp6['shuffle_accuracy_sammer'],temp6['chance'],temp7['accuracy_samme'],temp7['accuracy_sammer'],temp7['shuffle_accuracy_samme'],temp7['shuffle_accuracy_sammer'],temp7['chance'],temp8['accuracy_samme'],temp8['accuracy_sammer'],temp8['shuffle_accuracy_samme'],temp8['shuffle_accuracy_sammer'],temp8['chance']]
+
+temp = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['r_level_all']
+temp2 = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['p_level_all']
+temp3 = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['succ_all']
+temp4 = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['comb_all']
+temp5 = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['r_bin_all']
+temp6 = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['p_bin_all']
+temp7 = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['r_bin_sf_all']
+temp8 = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['p_bin_sf_all']
+ar = [temp['accuracy_samme'],temp['accuracy_sammer'],temp['shuffle_accuracy_samme'],temp['shuffle_accuracy_sammer'],temp['chance'],temp2['accuracy_samme'],temp2['accuracy_sammer'],temp2['shuffle_accuracy_samme'],temp2['shuffle_accuracy_sammer'],temp2['chance'],temp3['accuracy_samme'],temp3['accuracy_sammer'],temp3['shuffle_accuracy_samme'],temp3['shuffle_accuracy_sammer'],temp3['chance'],temp4['accuracy_samme'],temp4['accuracy_sammer'],temp4['shuffle_accuracy_samme'],temp4['shuffle_accuracy_sammer'],temp4['chance'],temp5['accuracy_samme'],temp5['accuracy_sammer'],temp5['shuffle_accuracy_samme'],temp5['shuffle_accuracy_sammer'],temp5['chance'],temp6['accuracy_samme'],temp6['accuracy_sammer'],temp6['shuffle_accuracy_samme'],temp6['shuffle_accuracy_sammer'],temp6['chance'],temp7['accuracy_samme'],temp7['accuracy_sammer'],temp7['shuffle_accuracy_samme'],temp7['shuffle_accuracy_sammer'],temp7['chance'],temp8['accuracy_samme'],temp8['accuracy_sammer'],temp8['shuffle_accuracy_samme'],temp8['shuffle_accuracy_sammer'],temp8['chance']]
+
+temp = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['r_level_all']
+temp2 = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['p_level_all']
+temp3 = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['succ_all']
+temp4 = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['comb_all']
+temp5 = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['r_bin_all']
+temp6 = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['p_bin_all']
+temp7 = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['r_bin_sf_all']
+temp8 = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['p_bin_sf_all']
+rw = [temp['accuracy_samme'],temp['accuracy_sammer'],temp['shuffle_accuracy_samme'],temp['shuffle_accuracy_sammer'],temp['chance'],temp2['accuracy_samme'],temp2['accuracy_sammer'],temp2['shuffle_accuracy_samme'],temp2['shuffle_accuracy_sammer'],temp2['chance'],temp3['accuracy_samme'],temp3['accuracy_sammer'],temp3['shuffle_accuracy_samme'],temp3['shuffle_accuracy_sammer'],temp3['chance'],temp4['accuracy_samme'],temp4['accuracy_sammer'],temp4['shuffle_accuracy_samme'],temp4['shuffle_accuracy_sammer'],temp4['chance'],temp5['accuracy_samme'],temp5['accuracy_sammer'],temp5['shuffle_accuracy_samme'],temp5['shuffle_accuracy_sammer'],temp5['chance'],temp6['accuracy_samme'],temp6['accuracy_sammer'],temp6['shuffle_accuracy_samme'],temp6['shuffle_accuracy_sammer'],temp6['chance'],temp7['accuracy_samme'],temp7['accuracy_sammer'],temp7['shuffle_accuracy_samme'],temp7['shuffle_accuracy_sammer'],temp7['chance'],temp8['accuracy_samme'],temp8['accuracy_sammer'],temp8['shuffle_accuracy_samme'],temp8['shuffle_accuracy_sammer'],temp8['chance']]
+
+temp = data_dict_all['PmD_dicts']['classification_output_all']['concat']['r_level_all']
+temp2 = data_dict_all['PmD_dicts']['classification_output_all']['concat']['p_level_all']
+temp3 = data_dict_all['PmD_dicts']['classification_output_all']['concat']['succ_all']
+temp4 = data_dict_all['PmD_dicts']['classification_output_all']['concat']['comb_all']
+temp5 = data_dict_all['PmD_dicts']['classification_output_all']['concat']['r_bin_all']
+temp6 = data_dict_all['PmD_dicts']['classification_output_all']['concat']['p_bin_all']
+temp7 = data_dict_all['PmD_dicts']['classification_output_all']['concat']['r_bin_sf_all']
+temp8 = data_dict_all['PmD_dicts']['classification_output_all']['concat']['p_bin_sf_all']
+ct = [temp['accuracy_samme'],temp['accuracy_sammer'],temp['shuffle_accuracy_samme'],temp['shuffle_accuracy_sammer'],temp['chance'],temp2['accuracy_samme'],temp2['accuracy_sammer'],temp2['shuffle_accuracy_samme'],temp2['shuffle_accuracy_sammer'],temp2['chance'],temp3['accuracy_samme'],temp3['accuracy_sammer'],temp3['shuffle_accuracy_samme'],temp3['shuffle_accuracy_sammer'],temp3['chance'],temp4['accuracy_samme'],temp4['accuracy_sammer'],temp4['shuffle_accuracy_samme'],temp4['shuffle_accuracy_sammer'],temp4['chance'],temp5['accuracy_samme'],temp5['accuracy_sammer'],temp5['shuffle_accuracy_samme'],temp5['shuffle_accuracy_sammer'],temp5['chance'],temp6['accuracy_samme'],temp6['accuracy_sammer'],temp6['shuffle_accuracy_samme'],temp6['shuffle_accuracy_sammer'],temp6['chance'],temp7['accuracy_samme'],temp7['accuracy_sammer'],temp7['shuffle_accuracy_samme'],temp7['shuffle_accuracy_sammer'],temp7['chance'],temp8['accuracy_samme'],temp8['accuracy_sammer'],temp8['shuffle_accuracy_samme'],temp8['shuffle_accuracy_sammer'],temp8['chance']]
+
+worksheet.write(16,0,'PmD')
+worksheet.write(16,1,comb_names[0])
+worksheet.write(16,6,comb_names[1])
+worksheet.write(16,11,comb_names[2])
+worksheet.write(16,16,comb_names[3])
+worksheet.write(16,21,comb_names[4])
+worksheet.write(16,26,comb_names[5])
+worksheet.write(16,31,comb_names[6])
+worksheet.write(16,36,comb_names[7])
+
+worksheet.write_row(17,6,out_names)
+worksheet.write_row(17,11,out_names)
+worksheet.write_row(17,16,out_names)
+worksheet.write_row(17,21,out_names)
+worksheet.write_row(17,26,out_names)
+worksheet.write_row(17,31,out_names)
+worksheet.write_row(17,36,out_names)
+
+worksheet.write_column(17,0,type_names)
+worksheet.write_row(18,1,ac)
+worksheet.write_row(19,1,br)
+worksheet.write_row(20,1,ar)
+worksheet.write_row(21,1,rw)
+worksheet.write_row(22,1,ct)
 
 
 
