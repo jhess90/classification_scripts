@@ -23,10 +23,11 @@ import os
 from scipy.stats.stats import pearsonr
 from mpl_toolkits.mplot3d import Axes3D
 import math
-from sklearn.cross_validation import train_test_split
+#from sklearn.cross_validation import train_test_split
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
 
 ########################
 # params to set ########
