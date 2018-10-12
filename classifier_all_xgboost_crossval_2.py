@@ -156,9 +156,42 @@ def is_outlier(points, thresh = 4.0):
 
 
 ################
-#ada ###########
+#xgboost ###########
 ################
 def run_xgboost(value,targets):
+    #x_train, x_test, y_train, y_test = train_test_split(value,targets,test_size =.33)
+
+    model = xgb.XGBClassifier()
+    
+    kfold = KFold(n_splits=10, random_state=7)
+    results = cross_val_score(model, value, targets, cv=kfold)
+
+    ##
+    chance = float(1) / np.shape(np.unique(targets))[0]
+
+    #run again with shuffled targets
+    #np.random.shuffle(targets)
+
+    #kfold = KFold(n_splits=10, random_state=7)
+    #results_shuffled = cross_val_score(model, value, targets, cv=kfold)
+
+    #
+    #try:
+    #    f,p_val = stats.wilcoxon(results,results_shuffled)
+    #except:
+    #    p_val = 1.0
+
+    #TODO fix
+    accuracy_shuffled = 0.0
+    results_shuffled = np.array([0,0])
+    p_val = 0.0
+
+    return_dict = {'accuracy':np.mean(results),'accuracy_shuffled':np.mean(results_shuffled),'chance':chance,'results':results,'results_shuffled':results_shuffled,'diff_p_val':p_val}
+
+    return(return_dict)
+
+
+def run_xgboost_old(value,targets):
     #x_train, x_test, y_train, y_test = train_test_split(value,targets,test_size =.33)
 
     model = xgb.XGBClassifier()
@@ -175,7 +208,6 @@ def run_xgboost(value,targets):
     kfold = KFold(n_splits=10, random_state=7)
     results_shuffled = cross_val_score(model, value, targets, cv=kfold)
 
-    #
     try:
         f,p_val = stats.wilcoxon(results,results_shuffled)
     except:
@@ -406,25 +438,40 @@ for region_key,region_val in data_dict_all.iteritems():
     total_unit_num = avg_and_corr['aft_cue']['total_unit_num']
         
     output_by_window = {}
-    output_by_window_all = {}
     p_val_by_window = {}
+
+    accuracy_spread_r_levels_by_window = {}
+    accuracy_spread_p_levels_by_window = {}
+    accuracy_spread_sf_by_window = {}
+    accuracy_spread_comb_by_window = {}
+    
+    accuracy_spread_r_bin_by_window = {}
+    accuracy_spread_p_bin_by_window = {}
+    accuracy_spread_r_binsf_by_window = {}
+    accuracy_spread_p_binsf_by_window = {}
+
     for win_key,win_val in data_dict_all[region_key]['avg_and_corr'].iteritems():
         all_list =  win_val['all_list']
         
-        #shorter for devel
         accuracy_list_total = np.zeros((np.shape(all_list)[0],24))
-        #accuracy_list_total = np.zeros((2,24))
+
+        accuracy_spread_r_levels = np.zeros((np.shape(all_list)[0],10))
+        accuracy_spread_p_levels = np.zeros((np.shape(all_list)[0],10))
+        accuracy_spread_sf = np.zeros((np.shape(all_list)[0],10))
+        accuracy_spread_comb = np.zeros((np.shape(all_list)[0],10))
         
+        accuracy_spread_r_bin = np.zeros((np.shape(all_list)[0],10))
+        accuracy_spread_p_bin = np.zeros((np.shape(all_list)[0],10))
+        accuracy_spread_r_binsf = np.zeros((np.shape(all_list)[0],10))
+        accuracy_spread_p_binsf = np.zeros((np.shape(all_list)[0],10))
+
         print 'window: %s' %(win_key)
 
-
-        #shorter for devel
         all_p_vals = np.zeros((np.shape(all_list)[0],8))
-        #all_p_vals = np.zeros((2,8))
 
         #shorter for devel
-        for unit_num in range(np.shape(all_list)[0]):
-        #for unit_num in range(2):
+        #for unit_num in range(np.shape(all_list)[0]):
+        for unit_num in range(6):
             
             #succ/fail high even aft cue- b/ of more succ? unequal distrib? 
             #how many times run? What best test/train split?
@@ -438,7 +485,13 @@ for region_key,region_val in data_dict_all.iteritems():
                 r_level_out = {'results_shuffled': np.array([0,0]), 'chance': 0.0, 'results': np.array([0,0]), 'accuracy_shuffled': 0.0, 'diff_p_val':1.0, 'accuracy': 0.0}
                 p_level_out = {'results_shuffled': np.array([0,0]), 'chance': 0.0, 'results': np.array([0,0]), 'accuracy_shuffled': 0.0, 'diff_p_val':1.0, 'accuracy': 0.0}
 
-            succ_out = run_xgboost(all_list[unit_num][0],all_list[unit_num][1][2,:])
+
+            #temp = all_list[unit_num][1][2,:]
+            #temp[temp == -1] = 0
+
+            succ_targs = np.where(all_list[unit_num][1][2,:] == 1,1,0)
+
+            succ_out = run_xgboost_old(all_list[unit_num][0],succ_targs)
 
             r_nr_targs = np.where(all_list[unit_num][1][0,:] > 0,1,0)
             p_np_targs = np.where(all_list[unit_num][1][1,:] > 0,1,0)
@@ -461,38 +514,63 @@ for region_key,region_val in data_dict_all.iteritems():
 
             r_bin_sf_targ = np.zeros((np.shape(r_nr_targs)[0]))
             for i in range(np.shape(r_nr_targs)[0]):
-                if r_nr_targs[i] == 0 and all_list[unit_num][1][2,:][i] == 0:
+                if r_nr_targs[i] == 0 and succ_targs[i] != 1:
                     r_bin_sf_targ[i] = 0
-                elif r_nr_targs[i] == 1 and all_list[unit_num][1][2,:][i] == 0:
+                elif r_nr_targs[i] == 1 and succ_targs[i] != 1:
                     r_bin_sf_targ[i] = 1
-                elif r_nr_targs[i] == 0 and all_list[unit_num][1][2,:][i] == 1:
+                elif r_nr_targs[i] == 0 and succ_targs[i] == 1:
                     r_bin_sf_targ[i] = 2
-                elif r_nr_targs[i] == 1 and all_list[unit_num][1][2,:][i] == 1:
+                elif r_nr_targs[i] == 1 and succ_targs[i] == 1:
                     r_bin_sf_targ[i] = 3
 
             p_bin_sf_targ = np.zeros((np.shape(p_np_targs)[0]))
             for i in range(np.shape(p_np_targs)[0]):
-                if p_np_targs[i] == 0 and all_list[unit_num][1][2,:][i] == 0:
+                if p_np_targs[i] == 0 and succ_targs[i] != 1:
                     p_bin_sf_targ[i] = 0
-                elif p_np_targs[i] == 1 and all_list[unit_num][1][2,:][i] == 0:
+                elif p_np_targs[i] == 1 and succ_targs[i] != 1:
                     p_bin_sf_targ[i] = 1
-                elif p_np_targs[i] == 0 and all_list[unit_num][1][2,:][i] == 1:
+                elif p_np_targs[i] == 0 and succ_targs[i] == 1:
                     p_bin_sf_targ[i] = 2
-                elif p_np_targs[i] == 1 and all_list[unit_num][1][2,:][i] == 1:
+                elif p_np_targs[i] == 1 and succ_targs[i] == 1:
                     p_bin_sf_targ[i] = 3
 
-            r_bin_sf_out = run_xgboost(all_list[unit_num][0],r_bin_sf_targ)
-            p_bin_sf_out = run_xgboost(all_list[unit_num][0],p_bin_sf_targ)
+            r_bin_sf_out = run_xgboost_old(all_list[unit_num][0],r_bin_sf_targ)
+            p_bin_sf_out = run_xgboost_old(all_list[unit_num][0],p_bin_sf_targ)
 
             all_p_vals[unit_num,:] = [r_level_out['diff_p_val'],p_level_out['diff_p_val'],succ_out['diff_p_val'],comb_out['diff_p_val'],r_bin_out['diff_p_val'],p_bin_out['diff_p_val'],r_bin_sf_out['diff_p_val'],p_bin_sf_out['diff_p_val']]
 
             accuracy_list_total[unit_num,:] = [r_level_out['accuracy'],r_level_out['chance'],r_level_out['accuracy_shuffled'],p_level_out['accuracy'],p_level_out['chance'],p_level_out['accuracy_shuffled'],succ_out['accuracy'],succ_out['chance'],succ_out['accuracy_shuffled'],comb_out['accuracy'],comb_out['chance'],comb_out['accuracy_shuffled'],r_bin_out['accuracy'],r_bin_out['chance'],r_bin_out['accuracy_shuffled'],p_bin_out['accuracy'],p_bin_out['chance'],p_bin_out['accuracy_shuffled'],r_bin_sf_out['accuracy'],r_bin_sf_out['chance'],r_bin_sf_out['accuracy_shuffled'],p_bin_sf_out['accuracy'],p_bin_sf_out['chance'],p_bin_sf_out['accuracy_shuffled']]
 
+            #
+            accuracy_spread_r_levels[unit_num,:] = r_level_out['results']
+            accuracy_spread_p_levels[unit_num,:] = p_level_out['results']
+            accuracy_spread_sf[unit_num,:] = succ_out['results']
+            accuracy_spread_comb[unit_num,:] = comb_out['results']
+
+            accuracy_spread_r_bin[unit_num,:] = r_bin_out['results']
+            accuracy_spread_p_bin[unit_num,:] = p_bin_out['results']
+            accuracy_spread_r_binsf[unit_num,:] = r_bin_sf_out['results']
+            accuracy_spread_p_binsf[unit_num,:] = p_bin_sf_out['results']
+            
             sys.stdout.write('.')
             sys.stdout.flush()
 
         p_val_by_window[win_key] = all_p_vals
         output_by_window[win_key] = accuracy_list_total
+
+        #
+        accuracy_spread_r_levels_by_window[win_key] = accuracy_spread_r_levels
+        accuracy_spread_p_levels_by_window[win_key] = accuracy_spread_p_levels
+        accuracy_spread_sf_by_window[win_key] = accuracy_spread_sf
+        accuracy_spread_comb_by_window[win_key] = accuracy_spread_comb
+
+        accuracy_spread_r_bin_by_window[win_key] = accuracy_spread_r_bin
+        accuracy_spread_p_bin_by_window[win_key] = accuracy_spread_p_bin
+        accuracy_spread_r_binsf_by_window[win_key] = accuracy_spread_r_binsf
+        accuracy_spread_p_binsf_by_window[win_key] = accuracy_spread_p_binsf
+
+
+        '''
         print ''
 
         f,axarr = plt.subplots(4,sharex=True)
@@ -517,9 +595,10 @@ for region_key,region_val in data_dict_all.iteritems():
             axi.yaxis.set_major_locator(plt.MaxNLocator(3))
         plt.tight_layout()
         plt.subplots_adjust(top=0.9)
-        plt.savefig('unit_accuracy_hist_xgboost_cv_1_%s_%s' %(region_key,win_key))
+        plt.savefig('v2_unit_accuracy_hist_xgboost_cv_1_%s_%s' %(region_key,win_key))
         plt.clf()
 
+        '''
         #
         f,axarr = plt.subplots(4,sharex=True)
 
@@ -527,6 +606,7 @@ for region_key,region_val in data_dict_all.iteritems():
         axarr[0].hist(accuracy_list_total[:,6],color='mediumturquoise',lw=0)
         axarr[0].axvline(accuracy_list_total[:,7][0],color='k',linestyle='dashed',linewidth=1)
         axarr[0].set_title('succ/fail accuracy')
+        axarr[0].set_xlim([0,1])
         axarr[1].hist(accuracy_list_total[:,8],color='darkviolet',lw=0)
         axarr[1].axvline(accuracy_list_total[:,7][0],color='k',linestyle='dashed',linewidth=1)
         axarr[1].set_title('succ/fail accuracy: shuffled')
@@ -542,9 +622,10 @@ for region_key,region_val in data_dict_all.iteritems():
             axi.yaxis.set_major_locator(plt.MaxNLocator(3))
         plt.tight_layout()
         plt.subplots_adjust(top=0.9)
-        plt.savefig('unit_accuracy_hist_xgboost_cv_2_%s_%s' %(region_key,win_key))
+        plt.savefig('v2_unit_accuracy_hist_xgboost_cv_2_%s_%s' %(region_key,win_key))
         plt.clf()
 
+        '''
         #
         f,axarr = plt.subplots(4,sharex=True)
 
@@ -568,9 +649,10 @@ for region_key,region_val in data_dict_all.iteritems():
             axi.yaxis.set_major_locator(plt.MaxNLocator(3))
         plt.tight_layout()
         plt.subplots_adjust(top=0.9)
-        plt.savefig('unit_accuracy_hist_xgboost_cv_3_%s_%s' %(region_key,win_key))
+        plt.savefig('v2_unit_accuracy_hist_xgboost_cv_3_%s_%s' %(region_key,win_key))
         plt.clf()
-
+        '''
+        
         #
         f,axarr = plt.subplots(4,sharex=True)
 
@@ -579,6 +661,7 @@ for region_key,region_val in data_dict_all.iteritems():
         axarr[0].hist(accuracy_list_total[:,18],color='mediumturquoise',lw=0)
         axarr[0].axvline(accuracy_list_total[:,19][0],color='k',linestyle='dashed',linewidth=1)
         axarr[0].set_title('reward binary succ fail accuracy')
+        axarr[0].set_xlim([0,1])
         axarr[1].hist(accuracy_list_total[:,20],color='darkviolet',lw=0)
         axarr[1].axvline(accuracy_list_total[:,19][0],color='k',linestyle='dashed',linewidth=1)
         axarr[1].set_title('reward binary succ fail accuracy: shuffled')
@@ -594,120 +677,126 @@ for region_key,region_val in data_dict_all.iteritems():
             axi.yaxis.set_major_locator(plt.MaxNLocator(3))
         plt.tight_layout()
         plt.subplots_adjust(top=0.9)
-        plt.savefig('unit_accuracy_hist_xgboost_cv_4_%s_%s' %(region_key,win_key))
+        plt.savefig('v2_unit_accuracy_hist_xgboost_cv_4_%s_%s' %(region_key,win_key))
         plt.clf()
 
-        #run on whole data
-        file_overview = np.zeros((np.shape(file_dict.keys())[0],2))
-        for block_num in range(np.shape(file_dict.keys())[0]):
-            file_overview[block_num] = [np.shape(file_dict[block_num][region_key][win_key])[0],np.shape(file_dict[block_num][region_key][win_key])[1]]
+        #######################
+        #accuracy spread plots
+ 
+        #
+        f,axarr = plt.subplots(2,sharex=True)
+
+        f.suptitle('unit accuracies: %s %s' %(region_key,win_key))
+
+        srt = np.mean(accuracy_spread_r_levels,axis=1).argsort()
+        srt2 = np.mean(accuracy_spread_p_levels,axis=1).argsort()
+
+        axarr[0].errorbar(np.mean(accuracy_spread_r_levels,axis=1)[srt],range(np.shape(accuracy_spread_r_levels)[0]),xerr = np.std(accuracy_spread_r_levels,axis=1)[srt],ecolor='dimgrey',elinewidth=0.25,marker='.',capsize=0.0,linewidth=0.0,mec='darkcyan',mfc='darkcyan',mew=0.5)
+        axarr[0].set_xlim([0,1])
+        axarr[0].axvline(accuracy_list_total[:,1][0],color='k',linestyle='dashed',linewidth=0.75)
+        axarr[0].set_title('reward level accuracy')
+        axarr[0].yaxis.set_major_locator(plt.MaxNLocator(3))
+        axarr[1].errorbar(np.mean(accuracy_spread_p_levels,axis=1)[srt2],range(np.shape(accuracy_spread_p_levels)[0]),xerr = np.std(accuracy_spread_p_levels,axis=1)[srt2],ecolor='dimgrey',elinewidth=0.25,marker='.',capsize=0.0,linewidth=0.0,mec='darkcyan',mfc='darkcyan',mew=0.5)
+        axarr[1].axvline(accuracy_list_total[:,4][0],color='k',linestyle='dashed',linewidth=0.75)
+        axarr[1].yaxis.set_major_locator(plt.MaxNLocator(3))
+        axarr[1].set_title('punishment level accuracy')
         
-        ind = 0
-        r_all = ()
-        p_all = ()
-        s_all = ()
-        unit = int(0)
-        for block_num in range(np.shape(file_dict.keys())[0]):
-            for temp in range(int(file_overview[block_num,1])):
-                r_all = np.append(r_all,all_list[unit][1][0,:])
-                p_all = np.append(p_all,all_list[unit][1][1,:])
-                s_all = np.append(s_all,all_list[unit][1][2,:])
-            unit += int(file_overview[block_num,1])
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.9)
+        plt.savefig('v2_accuracy_spread_1_%s_%s' %(region_key,win_key))
+        plt.clf()
 
-        rps_all = [r_all,p_all,s_all]
+        #
+        f,axarr = plt.subplots(2,sharex=True)
 
-        frs_all = ()
-        for temp in range(np.shape(all_list)[0]):
-            if temp == 0:
-                frs_all = all_list[temp][0]
-            else:
-                frs_all = np.append(frs_all,all_list[temp][0],axis=0)
+        f.suptitle('unit accuracies: %s %s' %(region_key,win_key))
+        srt = np.mean(accuracy_spread_sf,axis=1).argsort()
+        srt2 = np.mean(accuracy_spread_comb,axis=1).argsort()
 
-
-        if run_pop_bool:
-            print 'running all'
-            r_level_all_out = run_xgboost(frs_all,rps_all[0])
-            p_level_all_out = run_xgboost(frs_all,rps_all[1])
-            succ_all_out = run_xgboost(frs_all,rps_all[2])
+        axarr[0].errorbar(np.mean(accuracy_spread_sf,axis=1)[srt],range(np.shape(accuracy_spread_sf)[0]),xerr = np.std(accuracy_spread_sf,axis=1)[srt],ecolor='dimgrey',elinewidth=0.25,marker='.',capsize=0.0,linewidth=0.0,mec='darkcyan',mfc='darkcyan',mew=0.5)
+        axarr[0].set_xlim([0,1])
+        axarr[0].axvline(accuracy_list_total[:,7][0],color='k',linestyle='dashed',linewidth=0.75)
+        axarr[0].yaxis.set_major_locator(plt.MaxNLocator(3))
+        axarr[0].set_title('succ/fail accuracy')
+        axarr[1].errorbar(np.mean(accuracy_spread_comb,axis=1)[srt2],range(np.shape(accuracy_spread_comb)[0]),xerr = np.std(accuracy_spread_comb,axis=1)[srt2],ecolor='dimgrey',elinewidth=0.25,marker='.',capsize=0.0,linewidth=0.0,mec='darkcyan',mfc='darkcyan',mew=0.5)
+        axarr[1].axvline(accuracy_list_total[:,10][0],color='k',linestyle='dashed',linewidth=0.75)
+        axarr[1].yaxis.set_major_locator(plt.MaxNLocator(3))
+        axarr[1].set_title('comb accuracy')
         
-        ##
-        r_nr_targs = np.where(rps_all[0] > 0,1,0)
-        p_np_targs = np.where(rps_all[1] > 0,1,0)
-            
-        if run_pop_bool:
-            r_bin_all_out = run_xgboost(frs_all,r_nr_targs)
-            p_bin_all_out = run_xgboost(frs_all,p_np_targs)
-            
-        comb = np.zeros((np.shape(r_nr_targs)[0]))
-        for i in range(np.shape(r_nr_targs)[0]):
-            if r_nr_targs[i] == 0 and p_np_targs[i] == 0:
-                comb[i] = 0
-            elif r_nr_targs[i] == 1 and p_np_targs[i] == 0:
-                comb[i] = 1
-            elif r_nr_targs[i] == 0 and p_np_targs[i] == 1:
-                comb[i] = 2
-            elif r_nr_targs[i] == 1 and p_np_targs[i] == 1:
-                comb[i] = 3
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.9)
+        plt.savefig('v2_accuracy_spread_2_%s_%s' %(region_key,win_key))
+        plt.clf()
 
-        if run_pop_bool:                
-            comb_all_out = run_xgboost(frs_all,comb)
+        #
+        f,axarr = plt.subplots(2,sharex=True)
 
-        r_bin_sf_targ = np.zeros((np.shape(r_nr_targs)[0]))
-        for i in range(np.shape(r_nr_targs)[0]):
-            if r_nr_targs[i] == 0 and rps_all[2][i] == 0:
-                r_bin_sf_targ[i] = 0
-            elif r_nr_targs[i] == 1 and rps_all[2][i] == 0:
-                r_bin_sf_targ[i] = 1
-            elif r_nr_targs[i] == 0 and rps_all[2][i] == 1:
-                r_bin_sf_targ[i] = 2
-            elif r_nr_targs[i] == 1 and rps_all[2][i] == 1:
-                r_bin_sf_targ[i] = 3
+        f.suptitle('unit accuracies: %s %s' %(region_key,win_key))
+        srt = np.mean(accuracy_spread_r_bin,axis=1).argsort()
+        srt2 = np.mean(accuracy_spread_p_bin,axis=1).argsort()
 
-        p_bin_sf_targ = np.zeros((np.shape(p_np_targs)[0]))
-        for i in range(np.shape(p_np_targs)[0]):
-            if p_np_targs[i] == 0 and rps_all[2][i] == 0:
-                p_bin_sf_targ[i] = 0
-            elif p_np_targs[i] == 1 and rps_all[2][i] == 0:
-                p_bin_sf_targ[i] = 1
-            elif p_np_targs[i] == 0 and rps_all[2][i] == 1:
-                p_bin_sf_targ[i] = 2
-            elif p_np_targs[i] == 1 and rps_all[2][i] == 1:
-                p_bin_sf_targ[i] = 3
+        axarr[0].errorbar(np.mean(accuracy_spread_r_bin,axis=1)[srt],range(np.shape(accuracy_spread_r_bin)[0]),xerr = np.std(accuracy_spread_r_bin,axis=1)[srt],ecolor='dimgrey',elinewidth=0.25,marker='.',capsize=0.0,linewidth=0.0,mec='darkcyan',mfc='darkcyan',mew=0.5)
+        axarr[0].set_xlim([0,1])
+        axarr[0].axvline(accuracy_list_total[:,13][0],color='k',linestyle='dashed',linewidth=0.75)
+        axarr[0].yaxis.set_major_locator(plt.MaxNLocator(3))
+        axarr[0].set_title('reward binary accuracy')
+        axarr[1].errorbar(np.mean(accuracy_spread_p_bin,axis=1)[srt2],range(np.shape(accuracy_spread_p_bin)[0]),xerr = np.std(accuracy_spread_p_bin,axis=1)[srt2],ecolor='dimgrey',elinewidth=0.25,marker='.',capsize=0.0,linewidth=0.0,mec='darkcyan',mfc='darkcyan',mew=0.5)
+        axarr[1].axvline(accuracy_list_total[:,16][0],color='k',linestyle='dashed',linewidth=0.75)
+        axarr[1].yaxis.set_major_locator(plt.MaxNLocator(3))
+        axarr[1].set_title('punishment binary accuracy')
+        
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.9)
+        plt.savefig('v2_accuracy_spread_3_%s_%s' %(region_key,win_key))
+        plt.clf()
+        #
+        f,axarr = plt.subplots(2,sharex=True)
 
-        if run_pop_bool:
-            r_bin_sf_all_out = run_xgboost(frs_all,r_bin_sf_targ)
-            p_bin_sf_all_out = run_xgboost(frs_all,p_bin_sf_targ)
+        f.suptitle('unit accuracies: %s %s' %(region_key,win_key))
+        srt = np.mean(accuracy_spread_r_binsf,axis=1).argsort()
+        srt2 = np.mean(accuracy_spread_p_binsf,axis=1).argsort()
 
-        if not run_pop_bool:
-            r_level_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
-            p_level_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
-            succ_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
-            r_bin_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
-            p_bin_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
-            comb_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
-            r_bin_sf_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
-            p_bin_sf_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
+        axarr[0].errorbar(np.mean(accuracy_spread_r_binsf,axis=1)[srt],range(np.shape(accuracy_spread_r_binsf)[0]),xerr = np.std(accuracy_spread_r_binsf,axis=1)[srt],ecolor='dimgrey',elinewidth=0.25,marker='.',capsize=0.0,linewidth=0.0,mec='darkcyan',mfc='darkcyan',mew=0.5)
+        axarr[0].set_xlim([0,1]) 
+        axarr[0].axvline(accuracy_list_total[:,19][0],color='k',linestyle='dashed',linewidth=0.75)
+        axarr[0].yaxis.set_major_locator(plt.MaxNLocator(3))
+        axarr[0].set_title('reward bin sf accuracy')
+        axarr[1].errorbar(np.mean(accuracy_spread_p_binsf,axis=1)[srt2],range(np.shape(accuracy_spread_p_binsf)[0]),xerr = np.std(accuracy_spread_p_binsf,axis=1)[srt2],ecolor='dimgrey',elinewidth=0.25,marker='.',capsize=0.0,linewidth=0.0,mec='darkcyan',mfc='darkcyan',mew=0.5)
+        axarr[1].axvline(accuracy_list_total[:,22][0],color='k',linestyle='dashed',linewidth=0.75)
+        axarr[1].yaxis.set_major_locator(plt.MaxNLocator(3))
+        axarr[1].set_title('punishment bin sf accuracy')
+        
+        plt.tight_layout()
+        plt.subplots_adjust(top=0.9)
+        plt.savefig('v2_accuracy_spread_4_%s_%s' %(region_key,win_key))
+        plt.clf()
 
-        output_by_window_all[win_key] = {'r_level_all':r_level_all_out,'p_level_all':p_level_all_out,'succ_all':succ_all_out,'r_bin_all':r_bin_all_out,'p_bin_all':p_bin_all_out,'comb_all':comb_all_out,'r_bin_sf_all':r_bin_sf_all_out,'p_bin_sf_all':p_bin_sf_all_out}
+        print ''
 
     data_dict_all[region_key]['classification_output'] = output_by_window
-    data_dict_all[region_key]['classification_output_all'] = output_by_window_all
     data_dict_all[region_key]['classification_output_p_val'] = p_val_by_window
+    data_dict_all[region_key]['accuracy_spread'] = {'r_levels':accuracy_spread_r_levels_by_window,'p_levels':accuracy_spread_p_levels_by_window,'sf':accuracy_spread_sf_by_window,'comb':accuracy_spread_comb_by_window,'r_bin':accuracy_spread_r_bin_by_window,'p_bin':accuracy_spread_p_bin_by_window,'r_bin_sf':accuracy_spread_r_binsf_by_window,'p_bin_sf':accuracy_spread_p_binsf_by_window}
+    
 
-np.save('backup_cv.npy',data_dict_all)
+
+
+
+
+
+np.save('v2_backup_cv.npy',data_dict_all)
 
 
 
 #################
 
 #if xlsx currently exists delte, or else won't write properly
-if os.path.isfile('xgb_output_cv.xlsx'):
-    os.remove('xgb_output_cv.xlsx')
+if os.path.isfile('v2_xgb_output_cv.xlsx'):
+    os.remove('v2_xgb_output_cv.xlsx')
 
 type_names = ['aft cue','bfr res','aft res','res win','concat']
 comb_names = ['r levels','p levels','succ/fail','comb','r bin','p bin','r bin sf','p bin sf']
 
-accuracy_workbook = xlsxwriter.Workbook('xgb_output_cv.xlsx',options={'nan_inf_to_errors':True})
+accuracy_workbook = xlsxwriter.Workbook('v2_xgb_output_cv.xlsx',options={'nan_inf_to_errors':True})
 worksheet = accuracy_workbook.add_worksheet('unit_accuracy')
 
 # > chance and > shuff
@@ -930,6 +1019,7 @@ worksheet.write_column(17,28,p_bin_sf_accuracies)
 
 
 
+'''
 #########
 worksheet = accuracy_workbook.add_worksheet('all_accuracy')
 
@@ -1166,7 +1256,7 @@ worksheet.write_row(19,1,br)
 worksheet.write_row(20,1,ar)
 worksheet.write_row(21,1,rw)
 worksheet.write_row(22,1,ct)
-
+'''
 
 
 ###########

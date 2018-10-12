@@ -37,89 +37,6 @@ from sklearn.model_selection import train_test_split
 # params to set ########
 ########################
 
-plot_bool = False
-plot_hist_bool = True
-
-bin_size = 10 #in ms
-time_before = -0.5 #negative value
-time_after = 1.0
-res_window = [0.3,0.8]
-
-run_pop_bool = False
-
-#########################
-# functions  ############
-#########################
-def make_hist_all(spike_data):
-        hist = []
-        hist_data = []
-        hist_bins = []
-        
-        #find max value (amax not working with data shape for some reason)
-        max_spike_ts = 0
-        for i in range(len(spike_data)):
-                if np.max(spike_data[i]) > max_spike_ts:
-                        max_spike_ts = np.max(spike_data[i])
-
-        max_bin_num = int(np.ceil(max_spike_ts) / float(bin_size) * 1000)
-        hist_data = np.zeros((len(spike_data),max_bin_num))
-        hist_bins = np.zeros((len(spike_data),max_bin_num))
-        for i in range(len(spike_data)):
-                total_bin_range = np.arange(0,int(np.ceil(spike_data[i].max())),bin_size/1000.0)
-                hist,bins = np.histogram(spike_data[i],bins=total_bin_range,range=(0,int(np.ceil(spike_data[i].max()))),normed=False,density=False)
-                hist_data[i,0:len(hist)] = hist
-                hist_bins[i,0:len(bins)] = bins
-        
-        return_dict = {'hist_data':hist_data,'hist_bins':hist_bins}
-        return(return_dict)
-
-def calc_firing_rates(hists,data_key,condensed):
-        bin_size_sec = bin_size / 1000.0
-        hists = stats.zscore(hists,axis=1)
-
-        bfr_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
-        aft_cue_fr = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
-        bfr_result_fr = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
-        aft_result_fr = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
-        res_wind_fr = np.zeros((len(condensed),np.shape(hists)[0],res_wind_bins[1] - res_wind_bins[0]))
-        concat_fr = np.zeros((len(condensed),np.shape(hists)[0],2*bins_after + -1*bins_before))
-
-        bfr_cue_hist_all = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
-        aft_cue_hist_all = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
-        bfr_result_hist_all = np.zeros((len(condensed),np.shape(hists)[0],-1*bins_before))
-        aft_result_hist_all = np.zeros((len(condensed),np.shape(hists)[0],bins_after))
-        res_wind_hist_all = np.zeros((len(condensed),np.shape(hists)[0],res_wind_bins[1] - res_wind_bins[0]))
-
-        #col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum, 5 = succ/fail
-        for i in range(np.shape(condensed)[0]):
-                closest_cue_start_time = np.around((round(condensed[i,0] / bin_size_sec) * bin_size_sec),decimals=2)
-                cue_start_bin = int(closest_cue_start_time / bin_size_sec)
-                if condensed[i,5] == 1:
-                        closest_result_start_time = np.around(round((condensed[i,1] / bin_size_sec) * bin_size_sec),decimals=2)
-                        result_start_bin = int(closest_result_start_time / bin_size_sec)
-                else:
-                        closest_result_start_time = np.around((round(condensed[i,2] / bin_size_sec) * bin_size_sec),decimals=2)
-                        result_start_bin = int(closest_result_start_time / bin_size_sec)
-                
-                if not (result_start_bin + bins_after) > np.shape(hists)[1]:
-                        for j in range(np.shape(hists)[0]):
-                                bfr_cue_fr[i,j,:] = hists[j,bins_before + cue_start_bin : cue_start_bin]
-                                aft_cue_fr[i,j,:] = hists[j,cue_start_bin : cue_start_bin + bins_after]
-                                bfr_result_fr[i,j,:] = hists[j,bins_before + result_start_bin : result_start_bin]
-                                aft_result_fr[i,j,:] = hists[j,result_start_bin : result_start_bin + bins_after]
-                                res_wind_fr[i,j,:] = hists[j,result_start_bin + res_wind_bins[0] : result_start_bin + res_wind_bins[1]]
-
-                                #aft cue + bfr res + aft res
-                                concat_fr[i,j,:] = np.concatenate((hists[j,cue_start_bin : cue_start_bin + bins_after],hists[j,bins_before + result_start_bin : result_start_bin],hists[j,result_start_bin : result_start_bin + bins_after]))
-
-                else:
-                        continue
-
-        return_dict = {'bfr_cue_fr':bfr_cue_fr,'aft_cue_fr':aft_cue_fr,'bfr_result_fr':bfr_result_fr,'aft_result_fr':aft_result_fr,'res_wind_fr':res_wind_fr,'concat_fr':concat_fr}
-
-
-        return(return_dict)
-
 
 def is_outlier(points, thresh = 4.0):
     """
@@ -155,346 +72,31 @@ def is_outlier(points, thresh = 4.0):
     return modified_z_score > thresh
 
 
-################
-#ada ###########
-################
-def run_xgboost(value,targets):
-    #x_train, x_test, y_train, y_test = train_test_split(value,targets,test_size =.33)
-
-    model = xgb.XGBClassifier()
-    
-    kfold = KFold(n_splits=10, random_state=7)
-    results = cross_val_score(model, value, targets, cv=kfold)
-
-    ##
-    chance = float(1) / np.shape(np.unique(targets))[0]
-
-    #run again with shuffled targets
-    np.random.shuffle(targets)
-
-    kfold = KFold(n_splits=10, random_state=7)
-    results_shuffled = cross_val_score(model, value, targets, cv=kfold)
-
-    #
-    try:
-        f,p_val = stats.wilcoxon(results,results_shuffled)
-    except:
-        p_val = 1.0
-
-    return_dict = {'accuracy':np.mean(results),'accuracy_shuffled':np.mean(results_shuffled),'chance':chance,'results':results,'results_shuffled':results_shuffled,'diff_p_val':p_val}
-
-    return(return_dict)
+######################
+data_dict_all = np.load('backup_cv.npy')[()]
 
 
-
-#########################
-# run ###################
-#########################
-
-bins_before = int(time_before / float(bin_size) * 1000)  #neg for now
-bins_after = int(time_after / float(bin_size) * 1000)   
-res_wind_bins = [int(res_window[0] / float(bin_size) * 1000),int(res_window[1] / float(bin_size)*1000)]
-
-print 'bin size: %s' %(bin_size)
-print 'time before: %s, time after: %s' %(time_before,time_after)
-
-#load and then concat all rp/alt/uncued
-
-file_ct = 0
-file_dict = {}
-for file in glob.glob('*timestamps.mat'):
-
-    timestamps = sio.loadmat(file)
-    a = sio.loadmat(file[:-15])
-    
-    neural_data=a['neural_data']
-    Spikes = a['neural_data']['spikeTimes'];
-    trial_breakdown = timestamps['trial_breakdown']
-
-    condensed = np.zeros((np.shape(trial_breakdown)[0],6))
-
-    #col 0 = disp_rp, 1 = succ scene, 2 = failure scene, 3 = rnum, 4 = pnum, 5 = catch_num
-    condensed[:,0] = trial_breakdown[:,1]
-    condensed[:,1] = trial_breakdown[:,2]
-    condensed[:,2] = trial_breakdown[:,3]
-    condensed[:,3] = trial_breakdown[:,5]
-    condensed[:,4] = trial_breakdown[:,7]
-    condensed[:,5] = trial_breakdown[:,10]
-
-    #delete end trials if not fully finished
-    if condensed[-1,1] == condensed[-1,2] == 0:
-	new_condensed = condensed[0:-1,:]
-        condensed = new_condensed
-    condensed = condensed[condensed[:,0] != 0]
-
-    #remove trials with no succ or failure scene (not sure why, but saw in one)
-    condensed = condensed[np.invert(np.logical_and(condensed[:,1] == 0, condensed[:,2] == 0))]
-
-    #TODOD FOR NOW remove catch trials
-    condensed = condensed[condensed[:,5] == 0]
-    #col 5 all 0s now, replace with succ/fail vector: succ = 1, fail = -1
-    condensed[condensed[:,1] != 0, 5] = 1
-    condensed[condensed[:,2] != 0, 5] = -1
-
-    #succ only
-    #condensed = condensed[condensed[:,5] == 1]
-
-    #fail only
-    #condensed = condensed[condensed[:,5] == -1]
-
-    #Break spikes into M1 S1 pmd 
-    M1_spikes = Spikes[0,0][0,1];
-    PmD_spikes = Spikes[0,0][0,0];
-    S1_spikes = Spikes[0,0][0,2];
-    #Find first channel count for pmv on map1
-    #PmV requires extra processing to generate as the data is the last 32 channels of each MAP system
-    unit_names={}
-    M1_unit_names = []
-    for i in range(0,M1_spikes.shape[1]):
-        if int(M1_spikes[0,i]['signame'][0][0][0][3:-1]) > 96:
-            M1_limit = i;
-            print ("The number of units in M1 is: %s"%(M1_limit))
-            break
-        elif (int(M1_spikes[0,i]['signame'][0][0][0][3:-1]) == 96):
-            M1_limit = i;
-            print ("The number of units in M1 is: %s"%(M1_limit))
-        M1_unit_names.append(M1_spikes[0,i]['signame'][0][0][0])
-    if not 'M1_limit' in locals():
-        M1_limit = i
-        print ("The number of units in M1 is: %s"%(M1_limit))
-    dummy = [];
-    for i in range(M1_limit,M1_spikes.shape[1]):
-        dummy.append(M1_spikes[0,i]['ts'][0,0][0])
-    unit_names['M1_unit_names']=M1_unit_names
-    #Find first channel count for pmv on map3
-    S1_unit_names = []  
-    for i in range(0,S1_spikes.shape[1]):
-        if int(S1_spikes[0,i]['signame'][0][0][0][3:-1]) > 96:
-            #if int(S1_spikes[0,i]['signame'][0][0][0][5:-1]) > 96:
-            S1_limit = i;
-            #print S1_limit
-            print ("The number of units in S1 is: %s"%(S1_limit))
-            break
-        elif (int(S1_spikes[0,i]['signame'][0][0][0][3:-1]) == 96):
-            S1_limit = i;
-            #print S1_limit
-            print ('The number of units in S1 is: %s' %(S1_limit))
-        S1_unit_names.append(S1_spikes[0,i]['signame'][0][0][0])
-    if not 'S1_limit' in locals():
-	S1_limit = i
-	print ("The number of units in S1 is: %s"%(M1_limit))
-    for i in range(S1_limit,S1_spikes.shape[1]):
-        dummy.append(S1_spikes[0,i]['ts'][0,0][0])
-    unit_names['S1_unit_names']=S1_unit_names
-    #Find first channel count for pmv on map2
-    pmd_unit_names = []
-    for i in range(0,PmD_spikes.shape[1]):
-        if int(PmD_spikes[0,i]['signame'][0][0][0][3:-1]) > 96:
-            PmD_limit =i;
-            print ("The number of units in PmD is: %s"%(PmD_limit))
-            break
-        elif (int(PmD_spikes[0,i]['signame'][0][0][0][3:-1]) == 96):
-            PmD_limit = i;
-            print ("The number of units in PmD is: %s"%(PmD_limit))
-        pmd_unit_names.append(PmD_spikes[0,i]['signame'][0][0][0])
-    if not 'pmd_limit' in locals():
-	PmD_limit = i
-	print ("The number of units in PmD is: %s"%(M1_limit))
-    for i in range(PmD_limit,PmD_spikes.shape[1]):
-        dummy.append(PmD_spikes[0,i]['ts'][0,0][0])
-    #Generate Pmv Spiking data
-    PmV_spikes = np.array(dummy);
-    print("The number of units in PmV is: %s"%(len(PmV_spikes)))
-    unit_names['pmd_unit_names']=pmd_unit_names
-
-    #trim M1,S1,and PmD spikes to remove PmV spikes trailing at end; nerual data pruning now complete
-    M1_spikes = M1_spikes[0,0:M1_limit];
-    S1_spikes = S1_spikes[0,0:S1_limit];
-    PmD_spikes = PmD_spikes[0,0:PmD_limit];
-
-    #take care of some misc params, save param dict
-    no_bins = int((time_after - time_before) * 1000 / bin_size)
-    print 'bin size = %s' %(bin_size)
-    param_dict = {'time_before':time_before,'time_after':time_after,'bin_size':bin_size,'no_bins':no_bins}
-    min_hist_len = 1000000 #set arbitrarily high number, because want to determin min length later
-    data_dict={'M1_spikes':M1_spikes,'S1_spikes':S1_spikes,'PmD_spikes':PmD_spikes,'PmV_spikes':PmV_spikes}
-
-    data_dict_hist_all = {}
-    print 'making hist'
-    for key, value in data_dict.iteritems():
-	spike_data = []
-	if key == 'PmV_spikes':
-                continue
-	else:
-            for i in range(len(value)):
-                spike_data.append(value[i]['ts'][0,0][0])
-
-        hist_dict = make_hist_all(spike_data)
-        data_dict_hist_all['%s_hist_dict' %(key)] = hist_dict
-
-    M1_dicts = {'hist_all':data_dict_hist_all['M1_spikes_hist_dict']['hist_data']} 
-    S1_dicts = {'hist_all':data_dict_hist_all['S1_spikes_hist_dict']['hist_data']}
-    PmD_dicts = {'hist_all':data_dict_hist_all['PmD_spikes_hist_dict']['hist_data']}
-
-    data_dict_all = {'M1_dicts':M1_dicts,'S1_dicts':S1_dicts,'PmD_dicts':PmD_dicts}
-
-    file_dict[file_ct] = {}
-
-    for region_key,region_value in data_dict_all.iteritems():
-        hists = data_dict_all[region_key]['hist_all']
-        fr_dict = calc_firing_rates(hists,region_key,condensed)
-        data_dict_all[region_key]['fr_dict'] = fr_dict
-        
-        file_dict[file_ct][region_key] = {'aft_cue':fr_dict['aft_cue_fr'],'bfr_res':fr_dict['bfr_result_fr'],'aft_res':fr_dict['aft_result_fr'],'res_win':fr_dict['res_wind_fr'],'condensed':condensed,'concat':fr_dict['concat_fr']}
-
-    file_ct += 1
-    
-
-file_length = np.shape(file_dict.keys())[0]
-
-for region_key,region_val in file_dict[0].iteritems():
-    data_dict_all[region_key]['avg_and_corr'] = {}
-    total_unit_num = 0
-    total_trial_num = 0
-    for num in range(file_length):
-        total_unit_num += np.shape(file_dict[num][region_key]['aft_cue'])[1]
-        total_trial_num += np.shape(file_dict[num][region_key]['condensed'])[0]
-
-    for type_key,type_val in file_dict[0][region_key].iteritems():
-            
-        if type_key != 'condensed':
-            sig_vals = np.zeros((total_unit_num,4))
-            r_p_all = np.zeros((total_trial_num,3))
-
-            all_list = list()
-            avg_fr_dict = {}
-            unit_ct = 0
-            trial_ct = 0
-            sig_vals_by_file = {}
-            
-            for file_ind in range(file_length):
-                frs = file_dict[file_ind][region_key][type_key]
-                condensed = file_dict[file_ind][region_key]['condensed']
-                r_vals = condensed[:,3]
-                p_vals = condensed[:,4]
-                succ_vals = condensed[:,5]
-                
-                for unit_num in range(np.shape(frs)[1]):
-                    all_list.append((frs[:,unit_num,:],np.array((r_vals,p_vals,succ_vals))))
-
-                unit_ct += frs.shape[1]
-                r_p_all[trial_ct : trial_ct + np.shape(r_vals)[0],:] = np.column_stack((r_vals,p_vals,succ_vals))
-                trial_ct += np.shape(r_vals)[0]
-                avg_fr_dict[file_ind] = np.mean(frs,axis=2)
-                
-            save_dict = {'avg_fr_dict':avg_fr_dict,'r_p_all':r_p_all,'total_unit_num':total_unit_num,'total_trial_num':total_trial_num,'all_list':all_list}
-            data_dict_all[region_key]['avg_and_corr'][type_key] = save_dict
-
-
-################
 
 for region_key,region_val in data_dict_all.iteritems():
     print 'region: %s' %(region_key)
     
-    data_dict_all[region_key]['classification_output'] = {}
-    data_dict_all[region_key]['classification_output_all'] = {}
-    data_dict_all[region_key]['classification_output_p_val'] = {}
-
-    file_length = np.shape(file_dict.keys())[0]
-    avg_and_corr = data_dict_all[region_key]['avg_and_corr']
-
-    total_unit_num = avg_and_corr['aft_cue']['total_unit_num']
-        
-    output_by_window = {}
-    output_by_window_all = {}
-    p_val_by_window = {}
     for win_key,win_val in data_dict_all[region_key]['avg_and_corr'].iteritems():
-        all_list =  win_val['all_list']
-        
-        #shorter for devel
-        accuracy_list_total = np.zeros((np.shape(all_list)[0],24))
-        #accuracy_list_total = np.zeros((2,24))
+
+        accuracy_list_total = data_dict_all[region_key]['classification_output'][win_key]
         
         print 'window: %s' %(win_key)
 
+        f,axarr = plt.subplots(2,sharex=True)
 
-        #shorter for devel
-        all_p_vals = np.zeros((np.shape(all_list)[0],8))
-        #all_p_vals = np.zeros((2,8))
+        f.suptitle('unit accuracies: %s %s' %(region_key,win_key))
 
-        #shorter for devel
-        for unit_num in range(np.shape(all_list)[0]):
-        #for unit_num in range(2):
-            
-            #succ/fail high even aft cue- b/ of more succ? unequal distrib? 
-            #how many times run? What best test/train split?
+        axarr[0] = 
 
-            if np.shape(np.unique(all_list[unit_num][1][0,:]))[0] > 2:
 
-                r_level_out = run_xgboost(all_list[unit_num][0],all_list[unit_num][1][0,:])
-                p_level_out = run_xgboost(all_list[unit_num][0],all_list[unit_num][1][1,:])
-        
-            else:
-                r_level_out = {'results_shuffled': np.array([0,0]), 'chance': 0.0, 'results': np.array([0,0]), 'accuracy_shuffled': 0.0, 'diff_p_val':1.0, 'accuracy': 0.0}
-                p_level_out = {'results_shuffled': np.array([0,0]), 'chance': 0.0, 'results': np.array([0,0]), 'accuracy_shuffled': 0.0, 'diff_p_val':1.0, 'accuracy': 0.0}
 
-            succ_out = run_xgboost(all_list[unit_num][0],all_list[unit_num][1][2,:])
 
-            r_nr_targs = np.where(all_list[unit_num][1][0,:] > 0,1,0)
-            p_np_targs = np.where(all_list[unit_num][1][1,:] > 0,1,0)
-            
-            r_bin_out = run_xgboost(all_list[unit_num][0],r_nr_targs)
-            p_bin_out = run_xgboost(all_list[unit_num][0],p_np_targs)
-            
-            comb = np.zeros((np.shape(r_nr_targs)[0]))
-            for i in range(np.shape(r_nr_targs)[0]):
-                if r_nr_targs[i] == 0 and p_np_targs[i] == 0:
-                    comb[i] = 0
-                elif r_nr_targs[i] == 1 and p_np_targs[i] == 0:
-                    comb[i] = 1
-                elif r_nr_targs[i] == 0 and p_np_targs[i] == 1:
-                    comb[i] = 2
-                elif r_nr_targs[i] == 1 and p_np_targs[i] == 1:
-                    comb[i] = 3
-                
-            comb_out = run_xgboost(all_list[unit_num][0],comb)
 
-            r_bin_sf_targ = np.zeros((np.shape(r_nr_targs)[0]))
-            for i in range(np.shape(r_nr_targs)[0]):
-                if r_nr_targs[i] == 0 and all_list[unit_num][1][2,:][i] == 0:
-                    r_bin_sf_targ[i] = 0
-                elif r_nr_targs[i] == 1 and all_list[unit_num][1][2,:][i] == 0:
-                    r_bin_sf_targ[i] = 1
-                elif r_nr_targs[i] == 0 and all_list[unit_num][1][2,:][i] == 1:
-                    r_bin_sf_targ[i] = 2
-                elif r_nr_targs[i] == 1 and all_list[unit_num][1][2,:][i] == 1:
-                    r_bin_sf_targ[i] = 3
-
-            p_bin_sf_targ = np.zeros((np.shape(p_np_targs)[0]))
-            for i in range(np.shape(p_np_targs)[0]):
-                if p_np_targs[i] == 0 and all_list[unit_num][1][2,:][i] == 0:
-                    p_bin_sf_targ[i] = 0
-                elif p_np_targs[i] == 1 and all_list[unit_num][1][2,:][i] == 0:
-                    p_bin_sf_targ[i] = 1
-                elif p_np_targs[i] == 0 and all_list[unit_num][1][2,:][i] == 1:
-                    p_bin_sf_targ[i] = 2
-                elif p_np_targs[i] == 1 and all_list[unit_num][1][2,:][i] == 1:
-                    p_bin_sf_targ[i] = 3
-
-            r_bin_sf_out = run_xgboost(all_list[unit_num][0],r_bin_sf_targ)
-            p_bin_sf_out = run_xgboost(all_list[unit_num][0],p_bin_sf_targ)
-
-            all_p_vals[unit_num,:] = [r_level_out['diff_p_val'],p_level_out['diff_p_val'],succ_out['diff_p_val'],comb_out['diff_p_val'],r_bin_out['diff_p_val'],p_bin_out['diff_p_val'],r_bin_sf_out['diff_p_val'],p_bin_sf_out['diff_p_val']]
-
-            accuracy_list_total[unit_num,:] = [r_level_out['accuracy'],r_level_out['chance'],r_level_out['accuracy_shuffled'],p_level_out['accuracy'],p_level_out['chance'],p_level_out['accuracy_shuffled'],succ_out['accuracy'],succ_out['chance'],succ_out['accuracy_shuffled'],comb_out['accuracy'],comb_out['chance'],comb_out['accuracy_shuffled'],r_bin_out['accuracy'],r_bin_out['chance'],r_bin_out['accuracy_shuffled'],p_bin_out['accuracy'],p_bin_out['chance'],p_bin_out['accuracy_shuffled'],r_bin_sf_out['accuracy'],r_bin_sf_out['chance'],r_bin_sf_out['accuracy_shuffled'],p_bin_sf_out['accuracy'],p_bin_sf_out['chance'],p_bin_sf_out['accuracy_shuffled']]
-
-            sys.stdout.write('.')
-            sys.stdout.flush()
-
-        p_val_by_window[win_key] = all_p_vals
-        output_by_window[win_key] = accuracy_list_total
-        print ''
-
+        '''
         f,axarr = plt.subplots(4,sharex=True)
 
         f.suptitle('unit accuracy distribution: %s %s' %(region_key,win_key))
@@ -571,130 +173,40 @@ for region_key,region_val in data_dict_all.iteritems():
         plt.savefig('unit_accuracy_hist_xgboost_cv_3_%s_%s' %(region_key,win_key))
         plt.clf()
 
+        '''
         #
-        f,axarr = plt.subplots(4,sharex=True)
+        #f,axarr = plt.subplots(4,sharex=True)
 
-        f.suptitle('unit accuracy distribution 4: %s %s' %(region_key,win_key))
+        #f.suptitle('unit accuracy distribution 4: %s %s' %(region_key,win_key))
 
-        axarr[0].hist(accuracy_list_total[:,18],color='mediumturquoise',lw=0)
-        axarr[0].axvline(accuracy_list_total[:,19][0],color='k',linestyle='dashed',linewidth=1)
-        axarr[0].set_title('reward binary succ fail accuracy')
-        axarr[1].hist(accuracy_list_total[:,20],color='darkviolet',lw=0)
-        axarr[1].axvline(accuracy_list_total[:,19][0],color='k',linestyle='dashed',linewidth=1)
-        axarr[1].set_title('reward binary succ fail accuracy: shuffled')
+        #axarr[0].hist(accuracy_list_total[:,18],color='mediumturquoise',lw=0)
+        #axarr[0].axvline(accuracy_list_total[:,19][0],color='k',linestyle='dashed',linewidth=1)
+        #axarr[0].set_xlim([0,1])
+        #axarr[0].set_title('reward binary succ fail accuracy')
+        #axarr[1].hist(accuracy_list_total[:,20],color='darkviolet',lw=0)
+        #axarr[1].axvline(accuracy_list_total[:,19][0],color='k',linestyle='dashed',linewidth=1)
+        #axarr[1].set_title('reward binary succ fail accuracy: shuffled')
 
-        axarr[2].hist(accuracy_list_total[:,21],color='mediumturquoise',lw=0)
-        axarr[2].axvline(accuracy_list_total[:,22][0],color='k',linestyle='dashed',linewidth=1)
-        axarr[2].set_title('punishment binary succ fail accuracy')
-        axarr[3].hist(accuracy_list_total[:,23],color='darkviolet',lw=0)
-        axarr[3].axvline(accuracy_list_total[:,22][0],color='k',linestyle='dashed',linewidth=1)
-        axarr[3].set_title('punishment binary succ fail accuracy: shuffled')
+        #axarr[2].hist(accuracy_list_total[:,21],color='mediumturquoise',lw=0)
+        #axarr[2].axvline(accuracy_list_total[:,22][0],color='k',linestyle='dashed',linewidth=1)
+        #axarr[2].set_title('punishment binary succ fail accuracy')
+        #axarr[3].hist(accuracy_list_total[:,23],color='darkviolet',lw=0)
+        #axarr[3].axvline(accuracy_list_total[:,22][0],color='k',linestyle='dashed',linewidth=1)
+        #axarr[3].set_title('punishment binary succ fail accuracy: shuffled')
 
-        for axi in axarr.reshape(-1):
-            axi.yaxis.set_major_locator(plt.MaxNLocator(3))
-        plt.tight_layout()
-        plt.subplots_adjust(top=0.9)
-        plt.savefig('unit_accuracy_hist_xgboost_cv_4_%s_%s' %(region_key,win_key))
-        plt.clf()
+        #for axi in axarr.reshape(-1):
+        #    axi.yaxis.set_major_locator(plt.MaxNLocator(3))
+        #plt.tight_layout()
+        #plt.subplots_adjust(top=0.9)
+        #plt.savefig('unit_accuracy_hist_xgboost_cv_4_supp_%s_%s' %(region_key,win_key))
+        #plt.clf()
 
-        #run on whole data
-        file_overview = np.zeros((np.shape(file_dict.keys())[0],2))
-        for block_num in range(np.shape(file_dict.keys())[0]):
-            file_overview[block_num] = [np.shape(file_dict[block_num][region_key][win_key])[0],np.shape(file_dict[block_num][region_key][win_key])[1]]
-        
-        ind = 0
-        r_all = ()
-        p_all = ()
-        s_all = ()
-        unit = int(0)
-        for block_num in range(np.shape(file_dict.keys())[0]):
-            for temp in range(int(file_overview[block_num,1])):
-                r_all = np.append(r_all,all_list[unit][1][0,:])
-                p_all = np.append(p_all,all_list[unit][1][1,:])
-                s_all = np.append(s_all,all_list[unit][1][2,:])
-            unit += int(file_overview[block_num,1])
-
-        rps_all = [r_all,p_all,s_all]
-
-        frs_all = ()
-        for temp in range(np.shape(all_list)[0]):
-            if temp == 0:
-                frs_all = all_list[temp][0]
-            else:
-                frs_all = np.append(frs_all,all_list[temp][0],axis=0)
+        pdb.set_trace()
 
 
-        if run_pop_bool:
-            print 'running all'
-            r_level_all_out = run_xgboost(frs_all,rps_all[0])
-            p_level_all_out = run_xgboost(frs_all,rps_all[1])
-            succ_all_out = run_xgboost(frs_all,rps_all[2])
-        
-        ##
-        r_nr_targs = np.where(rps_all[0] > 0,1,0)
-        p_np_targs = np.where(rps_all[1] > 0,1,0)
-            
-        if run_pop_bool:
-            r_bin_all_out = run_xgboost(frs_all,r_nr_targs)
-            p_bin_all_out = run_xgboost(frs_all,p_np_targs)
-            
-        comb = np.zeros((np.shape(r_nr_targs)[0]))
-        for i in range(np.shape(r_nr_targs)[0]):
-            if r_nr_targs[i] == 0 and p_np_targs[i] == 0:
-                comb[i] = 0
-            elif r_nr_targs[i] == 1 and p_np_targs[i] == 0:
-                comb[i] = 1
-            elif r_nr_targs[i] == 0 and p_np_targs[i] == 1:
-                comb[i] = 2
-            elif r_nr_targs[i] == 1 and p_np_targs[i] == 1:
-                comb[i] = 3
 
-        if run_pop_bool:                
-            comb_all_out = run_xgboost(frs_all,comb)
 
-        r_bin_sf_targ = np.zeros((np.shape(r_nr_targs)[0]))
-        for i in range(np.shape(r_nr_targs)[0]):
-            if r_nr_targs[i] == 0 and rps_all[2][i] == 0:
-                r_bin_sf_targ[i] = 0
-            elif r_nr_targs[i] == 1 and rps_all[2][i] == 0:
-                r_bin_sf_targ[i] = 1
-            elif r_nr_targs[i] == 0 and rps_all[2][i] == 1:
-                r_bin_sf_targ[i] = 2
-            elif r_nr_targs[i] == 1 and rps_all[2][i] == 1:
-                r_bin_sf_targ[i] = 3
 
-        p_bin_sf_targ = np.zeros((np.shape(p_np_targs)[0]))
-        for i in range(np.shape(p_np_targs)[0]):
-            if p_np_targs[i] == 0 and rps_all[2][i] == 0:
-                p_bin_sf_targ[i] = 0
-            elif p_np_targs[i] == 1 and rps_all[2][i] == 0:
-                p_bin_sf_targ[i] = 1
-            elif p_np_targs[i] == 0 and rps_all[2][i] == 1:
-                p_bin_sf_targ[i] = 2
-            elif p_np_targs[i] == 1 and rps_all[2][i] == 1:
-                p_bin_sf_targ[i] = 3
-
-        if run_pop_bool:
-            r_bin_sf_all_out = run_xgboost(frs_all,r_bin_sf_targ)
-            p_bin_sf_all_out = run_xgboost(frs_all,p_bin_sf_targ)
-
-        if not run_pop_bool:
-            r_level_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
-            p_level_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
-            succ_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
-            r_bin_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
-            p_bin_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
-            comb_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
-            r_bin_sf_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
-            p_bin_sf_all_out = {'accuracy':1,'accuracy_shuffled':1,'chance':0}
-
-        output_by_window_all[win_key] = {'r_level_all':r_level_all_out,'p_level_all':p_level_all_out,'succ_all':succ_all_out,'r_bin_all':r_bin_all_out,'p_bin_all':p_bin_all_out,'comb_all':comb_all_out,'r_bin_sf_all':r_bin_sf_all_out,'p_bin_sf_all':p_bin_sf_all_out}
-
-    data_dict_all[region_key]['classification_output'] = output_by_window
-    data_dict_all[region_key]['classification_output_all'] = output_by_window_all
-    data_dict_all[region_key]['classification_output_p_val'] = p_val_by_window
-
-np.save('backup_cv.npy',data_dict_all)
 
 
 
