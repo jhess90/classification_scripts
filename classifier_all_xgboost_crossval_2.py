@@ -183,7 +183,7 @@ def run_xgboost(value,targets):
 
     #TODO fix
     accuracy_shuffled = 0.0
-    results_shuffled = np.array([0,0])
+    results_shuffled = np.array([0,0,0,0,0,0,0,0,0,0])
     p_val = 0.0
 
     return_dict = {'accuracy':np.mean(results),'accuracy_shuffled':np.mean(results_shuffled),'chance':chance,'results':results,'results_shuffled':results_shuffled,'diff_p_val':p_val}
@@ -470,8 +470,8 @@ for region_key,region_val in data_dict_all.iteritems():
         all_p_vals = np.zeros((np.shape(all_list)[0],8))
 
         #shorter for devel
-        #for unit_num in range(np.shape(all_list)[0]):
-        for unit_num in range(6):
+        for unit_num in range(np.shape(all_list)[0]):
+        #for unit_num in range(6):
             
             #succ/fail high even aft cue- b/ of more succ? unequal distrib? 
             #how many times run? What best test/train split?
@@ -482,8 +482,8 @@ for region_key,region_val in data_dict_all.iteritems():
                 p_level_out = run_xgboost(all_list[unit_num][0],all_list[unit_num][1][1,:])
         
             else:
-                r_level_out = {'results_shuffled': np.array([0,0]), 'chance': 0.0, 'results': np.array([0,0]), 'accuracy_shuffled': 0.0, 'diff_p_val':1.0, 'accuracy': 0.0}
-                p_level_out = {'results_shuffled': np.array([0,0]), 'chance': 0.0, 'results': np.array([0,0]), 'accuracy_shuffled': 0.0, 'diff_p_val':1.0, 'accuracy': 0.0}
+                r_level_out = {'results_shuffled': np.array([0,0,0,0,0,0,0,0,0,0]), 'chance': 0.0, 'results': np.array([0,0,0,0,0,0,0,0,0,0]), 'accuracy_shuffled': 0.0, 'diff_p_val':1.0, 'accuracy': 0.0}
+                p_level_out = {'results_shuffled': np.array([0,0,0,0,0,0,0,0,0,0]), 'chance': 0.0, 'results': np.array([0,0,0,0,0,0,0,0,0,0]), 'accuracy_shuffled': 0.0, 'diff_p_val':1.0, 'accuracy': 0.0}
 
 
             #temp = all_list[unit_num][1][2,:]
