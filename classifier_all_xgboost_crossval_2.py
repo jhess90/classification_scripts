@@ -1019,248 +1019,211 @@ worksheet.write_column(17,28,p_bin_sf_accuracies)
 
 
 
-'''
-#########
-worksheet = accuracy_workbook.add_worksheet('all_accuracy')
-
-out_names = ['accuracy','accuracy shuffled','chance']
-
-#
-temp = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['r_level_all']
-temp2 = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['p_level_all']
-temp3 = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['succ_all']
-temp4 = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['comb_all']
-temp5 = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['r_bin_all']
-temp6 = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['p_bin_all']
-temp7 = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['r_bin_sf_all']
-temp8 = data_dict_all['M1_dicts']['classification_output_all']['aft_cue']['p_bin_sf_all']
-ac = [temp['accuracy'],temp['accuracy_shuffled'],temp['chance'],temp2['accuracy'],temp2['accuracy_shuffled'],temp2['chance'],temp3['accuracy'],temp3['accuracy_shuffled'],temp3['chance'],temp4['accuracy'],temp4['accuracy_shuffled'],temp4['chance'],temp5['accuracy'],temp5['accuracy_shuffled'],temp5['chance'],temp6['accuracy'],temp6['accuracy_shuffled'],temp6['chance'],temp7['accuracy'],temp7['accuracy_shuffled'],temp7['chance'],temp8['accuracy'],temp8['accuracy_shuffled'],temp8['chance']]
-
-temp = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['r_level_all']
-temp2 = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['p_level_all']
-temp3 = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['succ_all']
-temp4 = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['comb_all']
-temp5 = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['r_bin_all']
-temp6 = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['p_bin_all']
-temp7 = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['r_bin_sf_all']
-temp8 = data_dict_all['M1_dicts']['classification_output_all']['bfr_res']['p_bin_sf_all']
-br = [temp['accuracy'],temp['accuracy_shuffled'],temp['chance'],temp2['accuracy'],temp2['accuracy_shuffled'],temp2['chance'],temp3['accuracy'],temp3['accuracy_shuffled'],temp3['chance'],temp4['accuracy'],temp4['accuracy_shuffled'],temp4['chance'],temp5['accuracy'],temp5['accuracy_shuffled'],temp5['chance'],temp6['accuracy'],temp6['accuracy_shuffled'],temp6['chance'],temp7['accuracy'],temp7['accuracy_shuffled'],temp7['chance'],temp8['accuracy'],temp8['accuracy_shuffled'],temp8['chance']]
-
-temp = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['r_level_all']
-temp2 = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['p_level_all']
-temp3 = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['succ_all']
-temp4 = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['comb_all']
-temp5 = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['r_bin_all']
-temp6 = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['p_bin_all']
-temp7 = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['r_bin_sf_all']
-temp8 = data_dict_all['M1_dicts']['classification_output_all']['aft_res']['p_bin_sf_all']
-ar = [temp['accuracy'],temp['accuracy_shuffled'],temp['chance'],temp2['accuracy'],temp2['accuracy_shuffled'],temp2['chance'],temp3['accuracy'],temp3['accuracy_shuffled'],temp3['chance'],temp4['accuracy'],temp4['accuracy_shuffled'],temp4['chance'],temp5['accuracy'],temp5['accuracy_shuffled'],temp5['chance'],temp6['accuracy'],temp6['accuracy_shuffled'],temp6['chance'],temp7['accuracy'],temp7['accuracy_shuffled'],temp7['chance'],temp8['accuracy'],temp8['accuracy_shuffled'],temp8['chance']]
-
-temp = data_dict_all['M1_dicts']['classification_output_all']['res_win']['r_level_all']
-temp2 = data_dict_all['M1_dicts']['classification_output_all']['res_win']['p_level_all']
-temp3 = data_dict_all['M1_dicts']['classification_output_all']['res_win']['succ_all']
-temp4 = data_dict_all['M1_dicts']['classification_output_all']['res_win']['comb_all']
-temp5 = data_dict_all['M1_dicts']['classification_output_all']['res_win']['r_bin_all']
-temp6 = data_dict_all['M1_dicts']['classification_output_all']['res_win']['p_bin_all']
-temp7 = data_dict_all['M1_dicts']['classification_output_all']['res_win']['r_bin_sf_all']
-temp8 = data_dict_all['M1_dicts']['classification_output_all']['res_win']['p_bin_sf_all']
-rw = [temp['accuracy'],temp['accuracy_shuffled'],temp['chance'],temp2['accuracy'],temp2['accuracy_shuffled'],temp2['chance'],temp3['accuracy'],temp3['accuracy_shuffled'],temp3['chance'],temp4['accuracy'],temp4['accuracy_shuffled'],temp4['chance'],temp5['accuracy'],temp5['accuracy_shuffled'],temp5['chance'],temp6['accuracy'],temp6['accuracy_shuffled'],temp6['chance'],temp7['accuracy'],temp7['accuracy_shuffled'],temp7['chance'],temp8['accuracy'],temp8['accuracy_shuffled'],temp8['chance']]
-
-temp = data_dict_all['M1_dicts']['classification_output_all']['concat']['r_level_all']
-temp2 = data_dict_all['M1_dicts']['classification_output_all']['concat']['p_level_all']
-temp3 = data_dict_all['M1_dicts']['classification_output_all']['concat']['succ_all']
-temp4 = data_dict_all['M1_dicts']['classification_output_all']['concat']['comb_all']
-temp5 = data_dict_all['M1_dicts']['classification_output_all']['concat']['r_bin_all']
-temp6 = data_dict_all['M1_dicts']['classification_output_all']['concat']['p_bin_all']
-temp7 = data_dict_all['M1_dicts']['classification_output_all']['concat']['r_bin_sf_all']
-temp8 = data_dict_all['M1_dicts']['classification_output_all']['concat']['p_bin_sf_all']
-ct = [temp['accuracy'],temp['accuracy_shuffled'],temp['chance'],temp2['accuracy'],temp2['accuracy_shuffled'],temp2['chance'],temp3['accuracy'],temp3['accuracy_shuffled'],temp3['chance'],temp4['accuracy'],temp4['accuracy_shuffled'],temp4['chance'],temp5['accuracy'],temp5['accuracy_shuffled'],temp5['chance'],temp6['accuracy'],temp6['accuracy_shuffled'],temp6['chance'],temp7['accuracy'],temp7['accuracy_shuffled'],temp7['chance'],temp8['accuracy'],temp8['accuracy_shuffled'],temp8['chance']]
-
-worksheet.write(0,0,'M1')
-worksheet.write(0,1,comb_names[0])
-worksheet.write(0,4,comb_names[1])
-worksheet.write(0,7,comb_names[2])
-worksheet.write(0,10,comb_names[3])
-worksheet.write(0,13,comb_names[4])
-worksheet.write(0,16,comb_names[5])
-worksheet.write(0,19,comb_names[6])
-worksheet.write(0,22,comb_names[7])
-
-worksheet.write_row(1,1,out_names)
-worksheet.write_row(1,4,out_names)
-worksheet.write_row(1,7,out_names)
-worksheet.write_row(1,10,out_names)
-worksheet.write_row(1,13,out_names)
-worksheet.write_row(1,16,out_names)
-worksheet.write_row(1,19,out_names)
-worksheet.write_row(1,22,out_names)
-
-worksheet.write_column(1,0,type_names)
-worksheet.write_row(2,1,ac)
-worksheet.write_row(3,1,br)
-worksheet.write_row(4,1,ar)
-worksheet.write_row(5,1,rw)
-worksheet.write_row(6,1,ct)
-
-
-#
-temp = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['r_level_all']
-temp2 = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['p_level_all']
-temp3 = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['succ_all']
-temp4 = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['comb_all']
-temp5 = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['r_bin_all']
-temp6 = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['p_bin_all']
-temp7 = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['r_bin_sf_all']
-temp8 = data_dict_all['S1_dicts']['classification_output_all']['aft_cue']['p_bin_sf_all']
-ac =[temp['accuracy'],temp['accuracy_shuffled'],temp['chance'],temp2['accuracy'],temp2['accuracy_shuffled'],temp2['chance'],temp3['accuracy'],temp3['accuracy_shuffled'],temp3['chance'],temp4['accuracy'],temp4['accuracy_shuffled'],temp4['chance'],temp5['accuracy'],temp5['accuracy_shuffled'],temp5['chance'],temp6['accuracy'],temp6['accuracy_shuffled'],temp6['chance'],temp7['accuracy'],temp7['accuracy_shuffled'],temp7['chance'],temp8['accuracy'],temp8['accuracy_shuffled'],temp8['chance']]
-
-temp = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['r_level_all']
-temp2 = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['p_level_all']
-temp3 = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['succ_all']
-temp4 = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['comb_all']
-temp5 = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['r_bin_all']
-temp6 = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['p_bin_all']
-temp7 = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['r_bin_sf_all']
-temp8 = data_dict_all['S1_dicts']['classification_output_all']['bfr_res']['p_bin_sf_all']
-br = [temp['accuracy'],temp['accuracy_shuffled'],temp['chance'],temp2['accuracy'],temp2['accuracy_shuffled'],temp2['chance'],temp3['accuracy'],temp3['accuracy_shuffled'],temp3['chance'],temp4['accuracy'],temp4['accuracy_shuffled'],temp4['chance'],temp5['accuracy'],temp5['accuracy_shuffled'],temp5['chance'],temp6['accuracy'],temp6['accuracy_shuffled'],temp6['chance'],temp7['accuracy'],temp7['accuracy_shuffled'],temp7['chance'],temp8['accuracy'],temp8['accuracy_shuffled'],temp8['chance']]
-
-temp = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['r_level_all']
-temp2 = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['p_level_all']
-temp3 = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['succ_all']
-temp4 = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['comb_all']
-temp5 = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['r_bin_all']
-temp6 = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['p_bin_all']
-temp7 = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['r_bin_sf_all']
-temp8 = data_dict_all['S1_dicts']['classification_output_all']['aft_res']['p_bin_sf_all']
-ar = [temp['accuracy'],temp['accuracy_shuffled'],temp['chance'],temp2['accuracy'],temp2['accuracy_shuffled'],temp2['chance'],temp3['accuracy'],temp3['accuracy_shuffled'],temp3['chance'],temp4['accuracy'],temp4['accuracy_shuffled'],temp4['chance'],temp5['accuracy'],temp5['accuracy_shuffled'],temp5['chance'],temp6['accuracy'],temp6['accuracy_shuffled'],temp6['chance'],temp7['accuracy'],temp7['accuracy_shuffled'],temp7['chance'],temp8['accuracy'],temp8['accuracy_shuffled'],temp8['chance']]
-
-temp = data_dict_all['S1_dicts']['classification_output_all']['res_win']['r_level_all']
-temp2 = data_dict_all['S1_dicts']['classification_output_all']['res_win']['p_level_all']
-temp3 = data_dict_all['S1_dicts']['classification_output_all']['res_win']['succ_all']
-temp4 = data_dict_all['S1_dicts']['classification_output_all']['res_win']['comb_all']
-temp5 = data_dict_all['S1_dicts']['classification_output_all']['res_win']['r_bin_all']
-temp6 = data_dict_all['S1_dicts']['classification_output_all']['res_win']['p_bin_all']
-temp7 = data_dict_all['S1_dicts']['classification_output_all']['res_win']['r_bin_sf_all']
-temp8 = data_dict_all['S1_dicts']['classification_output_all']['res_win']['p_bin_sf_all']
-rw = [temp['accuracy'],temp['accuracy_shuffled'],temp['chance'],temp2['accuracy'],temp2['accuracy_shuffled'],temp2['chance'],temp3['accuracy'],temp3['accuracy_shuffled'],temp3['chance'],temp4['accuracy'],temp4['accuracy_shuffled'],temp4['chance'],temp5['accuracy'],temp5['accuracy_shuffled'],temp5['chance'],temp6['accuracy'],temp6['accuracy_shuffled'],temp6['chance'],temp7['accuracy'],temp7['accuracy_shuffled'],temp7['chance'],temp8['accuracy'],temp8['accuracy_shuffled'],temp8['chance']]
-
-temp = data_dict_all['S1_dicts']['classification_output_all']['concat']['r_level_all']
-temp2 = data_dict_all['S1_dicts']['classification_output_all']['concat']['p_level_all']
-temp3 = data_dict_all['S1_dicts']['classification_output_all']['concat']['succ_all']
-temp4 = data_dict_all['S1_dicts']['classification_output_all']['concat']['comb_all']
-temp5 = data_dict_all['S1_dicts']['classification_output_all']['concat']['r_bin_all']
-temp6 = data_dict_all['S1_dicts']['classification_output_all']['concat']['p_bin_all']
-temp7 = data_dict_all['S1_dicts']['classification_output_all']['concat']['r_bin_sf_all']
-temp8 = data_dict_all['S1_dicts']['classification_output_all']['concat']['p_bin_sf_all']
-ct = [temp['accuracy'],temp['accuracy_shuffled'],temp['chance'],temp2['accuracy'],temp2['accuracy_shuffled'],temp2['chance'],temp3['accuracy'],temp3['accuracy_shuffled'],temp3['chance'],temp4['accuracy'],temp4['accuracy_shuffled'],temp4['chance'],temp5['accuracy'],temp5['accuracy_shuffled'],temp5['chance'],temp6['accuracy'],temp6['accuracy_shuffled'],temp6['chance'],temp7['accuracy'],temp7['accuracy_shuffled'],temp7['chance'],temp8['accuracy'],temp8['accuracy_shuffled'],temp8['chance']]
-
-worksheet.write(8,0,'S1')
-worksheet.write(0,1,comb_names[0])
-worksheet.write(0,4,comb_names[1])
-worksheet.write(0,7,comb_names[2])
-worksheet.write(0,10,comb_names[3])
-worksheet.write(0,13,comb_names[4])
-worksheet.write(0,16,comb_names[5])
-worksheet.write(0,19,comb_names[6])
-worksheet.write(0,22,comb_names[7])
-
-worksheet.write_row(1,1,out_names)
-worksheet.write_row(1,4,out_names)
-worksheet.write_row(1,7,out_names)
-worksheet.write_row(1,10,out_names)
-worksheet.write_row(1,13,out_names)
-worksheet.write_row(1,16,out_names)
-worksheet.write_row(1,19,out_names)
-worksheet.write_row(1,22,out_names)
-
-worksheet.write_column(9,0,type_names)
-worksheet.write_row(10,1,ac)
-worksheet.write_row(11,1,br)
-worksheet.write_row(12,1,ar)
-worksheet.write_row(13,1,rw)
-worksheet.write_row(14,1,ct)
-
-#
-temp = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['r_level_all']
-temp2 = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['p_level_all']
-temp3 = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['succ_all']
-temp4 = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['comb_all']
-temp5 = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['r_bin_all']
-temp6 = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['p_bin_all']
-temp7 = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['r_bin_sf_all']
-temp8 = data_dict_all['PmD_dicts']['classification_output_all']['aft_cue']['p_bin_sf_all']
-ac = [temp['accuracy'],temp['accuracy_shuffled'],temp['chance'],temp2['accuracy'],temp2['accuracy_shuffled'],temp2['chance'],temp3['accuracy'],temp3['accuracy_shuffled'],temp3['chance'],temp4['accuracy'],temp4['accuracy_shuffled'],temp4['chance'],temp5['accuracy'],temp5['accuracy_shuffled'],temp5['chance'],temp6['accuracy'],temp6['accuracy_shuffled'],temp6['chance'],temp7['accuracy'],temp7['accuracy_shuffled'],temp7['chance'],temp8['accuracy'],temp8['accuracy_shuffled'],temp8['chance']]
-
-temp = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['r_level_all']
-temp2 = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['p_level_all']
-temp3 = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['succ_all']
-temp4 = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['comb_all']
-temp5 = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['r_bin_all']
-temp6 = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['p_bin_all']
-temp7 = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['r_bin_sf_all']
-temp8 = data_dict_all['PmD_dicts']['classification_output_all']['bfr_res']['p_bin_sf_all']
-br = [temp['accuracy'],temp['accuracy_shuffled'],temp['chance'],temp2['accuracy'],temp2['accuracy_shuffled'],temp2['chance'],temp3['accuracy'],temp3['accuracy_shuffled'],temp3['chance'],temp4['accuracy'],temp4['accuracy_shuffled'],temp4['chance'],temp5['accuracy'],temp5['accuracy_shuffled'],temp5['chance'],temp6['accuracy'],temp6['accuracy_shuffled'],temp6['chance'],temp7['accuracy'],temp7['accuracy_shuffled'],temp7['chance'],temp8['accuracy'],temp8['accuracy_shuffled'],temp8['chance']]
-
-temp = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['r_level_all']
-temp2 = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['p_level_all']
-temp3 = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['succ_all']
-temp4 = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['comb_all']
-temp5 = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['r_bin_all']
-temp6 = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['p_bin_all']
-temp7 = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['r_bin_sf_all']
-temp8 = data_dict_all['PmD_dicts']['classification_output_all']['aft_res']['p_bin_sf_all']
-ar = [temp['accuracy'],temp['accuracy_shuffled'],temp['chance'],temp2['accuracy'],temp2['accuracy_shuffled'],temp2['chance'],temp3['accuracy'],temp3['accuracy_shuffled'],temp3['chance'],temp4['accuracy'],temp4['accuracy_shuffled'],temp4['chance'],temp5['accuracy'],temp5['accuracy_shuffled'],temp5['chance'],temp6['accuracy'],temp6['accuracy_shuffled'],temp6['chance'],temp7['accuracy'],temp7['accuracy_shuffled'],temp7['chance'],temp8['accuracy'],temp8['accuracy_shuffled'],temp8['chance']]
-
-temp = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['r_level_all']
-temp2 = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['p_level_all']
-temp3 = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['succ_all']
-temp4 = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['comb_all']
-temp5 = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['r_bin_all']
-temp6 = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['p_bin_all']
-temp7 = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['r_bin_sf_all']
-temp8 = data_dict_all['PmD_dicts']['classification_output_all']['res_win']['p_bin_sf_all']
-rw = [temp['accuracy'],temp['accuracy_shuffled'],temp['chance'],temp2['accuracy'],temp2['accuracy_shuffled'],temp2['chance'],temp3['accuracy'],temp3['accuracy_shuffled'],temp3['chance'],temp4['accuracy'],temp4['accuracy_shuffled'],temp4['chance'],temp5['accuracy'],temp5['accuracy_shuffled'],temp5['chance'],temp6['accuracy'],temp6['accuracy_shuffled'],temp6['chance'],temp7['accuracy'],temp7['accuracy_shuffled'],temp7['chance'],temp8['accuracy'],temp8['accuracy_shuffled'],temp8['chance']]
-
-temp = data_dict_all['PmD_dicts']['classification_output_all']['concat']['r_level_all']
-temp2 = data_dict_all['PmD_dicts']['classification_output_all']['concat']['p_level_all']
-temp3 = data_dict_all['PmD_dicts']['classification_output_all']['concat']['succ_all']
-temp4 = data_dict_all['PmD_dicts']['classification_output_all']['concat']['comb_all']
-temp5 = data_dict_all['PmD_dicts']['classification_output_all']['concat']['r_bin_all']
-temp6 = data_dict_all['PmD_dicts']['classification_output_all']['concat']['p_bin_all']
-temp7 = data_dict_all['PmD_dicts']['classification_output_all']['concat']['r_bin_sf_all']
-temp8 = data_dict_all['PmD_dicts']['classification_output_all']['concat']['p_bin_sf_all']
-ct = [temp['accuracy'],temp['accuracy_shuffled'],temp['chance'],temp2['accuracy'],temp2['accuracy_shuffled'],temp2['chance'],temp3['accuracy'],temp3['accuracy_shuffled'],temp3['chance'],temp4['accuracy'],temp4['accuracy_shuffled'],temp4['chance'],temp5['accuracy'],temp5['accuracy_shuffled'],temp5['chance'],temp6['accuracy'],temp6['accuracy_shuffled'],temp6['chance'],temp7['accuracy'],temp7['accuracy_shuffled'],temp7['chance'],temp8['accuracy'],temp8['accuracy_shuffled'],temp8['chance']]
-
-worksheet.write(16,0,'PmD')
-worksheet.write(0,1,comb_names[0])
-worksheet.write(0,4,comb_names[1])
-worksheet.write(0,7,comb_names[2])
-worksheet.write(0,10,comb_names[3])
-worksheet.write(0,13,comb_names[4])
-worksheet.write(0,16,comb_names[5])
-worksheet.write(0,19,comb_names[6])
-worksheet.write(0,22,comb_names[7])
-
-worksheet.write_row(1,1,out_names)
-worksheet.write_row(1,4,out_names)
-worksheet.write_row(1,7,out_names)
-worksheet.write_row(1,10,out_names)
-worksheet.write_row(1,13,out_names)
-worksheet.write_row(1,16,out_names)
-worksheet.write_row(1,19,out_names)
-worksheet.write_row(1,22,out_names)
-
-worksheet.write_column(17,0,type_names)
-worksheet.write_row(18,1,ac)
-worksheet.write_row(19,1,br)
-worksheet.write_row(20,1,ar)
-worksheet.write_row(21,1,rw)
-worksheet.write_row(22,1,ct)
-'''
-
-
 ###########
 
 plt.close('all')
 
 
+
+
+####################################
+
+def search_sequence_numpy(arr,seq):
+    """ Find sequence in an array using NumPy only.
+
+    Parameters
+    ----------    
+    arr    : input 1D array
+    seq    : input 1D array
+
+    Output
+    ------    
+    Output : 1D Array of indices in the input array that satisfy the 
+    matching of input sequence in the input array.
+    In case of no match, empty list is returned.
+    """
+
+    # Store sizes of input array and sequence
+    Na, Nseq = arr.size, seq.size
+
+    # Range of sequence
+    r_seq = np.arange(Nseq)
+
+    # Create 2D array of sliding indices across entire length of input array.
+    # Match up with the input sequence & get the matching starting indices.
+    M = (arr[np.arange(Na-Nseq+1)[:,None] + r_seq] == seq).all(1)
+
+    # Get the range of those indices as final output
+    if M.any>0:
+        return np.where(np.convolve(M,np.ones((Nseq),dtype=int))>0)[0]
+    else:
+        return []         # No match found
+
+def find_runs(x):
+    """Find runs of consecutive items in an array."""
+
+    # ensure array
+    x = np.asanyarray(x)
+    if x.ndim != 1:
+        raise ValueError('only 1D array supported')
+    n = x.shape[0]
+
+    # handle empty array
+    if n == 0:
+        return np.array([]), np.array([]), np.array([])
+
+    else:
+        # find run starts
+        loc_run_start = np.empty(n, dtype=bool)
+        loc_run_start[0] = True
+        np.not_equal(x[:-1], x[1:], out=loc_run_start[1:])
+        run_starts = np.nonzero(loc_run_start)[0]
+
+        # find run values
+        run_values = x[loc_run_start]
+
+        # find run lengths
+        run_lengths = np.diff(np.append(run_starts, n))
+
+    return run_values, run_starts, run_lengths
+
+
+
+#########################
+# run ###################
+#########################
+
+#all_dict = np.load('v2_backup_cv.npy',encoding='latin1')[()]
+all_dict = data_dict_all
+
+corr_output = np.zeros((5,2))
+
+r_p_all = all_dict['M1_dicts']['avg_and_corr']['aft_cue']['r_p_all']
+
+r_levels = r_p_all[:,0]
+p_levels = r_p_all[:,1]
+        
+succ_targs = np.where(r_p_all[:,2] > 0, 1,0)
+
+r_nr_targs = np.where(r_p_all[:,0] > 0,1,0)
+p_np_targs = np.where(r_p_all[:,1] > 0,1,0)
+
+comb = np.zeros((np.shape(r_p_all)[0]))
+for i in range(np.shape(r_nr_targs)[0]):
+    if r_nr_targs[i] == 0 and p_np_targs[i] == 0:
+        comb[i] = 0
+    elif r_nr_targs[i] == 1 and p_np_targs[i] == 0:
+        comb[i] = 1
+    elif r_nr_targs[i] == 0 and p_np_targs[i] == 1:
+        comb[i] = 2
+    elif r_nr_targs[i] == 1 and p_np_targs[i] == 1:
+        comb[i] = 3
+            
+r_bin_sf_targ = np.zeros((np.shape(r_p_all)[0]))
+for i in range(np.shape(r_nr_targs)[0]):
+    if r_nr_targs[i] == 0 and succ_targs[i] != 1:
+        r_bin_sf_targ[i] = 0
+    elif r_nr_targs[i] == 1 and succ_targs[i] != 1:
+        r_bin_sf_targ[i] = 1
+    elif r_nr_targs[i] == 0 and succ_targs[i] == 1:
+        r_bin_sf_targ[i] = 2
+    elif r_nr_targs[i] == 1 and succ_targs[i] == 1:
+        r_bin_sf_targ[i] = 3
+            
+p_bin_sf_targ = np.zeros((np.shape(r_p_all)[0]))
+for i in range(np.shape(p_np_targs)[0]):
+    if p_np_targs[i] == 0 and succ_targs[i] != 1:
+        p_bin_sf_targ[i] = 0
+    elif p_np_targs[i] == 1 and succ_targs[i] != 1:
+        p_bin_sf_targ[i] = 1
+    elif p_np_targs[i] == 0 and succ_targs[i] == 1:
+        p_bin_sf_targ[i] = 2
+    elif p_np_targs[i] == 1 and succ_targs[i] == 1:
+        p_bin_sf_targ[i] = 3
+
+comb_sf = np.zeros((np.shape(comb)[0]))
+for i in range(np.shape(comb)[0]):
+    if comb[i] == 0 and succ_targs[i] != 1:
+        comb_sf[i] = 0
+    elif comb[i] == 0 and succ_targs[i] == 1:
+        comb_sf[i] = 1
+    elif comb[i] == 1 and succ_targs[i] != 1:
+        comb_sf[i] = 2
+    elif comb[i] == 1 and succ_targs[i] == 1:
+        comb_sf[i] = 3
+    elif comb[i] == 2 and succ_targs[i] != 1:
+        comb_sf[i] = 4
+    elif comb[i] == 2 and succ_targs[i] == 1:
+        comb_sf[i] = 5
+    elif comb[i] == 3 and succ_targs[i] != 1:
+        comb_sf[i] = 6
+    elif comb[i] == 3 and succ_targs[i] == 1:
+        comb_sf[i] = 7
+
+
+
+            
+r_levels_succ = pearsonr(r_levels,succ_targs)
+p_levels_succ = pearsonr(p_levels,succ_targs)
+
+r_bin_succ = pearsonr(r_nr_targs,succ_targs)
+p_bin_succ = pearsonr(p_np_targs,succ_targs)
+
+comb_succ = pearsonr(comb,succ_targs)
+    
+corr_output[0,:] = r_levels_succ
+corr_output[1,:] = p_levels_succ
+corr_output[2,:] = r_bin_succ
+corr_output[3,:] = p_bin_succ
+corr_output[4,:] = comb_succ
+
+##
+#two_fail = np.shape(search_sequence_numpy(succ_targs,np.array([0,0])))[0]
+#three_fail = np.shape(search_sequence_numpy(succ_targs,np.array([0,0,0])))[0]
+#four_fail = np.shape(search_sequence_numpy(succ_targs,np.array([0,0,0,0])))[0]
+
+run_values, run_starts, run_lengths = find_runs(succ_targs)
+fails = run_lengths[run_values == 0]
+
+single_fail_perc = np.sum(fails == 1) / float(np.shape(fails)[0])
+
+f = open('corr_summary.txt','w')
+
+f.write('correlation with succ/fail summary:\n')
+f.write('r levels: p- ' + repr(r_levels_succ[1]) + ' corcoeff- ' + repr(r_levels_succ[0]) + '\n')
+f.write('p levels: p- ' + repr(p_levels_succ[1]) + ' corcoeff- ' + repr(p_levels_succ[0]) + '\n')
+f.write('r bin: p- ' + repr(r_bin_succ[1]) + ' corcoeff- ' + repr(r_bin_succ[0]) + '\n')
+f.write('p bin: p- ' + repr(p_bin_succ[1]) + ' corcoeff- ' + repr(p_bin_succ[0]) + '\n')
+f.write('comb: p- ' + repr(comb_succ[1]) + ' corcoeff- ' + repr(comb_succ[0]) + '\n\n')
+
+
+f.write('total trials: ' + repr(np.shape(r_levels)[0])  + '\n')
+f.write('perc succ: ' + repr(np.sum(succ_targs == 1) / float(np.shape(succ_targs)[0])) + '\n')
+f.write('perc fail: ' + repr(np.sum(succ_targs == 0) / float(np.shape(succ_targs)[0])) + '\n\n')
+
+f.write('perc nr fail: ' + repr(np.sum(r_bin_sf_targ == 0) / float(np.shape(r_bin_sf_targ)[0])) + '\n')
+f.write('perc r fail: ' + repr(np.sum(r_bin_sf_targ == 1) / float(np.shape(r_bin_sf_targ)[0])) + '\n')
+f.write('perc nr succ: ' + repr(np.sum(r_bin_sf_targ == 2) / float(np.shape(r_bin_sf_targ)[0])) + '\n')
+f.write('perc r succ: ' + repr(np.sum(r_bin_sf_targ == 3) / float(np.shape(r_bin_sf_targ)[0])) + '\n\n')
+
+f.write('perc np fail: ' + repr(np.sum(p_bin_sf_targ == 0) / float(np.shape(p_bin_sf_targ)[0])) + '\n')
+f.write('perc p fail: ' + repr(np.sum(p_bin_sf_targ == 1) / float(np.shape(p_bin_sf_targ)[0])) + '\n')
+f.write('perc np succ: '+ repr(np.sum(p_bin_sf_targ == 2) / float(np.shape(p_bin_sf_targ)[0])) + '\n')
+f.write('perc p succ: ' + repr(np.sum(p_bin_sf_targ == 3) / float(np.shape(p_bin_sf_targ)[0])) + '\n\n')
+
+
+f.write('perc R0P0 fail: ' + repr(np.sum(comb_sf == 0) / float(np.shape(comb_sf)[0])) + '\n')
+f.write('perc R0P0 succ: ' + repr(np.sum(comb_sf == 1) / float(np.shape(comb_sf)[0])) + '\n')
+f.write('perc RXP0 fail: ' + repr(np.sum(comb_sf == 2) / float(np.shape(comb_sf)[0])) + '\n')
+f.write('perc RXP0 succ: ' + repr(np.sum(comb_sf == 3) / float(np.shape(comb_sf)[0])) + '\n')
+f.write('perc R0PX fail: ' + repr(np.sum(comb_sf == 4) / float(np.shape(comb_sf)[0])) + '\n')
+f.write('perc R0PX succ: ' + repr(np.sum(comb_sf == 5) / float(np.shape(comb_sf)[0])) + '\n')
+f.write('perc RXPX fail: ' + repr(np.sum(comb_sf == 6) / float(np.shape(comb_sf)[0])) + '\n')
+f.write('perc RXPX succ: ' + repr(np.sum(comb_sf == 7) / float(np.shape(comb_sf)[0])) + '\n\n')
+
+f.write('single fail perc: ' + repr(single_fail_perc) + '\n')
+f.write('fail runs: ' + repr(fails) + '\n\n')
+
+f.close()
+
+np.save('corr_output',corr_output)
