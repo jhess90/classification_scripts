@@ -84,17 +84,7 @@ for(region_index in 1:length(region_list)){
 
   res0 <- which(condensed[,6] == 0)
   res1 <- which(condensed[,6] == 1)
-  
-  #test = tryCatch({
-  #catch_x <- which(condensed[,12] <= -1)
-  #catch0 <- which(condensed[,12] == 0)
-  #catchx <- which(condensed[,12] >= 1)
-  #},warning = function(war) {
-  #catch_x <- c(0)
-  #catch0 <- c(0)
-  #catchx <- c(0)
-  #},finally={})
-  
+    
   r0_f <- res0[which(res0 %in% r0)]
   rx_f <- res0[which(res0 %in% rx)]
   r0_s <- res1[which(res1 %in% r0)]
@@ -431,29 +421,6 @@ for(region_index in 1:length(region_list)){
   plot(plt)
   graphics.off()
   
-  #catch
-  #png(paste(region_list[region_index],'_catch_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
-  
-  #num_inc <- rbind(out_sig_sign_percs$catch_x_sig_sign_percs[2,],out_sig_sign_percs$catchx_sig_sign_percs[2,])
-  #rownames(num_inc) <- c('P catch trial','R catch trial')
-  #colnames(num_inc) <- window_names
-  #num_inc_melt <- melt(num_inc,varnames=c('level','window'))
-  #num_inc_melt$direction <- 'inc'
-  
-  #num_dec <- rbind(out_sig_sign_percs$res0_sig_sign_percs[3,],out_sig_sign_percs$res1_sig_sign_percs[3,])
-  #rownames(num_dec) <- c('P catch trial','R catch trial')
-  #colnames(num_dec) <- window_names
-  #num_dec_melt <- melt(num_dec,varnames=c('level','window'))
-  #num_dec_melt$direction <- 'dec'
-  
-  #both_num <- rbind(num_inc_melt,num_dec_melt)
-  
-  #plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
-  #plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Catch trials',y='Number of units')
-  #plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
-  
-  #plot(plt)
-  #graphics.off()
   
   #################
   #### Ski Mack ###
@@ -888,29 +855,13 @@ for(region_index in 1:length(region_list)){
     #if (length(sm_sig_p_comb_outcome_levels[,1]) != length(ph_comb_outcome_levels)){cat('ERROR in post hoc lengths\n')
     #  cat('test')}
     cat('comb outcome level differences: ',length(ph_comb_outcome_levels),'units\n')
-    
-    assign(paste(region_list[region_index],'_sm_sig_p_r_catch_levels_',window_name[i],sep=""),sm_sig_p_r_catch_levels)
-    assign(paste(region_list[region_index],'_ph_r_catch_levels_',window_name[i],sep=""),ph_r_catch_levels)
-    if (length(sm_sig_p_r_catch_levels[,1]) != length(ph_r_catch_levels)){cat('ERROR in post hoc lengths\n')}
-    cat('r catch level differences: ',length(ph_r_catch_levels),'units\n')
-    
-    assign(paste(region_list[region_index],'_sm_sig_p_p_catch_levels_',window_name[i],sep=""),sm_sig_p_p_catch_levels)
-    assign(paste(region_list[region_index],'_ph_p_catch_levels_',window_name[i],sep=""),ph_p_catch_levels)
-    if (length(sm_sig_p_p_catch_levels[,1]) != length(ph_p_catch_levels)){cat('ERROR in post hoc lengths\n')}
-    cat('p catch level differences: ',length(ph_p_catch_levels),'units\n')
-    
+        
     assign(paste(region_list[region_index],'_sig_p_r_delivery_levels_',window_name[i],sep=""),sig_p_r_delivery_levels)
     cat('r delivery diffs: ',length(sig_p_r_delivery_levels[,1]),'units\n')
   
     assign(paste(region_list[region_index],'_sig_p_p_delivery_levels_',window_name[i],sep=""),sig_p_p_delivery_levels)
     cat('p delivery diffs: ',length(sig_p_p_delivery_levels[,1]),'units\n')
     
-    assign(paste(region_list[region_index],'_sig_p_r_bin_catch_levels_',window_name[i],sep=""),sig_p_r_bin_catch_levels)
-    cat('r bin catch diffs: ',length(sig_p_r_bin_catch_levels[,1]),'units\n')
-    
-    tryCatch({assign(paste(region_list[region_index],'_sig_p_p_bin_catch_levels_',window_name[i],sep=""),sig_p_p_bin_catch_levels)
-      cat('p bin catch diffs: ',length(sig_p_p_bin_catch_levels[,1]),'units\n')
-    },error=function(e){},finally={})
    
     assign(paste(region_list[region_index],'_sm_sig_p_v_levels_',window_name[i],sep=""),sm_sig_p_v_levels)
     assign(paste(region_list[region_index],'_ph_v_levels_',window_name[i],sep=""),ph_v_levels)
@@ -920,7 +871,7 @@ for(region_index in 1:length(region_list)){
     assign(paste(region_list[region_index],'_ph_m_levels_',window_name[i],sep=""),ph_m_levels)
     cat('m level differences: ',length(ph_m_levels),'units\n')
      
-    diffs_length_list <- list(r=length(sig_p_r_levels[,1]),p=length(sig_p_p_levels[,1]),r_outcome=length(ph_r_outcome_levels),p_outcome=length(ph_p_outcome_levels),outcome=length(sm_sig_p_outcome_levels[,1]),comb=length(ph_comb_levels),comb_outcome=length(ph_comb_outcome_levels),r_catch=length(ph_r_catch_levels),p_catch=length(ph_p_catch_levels),r_delivery=length(sig_p_r_delivery_levels[,1]),p_delivery=length(sig_p_p_delivery_levels[,1]),r_bin_catch=length(sig_p_r_bin_catch_levels[,1]),p_bin_catch=length(sig_p_p_bin_catch_levels),value=length(sm_sig_p_v_levels[,1]),motivation=length(sm_sig_p_m_levels[,1]))
+    diffs_length_list <- list(r=length(sig_p_r_levels[,1]),p=length(sig_p_p_levels[,1]),r_outcome=length(ph_r_outcome_levels),p_outcome=length(ph_p_outcome_levels),outcome=length(sm_sig_p_outcome_levels[,1]),comb=length(ph_comb_levels),comb_outcome=length(ph_comb_outcome_levels),r_delivery=length(sig_p_r_delivery_levels[,1]),p_delivery=length(sig_p_p_delivery_levels[,1]),value=length(sm_sig_p_v_levels[,1]),motivation=length(sm_sig_p_m_levels[,1]))
     assign(paste(region_list[region_index],'_diffs_length_list_',window_name[i],sep=""),diffs_length_list)
 
   }
@@ -930,8 +881,10 @@ for(region_index in 1:length(region_list)){
 
 pth <- getwd()
 
-if(substr(pth,nchar(pth)-2,nchar(pth)-2) == "9"){save_name = substr(pth,nchar(pth)-6,nchar(pth))}else{save_name=substr(pth,nchar(pth)-7,nchar(pth))}
+#if(substr(pth,nchar(pth)-2,nchar(pth)-2) == "9"){save_name = substr(pth,nchar(pth)-6,nchar(pth))}else{save_name=substr(pth,nchar(pth)-7,nchar(pth))}
+
+save_name <- 'block'
 
 save.image(paste(save_name,".RData",sep=""))
-#rm(list=ls())
+rm(list=ls())
 

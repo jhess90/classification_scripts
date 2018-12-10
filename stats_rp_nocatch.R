@@ -60,9 +60,15 @@ for(region_index in 1:length(region_list)){
 
   ###########
   r0 <- which(condensed[,4] == 0)
+  r1 <- which(condensed[,4] == 1)
+  r2 <- which(condensed[,4] == 2)
+  r3 <- which(condensed[,4] == 3)
   rx <- which(condensed[,4] >= 1)
   
   p0 <- which(condensed[,5] == 0)
+  p1 <- which(condensed[,5] == 1)
+  p2 <- which(condensed[,5] == 2)
+  p3 <- which(condensed[,5] == 3)
   px <- which(condensed[,5] >= 1)
   
   v_3 <- which(condensed[,7] == -3)
@@ -73,28 +79,35 @@ for(region_index in 1:length(region_list)){
   v2 <- which(condensed[,7] == 2)
   v3 <- which(condensed[,7] == 3)
   
-  v_x <- which(condensed[,7] < 0)
-  v0 <- which(condensed[,7] == 0)
-  vx <- which(condensed[,7] > 0)
-  
-  #todo unhardcode motivation? doesn't work for all nonbinary
   m0 <- which(condensed[,8] == 0)
-  mx <- which(condensed[,8] == 3)
-  m2x <- which(condensed[,8] == 6)
-
+  m1 <- which(condensed[,8] == 1)
+  m2 <- which(condensed[,8] == 2)
+  m3 <- which(condensed[,8] == 3)
+  m4 <- which(condensed[,8] == 4)
+  m5 <- which(condensed[,8] == 5)
+  m6 <- which(condensed[,8] == 6)
+  
   res0 <- which(condensed[,6] == 0)
   res1 <- which(condensed[,6] == 1)
   
-  #test = tryCatch({
-  #catch_x <- which(condensed[,12] <= -1)
-  #catch0 <- which(condensed[,12] == 0)
-  #catchx <- which(condensed[,12] >= 1)
-  #},warning = function(war) {
-  #catch_x <- c(0)
-  #catch0 <- c(0)
-  #catchx <- c(0)
-  #},finally={})
+  r0_fail <- res0[which(res0 %in% r0)]
+  r1_fail <- res0[which(res0 %in% r1)]
+  r2_fail <- res0[which(res0 %in% r2)]
+  r3_fail <- res0[which(res0 %in% r3)]
+  r0_succ <- res1[which(res1 %in% r0)]
+  r1_succ <- res1[which(res1 %in% r1)]
+  r2_succ <- res1[which(res1 %in% r2)]
+  r3_succ <- res1[which(res1 %in% r3)]
   
+  p0_fail <- res0[which(res0 %in% p0)]
+  p1_fail <- res0[which(res0 %in% p1)]
+  p2_fail <- res0[which(res0 %in% p2)]
+  p3_fail <- res0[which(res0 %in% p3)]
+  p0_succ <- res1[which(res1 %in% p0)]
+  p1_succ <- res1[which(res1 %in% p1)]
+  p2_succ <- res1[which(res1 %in% p2)]
+  p3_succ <- res1[which(res1 %in% p3)]
+    
   r0_f <- res0[which(res0 %in% r0)]
   rx_f <- res0[which(res0 %in% rx)]
   r0_s <- res1[which(res1 %in% r0)]
@@ -121,9 +134,9 @@ for(region_index in 1:length(region_list)){
   
   #########################
   
-  #comb_list <- c('r0','p0','res0','res1','catch_x','catch0','catchx','rx','px','r0_f','rx_f','r0_s','rx_s','p0_f','px_f','p0_s','px_s','r0_p0','rx_p0','r0_px','rx_px','r0_p0_s','rx_p0_s','r0_px_s','rx_px_s','r0_p0_f','rx_p0_f','r0_px_f','rx_px_f','v_x','v0','vx','m0','mx','m2x','catch_x','catchx')
+  #comb_list <- c('r0','r1','r2','r3','p0','p1','p2','p3','res0','res1','r0_fail','r1_fail','r2_fail','r3_fail','r0_succ','r1_succ','r2_succ','r3_succ','p0_fail','p1_fail','p2_fail','p3_fail','p0_succ','p1_succ','p2_succ','p3_succ','catch_x','catch0','catchx','rx','px','r0_f','rx_f','r0_s','rx_s','p0_f','px_f','p0_s','px_s','r0_p0','rx_p0','r0_px','rx_px','r0_p0_s','rx_p0_s','r0_px_s','rx_px_s','r0_p0_f','rx_p0_f','r0_px_f','rx_px_f','v_3','v_2','v_1','v0','v1','v2','v3','m0','m1','m2','m3','m4','m5','m6','catch_x','catchx')
 
-  comb_list <- c('r0','p0','res0','res1','rx','px','r0_f','rx_f','r0_s','rx_s','p0_f','px_f','p0_s','px_s','r0_p0','rx_p0','r0_px','rx_px','r0_p0_s','rx_p0_s','r0_px_s','rx_px_s','r0_p0_f','rx_p0_f','r0_px_f','rx_px_f','v_x','v0','vx','m0','mx','m2x')
+  comb_list <- c('r0','r1','r2','r3','p0','p1','p2','p3','res0','res1','r0_fail','r1_fail','r2_fail','r3_fail','r0_succ','r1_succ','r2_succ','r3_succ','p0_fail','p1_fail','p2_fail','p3_fail','p0_succ','p1_succ','p2_succ','p3_succ','rx','px','r0_f','rx_f','r0_s','rx_s','p0_f','px_f','p0_s','px_s','r0_p0','rx_p0','r0_px','rx_px','r0_p0_s','rx_p0_s','r0_px_s','rx_px_s','r0_p0_f','rx_p0_f','r0_px_f','rx_px_f','v_3','v_2','v_1','v0','v1','v2','v3','m0','m1','m2','m3','m4','m5','m6')
   
   out_p_list <- c()
   out_perc_sig_list <- c()
@@ -223,14 +236,14 @@ for(region_index in 1:length(region_list)){
   #reward
   png(paste(region_list[region_index],'_r_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
   
-  num_inc <- rbind(out_sig_sign_percs$r0_sig_sign_percs[2,],out_sig_sign_percs$rx_sig_sign_percs[2,])
-  rownames(num_inc) <- c(0,'x')
+  num_inc <- rbind(out_sig_sign_percs$r0_sig_sign_percs[2,],out_sig_sign_percs$r1_sig_sign_percs[2,],out_sig_sign_percs$r2_sig_sign_percs[2,],out_sig_sign_percs$r3_sig_sign_percs[2,])
+  rownames(num_inc) <- c(0,1,2,3)
   colnames(num_inc) <- window_names
   num_inc_melt <- melt(num_inc,varnames=c('level','window'))
   num_inc_melt$direction <- 'inc'
 
-  num_dec <- rbind(out_sig_sign_percs$r0_sig_sign_percs[3,],out_sig_sign_percs$rx_sig_sign_percs[3,])
-  rownames(num_dec) <- c(0,'x')
+  num_dec <- rbind(out_sig_sign_percs$r0_sig_sign_percs[3,],out_sig_sign_percs$r1_sig_sign_percs[3,],out_sig_sign_percs$r2_sig_sign_percs[3,],out_sig_sign_percs$r3_sig_sign_percs[3,])
+  rownames(num_dec) <- c(0,1,2,3)
   colnames(num_dec) <- window_names
   num_dec_melt <- melt(num_dec,varnames=c('level','window'))
   num_dec_melt$direction <- 'dec'
@@ -246,14 +259,14 @@ for(region_index in 1:length(region_list)){
   #punishment
   png(paste(region_list[region_index],'_p_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
   
-  num_inc <- rbind(out_sig_sign_percs$p0_sig_sign_percs[2,],out_sig_sign_percs$px_sig_sign_percs[2,])
-  rownames(num_inc) <- c(0,'x')
+  num_inc <- rbind(out_sig_sign_percs$p0_sig_sign_percs[2,],out_sig_sign_percs$p1_sig_sign_percs[2,],out_sig_sign_percs$p2_sig_sign_percs[2,],out_sig_sign_percs$p3_sig_sign_percs[2,])
+  rownames(num_inc) <- c(0,1,2,3)
   colnames(num_inc) <- window_names
   num_inc_melt <- melt(num_inc,varnames=c('level','window'))
   num_inc_melt$direction <- 'inc'
   
-  num_dec <- rbind(out_sig_sign_percs$p0_sig_sign_percs[3,],out_sig_sign_percs$px_sig_sign_percs[3,])
-  rownames(num_dec) <- c(0,'x')
+  num_dec <- rbind(out_sig_sign_percs$p0_sig_sign_percs[3,],out_sig_sign_percs$p1_sig_sign_percs[3,],out_sig_sign_percs$p2_sig_sign_percs[3,],out_sig_sign_percs$p3_sig_sign_percs[3,])
+  rownames(num_dec) <- c(0,1,2,3)
   colnames(num_dec) <- window_names
   num_dec_melt <- melt(num_dec,varnames=c('level','window'))
   num_dec_melt$direction <- 'dec'
@@ -383,17 +396,65 @@ for(region_index in 1:length(region_list)){
   plot(plt)
   graphics.off()
   
-  #motivation
-  png(paste(region_list[region_index],'_m_outcome_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
+  #reward outcome
+  png(paste(region_list[region_index],'_r_outcome_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
   
-  num_inc <- rbind(out_sig_sign_percs$m0_sig_sign_percs[2,],out_sig_sign_percs$mx_sig_sign_percs[2,],out_sig_sign_percs$m2x_sig_sign_percs[2,])
-  rownames(num_inc) <- c('m0','mx','m2x')
+  num_inc <- rbind(out_sig_sign_percs$r0_succ_sig_sign_percs[2,],out_sig_sign_percs$r1_succ_sig_sign_percs[2,],out_sig_sign_percs$r2_succ_sig_sign_percs[2,],out_sig_sign_percs$r3_succ_sig_sign_percs[2,],out_sig_sign_percs$r0_fail_sig_sign_percs[2,],out_sig_sign_percs$r1_fail_sig_sign_percs[2,],out_sig_sign_percs$r2_fail_sig_sign_percs[2,],out_sig_sign_percs$r3_fail_sig_sign_percs[2,])
+  rownames(num_inc) <- c('r0s','r1s','r2s','r3s','r0f','r1f','r2f','r3f')
   colnames(num_inc) <- window_names
   num_inc_melt <- melt(num_inc,varnames=c('level','window'))
   num_inc_melt$direction <- 'inc'
   
-  num_dec <- rbind(out_sig_sign_percs$m0_sig_sign_percs[3,],out_sig_sign_percs$mx_sig_sign_percs[3,],out_sig_sign_percs$m2x_sig_sign_percs[3,])
-  rownames(num_dec) <- c('m0','mx','m2x')
+  num_dec <- rbind(out_sig_sign_percs$r0_succ_sig_sign_percs[3,],out_sig_sign_percs$r1_succ_sig_sign_percs[3,],out_sig_sign_percs$r2_succ_sig_sign_percs[3,],out_sig_sign_percs$r3_succ_sig_sign_percs[3,],out_sig_sign_percs$r0_fail_sig_sign_percs[3,],out_sig_sign_percs$r1_fail_sig_sign_percs[3,],out_sig_sign_percs$r2_fail_sig_sign_percs[3,],out_sig_sign_percs$r3_fail_sig_sign_percs[3,])
+  rownames(num_dec) <- c('r0s','r1s','r2s','r3s','r0f','r1f','r2f','r3f')
+  colnames(num_dec) <- window_names
+  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  num_dec_melt$direction <- 'dec'
+  
+  both_num <- rbind(num_inc_melt,num_dec_melt)
+  
+  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Reward Level and Outcome',y='Number of units')
+  plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
+  
+  plot(plt)
+  graphics.off()
+  
+  #punishment outcome
+  png(paste(region_list[region_index],'_p_outcome_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  num_inc <- rbind(out_sig_sign_percs$p0_succ_sig_sign_percs[2,],out_sig_sign_percs$p1_succ_sig_sign_percs[2,],out_sig_sign_percs$p2_succ_sig_sign_percs[2,],out_sig_sign_percs$p3_succ_sig_sign_percs[2,],out_sig_sign_percs$p0_fail_sig_sign_percs[2,],out_sig_sign_percs$p1_fail_sig_sign_percs[2,],out_sig_sign_percs$p2_fail_sig_sign_percs[2,],out_sig_sign_percs$p3_fail_sig_sign_percs[2,])
+  rownames(num_inc) <- c('p0s','p1s','p2s','p3s','p0f','p1f','p2f','p3f')
+  colnames(num_inc) <- window_names
+  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  num_inc_melt$direction <- 'inc'
+  
+  num_dec <- rbind(out_sig_sign_percs$p0_succ_sig_sign_percs[3,],out_sig_sign_percs$p1_succ_sig_sign_percs[3,],out_sig_sign_percs$p2_succ_sig_sign_percs[3,],out_sig_sign_percs$p3_succ_sig_sign_percs[3,],out_sig_sign_percs$p0_fail_sig_sign_percs[3,],out_sig_sign_percs$p1_fail_sig_sign_percs[3,],out_sig_sign_percs$p2_fail_sig_sign_percs[3,],out_sig_sign_percs$p3_fail_sig_sign_percs[3,])
+  rownames(num_dec) <- c('p0s','p1s','p2s','p3s','p0f','p1f','p2f','p3f')
+  colnames(num_dec) <- window_names
+  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  num_dec_melt$direction <- 'dec'
+  
+  both_num <- rbind(num_inc_melt,num_dec_melt)
+  
+  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Punishment Level and Outcome',y='Number of units')
+  plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
+  
+  plot(plt)
+  graphics.off()
+  
+  #motivation
+  png(paste(region_list[region_index],'_m_outcome_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  num_inc <- rbind(out_sig_sign_percs$m0_sig_sign_percs[2,],out_sig_sign_percs$m1_sig_sign_percs[2,],out_sig_sign_percs$m2_sig_sign_percs[2,],out_sig_sign_percs$m3_sig_sign_percs[2,],out_sig_sign_percs$m4_sig_sign_percs[2,],out_sig_sign_percs$m5_sig_sign_percs[2,],out_sig_sign_percs$m6_sig_sign_percs[2,])
+  rownames(num_inc) <- c('m0','m1','m2','m3','m4','m5','m6')
+  colnames(num_inc) <- window_names
+  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  num_inc_melt$direction <- 'inc'
+  
+  num_dec <- rbind(out_sig_sign_percs$m0_sig_sign_percs[3,],out_sig_sign_percs$m1_sig_sign_percs[3,],out_sig_sign_percs$m2_sig_sign_percs[3,],out_sig_sign_percs$m3_sig_sign_percs[3,],out_sig_sign_percs$m4_sig_sign_percs[3,],out_sig_sign_percs$m5_sig_sign_percs[3,],out_sig_sign_percs$m6_sig_sign_percs[3,])
+  rownames(num_dec) <- c('m0','m1','m2','m3','m4','m5','m6')
   colnames(num_dec) <- window_names
   num_dec_melt <- melt(num_dec,varnames=c('level','window'))
   num_dec_melt$direction <- 'dec'
@@ -410,14 +471,14 @@ for(region_index in 1:length(region_list)){
   #value
   png(paste(region_list[region_index],'_v_outcome_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
   
-  num_inc <- rbind(out_sig_sign_percs$v_x_sig_sign_percs[2,],out_sig_sign_percs$v0_sig_sign_percs[2,],out_sig_sign_percs$vx_sig_sign_percs[2,])
-  rownames(num_inc) <- c('v_x','v0','vx')
+  num_inc <- rbind(out_sig_sign_percs$v_3_sig_sign_percs[2,],out_sig_sign_percs$v_2_sig_sign_percs[2,],out_sig_sign_percs$v_1_sig_sign_percs[2,],out_sig_sign_percs$v0_sig_sign_percs[2,],out_sig_sign_percs$v1_sig_sign_percs[2,],out_sig_sign_percs$v2_sig_sign_percs[2,],out_sig_sign_percs$v3_sig_sign_percs[2,])
+  rownames(num_inc) <- c('v_3','v_2','v_1','v0','v1','v2','v3')
   colnames(num_inc) <- window_names
   num_inc_melt <- melt(num_inc,varnames=c('level','window'))
   num_inc_melt$direction <- 'inc'
   
-  num_dec <- rbind(out_sig_sign_percs$v_x_sig_sign_percs[3,],out_sig_sign_percs$v0_sig_sign_percs[3,],out_sig_sign_percs$vx_sig_sign_percs[3,])
-  rownames(num_dec) <-c('v_x','v0','vx')
+  num_dec <- rbind(out_sig_sign_percs$v_3_sig_sign_percs[3,],out_sig_sign_percs$v_2_sig_sign_percs[3,],out_sig_sign_percs$v_1_sig_sign_percs[3,],out_sig_sign_percs$v0_sig_sign_percs[3,],out_sig_sign_percs$v1_sig_sign_percs[3,],out_sig_sign_percs$v2_sig_sign_percs[3,],out_sig_sign_percs$v3_sig_sign_percs[3,])
+  rownames(num_dec) <- c('v_3','v_2','v_1','v0','v1','v2','v3')
   colnames(num_dec) <- window_names
   num_dec_melt <- melt(num_dec,varnames=c('level','window'))
   num_dec_melt$direction <- 'dec'
@@ -475,11 +536,11 @@ for(region_index in 1:length(region_list)){
   for(i in 1:4){
     cat('window',window_name[i],'\n')
    
-    sig_p_r_levels <- c()
+    sm_sig_p_r_levels <- c()
     ph_r_levels <- c()
     sig_r_level_ct <- 1
     
-    sig_p_p_levels <- c()
+    sm_sig_p_p_levels <- c()
     ph_p_levels <- c()
     sig_p_level_ct <- 1
     
@@ -531,42 +592,55 @@ for(region_index in 1:length(region_list)){
       #reward levels
       
       r0_means <- rowMeans(all_total_fr[unit_num,r0,windows[i,1]:windows[i,2]])
-      rx_means <- rowMeans(all_total_fr[unit_num,rx,windows[i,1]:windows[i,2]])
+      r1_means <- rowMeans(all_total_fr[unit_num,r1,windows[i,1]:windows[i,2]])
+      r2_means <- rowMeans(all_total_fr[unit_num,r2,windows[i,1]:windows[i,2]])
+      r3_means <- rowMeans(all_total_fr[unit_num,r3,windows[i,1]:windows[i,2]])
       
-      r_levels <- t(rbind.fill.matrix(t(r0_means),t(rx_means)))
-    
-      suppressWarnings(wsr <- wilcox.test(r_levels[,1],r_levels[,2],paired=T))
-      p_val <- wsr$p.v
-      if(p_val < 0.05 & is.finite(p_val)){
-        if (mean(r_levels[,1],na.rm=T) > mean(r_levels[,2],na.rm=T)){r_levels_change = -1}else if(mean(r_levels[,1],na.rm=T) < mean(r_levels[,2],na.rm=T)){r_levels_change = 1}else{change=0}
-        sig_p_r_levels <- rbind(sig_p_r_levels,c(unit_num,p_val,r_levels_change))
+      r_levels <- t(rbind.fill.matrix(t(r0_means),t(r1_means),t(r2_means),t(r3_means)))
+      
+      sm_out <- as.numeric(Ski.Mack(r_levels))
+
+      if(sm_out[1] < 0.05){
+        sm_sig_p_r_levels <- rbind(sm_sig_p_r_levels,c(unit_num,sm_out))
+        
+        r_levels.m <- melt(data.frame(r0=r_levels[,1],r1=r_levels[,2],r2=r_levels[,3],r3=r_levels[,4]),measure.vars=c('r0','r1','r2','r3'),variable.name='level')
+        trash <- capture.output(d_t <- dunn.test(r_levels.m$value,r_levels.m$level,method=p.adjust.methods))
+
+        ph_r_levels[[sig_r_level_ct]] <- d_t
+        sig_r_level_ct <- sig_r_level_ct + 1
       }
-      
       
       #############
       #punishment levels
       p0_means <- rowMeans(all_total_fr[unit_num,p0,windows[i,1]:windows[i,2]])
-      px_means <- rowMeans(all_total_fr[unit_num,px,windows[i,1]:windows[i,2]])
+      p1_means <- rowMeans(all_total_fr[unit_num,p1,windows[i,1]:windows[i,2]])
+      p2_means <- rowMeans(all_total_fr[unit_num,p2,windows[i,1]:windows[i,2]])
+      p3_means <- rowMeans(all_total_fr[unit_num,p3,windows[i,1]:windows[i,2]])
        
-      p_levels <- t(rbind.fill.matrix(t(p0_means),t(px_means)))
+      p_levels <- t(rbind.fill.matrix(t(p0_means),t(p1_means),t(p2_means),t(p3_means)))
       
-      suppressWarnings(wsr <- wilcox.test(p_levels[,1],p_levels[,2],paired=T))
-      p_val <- wsr$p.v
-      if(p_val < 0.05 & is.finite(p_val)){
-        if (mean(p_levels[,1],na.rm=T) > mean(p_levels[,2],na.rm=T)){p_levels_change = -1}else if(mean(p_levels[,1],na.rm=T) < mean(p_levels[,2],na.rm=T)){p_levels_change = 1}else{change=0}
-        sig_p_p_levels <- rbind(sig_p_p_levels,c(unit_num,p_val,p_levels_change))
-      }
+      sm_out <- as.numeric(Ski.Mack(p_levels))
 
+      if(sm_out[1] < 0.05){
+        sm_sig_p_p_levels <- rbind(sm_sig_p_p_levels,c(unit_num,sm_out))
+        
+        p_levels.m <- melt(data.frame(p0=p_levels[,1],p1=p_levels[,2],p2=p_levels[,3],p3=p_levels[,4]),measure.vars=c('p0','p1','p2','p3'),variable.name='level')
+        trash <- capture.output(d_t <- dunn.test(p_levels.m$value,p_levels.m$level,method=p.adjust.methods))
+        
+        ph_p_levels[[sig_p_level_ct]] <- d_t
+        sig_p_level_ct <- sig_p_level_ct + 1
+      }
+      
       #############
       #reward outcome
       r0_s_means <- rowMeans(all_total_fr[unit_num,r0_s,windows[i,1]:windows[i,2]])
       rx_s_means <- rowMeans(all_total_fr[unit_num,rx_s,windows[i,1]:windows[i,2]])
-      if(length(r0_f)==1){r0_f_means = mean(all_total_fr[unit_num,r0_f,windows[i,1]:windows[i,2]])}else{r0_f_means = rowMeans(all_total_fr[unit_num,r0_f,windows[i,1]:windows[i,2]])}
-      if(length(rx_f)==1){rx_f_means = mean(all_total_fr[unit_num,rx_f,windows[i,1]:windows[i,2]])}else{rx_f_means = rowMeans(all_total_fr[unit_num,rx_f,windows[i,1]:windows[i,2]])}
-
+      r0_f_means <- rowMeans(all_total_fr[unit_num,r0_f,windows[i,1]:windows[i,2]])
+      rx_f_means <- rowMeans(all_total_fr[unit_num,rx_f,windows[i,1]:windows[i,2]])
+      
       r_levels <- t(rbind.fill.matrix(t(r0_s_means),t(rx_s_means),t(r0_f_means),t(rx_f_means)))
       
-      tryCatch({sm_out <- as.numeric(Ski.Mack(r_levels))},error=function(e){sm_out <<- c(1.0,1.0)},finally={})
+      sm_out <- as.numeric(Ski.Mack(r_levels))
 
       if(sm_out[1] < 0.05){
         sm_sig_p_r_outcome_levels <- rbind(sm_sig_p_r_outcome_levels,c(unit_num,sm_out))
@@ -582,13 +656,13 @@ for(region_index in 1:length(region_list)){
       #punishment outcome
       p0_s_means <- rowMeans(all_total_fr[unit_num,p0_s,windows[i,1]:windows[i,2]])
       px_s_means <- rowMeans(all_total_fr[unit_num,px_s,windows[i,1]:windows[i,2]])
-      if(length(p0_f)==1){p0_f_means = mean(all_total_fr[unit_num,p0_f,windows[i,1]:windows[i,2]])}else{p0_f_means = rowMeans(all_total_fr[unit_num,p0_f,windows[i,1]:windows[i,2]])}
-      if(length(px_f)==1){px_f_means = mean(all_total_fr[unit_num,px_f,windows[i,1]:windows[i,2]])}else{px_f_means = rowMeans(all_total_fr[unit_num,px_f,windows[i,1]:windows[i,2]])}
+      p0_f_means <- rowMeans(all_total_fr[unit_num,p0_f,windows[i,1]:windows[i,2]])
+      px_f_means <- rowMeans(all_total_fr[unit_num,px_f,windows[i,1]:windows[i,2]])
       
       p_levels <- t(rbind.fill.matrix(t(p0_s_means),t(px_s_means),t(p0_f_means),t(px_f_means)))
       
-      tryCatch({sm_out <- as.numeric(Ski.Mack(p_levels))},error=function(e){sm_out <<- c(1.0,1.0)},finally={})
-      
+      sm_out <- as.numeric(Ski.Mack(p_levels))
+
       if(sm_out[1] < 0.05){
         sm_sig_p_p_outcome_levels <- rbind(sm_sig_p_p_outcome_levels,c(unit_num,sm_out))
         
@@ -602,17 +676,18 @@ for(region_index in 1:length(region_list)){
       #############
       #outcome
 
-      if(length(res0)==1){res0_means = mean(all_total_fr[unit_num,res0,windows[i,1]:windows[i,2]])}else{res0_means = rowMeans(all_total_fr[unit_num,res0,windows[i,1]:windows[i,2]])}
+      res0_means <- rowMeans(all_total_fr[unit_num,res0,windows[i,1]:windows[i,2]])
       res1_means <- rowMeans(all_total_fr[unit_num,res1,windows[i,1]:windows[i,2]])
       
       res_levels <- t(rbind.fill.matrix(t(res0_means),t(res1_means)))
-      
+
       suppressWarnings(wsr <- wilcox.test(res_levels[,1],res_levels[,2],paired=T))
       p_val <- wsr$p.v
+      #cat(p_val,'\n')
       if(p_val < 0.05 & is.finite(p_val)){
         sm_sig_p_outcome_levels <- rbind(sm_sig_p_outcome_levels,c(unit_num,p_val))
       }
-
+    
       #############
       #combination 
       comb_list <- list(r0_p0,r0_px,rx_p0,rx_px)
@@ -666,7 +741,7 @@ for(region_index in 1:length(region_list)){
           means[[comb_outcome_list_names[[j]]]] <- element_mean
           ct <- ct + 1
           means_2[[ct]] <- element_mean
-          }
+        }
       }
       
       if(ct ==8){
@@ -693,64 +768,18 @@ for(region_index in 1:length(region_list)){
         comb_levels.m <- melt(data.frame(temp_temp),measure.vars=names(means),variable.name='level')
         
         trash <- capture.output(d_t <- dunn.test(comb_levels.m$value,comb_levels.m$level,method=p.adjust.methods))
-         
+        
         ph_comb_outcome_levels[[sig_comb_outcome_level_ct]] <- d_t
         sig_comb_outcome_level_ct <- sig_comb_outcome_level_ct + 1
-      
-        #cat(d_t$comparisons,'\n')
-        #cat(unit_num,'\n')
         
       }
-    
-      #reward catch
-      #rx_s_means <- rowMeans(all_total_fr[unit_num,rx_s,windows[i,1]:windows[i,2]])
-      #r0_s_means <- rowMeans(all_total_fr[unit_num,r0_s,windows[i,1]:windows[i,2]])
-      #if(length(catchx)==1){catchx_means = mean(all_total_fr[unit_num,catchx,windows[i,1]:windows[i,2]])}else{catchx_means = rowMeans(all_total_fr[unit_num,catchx,windows[i,1]:windows[i,2]])}
       
-      #c_levels <- t(rbind.fill.matrix(t(rx_s_means),t(r0_s_means),t(catchx_means)))
+      ###########
       
-      #tryCatch({sm_out <- as.numeric(Ski.Mack(c_levels))},error=function(e){sm_out <<- c(1.0,1.0)},finally={})
-      
-      #if(sm_out[1] < 0.05){
-      #  sm_sig_p_r_catch_levels <- rbind(sm_sig_p_r_catch_levels,c(unit_num,sm_out))
-      #  
-      #  c_levels.m <- melt(data.frame(rx_s=c_levels[,1],r0_s=c_levels[,2],catchx=c_levels[,3]),measure.vars=c('rx_s','r0_s','catchx'),variable.name='level')
-      #  trash <- capture.output(d_t <- dunn.test(c_levels.m$value,c_levels.m$level,method=p.adjust.methods))
-        
-      #  ph_r_catch_levels[[sig_r_catch_level_ct]] <- d_t
-      #  sig_r_catch_level_ct <- sig_r_catch_level_ct + 1
-        
-      #}
-      
-      #punishment catch
-      #tryCatch({
-      #  px_f_means <- rowMeans(all_total_fr[unit_num,px_f,windows[i,1]:windows[i,2]])
-      #  p0_f_means <- rowMeans(all_total_fr[unit_num,p0_f,windows[i,1]:windows[i,2]])
-      #  catch_x_means <- rowMeans(all_total_fr[unit_num,catch_x,windows[i,1]:windows[i,2]])
-      
-      #  c_levels <- t(rbind.fill.matrix(t(px_f_means),t(p0_f_means),t(catch_x_means)))
-      
-      #  sm_out <- as.numeric(Ski.Mack(c_levels))
-
-      #  if(sm_out[1] < 0.05){
-      #    sm_sig_p_p_catch_levels <- rbind(sm_sig_p_p_catch_levels,c(unit_num,sm_out))
-          
-      #    p_levels.m <- melt(data.frame(px_f=c_levels[,1],p0_f=c_levels[,2],catch_x=c_levels[,3]),measure.vars=c('px_f','p0_f','catch_x'),variable.name='level')
-      #    trash <- capture.output(d_t <- dunn.test(c_levels.m$value,c_levels.m$level,method=p.adjust.methods))
-          
-      #    ph_p_catch_levels[[sig_r_catch_level_ct]] <- d_t
-      #    sig_p_catch_level_ct <- sig_p_catch_level_ct + 1
-      #  }
-      #},error=function(e){
-
-      #  sm_sig_p_p_catch_levels <- 0
-      #  ph_p_catch_levels <- 0
-        
-      #},finally={})
       
       #############
       #r delivery
-  
+      
       rx_s_means <- rowMeans(all_total_fr[unit_num,rx_s,windows[i,1]:windows[i,2]])
       r0_s_means <- rowMeans(all_total_fr[unit_num,r0_s,windows[i,1]:windows[i,2]])
       
@@ -766,68 +795,36 @@ for(region_index in 1:length(region_list)){
       #############
       #p delivery
       
-      tryCatch({px_f_means <- rowMeans(all_total_fr[unit_num,px_f,windows[i,1]:windows[i,2]])},error=function(e){px_f_means <- mean(all_total_fr[unit_num,px_f,windows[i,1]:windows[i,2]])})
-      if(length(p0_f)==1){p0_f_means = mean(all_total_fr[unit_num,p0_f,windows[i,1]:windows[i,2]])}else{p0_f_means = rowMeans(all_total_fr[unit_num,p0_f,windows[i,1]:windows[i,2]])}
+      px_f_means <- rowMeans(all_total_fr[unit_num,px_f,windows[i,1]:windows[i,2]])
+      p0_f_means <- rowMeans(all_total_fr[unit_num,p0_f,windows[i,1]:windows[i,2]])
       
       p_delivery_levels <- t(rbind.fill.matrix(t(px_f_means),t(p0_f_means)))
       
-      if(length(p_delivery_levels[,1]) != 1){
-        suppressWarnings(wsr <- wilcox.test(p_delivery_levels[,1],p_delivery_levels[,2],paired=T))
-        p_val <- wsr$p.v
-      }else{p_val <- 1.0}
+      suppressWarnings(wsr <- wilcox.test(p_delivery_levels[,1],p_delivery_levels[,2],paired=T))
+      p_val <- wsr$p.v
       if(p_val < 0.05 & is.finite(p_val)){
         if (mean(p_delivery_levels[,1],na.rm=T) > mean(p_delivery_levels[,2],na.rm=T)){p_delivery_change = -1}else if(mean(p_delivery_levels[,1],na.rm=T) < mean(p_delivery_levels[,2],na.rm=T)){p_delivery_change = 1}else{change=0}
         sig_p_p_delivery_levels <- rbind(sig_p_p_delivery_levels,c(unit_num,p_val,p_delivery_change))
       }
       
-      #############
-      #r catch binary
-      
-      #rx_s_means <- rowMeans(all_total_fr[unit_num,rx_s,windows[i,1]:windows[i,2]])
-      #if(length(catchx)==1){catchx_means = mean(all_total_fr[unit_num,catchx,windows[i,1]:windows[i,2]])}else{catchx_means = rowMeans(all_total_fr[unit_num,catchx,windows[i,1]:windows[i,2]])}
-      
-      #catch_levels <- t(rbind.fill.matrix(t(rx_s_means),t(catchx_means)))
-      
-      
-      #if(length(catchx) != 0){
-      #  suppressWarnings(wsr <- wilcox.test(catch_levels[,1],catch_levels[,2],paired=T))
-      #  p_val <- wsr$p.v
-      #}else{p_val <- 1.0}
-      
-      #if(p_val < 0.05 & is.finite(p_val)){
-      #  if (mean(catch_levels[,1],na.rm=T) > mean(catch_levels[,2],na.rm=T)){catch_change = -1}else if(mean(catch_levels[,1],na.rm=T) < mean(catch_levels[,2],na.rm=T)){catch_change = 1}else{change=0}
-      #  sig_p_r_bin_catch_levels <- rbind(sig_p_r_bin_catch_levels,c(unit_num,p_val,catch_change))
-      #}
-      
-      #############
-      #p catch binary
-      #if(length(catch_x) > 1){
-      #  px_f_means <- rowMeans(all_total_fr[unit_num,px_f,windows[i,1]:windows[i,2]])
-      #  catch_x_means <- rowMeans(all_total_fr[unit_num,catch_x,windows[i,1]:windows[i,2]])
-        
-      #  catch_levels <- t(rbind.fill.matrix(t(px_f_means),t(catch_x_means)))
-        
-      #  suppressWarnings(wsr <- wilcox.test(catch_levels[,1],catch_levels[,2],paired=T))
-      #  p_val <- wsr$p.v
-      #  if(p_val < 0.05 & is.finite(p_val)){
-      #    if (mean(catch_levels[,1],na.rm=T) > mean(catch_levels[,2],na.rm=T)){catch_change = -1}else if(mean(catch_levels[,1],na.rm=T) < mean(catch_levels[,2],na.rm=T)){catch_change = 1}else{change=0}
-      #    sig_p_p_bin_catch_levels <- rbind(sig_p_p_bin_catch_levels,c(unit_num,p_val,catch_change))
-      #  }
-      #}else{sig_p_p_bin_catch_levels <- 0}
-      
+
       #value 
-      v_x_means <- rowMeans(all_total_fr[unit_num,v_x,windows[i,1]:windows[i,2]])
+      v_3_means <- rowMeans(all_total_fr[unit_num,v_3,windows[i,1]:windows[i,2]])
+      v_2_means <- rowMeans(all_total_fr[unit_num,v_2,windows[i,1]:windows[i,2]])
+      v_1_means <- rowMeans(all_total_fr[unit_num,v_1,windows[i,1]:windows[i,2]])
       v0_means <- rowMeans(all_total_fr[unit_num,v0,windows[i,1]:windows[i,2]])
-      vx_means <- rowMeans(all_total_fr[unit_num,vx,windows[i,1]:windows[i,2]])
+      v1_means <- rowMeans(all_total_fr[unit_num,v1,windows[i,1]:windows[i,2]])
+      v2_means <- rowMeans(all_total_fr[unit_num,v2,windows[i,1]:windows[i,2]])
+      v3_means <- rowMeans(all_total_fr[unit_num,v3,windows[i,1]:windows[i,2]])
       
-      v_levels <- t(rbind.fill.matrix(t(v_x_means),t(v0_means),t(vx_means)))
+      v_levels <- t(rbind.fill.matrix(t(v_3_means),t(v_2_means),t(v_1_means),t(v0_means),t(v1_means),t(v2_means),t(v3_means)))
       
       tryCatch({sm_out <- as.numeric(Ski.Mack(v_levels))},error=function(e){sm_out <<- c(1.0,1.0)},finally={})
       
       if(sm_out[1] < 0.05){
         sm_sig_p_v_levels <- rbind(sm_sig_p_v_levels,c(unit_num,sm_out))
         
-        v_levels.m <- melt(data.frame(v_x=v_levels[,1],v0=v_levels[,2],vx=v_levels[,3]),measure.vars=c('v_x','v0','vx'),variable.name='level')
+        v_levels.m <- melt(data.frame(v_3=v_levels[,1],v_2=v_levels[,2],v_1=v_levels[,3],v0=v_levels[,4],v1=v_levels[,5],v2=v_levels[,6],v3=v_levels[,7]),measure.vars=c('v_3','v_2','v_1','v0','v1','v2','v3'),variable.name='level')
         trash <- capture.output(d_t <- dunn.test(v_levels.m$value,v_levels.m$level,method=p.adjust.methods))
         
         ph_v_levels[[sig_v_level_ct]] <- d_t
@@ -837,17 +834,22 @@ for(region_index in 1:length(region_list)){
       
       #motiv 
       m0_means <- rowMeans(all_total_fr[unit_num,m0,windows[i,1]:windows[i,2]])
-      mx_means <- rowMeans(all_total_fr[unit_num,mx,windows[i,1]:windows[i,2]])
-      m2x_means <- rowMeans(all_total_fr[unit_num,m2x,windows[i,1]:windows[i,2]])
+      m1_means <- rowMeans(all_total_fr[unit_num,m1,windows[i,1]:windows[i,2]])
+      m2_means <- rowMeans(all_total_fr[unit_num,m2,windows[i,1]:windows[i,2]])
+      m3_means <- rowMeans(all_total_fr[unit_num,m3,windows[i,1]:windows[i,2]])
+      m4_means <- rowMeans(all_total_fr[unit_num,m4,windows[i,1]:windows[i,2]])
+      #m5_means <- rowMeans(all_total_fr[unit_num,m5,windows[i,1]:windows[i,2]])
+      if(length(m5)==1){m5_means = mean(all_total_fr[unit_num,m5,windows[i,1]:windows[i,2]])}else{m5_means = rowMeans(all_total_fr[unit_num,m5,windows[i,1]:windows[i,2]])}
+      m6_means <- rowMeans(all_total_fr[unit_num,m6,windows[i,1]:windows[i,2]])
       
-      m_levels <- t(rbind.fill.matrix(t(m0_means),t(mx_means),t(m2x_means)))
+      m_levels <- t(rbind.fill.matrix(t(m0_means),t(m1_means),t(m2_means),t(m3_means),t(m4_means),t(m5_means),t(m6_means)))
       
       tryCatch({sm_out <- as.numeric(Ski.Mack(m_levels))},error=function(e){sm_out <<- c(1.0,1.0)},finally={})
       
       if(sm_out[1] < 0.05){
         sm_sig_p_m_levels <- rbind(sm_sig_p_m_levels,c(unit_num,sm_out))
         
-        m_levels.m <- melt(data.frame(m0=m_levels[,1],mx=m_levels[,2],m2x=m_levels[,3]),measure.vars=c('m0','mx','m2x'),variable.name='level')
+        m_levels.m <- melt(data.frame(m0=m_levels[,1],m1=m_levels[,2],m2=m_levels[,3],m3=m_levels[,4],m4=m_levels[,5],m5=m_levels[,6],m6=m_levels[,7]),measure.vars=c('m0','m1','m2','m3','m4','m5','m6'),variable.name='level')
         trash <- capture.output(d_t <- dunn.test(m_levels.m$value,m_levels.m$level,method=p.adjust.methods))
         
         ph_m_levels[[sig_m_level_ct]] <- d_t
@@ -855,14 +857,17 @@ for(region_index in 1:length(region_list)){
         
       }
       
+      
     }
-    assign(paste(region_list[region_index],'_sig_p_r_levels_',window_name[i],sep=""),sig_p_r_levels)
-    #assign(paste(region_list[region_index],'_ph_r_levels_',window_name[i],sep=""),ph_r_levels)
-    cat('r level differences: ',length(sig_p_r_levels[,1]),'units\n')
+    assign(paste(region_list[region_index],'_sm_sig_p_r_levels_',window_name[i],sep=""),sm_sig_p_r_levels)
+    assign(paste(region_list[region_index],'_ph_r_levels_',window_name[i],sep=""),ph_r_levels)
+    if (length(sm_sig_p_r_levels[,1]) != length(ph_r_levels)){cat('ERROR in post hoc lengths\n')}
+    cat('r level differences: ',length(ph_r_levels),'units\n')
     
-    assign(paste(region_list[region_index],'_sig_p_p_levels_',window_name[i],sep=""),sig_p_p_levels)
-    #assign(paste(region_list[region_index],'_ph_p_levels_',window_name[i],sep=""),ph_p_levels)
-    cat('p level differences: ',length(sig_p_p_levels[,1]),'units\n')
+    assign(paste(region_list[region_index],'_sm_sig_p_p_levels_',window_name[i],sep=""),sm_sig_p_p_levels)
+    assign(paste(region_list[region_index],'_ph_p_levels_',window_name[i],sep=""),ph_p_levels)
+    if (length(sm_sig_p_p_levels[,1]) != length(ph_p_levels)){cat('ERROR in post hoc lengths\n')}
+    cat('p level differences: ',length(ph_p_levels),'units\n')
     
     assign(paste(region_list[region_index],'_sm_sig_p_r_outcome_levels_',window_name[i],sep=""),sm_sig_p_r_outcome_levels)
     assign(paste(region_list[region_index],'_ph_r_outcome_levels_',window_name[i],sep=""),ph_r_outcome_levels)
@@ -881,23 +886,13 @@ for(region_index in 1:length(region_list)){
     
     assign(paste(region_list[region_index],'_sm_sig_p_comb_levels_',window_name[i],sep=""),sm_sig_p_comb_levels)
     assign(paste(region_list[region_index],'_ph_comb_levels_',window_name[i],sep=""),ph_comb_levels)
+    if (length(sm_sig_p_comb_levels[,1]) != length(ph_comb_levels)){cat('ERROR in post hoc lengths\n')}
     cat('comb level differences: ',length(ph_comb_levels),'units\n')
     
     assign(paste(region_list[region_index],'_sm_sig_p_comb_outcome_levels_',window_name[i],sep=""),sm_sig_p_comb_outcome_levels)
     assign(paste(region_list[region_index],'_ph_comb_outcome_levels_',window_name[i],sep=""),ph_comb_outcome_levels)
-    #if (length(sm_sig_p_comb_outcome_levels[,1]) != length(ph_comb_outcome_levels)){cat('ERROR in post hoc lengths\n')
-    #  cat('test')}
+    if (length(sm_sig_p_comb_outcome_levels[,1]) != length(ph_comb_outcome_levels)){cat('ERROR in post hoc lengths\n')}
     cat('comb outcome level differences: ',length(ph_comb_outcome_levels),'units\n')
-    
-    assign(paste(region_list[region_index],'_sm_sig_p_r_catch_levels_',window_name[i],sep=""),sm_sig_p_r_catch_levels)
-    assign(paste(region_list[region_index],'_ph_r_catch_levels_',window_name[i],sep=""),ph_r_catch_levels)
-    if (length(sm_sig_p_r_catch_levels[,1]) != length(ph_r_catch_levels)){cat('ERROR in post hoc lengths\n')}
-    cat('r catch level differences: ',length(ph_r_catch_levels),'units\n')
-    
-    assign(paste(region_list[region_index],'_sm_sig_p_p_catch_levels_',window_name[i],sep=""),sm_sig_p_p_catch_levels)
-    assign(paste(region_list[region_index],'_ph_p_catch_levels_',window_name[i],sep=""),ph_p_catch_levels)
-    if (length(sm_sig_p_p_catch_levels[,1]) != length(ph_p_catch_levels)){cat('ERROR in post hoc lengths\n')}
-    cat('p catch level differences: ',length(ph_p_catch_levels),'units\n')
     
     assign(paste(region_list[region_index],'_sig_p_r_delivery_levels_',window_name[i],sep=""),sig_p_r_delivery_levels)
     cat('r delivery diffs: ',length(sig_p_r_delivery_levels[,1]),'units\n')
@@ -905,13 +900,7 @@ for(region_index in 1:length(region_list)){
     assign(paste(region_list[region_index],'_sig_p_p_delivery_levels_',window_name[i],sep=""),sig_p_p_delivery_levels)
     cat('p delivery diffs: ',length(sig_p_p_delivery_levels[,1]),'units\n')
     
-    assign(paste(region_list[region_index],'_sig_p_r_bin_catch_levels_',window_name[i],sep=""),sig_p_r_bin_catch_levels)
-    cat('r bin catch diffs: ',length(sig_p_r_bin_catch_levels[,1]),'units\n')
     
-    tryCatch({assign(paste(region_list[region_index],'_sig_p_p_bin_catch_levels_',window_name[i],sep=""),sig_p_p_bin_catch_levels)
-      cat('p bin catch diffs: ',length(sig_p_p_bin_catch_levels[,1]),'units\n')
-    },error=function(e){},finally={})
-   
     assign(paste(region_list[region_index],'_sm_sig_p_v_levels_',window_name[i],sep=""),sm_sig_p_v_levels)
     assign(paste(region_list[region_index],'_ph_v_levels_',window_name[i],sep=""),ph_v_levels)
     cat('v level differences: ',length(ph_v_levels),'units\n')
@@ -919,10 +908,11 @@ for(region_index in 1:length(region_list)){
     assign(paste(region_list[region_index],'_sm_sig_p_m_levels_',window_name[i],sep=""),sm_sig_p_m_levels)
     assign(paste(region_list[region_index],'_ph_m_levels_',window_name[i],sep=""),ph_m_levels)
     cat('m level differences: ',length(ph_m_levels),'units\n')
-     
-    diffs_length_list <- list(r=length(sig_p_r_levels[,1]),p=length(sig_p_p_levels[,1]),r_outcome=length(ph_r_outcome_levels),p_outcome=length(ph_p_outcome_levels),outcome=length(sm_sig_p_outcome_levels[,1]),comb=length(ph_comb_levels),comb_outcome=length(ph_comb_outcome_levels),r_catch=length(ph_r_catch_levels),p_catch=length(ph_p_catch_levels),r_delivery=length(sig_p_r_delivery_levels[,1]),p_delivery=length(sig_p_p_delivery_levels[,1]),r_bin_catch=length(sig_p_r_bin_catch_levels[,1]),p_bin_catch=length(sig_p_p_bin_catch_levels),value=length(sm_sig_p_v_levels[,1]),motivation=length(sm_sig_p_m_levels[,1]))
-    assign(paste(region_list[region_index],'_diffs_length_list_',window_name[i],sep=""),diffs_length_list)
+    
+    diffs_length_list <- list(r=length(ph_r_levels),p=length(ph_p_levels),r_outcome=length(ph_r_outcome_levels),p_outcome=length(ph_p_outcome_levels),outcome=length(sm_sig_p_outcome_levels[,1]),comb=length(ph_comb_levels),comb_outcome=length(ph_comb_outcome_levels),r_delivery=length(sig_p_r_delivery_levels[,1]),p_delivery=length(sig_p_p_delivery_levels[,1]),value=length(sm_sig_p_v_levels[,1]),motivation=length(sm_sig_p_m_levels[,1]))
 
+    assign(paste(region_list[region_index],'_diffs_length_list_',window_name[i],sep=""),diffs_length_list)
+    
   }
 }
 
@@ -930,8 +920,9 @@ for(region_index in 1:length(region_list)){
 
 pth <- getwd()
 
-if(substr(pth,nchar(pth)-2,nchar(pth)-2) == "9"){save_name = substr(pth,nchar(pth)-6,nchar(pth))}else{save_name=substr(pth,nchar(pth)-7,nchar(pth))}
+if(substr(pth,nchar(pth)-3,nchar(pth)-2) == "14"){save_name = substr(pth,nchar(pth)-5,nchar(pth))}else{save_name=substr(pth,nchar(pth)-4,nchar(pth))}
+
+save_name <- 'block'
 
 save.image(paste(save_name,".RData",sep=""))
-#rm(list=ls())
-
+rm(list=ls())

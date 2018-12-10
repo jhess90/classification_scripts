@@ -108,16 +108,16 @@ for(region_index in 1:length(region_list)){
   p2_succ <- res1[which(res1 %in% p2)]
   p3_succ <- res1[which(res1 %in% p3)]
   
-  catch_x <- which(condensed[,12] <= -1)
-  catch0 <- which(condensed[,12] == 0)
-  catchx <- which(condensed[,12] >= 1)
+  #catch_x <- which(condensed[,12] <= -1)
+  #catch0 <- which(condensed[,12] == 0)
+  #catchx <- which(condensed[,12] >= 1)
   
-  catch_3 <- which(condensed[,12] == -3)
-  catch_2 <- which(condensed[,12] == -2)
-  catch_1 <- which(condensed[,12] == -1)
-  catch1 <- which(condensed[,12] == 1)
-  catch2 <- which(condensed[,12] == 2)
-  catch3 <- which(condensed[,12] == 3)
+  #catch_3 <- which(condensed[,12] == -3)
+  #catch_2 <- which(condensed[,12] == -2)
+  #catch_1 <- which(condensed[,12] == -1)
+  #catch1 <- which(condensed[,12] == 1)
+  #catch2 <- which(condensed[,12] == 2)
+  #catch3 <- which(condensed[,12] == 3)
   
   r0_f <- res0[which(res0 %in% r0)]
   rx_f <- res0[which(res0 %in% rx)]
@@ -145,7 +145,9 @@ for(region_index in 1:length(region_list)){
   
   #########################
   
-  comb_list <- c('r0','r1','r2','r3','p0','p1','p2','p3','res0','res1','r0_fail','r1_fail','r2_fail','r3_fail','r0_succ','r1_succ','r2_succ','r3_succ','p0_fail','p1_fail','p2_fail','p3_fail','p0_succ','p1_succ','p2_succ','p3_succ','catch_x','catch0','catchx','rx','px','r0_f','rx_f','r0_s','rx_s','p0_f','px_f','p0_s','px_s','r0_p0','rx_p0','r0_px','rx_px','r0_p0_s','rx_p0_s','r0_px_s','rx_px_s','r0_p0_f','rx_p0_f','r0_px_f','rx_px_f','v_3','v_2','v_1','v0','v1','v2','v3','m0','m1','m2','m3','m4','m5','m6','catch_x','catchx')
+  #comb_list <- c('r0','r1','r2','r3','p0','p1','p2','p3','res0','res1','r0_fail','r1_fail','r2_fail','r3_fail','r0_succ','r1_succ','r2_succ','r3_succ','p0_fail','p1_fail','p2_fail','p3_fail','p0_succ','p1_succ','p2_succ','p3_succ','catch_x','catch0','catchx','rx','px','r0_f','rx_f','r0_s','rx_s','p0_f','px_f','p0_s','px_s','r0_p0','rx_p0','r0_px','rx_px','r0_p0_s','rx_p0_s','r0_px_s','rx_px_s','r0_p0_f','rx_p0_f','r0_px_f','rx_px_f','v_3','v_2','v_1','v0','v1','v2','v3','m0','m1','m2','m3','m4','m5','m6','catch_x','catchx')
+
+  comb_list <- c('r0','r1','r2','r3','p0','p1','p2','p3','res0','res1','r0_fail','r1_fail','r2_fail','r3_fail','r0_succ','r1_succ','r2_succ','r3_succ','p0_fail','p1_fail','p2_fail','p3_fail','p0_succ','p1_succ','p2_succ','p3_succ','rx','px','r0_f','rx_f','r0_s','rx_s','p0_f','px_f','p0_s','px_s','r0_p0','rx_p0','r0_px','rx_px','r0_p0_s','rx_p0_s','r0_px_s','rx_px_s','r0_p0_f','rx_p0_f','r0_px_f','rx_px_f','v_3','v_2','v_1','v0','v1','v2','v3','m0','m1','m2','m3','m4','m5','m6')
   
   out_p_list <- c()
   out_perc_sig_list <- c()
@@ -502,28 +504,28 @@ for(region_index in 1:length(region_list)){
   graphics.off()
   
   #catch
-  png(paste(region_list[region_index],'_catch_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
+  #png(paste(region_list[region_index],'_catch_sig_diffs.png',sep=""),width=8,height=6,units="in",res=500)
   
-  num_inc <- rbind(out_sig_sign_percs$catch_x_sig_sign_percs[2,],out_sig_sign_percs$catchx_sig_sign_percs[2,])
-  rownames(num_inc) <- c('P catch trial','R catch trial')
-  colnames(num_inc) <- window_names
-  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
-  num_inc_melt$direction <- 'inc'
+  #num_inc <- rbind(out_sig_sign_percs$catch_x_sig_sign_percs[2,],out_sig_sign_percs$catchx_sig_sign_percs[2,])
+  #rownames(num_inc) <- c('P catch trial','R catch trial')
+  #colnames(num_inc) <- window_names
+  #num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  #num_inc_melt$direction <- 'inc'
   
-  num_dec <- rbind(out_sig_sign_percs$res0_sig_sign_percs[3,],out_sig_sign_percs$res1_sig_sign_percs[3,])
-  rownames(num_dec) <- c('P catch trial','R catch trial')
-  colnames(num_dec) <- window_names
-  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
-  num_dec_melt$direction <- 'dec'
+  #num_dec <- rbind(out_sig_sign_percs$res0_sig_sign_percs[3,],out_sig_sign_percs$res1_sig_sign_percs[3,])
+  #rownames(num_dec) <- c('P catch trial','R catch trial')
+  #colnames(num_dec) <- window_names
+  #num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  #num_dec_melt$direction <- 'dec'
   
-  both_num <- rbind(num_inc_melt,num_dec_melt)
+  #both_num <- rbind(num_inc_melt,num_dec_melt)
   
-  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
-  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Catch trials',y='Number of units')
-  plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
+  #plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  #plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Catch trials',y='Number of units')
+  #plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
   
-  plot(plt)
-  graphics.off()
+  #plot(plt)
+  #graphics.off()
   
   #################
   #### Ski Mack ###
@@ -573,19 +575,19 @@ for(region_index in 1:length(region_list)){
     ph_comb_outcome_levels <- c()
     sig_comb_outcome_level_ct <- 1
     
-    sm_sig_p_r_catch_levels <- c()
-    ph_r_catch_levels <- c()
-    sig_r_catch_level_ct <- 1
+    #sm_sig_p_r_catch_levels <- c()
+    #ph_r_catch_levels <- c()
+    #sig_r_catch_level_ct <- 1
     
-    sm_sig_p_p_catch_levels <- c()
-    ph_p_catch_levels <- c()
-    sig_p_catch_level_ct <- 1
+    #sm_sig_p_p_catch_levels <- c()
+    #ph_p_catch_levels <- c()
+    #sig_p_catch_level_ct <- 1
     
     sig_p_r_delivery_levels <- c()
     sig_p_p_delivery_levels <- c()
     
-    sig_p_r_bin_catch_levels <- c()
-    sig_p_p_bin_catch_levels <- c()
+    #sig_p_r_bin_catch_levels <- c()
+    #sig_p_p_bin_catch_levels <- c()
     
     sm_sig_p_v_levels <- c()
     ph_v_levels <- c()

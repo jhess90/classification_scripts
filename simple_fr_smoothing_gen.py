@@ -27,7 +27,7 @@ from scipy import ndimage
 bin_size = 10 #in ms
 
 zscore_bool = True
-gaussian_bool = True
+gaussian_bool = False
 gauss_sigma = 30 #in ms
 
 plot_bool = True
@@ -58,18 +58,18 @@ def hist_and_smooth_data(spike_data):
                 hist_data[i,0:len(hist)] = hist
                 hist_bins[i,0:len(bins)] = bins
 
-		#TODO fix so gaus divide by bin size and -> fr before smoothing
-		#TODO make option for zscore and gaus togethre
+                #TODO fix so gaus divide by bin size and -> fr before smoothing
+                #TODO make option for zscore and gaus togethre
         if zscore_bool and gaussian_bool:
-			smoothed = stats.zscore(hist_data,axis=1)
-			smoothed = ndimage.filters.gaussian_filter1d(smoothed,gauss_sigma,axis=1)
+                        smoothed = stats.zscore(hist_data,axis=1)
+                        smoothed = ndimage.filters.gaussian_filter1d(smoothed,gauss_sigma,axis=1)
         elif zscore_bool:
-			smoothed = stats.zscore(hist_data,axis=1)
+                        smoothed = stats.zscore(hist_data,axis=1)
         elif gaussian_bool:
 
-			smoothed = ndimage.filters.gaussian_filter1d(hist_data,gauss_sigma,axis=1)
+                        smoothed = ndimage.filters.gaussian_filter1d(hist_data,gauss_sigma,axis=1)
         else:
-			smoothed = {}
+                        smoothed = {}
 
         return_dict = {'hist_data':hist_data,'hist_bins':hist_bins,'smoothed':smoothed}
         return(return_dict)
@@ -78,28 +78,32 @@ def run_breakdown(binned_data,condensed,region_key):
         last_ind = 0
         trim_bool = False
 
-	bfr_cue_bins = int(bfr_cue_time * 1000/bin_size)
-	aft_cue_bins = int(aft_cue_time * 1000/bin_size)
-	bfr_res_bins = int(bfr_result_time * 1000/bin_size)
-	aft_res_bins = int(aft_result_time * 1000/bin_size)
+        bfr_cue_bins = int(bfr_cue_time * 1000/bin_size)
+        aft_cue_bins = int(aft_cue_time * 1000/bin_size)
+        bfr_res_bins = int(bfr_result_time * 1000/bin_size)
+        aft_res_bins = int(aft_result_time * 1000/bin_size)
 
-	all_cue_fr = np.zeros((np.shape(binned_data)[0],np.shape(condensed)[0],bfr_cue_bins + aft_cue_bins))
-	all_res_fr = np.zeros((np.shape(binned_data)[0],np.shape(condensed)[0],bfr_res_bins + aft_res_bins))
-	
-	for unit_num in range(np.shape(binned_data)[0]):
-		for i in range(np.shape(condensed)[0]):
+        all_cue_fr = np.zeros((np.shape(binned_data)[0],np.shape(condensed)[0],bfr_cue_bins + aft_cue_bins))
+        all_res_fr = np.zeros((np.shape(binned_data)[0],np.shape(condensed)[0],bfr_res_bins + aft_res_bins))
+        
+        for unit_num in range(np.shape(binned_data)[0]):
+                for i in range(np.shape(condensed)[0]):
                         try:
                                 cue_temp = binned_data[unit_num,condensed[i,8]-bfr_cue_bins : condensed[i,8]+aft_cue_bins]
                                 res_temp = binned_data[unit_num,condensed[i,9]-bfr_res_bins : condensed[i,9]+aft_res_bins]
                                 all_cue_fr[unit_num,i,:] = cue_temp
                                 all_res_fr[unit_num,i,:] = res_temp
                         except:
-                                if np.shape(condensed)[0] - i > 3:
-                                        pdb.set_trace()
-                                else:
-                                        last_ind = i
-                                        trim_bool = True
-                                        break
+                                #if np.shape(condensed)[0] - i > 3:
+                                #        pdb.set_trace()
+                                #else:
+                                #        last_ind = i
+                                #        trim_bool = True
+                                #        break
+                                last_ind = i
+                                trim_bool = True
+                                break
+
         if trim_bool:
                 all_cue_fr = all_cue_fr[:,0:last_ind,:]
                 all_res_fr = all_res_fr[:,0:last_ind,:]
@@ -107,10 +111,10 @@ def run_breakdown(binned_data,condensed,region_key):
                 condensed = condensed[0:last_ind,:]
 
         params = {'bfr_cue':bfr_cue_time,'aft_cue':aft_cue_time,'bfr_result':bfr_result_time,'aft_result':aft_result_time,'bin_size':bin_size}
-	return_dict = {'all_cue_fr':all_cue_fr,'all_res_fr':all_res_fr,'condensed':condensed,'params':params}
-	sio.savemat('simple_output_%s' %(region_key),{'return_dict':return_dict},format='5')
-	
-	return(return_dict)
+        return_dict = {'all_cue_fr':all_cue_fr,'all_res_fr':all_res_fr,'condensed':condensed,'params':params}
+        sio.savemat('simple_output_%s' %(region_key),{'return_dict':return_dict},format='5')
+        
+        return(return_dict)
 
 
 
