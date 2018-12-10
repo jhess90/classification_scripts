@@ -25,459 +25,550 @@ tryCatch({
   source("~/workspace/classification_scripts/Ski.Mack.JH.R")
 },finally={print('sourced multiplot and ski mack')})
 
+####To generate:
+#see run_stat_plot.sh
+#from individual blocks, run python simple_fr_smoothing_gen.py then stats_rp_nocatch.R. Copy block.RDATA into a combination directory for each animal, rename block1.RData, block2.RData, etc
+#then run this 
 
 #######Set these params #######
-#nhp_id <- '504'
-nhp_id <- '0059'
-
-#pval_adjusted_bool <- TRUE
-pval_adjusted_bool <- FALSE
-
+pval_adjusted_bool <- TRUE
+#pval_adjusted_bool <- FALSE
 ##############################
 
 saveAsPng <- T
 region_list <- c('M1','S1','PmD')
 
-ph_list_names <- c('comb','comb_outcome','m','p_catch','p','p_outcome','r_catch','r','r_outcome','v')
+#ph_list_names <- c('comb','comb_outcome','m','p_catch','p','p_outcome','r_catch','r','r_outcome','v')
+ph_list_names <- c('comb','comb_outcome','m','p','p_outcome','r','r_outcome','v')
 time_windows <- c('ac','br','ar','rw')
 
+file_list <- Sys.glob("block*.RData")
 
-if(nhp_id == '0059'){
-  attach('0_8_1.RData')
-  cat('0059\n')
-  
-  M1_sig_sign_percs_total <- M1_sig_sign_percs
-  M1_total_unit_num <- length(M1_p_val_list$r0_p_vals[,1])
-  S1_sig_sign_percs_total <- S1_sig_sign_percs
-  S1_total_unit_num <- length(S1_p_val_list$r0_p_vals[,1])
-  PmD_sig_sign_percs_total <- PmD_sig_sign_percs
-  PmD_total_unit_num <- length(PmD_p_val_list$r0_p_vals[,1])
-  
-  M1_diffs_length_list_ac_total <- M1_diffs_length_list_ac
-  M1_diffs_length_list_br_total <- M1_diffs_length_list_br
-  M1_diffs_length_list_ar_total <- M1_diffs_length_list_ar
-  M1_diffs_length_list_rw_total <- M1_diffs_length_list_rw
-  S1_diffs_length_list_ac_total <- S1_diffs_length_list_ac
-  S1_diffs_length_list_br_total <- S1_diffs_length_list_br
-  S1_diffs_length_list_ar_total <- S1_diffs_length_list_ar
-  S1_diffs_length_list_rw_total <- S1_diffs_length_list_rw
-  PmD_diffs_length_list_ac_total <- PmD_diffs_length_list_ac
-  PmD_diffs_length_list_br_total <- PmD_diffs_length_list_br
-  PmD_diffs_length_list_ar_total <- PmD_diffs_length_list_ar
-  PmD_diffs_length_list_rw_total <- PmD_diffs_length_list_rw
-  
-  for(region_name in region_list){
-    for(ph_name in ph_list_names){
-      for(window_name in time_windows){
-        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
-        temp <- get(name)
-      
-        assign(paste(name,'_totals',sep=""),list())
-        if(length(temp) > 0){
-          #cat(name,'\n')
-          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
-          assign(paste(name,'_totals',sep=""),temp2)
+for(block_name in file_list){
+  cat(block_name)
+
+  if(block_name == "block1.RData"){
+    attach(block_name)
+
+    M1_sig_sign_percs_total <- M1_sig_sign_percs
+    M1_total_unit_num <- length(M1_p_val_list$r0_p_vals[,1])
+    S1_sig_sign_percs_total <- S1_sig_sign_percs
+    S1_total_unit_num <- length(S1_p_val_list$r0_p_vals[,1])
+    PmD_sig_sign_percs_total <- PmD_sig_sign_percs
+    PmD_total_unit_num <- length(PmD_p_val_list$r0_p_vals[,1])
+    
+    M1_diffs_length_list_ac_total <- M1_diffs_length_list_ac
+    M1_diffs_length_list_br_total <- M1_diffs_length_list_br
+    M1_diffs_length_list_ar_total <- M1_diffs_length_list_ar
+    M1_diffs_length_list_rw_total <- M1_diffs_length_list_rw
+    S1_diffs_length_list_ac_total <- S1_diffs_length_list_ac
+    S1_diffs_length_list_br_total <- S1_diffs_length_list_br
+    S1_diffs_length_list_ar_total <- S1_diffs_length_list_ar
+    S1_diffs_length_list_rw_total <- S1_diffs_length_list_rw
+    PmD_diffs_length_list_ac_total <- PmD_diffs_length_list_ac
+    PmD_diffs_length_list_br_total <- PmD_diffs_length_list_br
+    PmD_diffs_length_list_ar_total <- PmD_diffs_length_list_ar
+    PmD_diffs_length_list_rw_total <- PmD_diffs_length_list_rw
+    
+    for(region_name in region_list){
+      for(ph_name in ph_list_names){
+        for(window_name in time_windows){
+          name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+          temp <- get(name)
           
+          assign(paste(name,'_totals',sep=""),list())
+          if(length(temp) > 0){
+            #cat(name,'\n')
+            temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+            assign(paste(name,'_totals',sep=""),temp2)
+            
           }}}}
-
-  detach()
-  attach('0_8_2.RData')
-  M1_temp <- M1_sig_sign_percs
-  M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
-  S1_temp <- S1_sig_sign_percs
-  S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
-  PmD_temp <- PmD_sig_sign_percs
-  PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
-  
-  #NOTE just using raw number of units, not percs. So perc sections of these arrays can be ignored
-  for(name in names(M1_sig_sign_percs_total)){
-    M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
-    S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
-    PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
-  }
-  for(name in names(M1_diffs_length_list_ac_total)){
-    M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
-    M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
-    M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
-    M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
-    S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
-    S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
-    S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
-    S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
-    PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
-    PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
-    PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
-    PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
-  }
-  for(region_name in region_list){
-    for(ph_name in ph_list_names){
-      for(window_name in time_windows){
-        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
-        temp <- get(name)
-        
-        if(length(temp) > 0){
-          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
-          assign(paste(name,'_totals',sep=""),temp2)
+    
+    detach()
+    
+  }else{
+    attach(block_name)
+    M1_temp <- M1_sig_sign_percs
+    M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
+    S1_temp <- S1_sig_sign_percs
+    S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
+    PmD_temp <- PmD_sig_sign_percs
+    PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
+    
+    #NOTE just using raw number of units, not percs. So perc sections of these arrays can be ignored
+    for(name in names(M1_sig_sign_percs_total)){
+      M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
+      S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
+      PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
+    }
+    for(name in names(M1_diffs_length_list_ac_total)){
+      M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
+      M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
+      M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
+      M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
+      S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
+      S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
+      S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
+      S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
+      PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
+      PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
+      PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
+      PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
+    }
+    for(region_name in region_list){
+      for(ph_name in ph_list_names){
+        for(window_name in time_windows){
+          name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+          temp <- get(name)
           
-        }}}}
-  detach()
-  
-  attach('0_9_1.RData')
-  M1_temp <- M1_sig_sign_percs
-  M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
-  S1_temp <- S1_sig_sign_percs
-  S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
-  PmD_temp <- PmD_sig_sign_percs
-  PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
-  
-  for(name in names(M1_sig_sign_percs_total)){
-    M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
-    S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
-    PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
+          if(length(temp) > 0){
+            temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+            assign(paste(name,'_totals',sep=""),temp2)
+            
+          }}}}
+    detach()
   }
-  for(name in names(M1_diffs_length_list_ac_total)){
-    M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
-    M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
-    M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
-    M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
-    S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
-    S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
-    S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
-    S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
-    PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
-    PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
-    PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
-    PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
-  }
-  for(region_name in region_list){
-    for(ph_name in ph_list_names){
-      for(window_name in time_windows){
-        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
-        temp <- get(name)
-        
-        if(length(temp) > 0){
-          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
-          assign(paste(name,'_totals',sep=""),temp2)
-          
-        }}}}
-  detach()
-  attach('0_9_2.RData')
-  M1_temp <- M1_sig_sign_percs
-  M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
-  S1_temp <- S1_sig_sign_percs
-  S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
-  PmD_temp <- PmD_sig_sign_percs
-  PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
   
-  for(name in names(M1_sig_sign_percs_total)){
-    M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
-    S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
-    PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
-  }
-  for(name in names(M1_diffs_length_list_ac_total)){
-    M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
-    M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
-    M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
-    M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
-    S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
-    S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
-    S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
-    S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
-    PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
-    PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
-    PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
-    PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
-  }
-  for(region_name in region_list){
-    for(ph_name in ph_list_names){
-      for(window_name in time_windows){
-        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
-        temp <- get(name)
-        
-        if(length(temp) > 0){
-          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
-          assign(paste(name,'_totals',sep=""),temp2)
-          
-        }}}}
-  detach()
-  
-}else if(nhp_id == '504'){
-  attach('5_8_1.RData')
-  cat('504\n')
-  
-  M1_sig_sign_percs_total <- M1_sig_sign_percs
-  M1_total_unit_num <- length(M1_p_val_list$r0_p_vals[,1])
-  S1_sig_sign_percs_total <- S1_sig_sign_percs
-  S1_total_unit_num <- length(S1_p_val_list$r0_p_vals[,1])
-  PmD_sig_sign_percs_total <- PmD_sig_sign_percs
-  PmD_total_unit_num <- length(PmD_p_val_list$r0_p_vals[,1])
-  
-  M1_diffs_length_list_ac_total <- M1_diffs_length_list_ac
-  M1_diffs_length_list_br_total <- M1_diffs_length_list_br
-  M1_diffs_length_list_ar_total <- M1_diffs_length_list_ar
-  M1_diffs_length_list_rw_total <- M1_diffs_length_list_rw
-  S1_diffs_length_list_ac_total <- S1_diffs_length_list_ac
-  S1_diffs_length_list_br_total <- S1_diffs_length_list_br
-  S1_diffs_length_list_ar_total <- S1_diffs_length_list_ar
-  S1_diffs_length_list_rw_total <- S1_diffs_length_list_rw
-  PmD_diffs_length_list_ac_total <- PmD_diffs_length_list_ac
-  PmD_diffs_length_list_br_total <- PmD_diffs_length_list_br
-  PmD_diffs_length_list_ar_total <- PmD_diffs_length_list_ar
-  PmD_diffs_length_list_rw_total <- PmD_diffs_length_list_rw
-  
-  for(region_name in region_list){
-    for(ph_name in ph_list_names){
-      for(window_name in time_windows){
-        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
-        temp <- get(name)
-        
-        assign(paste(name,'_totals',sep=""),list())
-        if(length(temp) > 0){
-          #cat(name,'\n')
-          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
-          assign(paste(name,'_totals',sep=""),temp2)
-          
-        }}}}
-  detach()
-  attach('5_8_2.RData')
-  M1_temp <- M1_sig_sign_percs
-  M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
-  S1_temp <- S1_sig_sign_percs
-  S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
-  PmD_temp <- PmD_sig_sign_percs
-  PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
-  
-  #NOTE just using raw number of units, not percs. So perc sections of these arrays can be ignored
-  for(name in names(M1_sig_sign_percs_total)){
-    M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
-    S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
-    PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
-  }
-  for(name in names(M1_diffs_length_list_ac_total)){
-    M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
-    M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
-    M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
-    M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
-    S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
-    S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
-    S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
-    S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
-    PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
-    PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
-    PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
-    PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
-  }
-  for(region_name in region_list){
-    for(ph_name in ph_list_names){
-      for(window_name in time_windows){
-        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
-        temp <- get(name)
-        
-        if(length(temp) > 0){
-          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
-          assign(paste(name,'_totals',sep=""),temp2)
-          
-        }}}}
-  detach()
-  attach('5_9_1.RData')
-  M1_temp <- M1_sig_sign_percs
-  M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
-  S1_temp <- S1_sig_sign_percs
-  S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
-  PmD_temp <- PmD_sig_sign_percs
-  PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
-  
-  for(name in names(M1_sig_sign_percs_total)){
-    M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
-    S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
-    PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
-  }
-  for(name in names(M1_diffs_length_list_ac_total)){
-    M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
-    M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
-    M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
-    M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
-    S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
-    S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
-    S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
-    S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
-    PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
-    PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
-    PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
-    PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
-  }
-  for(region_name in region_list){
-    for(ph_name in ph_list_names){
-      for(window_name in time_windows){
-        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
-        temp <- get(name)
-        
-        if(length(temp) > 0){
-          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
-          assign(paste(name,'_totals',sep=""),temp2)
-          
-        }}}}
-  detach()
-  attach('5_9_2.RData')
-  M1_temp <- M1_sig_sign_percs
-  M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
-  S1_temp <- S1_sig_sign_percs
-  S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
-  PmD_temp <- PmD_sig_sign_percs
-  PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
-  
-  for(name in names(M1_sig_sign_percs_total)){
-    M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
-    S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
-    PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
-  }
-  for(name in names(M1_diffs_length_list_ac_total)){
-    M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
-    M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
-    M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
-    M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
-    S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
-    S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
-    S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
-    S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
-    PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
-    PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
-    PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
-    PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
-  }
-  for(region_name in region_list){
-    for(ph_name in ph_list_names){
-      for(window_name in time_windows){
-        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
-        temp <- get(name)
-        
-        if(length(temp) > 0){
-          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
-          assign(paste(name,'_totals',sep=""),temp2)
-          
-        }}}}
-  detach()
-  
-  attach('5_14_1.RData')
-  M1_temp <- M1_sig_sign_percs
-  M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
-  S1_temp <- S1_sig_sign_percs
-  S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
-  PmD_temp <- PmD_sig_sign_percs
-  PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
-  
-  for(name in names(M1_sig_sign_percs_total)){
-    M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
-    S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
-    PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
-  }
-  for(name in names(M1_diffs_length_list_ac_total)){
-    M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
-    M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
-    M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
-    M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
-    S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
-    S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
-    S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
-    S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
-    PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
-    PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
-    PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
-    PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
-  }
-  for(region_name in region_list){
-    for(ph_name in ph_list_names){
-      for(window_name in time_windows){
-        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
-        temp <- get(name)
-        
-        if(length(temp) > 0){
-          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
-          assign(paste(name,'_totals',sep=""),temp2)
-          
-        }}}}
-  detach()
-  
-  attach('5_14_2.RData')
-  M1_temp <- M1_sig_sign_percs
-  M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
-  S1_temp <- S1_sig_sign_percs
-  S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
-  PmD_temp <- PmD_sig_sign_percs
-  PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
-  
-  for(name in names(M1_sig_sign_percs_total)){
-    M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
-    S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
-    PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
-  }
-  for(name in names(M1_diffs_length_list_ac_total)){
-    M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
-    M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
-    M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
-    M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
-    S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
-    S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
-    S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
-    S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
-    PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
-    PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
-    PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
-    PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
-  }
-  for(region_name in region_list){
-    for(ph_name in ph_list_names){
-      for(window_name in time_windows){
-        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
-        temp <- get(name)
-        
-        if(length(temp) > 0){
-          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
-          assign(paste(name,'_totals',sep=""),temp2)
-          
-        }}}}
-  detach()
-  
-  attach('5_14_3.RData')
-  M1_temp <- M1_sig_sign_percs
-  M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
-  S1_temp <- S1_sig_sign_percs
-  S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
-  PmD_temp <- PmD_sig_sign_percs
-  PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
-  
-  for(name in names(M1_sig_sign_percs_total)){
-    M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
-    S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
-    PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
-  }
-  for(name in names(M1_diffs_length_list_ac_total)){
-    M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
-    M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
-    M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
-    M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
-    S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
-    S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
-    S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
-    S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
-    PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
-    PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
-    PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
-    PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
-  }
-  for(region_name in region_list){
-    for(ph_name in ph_list_names){
-      for(window_name in time_windows){
-        name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
-        temp <- get(name)
-        
-        if(length(temp) > 0){
-          temp2 <- c(get(paste(name,'_totals',sep="")),temp)
-          assign(paste(name,'_totals',sep=""),temp2)
-          
-        }}}}
-  detach()
 }
+
+
+
+# if(nhp_id == '0059'){
+#   attach('0_8_1.RData')
+#   cat('0059\n')
+#   
+#   M1_sig_sign_percs_total <- M1_sig_sign_percs
+#   M1_total_unit_num <- length(M1_p_val_list$r0_p_vals[,1])
+#   S1_sig_sign_percs_total <- S1_sig_sign_percs
+#   S1_total_unit_num <- length(S1_p_val_list$r0_p_vals[,1])
+#   PmD_sig_sign_percs_total <- PmD_sig_sign_percs
+#   PmD_total_unit_num <- length(PmD_p_val_list$r0_p_vals[,1])
+#   
+#   M1_diffs_length_list_ac_total <- M1_diffs_length_list_ac
+#   M1_diffs_length_list_br_total <- M1_diffs_length_list_br
+#   M1_diffs_length_list_ar_total <- M1_diffs_length_list_ar
+#   M1_diffs_length_list_rw_total <- M1_diffs_length_list_rw
+#   S1_diffs_length_list_ac_total <- S1_diffs_length_list_ac
+#   S1_diffs_length_list_br_total <- S1_diffs_length_list_br
+#   S1_diffs_length_list_ar_total <- S1_diffs_length_list_ar
+#   S1_diffs_length_list_rw_total <- S1_diffs_length_list_rw
+#   PmD_diffs_length_list_ac_total <- PmD_diffs_length_list_ac
+#   PmD_diffs_length_list_br_total <- PmD_diffs_length_list_br
+#   PmD_diffs_length_list_ar_total <- PmD_diffs_length_list_ar
+#   PmD_diffs_length_list_rw_total <- PmD_diffs_length_list_rw
+#   
+#   for(region_name in region_list){
+#     for(ph_name in ph_list_names){
+#       for(window_name in time_windows){
+#         name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+#         temp <- get(name)
+#       
+#         assign(paste(name,'_totals',sep=""),list())
+#         if(length(temp) > 0){
+#           #cat(name,'\n')
+#           temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+#           assign(paste(name,'_totals',sep=""),temp2)
+#           
+#           }}}}
+# 
+#   detach()
+#   attach('0_8_2.RData')
+#   M1_temp <- M1_sig_sign_percs
+#   M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
+#   S1_temp <- S1_sig_sign_percs
+#   S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
+#   PmD_temp <- PmD_sig_sign_percs
+#   PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
+#   
+#   #NOTE just using raw number of units, not percs. So perc sections of these arrays can be ignored
+#   for(name in names(M1_sig_sign_percs_total)){
+#     M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
+#     S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
+#     PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
+#   }
+#   for(name in names(M1_diffs_length_list_ac_total)){
+#     M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
+#     M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
+#     M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
+#     M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
+#     S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
+#     S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
+#     S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
+#     S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
+#     PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
+#     PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
+#     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
+#     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
+#   }
+#   for(region_name in region_list){
+#     for(ph_name in ph_list_names){
+#       for(window_name in time_windows){
+#         name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+#         temp <- get(name)
+#         
+#         if(length(temp) > 0){
+#           temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+#           assign(paste(name,'_totals',sep=""),temp2)
+#           
+#         }}}}
+#   detach()
+#   
+#   attach('0_9_1.RData')
+#   M1_temp <- M1_sig_sign_percs
+#   M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
+#   S1_temp <- S1_sig_sign_percs
+#   S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
+#   PmD_temp <- PmD_sig_sign_percs
+#   PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
+#   
+#   for(name in names(M1_sig_sign_percs_total)){
+#     M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
+#     S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
+#     PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
+#   }
+#   for(name in names(M1_diffs_length_list_ac_total)){
+#     M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
+#     M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
+#     M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
+#     M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
+#     S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
+#     S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
+#     S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
+#     S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
+#     PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
+#     PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
+#     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
+#     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
+#   }
+#   for(region_name in region_list){
+#     for(ph_name in ph_list_names){
+#       for(window_name in time_windows){
+#         name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+#         temp <- get(name)
+#         
+#         if(length(temp) > 0){
+#           temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+#           assign(paste(name,'_totals',sep=""),temp2)
+#           
+#         }}}}
+#   detach()
+#   attach('0_9_2.RData')
+#   M1_temp <- M1_sig_sign_percs
+#   M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
+#   S1_temp <- S1_sig_sign_percs
+#   S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
+#   PmD_temp <- PmD_sig_sign_percs
+#   PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
+#   
+#   for(name in names(M1_sig_sign_percs_total)){
+#     M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
+#     S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
+#     PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
+#   }
+#   for(name in names(M1_diffs_length_list_ac_total)){
+#     M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
+#     M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
+#     M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
+#     M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
+#     S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
+#     S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
+#     S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
+#     S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
+#     PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
+#     PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
+#     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
+#     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
+#   }
+#   for(region_name in region_list){
+#     for(ph_name in ph_list_names){
+#       for(window_name in time_windows){
+#         name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+#         temp <- get(name)
+#         
+#         if(length(temp) > 0){
+#           temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+#           assign(paste(name,'_totals',sep=""),temp2)
+#           
+#         }}}}
+#   detach()
+#   
+# }else if(nhp_id == '504'){
+#   attach('5_8_1.RData')
+#   cat('504\n')
+#   
+#   M1_sig_sign_percs_total <- M1_sig_sign_percs
+#   M1_total_unit_num <- length(M1_p_val_list$r0_p_vals[,1])
+#   S1_sig_sign_percs_total <- S1_sig_sign_percs
+#   S1_total_unit_num <- length(S1_p_val_list$r0_p_vals[,1])
+#   PmD_sig_sign_percs_total <- PmD_sig_sign_percs
+#   PmD_total_unit_num <- length(PmD_p_val_list$r0_p_vals[,1])
+#   
+#   M1_diffs_length_list_ac_total <- M1_diffs_length_list_ac
+#   M1_diffs_length_list_br_total <- M1_diffs_length_list_br
+#   M1_diffs_length_list_ar_total <- M1_diffs_length_list_ar
+#   M1_diffs_length_list_rw_total <- M1_diffs_length_list_rw
+#   S1_diffs_length_list_ac_total <- S1_diffs_length_list_ac
+#   S1_diffs_length_list_br_total <- S1_diffs_length_list_br
+#   S1_diffs_length_list_ar_total <- S1_diffs_length_list_ar
+#   S1_diffs_length_list_rw_total <- S1_diffs_length_list_rw
+#   PmD_diffs_length_list_ac_total <- PmD_diffs_length_list_ac
+#   PmD_diffs_length_list_br_total <- PmD_diffs_length_list_br
+#   PmD_diffs_length_list_ar_total <- PmD_diffs_length_list_ar
+#   PmD_diffs_length_list_rw_total <- PmD_diffs_length_list_rw
+#   
+#   for(region_name in region_list){
+#     for(ph_name in ph_list_names){
+#       for(window_name in time_windows){
+#         name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+#         temp <- get(name)
+#         
+#         assign(paste(name,'_totals',sep=""),list())
+#         if(length(temp) > 0){
+#           #cat(name,'\n')
+#           temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+#           assign(paste(name,'_totals',sep=""),temp2)
+#           
+#         }}}}
+#   detach()
+#   attach('5_8_2.RData')
+#   M1_temp <- M1_sig_sign_percs
+#   M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
+#   S1_temp <- S1_sig_sign_percs
+#   S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
+#   PmD_temp <- PmD_sig_sign_percs
+#   PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
+#   
+#   #NOTE just using raw number of units, not percs. So perc sections of these arrays can be ignored
+#   for(name in names(M1_sig_sign_percs_total)){
+#     M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
+#     S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
+#     PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
+#   }
+#   for(name in names(M1_diffs_length_list_ac_total)){
+#     M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
+#     M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
+#     M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
+#     M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
+#     S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
+#     S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
+#     S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
+#     S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
+#     PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
+#     PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
+#     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
+#     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
+#   }
+#   for(region_name in region_list){
+#     for(ph_name in ph_list_names){
+#       for(window_name in time_windows){
+#         name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+#         temp <- get(name)
+#         
+#         if(length(temp) > 0){
+#           temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+#           assign(paste(name,'_totals',sep=""),temp2)
+#           
+#         }}}}
+#   detach()
+#   attach('5_9_1.RData')
+#   M1_temp <- M1_sig_sign_percs
+#   M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
+#   S1_temp <- S1_sig_sign_percs
+#   S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
+#   PmD_temp <- PmD_sig_sign_percs
+#   PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
+#   
+#   for(name in names(M1_sig_sign_percs_total)){
+#     M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
+#     S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
+#     PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
+#   }
+#   for(name in names(M1_diffs_length_list_ac_total)){
+#     M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
+#     M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
+#     M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
+#     M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
+#     S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
+#     S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
+#     S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
+#     S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
+#     PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
+#     PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
+#     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
+#     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
+#   }
+#   for(region_name in region_list){
+#     for(ph_name in ph_list_names){
+#       for(window_name in time_windows){
+#         name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+#         temp <- get(name)
+#         
+#         if(length(temp) > 0){
+#           temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+#           assign(paste(name,'_totals',sep=""),temp2)
+#           
+#         }}}}
+#   detach()
+#   attach('5_9_2.RData')
+#   M1_temp <- M1_sig_sign_percs
+#   M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
+#   S1_temp <- S1_sig_sign_percs
+#   S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
+#   PmD_temp <- PmD_sig_sign_percs
+#   PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
+#   
+#   for(name in names(M1_sig_sign_percs_total)){
+#     M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
+#     S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
+#     PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
+#   }
+#   for(name in names(M1_diffs_length_list_ac_total)){
+#     M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
+#     M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
+#     M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
+#     M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
+#     S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
+#     S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
+#     S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
+#     S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
+#     PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
+#     PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
+#     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
+#     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
+#   }
+#   for(region_name in region_list){
+#     for(ph_name in ph_list_names){
+#       for(window_name in time_windows){
+#         name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+#         temp <- get(name)
+#         
+#         if(length(temp) > 0){
+#           temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+#           assign(paste(name,'_totals',sep=""),temp2)
+#           
+#         }}}}
+#   detach()
+#   
+#   attach('5_14_1.RData')
+#   M1_temp <- M1_sig_sign_percs
+#   M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
+#   S1_temp <- S1_sig_sign_percs
+#   S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
+#   PmD_temp <- PmD_sig_sign_percs
+#   PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
+#   
+#   for(name in names(M1_sig_sign_percs_total)){
+#     M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
+#     S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
+#     PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
+#   }
+#   for(name in names(M1_diffs_length_list_ac_total)){
+#     M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
+#     M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
+#     M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
+#     M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
+#     S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
+#     S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
+#     S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
+#     S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
+#     PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
+#     PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
+#     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
+#     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
+#   }
+#   for(region_name in region_list){
+#     for(ph_name in ph_list_names){
+#       for(window_name in time_windows){
+#         name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+#         temp <- get(name)
+#         
+#         if(length(temp) > 0){
+#           temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+#           assign(paste(name,'_totals',sep=""),temp2)
+#           
+#         }}}}
+#   detach()
+#   
+#   attach('5_14_2.RData')
+#   M1_temp <- M1_sig_sign_percs
+#   M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
+#   S1_temp <- S1_sig_sign_percs
+#   S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
+#   PmD_temp <- PmD_sig_sign_percs
+#   PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
+#   
+#   for(name in names(M1_sig_sign_percs_total)){
+#     M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
+#     S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
+#     PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
+#   }
+#   for(name in names(M1_diffs_length_list_ac_total)){
+#     M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
+#     M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
+#     M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
+#     M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
+#     S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
+#     S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
+#     S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
+#     S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
+#     PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
+#     PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
+#     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
+#     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
+#   }
+#   for(region_name in region_list){
+#     for(ph_name in ph_list_names){
+#       for(window_name in time_windows){
+#         name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+#         temp <- get(name)
+#         
+#         if(length(temp) > 0){
+#           temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+#           assign(paste(name,'_totals',sep=""),temp2)
+#           
+#         }}}}
+#   detach()
+#   
+#   attach('5_14_3.RData')
+#   M1_temp <- M1_sig_sign_percs
+#   M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
+#   S1_temp <- S1_sig_sign_percs
+#   S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
+#   PmD_temp <- PmD_sig_sign_percs
+#   PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
+#   
+#   for(name in names(M1_sig_sign_percs_total)){
+#     M1_sig_sign_percs_total[[name]] <- M1_sig_sign_percs_total[[name]] + M1_temp[[name]]
+#     S1_sig_sign_percs_total[[name]] <- S1_sig_sign_percs_total[[name]] + S1_temp[[name]]
+#     PmD_sig_sign_percs_total[[name]] <- PmD_sig_sign_percs_total[[name]] + PmD_temp[[name]]
+#   }
+#   for(name in names(M1_diffs_length_list_ac_total)){
+#     M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
+#     M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
+#     M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
+#     M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
+#     S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
+#     S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
+#     S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
+#     S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
+#     PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
+#     PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
+#     PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
+#     PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
+#   }
+#   for(region_name in region_list){
+#     for(ph_name in ph_list_names){
+#       for(window_name in time_windows){
+#         name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
+#         temp <- get(name)
+#         
+#         if(length(temp) > 0){
+#           temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+#           assign(paste(name,'_totals',sep=""),temp2)
+#           
+#         }}}}
+#   detach()
+# }
 
   
 #######################
@@ -821,34 +912,34 @@ for(region_index in 1:length(region_list)){
   graphics.off()
   
   #catch
-  png(paste(region_list[region_index],'_catch_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
+  #png(paste(region_list[region_index],'_catch_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
   
-  num_inc <- rbind(out_sig_sign_percs$catch_x_sig_sign_percs[2,],out_sig_sign_percs$catchx_sig_sign_percs[2,])
+  #num_inc <- rbind(out_sig_sign_percs$catch_x_sig_sign_percs[2,],out_sig_sign_percs$catchx_sig_sign_percs[2,])
   #
-  num_inc <- cbind(num_inc[,1],num_inc[,5])
-  num_inc <- num_inc / total_unit_num
-  rownames(num_inc) <- c('P catch trial','R catch trial')
-  colnames(num_inc) <- window_names
-  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
-  num_inc_melt$direction <- 'inc'
+  #num_inc <- cbind(num_inc[,1],num_inc[,5])
+  #num_inc <- num_inc / total_unit_num
+  #rownames(num_inc) <- c('P catch trial','R catch trial')
+  #colnames(num_inc) <- window_names
+  #num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  #num_inc_melt$direction <- 'inc'
   
-  num_dec <- rbind(out_sig_sign_percs$res0_sig_sign_percs[3,],out_sig_sign_percs$res1_sig_sign_percs[3,])
+  #num_dec <- rbind(out_sig_sign_percs$res0_sig_sign_percs[3,],out_sig_sign_percs$res1_sig_sign_percs[3,])
   #
-  num_dec <- cbind(num_dec[,1],num_dec[,5])
-  num_dec <- num_dec / total_unit_num
-  rownames(num_dec) <- c('P catch trial','R catch trial')
-  colnames(num_dec) <- window_names
-  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
-  num_dec_melt$direction <- 'dec'
+  #num_dec <- cbind(num_dec[,1],num_dec[,5])
+  #num_dec <- num_dec / total_unit_num
+  #rownames(num_dec) <- c('P catch trial','R catch trial')
+  #colnames(num_dec) <- window_names
+  #num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  #num_dec_melt$direction <- 'dec'
   
-  both_num <- rbind(num_inc_melt,num_dec_melt)
+  #both_num <- rbind(num_inc_melt,num_dec_melt)
   
-  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
-  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Catch trials',y='Proportion Significant')
-  plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
-  
-  plot(plt)
-  graphics.off()
+  #plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  #plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Catch trials',y='Proportion Significant')
+  #plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
+  #
+  #plot(plt)
+  #graphics.off()
   
   #####
   #####
@@ -889,7 +980,7 @@ for(region_name in region_list){
           if(pval_adjusted_bool){
             sig_comparisons <- temp[[i]]$comparisons[temp[[i]]$P.adjusted < 0.05]
             if(!identical(temp[[i]]$P < 0.05,temp[[i]]$P.adjusted < 0.05)){
-              cat('not equal\n\n')
+              cat('not equal\n')
             }
           }else{
             sig_comparisons <- temp[[i]]$comparisons[temp[[i]]$P < 0.05]
@@ -964,8 +1055,9 @@ for(region_name in region_list){
   }
 }
 
-save.image(paste(nhp_id,"_summary.RData",sep=""))
+save.image("summary.RData")
 
+#rm(list=ls())
 
 
 
