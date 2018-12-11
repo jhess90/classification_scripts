@@ -228,7 +228,7 @@ python /home/jack/workspace/classification_scripts/simple_fr_smoothing_gen.py
 Rscript /home/jack/workspace/classification_scripts/stats_rp_nocatch.R
 cp block.RData ../total/block1.RData
 
-cd /home/jack/Dropbox/stat_analysis/uncued/0059/block1/
+cd /home/jack/Dropbox/stat_analysis/uncued/504/block1/
 python /home/jack/workspace/classification_scripts/simple_fr_smoothing_gen.py
 Rscript /home/jack/workspace/classification_scripts/stats_rp_nocatch.R
 cp block.RData ../total/block1.RData
