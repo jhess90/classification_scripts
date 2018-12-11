@@ -28,6 +28,14 @@ sem <- function(x){sd(x)/sqrt(length(x))}
 
 ##########
 
+M1_sig_unit_list <- c()
+attach('block.RData')
+for(name in names(M1_p_val_list)){
+  M1_sig_unit_list <- append(M1_sig_unit_list,which(rowSums(M1_p_val_list[[name]] > 0.05) > 0))
+  
+}
+M1_sig_unit_list <- unique(M1_sig_unit_list) ##also do for w/in windows, but this is the right idea
+
 
 
 

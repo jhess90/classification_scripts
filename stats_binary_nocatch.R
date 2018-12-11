@@ -11,7 +11,7 @@ library(gridExtra)
 library(R.matlab)
 library(plyr)
 library(dunn.test)
-library(PMCMRplus)
+#library(PMCMRplus)
 
 tryCatch({
   source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
@@ -783,7 +783,11 @@ for(region_index in 1:length(region_list)){
       #}else{sig_p_p_bin_catch_levels <- 0}
       
       #value 
+      if (length(v_x == 1)){
+        v_x_means <- all_total_fr[unit_num,v_x,windows[i,1]:windows[i,2]]
+      }else{
       v_x_means <- rowMeans(all_total_fr[unit_num,v_x,windows[i,1]:windows[i,2]])
+      }
       v0_means <- rowMeans(all_total_fr[unit_num,v0,windows[i,1]:windows[i,2]])
       vx_means <- rowMeans(all_total_fr[unit_num,vx,windows[i,1]:windows[i,2]])
       
