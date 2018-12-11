@@ -151,7 +151,6 @@ for(region_index in 1:length(region_list)){
   png(paste(region_list[region_index],'_r_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
   
   num_inc <- rbind(out_sig_sign_percs$r0_sig_sign_percs[2,],out_sig_sign_percs$r1_sig_sign_percs[2,],out_sig_sign_percs$r2_sig_sign_percs[2,],out_sig_sign_percs$r3_sig_sign_percs[2,])
-  #
   num_inc <- cbind(num_inc[,1],num_inc[,5])
   num_inc <- num_inc / total_unit_num
   
@@ -164,7 +163,6 @@ for(region_index in 1:length(region_list)){
   num_inc_melt$direction <- 'inc'
   
   num_dec <- rbind(out_sig_sign_percs$r0_sig_sign_percs[3,],out_sig_sign_percs$r1_sig_sign_percs[3,],out_sig_sign_percs$r2_sig_sign_percs[3,],out_sig_sign_percs$r3_sig_sign_percs[3,])
-  #
   num_dec <- cbind(num_dec[,1],num_dec[,5])
   num_dec <- num_dec / total_unit_num
   
@@ -189,7 +187,6 @@ for(region_index in 1:length(region_list)){
     cat('binary\n')
   }else{
   num_inc <- rbind(out_sig_sign_percs$p0_sig_sign_percs[2,],out_sig_sign_percs$p1_sig_sign_percs[2,],out_sig_sign_percs$p2_sig_sign_percs[2,],out_sig_sign_percs$p3_sig_sign_percs[2,])
-  #
   num_inc <- cbind(num_inc[,1],num_inc[,5])
   num_inc <- num_inc / total_unit_num
   rownames(num_inc) <- c(0,1,2,3)
@@ -198,7 +195,6 @@ for(region_index in 1:length(region_list)){
   num_inc_melt$direction <- 'inc'
   
   num_dec <- rbind(out_sig_sign_percs$p0_sig_sign_percs[3,],out_sig_sign_percs$p1_sig_sign_percs[3,],out_sig_sign_percs$p2_sig_sign_percs[3,],out_sig_sign_percs$p3_sig_sign_percs[3,])
-  #
   num_dec <- cbind(num_dec[,1],num_dec[,5])
   num_dec <- num_dec / total_unit_num
   rownames(num_dec) <- c(0,1,2,3)
@@ -219,7 +215,6 @@ for(region_index in 1:length(region_list)){
   png(paste(region_list[region_index],'_rx_outcome_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
   
   num_inc <- rbind(out_sig_sign_percs$r0_s_sig_sign_percs[2,],out_sig_sign_percs$r0_f_sig_sign_percs[2,],out_sig_sign_percs$rx_s_sig_sign_percs[2,],out_sig_sign_percs$rx_f_sig_sign_percs[2,])
-  #
   num_inc <- cbind(num_inc[,1],num_inc[,5])
   num_inc <- num_inc / total_unit_num
   rownames(num_inc) <- c('r0s','r0f','rxs','rxf')
@@ -228,7 +223,6 @@ for(region_index in 1:length(region_list)){
   num_inc_melt$direction <- 'inc'
   
   num_dec <- rbind(out_sig_sign_percs$r0_f_sig_sign_percs[3,],out_sig_sign_percs$r0_f_sig_sign_percs[3,],out_sig_sign_percs$rx_s_sig_sign_percs[3,],out_sig_sign_percs$rx_f_sig_sign_percs[3,])
-  #
   num_dec <- cbind(num_dec[,1],num_dec[,5])
   num_dec <- num_dec / total_unit_num
   rownames(num_dec) <- c('r0s','r0f','rxs','rxf')
@@ -248,7 +242,6 @@ for(region_index in 1:length(region_list)){
   png(paste(region_list[region_index],'_px_outcome_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
   
   num_inc <- rbind(out_sig_sign_percs$p0_s_sig_sign_percs[2,],out_sig_sign_percs$p0_f_sig_sign_percs[2,],out_sig_sign_percs$px_s_sig_sign_percs[2,],out_sig_sign_percs$px_f_sig_sign_percs[2,])
-  #
   num_inc <- cbind(num_inc[,1],num_inc[,5])
   num_inc <- num_inc / total_unit_num
   rownames(num_inc) <- c('p0s','p0f','pxs','pxf')
@@ -257,7 +250,6 @@ for(region_index in 1:length(region_list)){
   num_inc_melt$direction <- 'inc'
   
   num_dec <- rbind(out_sig_sign_percs$p0_f_sig_sign_percs[3,],out_sig_sign_percs$p0_f_sig_sign_percs[3,],out_sig_sign_percs$px_s_sig_sign_percs[3,],out_sig_sign_percs$px_f_sig_sign_percs[3,])
-  #
   num_dec <- cbind(num_dec[,1],num_dec[,5])
   num_dec <- num_dec / total_unit_num
   rownames(num_dec) <- c('p0s','p0f','pxs','pxf')
@@ -273,14 +265,10 @@ for(region_index in 1:length(region_list)){
   plot(plt)
   graphics.off()
   
-  
-  
-  
   #r binary
   png(paste(region_list[region_index],'_r_binary_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
   
   num_inc <- rbind(out_sig_sign_percs$r0_sig_sign_percs[2,],out_sig_sign_percs$rx_sig_sign_percs[2,])
-  #
   num_inc <- cbind(num_inc[,1],num_inc[,5])
   num_inc <- num_inc / total_unit_num
   rownames(num_inc) <- c('r0','rx')
@@ -332,25 +320,10 @@ for(region_index in 1:length(region_list)){
   graphics.off()
   
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   #res outcome
   png(paste(region_list[region_index],'_res_outcome_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
   
   num_inc <- rbind(out_sig_sign_percs$res0_sig_sign_percs[2,],out_sig_sign_percs$res1_sig_sign_percs[2,])
-  #
   num_inc <- cbind(num_inc[,1],num_inc[,5])
   num_inc <- num_inc / total_unit_num
   rownames(num_inc) <- c('fail','succ')
@@ -359,7 +332,6 @@ for(region_index in 1:length(region_list)){
   num_inc_melt$direction <- 'inc'
   
   num_dec <- rbind(out_sig_sign_percs$res0_sig_sign_percs[3,],out_sig_sign_percs$res1_sig_sign_percs[3,])
-  #
   num_dec <- cbind(num_dec[,1],num_dec[,5])
   num_dec <- num_dec / total_unit_num
   rownames(num_dec) <- c('fail','succ')
@@ -379,7 +351,6 @@ for(region_index in 1:length(region_list)){
   png(paste(region_list[region_index],'_comb_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
   
   num_inc <- rbind(out_sig_sign_percs$r0_p0_sig_sign_percs[2,],out_sig_sign_percs$rx_p0_sig_sign_percs[2,],out_sig_sign_percs$r0_px_sig_sign_percs[2,],out_sig_sign_percs$rx_px_sig_sign_percs[2,])
-  #
   num_inc <- cbind(num_inc[,1],num_inc[,5])
   num_inc <- num_inc / total_unit_num
   rownames(num_inc) <- c('r0p0','rxp0','r0px','rxpx')
@@ -388,7 +359,6 @@ for(region_index in 1:length(region_list)){
   num_inc_melt$direction <- 'inc'
   
   num_dec <- rbind(out_sig_sign_percs$r0_p0_sig_sign_percs[3,],out_sig_sign_percs$rx_p0_sig_sign_percs[3,],out_sig_sign_percs$r0_px_sig_sign_percs[3,],out_sig_sign_percs$rx_px_sig_sign_percs[3,])
-  #
   num_dec <- cbind(num_dec[,1],num_dec[,5])
   num_dec <- num_dec / total_unit_num
   rownames(num_dec) <- c('r0p0','rxp0','r0px','rxpx')
@@ -409,7 +379,6 @@ for(region_index in 1:length(region_list)){
   png(paste(region_list[region_index],'_comb_outcome_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
   
   num_inc <- rbind(out_sig_sign_percs$r0_p0_s_sig_sign_percs[2,],out_sig_sign_percs$rx_p0_s_sig_sign_percs[2,],out_sig_sign_percs$r0_px_s_sig_sign_percs[2,],out_sig_sign_percs$rx_px_s_sig_sign_percs[2,],out_sig_sign_percs$r0_p0_f_sig_sign_percs[2,],out_sig_sign_percs$rx_p0_f_sig_sign_percs[2,],out_sig_sign_percs$r0_px_f_sig_sign_percs[2,],out_sig_sign_percs$rx_px_f_sig_sign_percs[2,])
-  #
   num_inc <- cbind(num_inc[,1],num_inc[,5])
   num_inc <- num_inc / total_unit_num
   rownames(num_inc) <- c('r0p0s','rxp0s','r0pxs','rxpxs','r0p0f','rxp0f','r0pxf','rxpxf')
@@ -418,7 +387,6 @@ for(region_index in 1:length(region_list)){
   num_inc_melt$direction <- 'inc'
   
   num_dec <- rbind(out_sig_sign_percs$r0_p0_s_sig_sign_percs[3,],out_sig_sign_percs$rx_p0_s_sig_sign_percs[3,],out_sig_sign_percs$r0_px_s_sig_sign_percs[3,],out_sig_sign_percs$rx_px_s_sig_sign_percs[3,],out_sig_sign_percs$r0_p0_f_sig_sign_percs[3,],out_sig_sign_percs$rx_p0_f_sig_sign_percs[3,],out_sig_sign_percs$r0_px_f_sig_sign_percs[3,],out_sig_sign_percs$rx_px_f_sig_sign_percs[3,])
-  #
   num_dec <- cbind(num_dec[,1],num_dec[,5])
   num_dec <- num_dec / total_unit_num
   rownames(num_dec) <- c('r0p0s','rxp0s','r0pxs','rxpxs','r0p0f','rxp0f','r0pxf','rxpxf')
@@ -439,11 +407,10 @@ for(region_index in 1:length(region_list)){
   png(paste(region_list[region_index],'_r_outcome_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
   
   num_inc <- rbind(out_sig_sign_percs$r0_succ_sig_sign_percs[2,],out_sig_sign_percs$r1_succ_sig_sign_percs[2,],out_sig_sign_percs$r2_succ_sig_sign_percs[2,],out_sig_sign_percs$r3_succ_sig_sign_percs[2,],out_sig_sign_percs$r0_fail_sig_sign_percs[2,],out_sig_sign_percs$r1_fail_sig_sign_percs[2,],out_sig_sign_percs$r2_fail_sig_sign_percs[2,],out_sig_sign_percs$r3_fail_sig_sign_percs[2,])
-  #
   num_inc <- cbind(num_inc[,1],num_inc[,5])
   num_inc <- num_inc / total_unit_num
   if(length(num_inc) > 0){
-  if(~(length(num_inc) == 0) | dim(num_inc)[1] != 8){
+  if(dim(num_inc)[1] != 8){
     cat('binary\n')
   }else{
   rownames(num_inc) <- c('r0s','r1s','r2s','r3s','r0f','r1f','r2f','r3f')
@@ -452,7 +419,6 @@ for(region_index in 1:length(region_list)){
   num_inc_melt$direction <- 'inc'
   
   num_dec <- rbind(out_sig_sign_percs$r0_succ_sig_sign_percs[3,],out_sig_sign_percs$r1_succ_sig_sign_percs[3,],out_sig_sign_percs$r2_succ_sig_sign_percs[3,],out_sig_sign_percs$r3_succ_sig_sign_percs[3,],out_sig_sign_percs$r0_fail_sig_sign_percs[3,],out_sig_sign_percs$r1_fail_sig_sign_percs[3,],out_sig_sign_percs$r2_fail_sig_sign_percs[3,],out_sig_sign_percs$r3_fail_sig_sign_percs[3,])
-  #
   num_dec <- cbind(num_dec[,1],num_dec[,5])
   num_dec <- num_dec / total_unit_num
   rownames(num_dec) <- c('r0s','r1s','r2s','r3s','r0f','r1f','r2f','r3f')
@@ -474,7 +440,6 @@ for(region_index in 1:length(region_list)){
   png(paste(region_list[region_index],'_p_outcome_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
   
   num_inc <- rbind(out_sig_sign_percs$p0_succ_sig_sign_percs[2,],out_sig_sign_percs$p1_succ_sig_sign_percs[2,],out_sig_sign_percs$p2_succ_sig_sign_percs[2,],out_sig_sign_percs$p3_succ_sig_sign_percs[2,],out_sig_sign_percs$p0_fail_sig_sign_percs[2,],out_sig_sign_percs$p1_fail_sig_sign_percs[2,],out_sig_sign_percs$p2_fail_sig_sign_percs[2,],out_sig_sign_percs$p3_fail_sig_sign_percs[2,])
-  #
   num_inc <- cbind(num_inc[,1],num_inc[,5])
   num_inc <- num_inc / total_unit_num
   if(length(num_inc) > 0){
@@ -487,7 +452,6 @@ for(region_index in 1:length(region_list)){
   num_inc_melt$direction <- 'inc'
   
   num_dec <- rbind(out_sig_sign_percs$p0_succ_sig_sign_percs[3,],out_sig_sign_percs$p1_succ_sig_sign_percs[3,],out_sig_sign_percs$p2_succ_sig_sign_percs[3,],out_sig_sign_percs$p3_succ_sig_sign_percs[3,],out_sig_sign_percs$p0_fail_sig_sign_percs[3,],out_sig_sign_percs$p1_fail_sig_sign_percs[3,],out_sig_sign_percs$p2_fail_sig_sign_percs[3,],out_sig_sign_percs$p3_fail_sig_sign_percs[3,])
-  #
   num_dec <- cbind(num_dec[,1],num_dec[,5])
   num_dec <- num_dec / total_unit_num
   rownames(num_dec) <- c('p0s','p1s','p2s','p3s','p0f','p1f','p2f','p3f')
