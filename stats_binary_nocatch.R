@@ -866,7 +866,6 @@ for(region_index in 1:length(region_list)){
     assign(paste(region_list[region_index],'_sig_p_p_delivery_levels_',window_name[i],sep=""),sig_p_p_delivery_levels)
     cat('p delivery diffs: ',length(sig_p_p_delivery_levels[,1]),'units\n')
     
-   
     assign(paste(region_list[region_index],'_sm_sig_p_v_levels_',window_name[i],sep=""),sm_sig_p_v_levels)
     assign(paste(region_list[region_index],'_ph_v_levels_',window_name[i],sep=""),ph_v_levels)
     cat('v level differences: ',length(ph_v_levels),'units\n')

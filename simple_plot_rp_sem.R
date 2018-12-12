@@ -27,17 +27,45 @@ sem <- function(x){sd(x)/sqrt(length(x))}
 
 
 ##########
+attach('block.RData')
 
 M1_sig_unit_list <- c()
-attach('block.RData')
 for(name in names(M1_p_val_list)){
+  #just 1 and 5, BC/AC and BR/AR
   M1_sig_unit_list <- append(M1_sig_unit_list,which(rowSums(M1_p_val_list[[name]] > 0.05) > 0))
-  
+  M1_sig_unit_list <- append(M1_sig_unit_list,which(rowSums(cbind(M1_p_val_list[[name]][,1] > 0.05,M1_p_val_list[[name]][,5] > 0.05)) > 0))
 }
-M1_sig_unit_list <- unique(M1_sig_unit_list) ##also do for w/in windows, but this is the right idea
+t1 <- c(M1_sm_sig_p_r_levels_ac[,1],M1_sm_sig_p_p_levels_ac[,1],M1_sm_sig_p_r_outcome_levels_ac[,1],M1_sm_sig_p_p_outcome_levels_ac[,1],M1_sm_sig_p_outcome_levels_ac[,1],M1_sm_sig_p_comb_levels_ac[,1],M1_sig_p_r_delivery_levels_ac[,1],M1_sig_p_p_delivery_levels_ac[,1])
+t2 <- c(M1_sm_sig_p_r_levels_br[,1],M1_sm_sig_p_p_levels_br[,1],M1_sm_sig_p_r_outcome_levels_br[,1],M1_sm_sig_p_p_outcome_levels_br[,1],M1_sm_sig_p_outcome_levels_br[,1],M1_sm_sig_p_comb_levels_br[,1],M1_sig_p_r_delivery_levels_br[,1],M1_sig_p_p_delivery_levels_br[,1])
+t3 <- c(M1_sm_sig_p_r_levels_ar[,1],M1_sm_sig_p_p_levels_ar[,1],M1_sm_sig_p_r_outcome_levels_ar[,1],M1_sm_sig_p_p_outcome_levels_ar[,1],M1_sm_sig_p_outcome_levels_ar[,1],M1_sm_sig_p_comb_levels_ar[,1],M1_sig_p_r_delivery_levels_ar[,1],M1_sig_p_p_delivery_levels_ar[,1])
+M1_sig_unit_list <- c(M1_sig_unit_list,t1,t2,t3)
+M1_sig_unit_list <- unique(M1_sig_unit_list) 
 
+S1_sig_unit_list <- c()
+for(name in names(S1_p_val_list)){
+  #just 1 and 5, BC/AC and BR/AR
+  S1_sig_unit_list <- append(S1_sig_unit_list,which(rowSums(S1_p_val_list[[name]] > 0.05) > 0))
+  S1_sig_unit_list <- append(S1_sig_unit_list,which(rowSums(cbind(S1_p_val_list[[name]][,1] > 0.05,S1_p_val_list[[name]][,5] > 0.05)) > 0))
+}
+t1 <- c(S1_sm_sig_p_r_levels_ac[,1],S1_sm_sig_p_p_levels_ac[,1],S1_sm_sig_p_r_outcome_levels_ac[,1],S1_sm_sig_p_p_outcome_levels_ac[,1],S1_sm_sig_p_outcome_levels_ac[,1],S1_sm_sig_p_comb_levels_ac[,1],S1_sig_p_r_delivery_levels_ac[,1],S1_sig_p_p_delivery_levels_ac[,1])
+t2 <- c(S1_sm_sig_p_r_levels_br[,1],S1_sm_sig_p_p_levels_br[,1],S1_sm_sig_p_r_outcome_levels_br[,1],S1_sm_sig_p_p_outcome_levels_br[,1],S1_sm_sig_p_outcome_levels_br[,1],S1_sm_sig_p_comb_levels_br[,1],S1_sig_p_r_delivery_levels_br[,1],S1_sig_p_p_delivery_levels_br[,1])
+t3 <- c(S1_sm_sig_p_r_levels_ar[,1],S1_sm_sig_p_p_levels_ar[,1],S1_sm_sig_p_r_outcome_levels_ar[,1],S1_sm_sig_p_p_outcome_levels_ar[,1],S1_sm_sig_p_outcome_levels_ar[,1],S1_sm_sig_p_comb_levels_ar[,1],S1_sig_p_r_delivery_levels_ar[,1],S1_sig_p_p_delivery_levels_ar[,1])
+S1_sig_unit_list <- c(S1_sig_unit_list,t1,t2,t3)
+S1_sig_unit_list <- unique(S1_sig_unit_list) 
 
+PmD_sig_unit_list <- c()
+for(name in names(PmD_p_val_list)){
+  #just 1 and 5, BC/AC and BR/AR
+  PmD_sig_unit_list <- append(PmD_sig_unit_list,which(rowSums(PmD_p_val_list[[name]] > 0.05) > 0))
+  PmD_sig_unit_list <- append(PmD_sig_unit_list,which(rowSums(cbind(PmD_p_val_list[[name]][,1] > 0.05,PmD_p_val_list[[name]][,5] > 0.05)) > 0))
+}
+t1 <- c(PmD_sm_sig_p_r_levels_ac[,1],PmD_sm_sig_p_p_levels_ac[,1],PmD_sm_sig_p_r_outcome_levels_ac[,1],PmD_sm_sig_p_p_outcome_levels_ac[,1],PmD_sm_sig_p_outcome_levels_ac[,1],PmD_sm_sig_p_comb_levels_ac[,1],PmD_sig_p_r_delivery_levels_ac[,1],PmD_sig_p_p_delivery_levels_ac[,1])
+t2 <- c(PmD_sm_sig_p_r_levels_br[,1],PmD_sm_sig_p_p_levels_br[,1],PmD_sm_sig_p_r_outcome_levels_br[,1],PmD_sm_sig_p_p_outcome_levels_br[,1],PmD_sm_sig_p_outcome_levels_br[,1],PmD_sm_sig_p_comb_levels_br[,1],PmD_sig_p_r_delivery_levels_br[,1],PmD_sig_p_p_delivery_levels_br[,1])
+t3 <- c(PmD_sm_sig_p_r_levels_ar[,1],PmD_sm_sig_p_p_levels_ar[,1],PmD_sm_sig_p_r_outcome_levels_ar[,1],PmD_sm_sig_p_p_outcome_levels_ar[,1],PmD_sm_sig_p_outcome_levels_ar[,1],PmD_sm_sig_p_comb_levels_ar[,1],PmD_sig_p_r_delivery_levels_ar[,1],PmD_sig_p_p_delivery_levels_ar[,1])
+PmD_sig_unit_list <- c(PmD_sig_unit_list,t1,t2,t3)
+PmD_sig_unit_list <- unique(PmD_sig_unit_list)
 
+##########################################
 
 for(region_index in 1:length(region_list)){
   cat("\nplotting region:",region_list[region_index])
@@ -113,12 +141,11 @@ for(region_index in 1:length(region_list)){
   r0_px <- r0[which(r0 %in% px)]
   rx_px <- rx[which(rx %in% px)]
   
+  if(region_index == 1){unit_list <- M1_sig_unit_list}else if (region_index == 2){unit_list <- S1_sig_unit_list}else{unit_list <- PmD_sig_unit_list}
   
-  
-  
-  ###TODO plot for select units only
-  
-  for (unit_num in 1:dim(all_cue_fr)[1]){
+  #for (unit_num in 1:dim(all_cue_fr)[1]){
+  for(unit_num in unit_list){
+    cat(unit_num)
     #for i in range(length units desired)
     #unit = unit_list[i]
     

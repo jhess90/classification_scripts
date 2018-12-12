@@ -11,7 +11,7 @@ library(gridExtra)
 library(R.matlab)
 library(plyr)
 library(dunn.test)
-library(PMCMRplus)
+#library(PMCMRplus)
 
 tryCatch({
   source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
