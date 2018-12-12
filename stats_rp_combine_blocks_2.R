@@ -44,10 +44,11 @@ time_windows <- c('ac','br','ar','rw')
 
 file_list <- Sys.glob("block*.RData")
 
+ind = 1
 for(block_name in file_list){
   cat(block_name)
 
-  if(block_name == "block1.RData"){
+  if(ind == 1){
     attach(block_name)
 
     M1_sig_sign_percs_total <- M1_sig_sign_percs
@@ -74,15 +75,21 @@ for(block_name in file_list){
       for(ph_name in ph_list_names){
         for(window_name in time_windows){
           name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
-          temp <- get(name)
+          tryCatch({
           
-          assign(paste(name,'_totals',sep=""),list())
-          if(length(temp) > 0){
-            #cat(name,'\n')
-            temp2 <- c(get(paste(name,'_totals',sep="")),temp)
-            assign(paste(name,'_totals',sep=""),temp2)
-            
-          }}}}
+            temp <- get(name)
+          
+            assign(paste(name,'_totals',sep=""),list())
+            if(length(temp) > 0){
+              #cat(name,'\n')
+              temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+              assign(paste(name,'_totals',sep=""),temp2)
+            }
+          },error=function(e){
+            #cat(name)
+          },finally={})
+              
+          }}}
     
     detach()
     
@@ -115,20 +122,32 @@ for(block_name in file_list){
       PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
       PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
     }
+
+    
     for(region_name in region_list){
       for(ph_name in ph_list_names){
         for(window_name in time_windows){
           name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,sep="")
-          temp <- get(name)
-          
-          if(length(temp) > 0){
-            temp2 <- c(get(paste(name,'_totals',sep="")),temp)
-            assign(paste(name,'_totals',sep=""),temp2)
+          tryCatch({
             
-          }}}}
+            temp <- get(name)
+            
+            assign(paste(name,'_totals',sep=""),list())
+            if(length(temp) > 0){
+              #cat(name,'\n')
+              temp2 <- c(get(paste(name,'_totals',sep="")),temp)
+              assign(paste(name,'_totals',sep=""),temp2)
+            }
+          },error=function(e){
+            #cat(name)
+          },finally={})
+          
+        }}}
+    
+    
     detach()
   }
-  
+  ind <- ind + 1
 }
 
 
@@ -157,26 +176,26 @@ for(region_index in 1:length(region_list)){
   if(dim(num_inc)[1] != 4){
     cat('binary\n')
   }else{
-  rownames(num_inc) <- c(0,1,2,3)
-  colnames(num_inc) <- window_names
-  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
-  num_inc_melt$direction <- 'inc'
-  
-  num_dec <- rbind(out_sig_sign_percs$r0_sig_sign_percs[3,],out_sig_sign_percs$r1_sig_sign_percs[3,],out_sig_sign_percs$r2_sig_sign_percs[3,],out_sig_sign_percs$r3_sig_sign_percs[3,])
-  num_dec <- cbind(num_dec[,1],num_dec[,5])
-  num_dec <- num_dec / total_unit_num
-  
-  rownames(num_dec) <- c(0,1,2,3)
-  colnames(num_dec) <- window_names
-  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
-  num_dec_melt$direction <- 'dec'
-  
-  both_num <- rbind(num_inc_melt,num_dec_melt)
-  
-  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
-  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Reward Level',y='Proportion Significant')
-  
-  plot(plt)
+    rownames(num_inc) <- c(0,1,2,3)
+    colnames(num_inc) <- window_names
+    num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+    num_inc_melt$direction <- 'inc'
+    
+    num_dec <- rbind(out_sig_sign_percs$r0_sig_sign_percs[3,],out_sig_sign_percs$r1_sig_sign_percs[3,],out_sig_sign_percs$r2_sig_sign_percs[3,],out_sig_sign_percs$r3_sig_sign_percs[3,])
+    num_dec <- cbind(num_dec[,1],num_dec[,5])
+    num_dec <- num_dec / total_unit_num
+    
+    rownames(num_dec) <- c(0,1,2,3)
+    colnames(num_dec) <- window_names
+    num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+    num_dec_melt$direction <- 'dec'
+    
+    both_num <- rbind(num_inc_melt,num_dec_melt)
+    
+    plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+    plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Reward Level',y='Proportion Significant')
+    
+    plot(plt)
   }
   graphics.off()
   
@@ -186,28 +205,28 @@ for(region_index in 1:length(region_list)){
   if(dim(num_inc)[1] != 4){
     cat('binary\n')
   }else{
-  num_inc <- rbind(out_sig_sign_percs$p0_sig_sign_percs[2,],out_sig_sign_percs$p1_sig_sign_percs[2,],out_sig_sign_percs$p2_sig_sign_percs[2,],out_sig_sign_percs$p3_sig_sign_percs[2,])
-  num_inc <- cbind(num_inc[,1],num_inc[,5])
-  num_inc <- num_inc / total_unit_num
-  rownames(num_inc) <- c(0,1,2,3)
-  colnames(num_inc) <- window_names
-  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
-  num_inc_melt$direction <- 'inc'
-  
-  num_dec <- rbind(out_sig_sign_percs$p0_sig_sign_percs[3,],out_sig_sign_percs$p1_sig_sign_percs[3,],out_sig_sign_percs$p2_sig_sign_percs[3,],out_sig_sign_percs$p3_sig_sign_percs[3,])
-  num_dec <- cbind(num_dec[,1],num_dec[,5])
-  num_dec <- num_dec / total_unit_num
-  rownames(num_dec) <- c(0,1,2,3)
-  colnames(num_dec) <- window_names
-  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
-  num_dec_melt$direction <- 'dec'
-  
-  both_num <- rbind(num_inc_melt,num_dec_melt)
-  
-  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
-  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Punishment Level',y='Proportion Significant')
-  
-  plot(plt)
+    num_inc <- rbind(out_sig_sign_percs$p0_sig_sign_percs[2,],out_sig_sign_percs$p1_sig_sign_percs[2,],out_sig_sign_percs$p2_sig_sign_percs[2,],out_sig_sign_percs$p3_sig_sign_percs[2,])
+    num_inc <- cbind(num_inc[,1],num_inc[,5])
+    num_inc <- num_inc / total_unit_num
+    rownames(num_inc) <- c(0,1,2,3)
+    colnames(num_inc) <- window_names
+    num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+    num_inc_melt$direction <- 'inc'
+    
+    num_dec <- rbind(out_sig_sign_percs$p0_sig_sign_percs[3,],out_sig_sign_percs$p1_sig_sign_percs[3,],out_sig_sign_percs$p2_sig_sign_percs[3,],out_sig_sign_percs$p3_sig_sign_percs[3,])
+    num_dec <- cbind(num_dec[,1],num_dec[,5])
+    num_dec <- num_dec / total_unit_num
+    rownames(num_dec) <- c(0,1,2,3)
+    colnames(num_dec) <- window_names
+    num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+    num_dec_melt$direction <- 'dec'
+    
+    both_num <- rbind(num_inc_melt,num_dec_melt)
+    
+    plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+    plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Punishment Level',y='Proportion Significant')
+    
+    plot(plt)
   }
   graphics.off()
   
@@ -410,29 +429,29 @@ for(region_index in 1:length(region_list)){
   num_inc <- cbind(num_inc[,1],num_inc[,5])
   num_inc <- num_inc / total_unit_num
   if(length(num_inc) > 0){
-  if(dim(num_inc)[1] != 8){
-    cat('binary\n')
-  }else{
-  rownames(num_inc) <- c('r0s','r1s','r2s','r3s','r0f','r1f','r2f','r3f')
-  colnames(num_inc) <- window_names
-  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
-  num_inc_melt$direction <- 'inc'
-  
-  num_dec <- rbind(out_sig_sign_percs$r0_succ_sig_sign_percs[3,],out_sig_sign_percs$r1_succ_sig_sign_percs[3,],out_sig_sign_percs$r2_succ_sig_sign_percs[3,],out_sig_sign_percs$r3_succ_sig_sign_percs[3,],out_sig_sign_percs$r0_fail_sig_sign_percs[3,],out_sig_sign_percs$r1_fail_sig_sign_percs[3,],out_sig_sign_percs$r2_fail_sig_sign_percs[3,],out_sig_sign_percs$r3_fail_sig_sign_percs[3,])
-  num_dec <- cbind(num_dec[,1],num_dec[,5])
-  num_dec <- num_dec / total_unit_num
-  rownames(num_dec) <- c('r0s','r1s','r2s','r3s','r0f','r1f','r2f','r3f')
-  colnames(num_dec) <- window_names
-  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
-  num_dec_melt$direction <- 'dec'
-  
-  both_num <- rbind(num_inc_melt,num_dec_melt)
-  
-  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
-  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Reward Level and Outcome',y='Proportion Significant')
-  plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
-  
-  plot(plt)
+    if(dim(num_inc)[1] != 8){
+      cat('binary\n')
+    }else{
+      rownames(num_inc) <- c('r0s','r1s','r2s','r3s','r0f','r1f','r2f','r3f')
+      colnames(num_inc) <- window_names
+      num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+      num_inc_melt$direction <- 'inc'
+      
+      num_dec <- rbind(out_sig_sign_percs$r0_succ_sig_sign_percs[3,],out_sig_sign_percs$r1_succ_sig_sign_percs[3,],out_sig_sign_percs$r2_succ_sig_sign_percs[3,],out_sig_sign_percs$r3_succ_sig_sign_percs[3,],out_sig_sign_percs$r0_fail_sig_sign_percs[3,],out_sig_sign_percs$r1_fail_sig_sign_percs[3,],out_sig_sign_percs$r2_fail_sig_sign_percs[3,],out_sig_sign_percs$r3_fail_sig_sign_percs[3,])
+      num_dec <- cbind(num_dec[,1],num_dec[,5])
+      num_dec <- num_dec / total_unit_num
+      rownames(num_dec) <- c('r0s','r1s','r2s','r3s','r0f','r1f','r2f','r3f')
+      colnames(num_dec) <- window_names
+      num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+      num_dec_melt$direction <- 'dec'
+      
+      both_num <- rbind(num_inc_melt,num_dec_melt)
+      
+      plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+      plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Reward Level and Outcome',y='Proportion Significant')
+      plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
+      
+      plot(plt)
   }}
   graphics.off()
   
@@ -443,37 +462,37 @@ for(region_index in 1:length(region_list)){
   num_inc <- cbind(num_inc[,1],num_inc[,5])
   num_inc <- num_inc / total_unit_num
   if(length(num_inc) > 0){
-  if(dim(num_inc)[1] != 8){
-    cat('binary\n')
-  }else{
-  rownames(num_inc) <- c('p0s','p1s','p2s','p3s','p0f','p1f','p2f','p3f')
-  colnames(num_inc) <- window_names
-  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
-  num_inc_melt$direction <- 'inc'
-  
-  num_dec <- rbind(out_sig_sign_percs$p0_succ_sig_sign_percs[3,],out_sig_sign_percs$p1_succ_sig_sign_percs[3,],out_sig_sign_percs$p2_succ_sig_sign_percs[3,],out_sig_sign_percs$p3_succ_sig_sign_percs[3,],out_sig_sign_percs$p0_fail_sig_sign_percs[3,],out_sig_sign_percs$p1_fail_sig_sign_percs[3,],out_sig_sign_percs$p2_fail_sig_sign_percs[3,],out_sig_sign_percs$p3_fail_sig_sign_percs[3,])
-  num_dec <- cbind(num_dec[,1],num_dec[,5])
-  num_dec <- num_dec / total_unit_num
-  rownames(num_dec) <- c('p0s','p1s','p2s','p3s','p0f','p1f','p2f','p3f')
-  colnames(num_dec) <- window_names
-  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
-  num_dec_melt$direction <- 'dec'
-  
-  both_num <- rbind(num_inc_melt,num_dec_melt)
-  
-  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
-  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Punishment Level and Outcome',y='Proportion Significant')
-  plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
-  
-  plot(plt)
+    if(dim(num_inc)[1] != 8){
+      cat('binary\n')
+    }else{
+      rownames(num_inc) <- c('p0s','p1s','p2s','p3s','p0f','p1f','p2f','p3f')
+      colnames(num_inc) <- window_names
+      num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+      num_inc_melt$direction <- 'inc'
+      
+      num_dec <- rbind(out_sig_sign_percs$p0_succ_sig_sign_percs[3,],out_sig_sign_percs$p1_succ_sig_sign_percs[3,],out_sig_sign_percs$p2_succ_sig_sign_percs[3,],out_sig_sign_percs$p3_succ_sig_sign_percs[3,],out_sig_sign_percs$p0_fail_sig_sign_percs[3,],out_sig_sign_percs$p1_fail_sig_sign_percs[3,],out_sig_sign_percs$p2_fail_sig_sign_percs[3,],out_sig_sign_percs$p3_fail_sig_sign_percs[3,])
+      num_dec <- cbind(num_dec[,1],num_dec[,5])
+      num_dec <- num_dec / total_unit_num
+      rownames(num_dec) <- c('p0s','p1s','p2s','p3s','p0f','p1f','p2f','p3f')
+      colnames(num_dec) <- window_names
+      num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+      num_dec_melt$direction <- 'dec'
+      
+      both_num <- rbind(num_inc_melt,num_dec_melt)
+      
+      plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+      plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Punishment Level and Outcome',y='Proportion Significant')
+      plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
+      
+      plot(plt)
   }}
   graphics.off()
   
   #motivation
-  png(paste(region_list[region_index],'_m_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
-  
   num_inc <- rbind(out_sig_sign_percs$m0_sig_sign_percs[2,],out_sig_sign_percs$m1_sig_sign_percs[2,],out_sig_sign_percs$m2_sig_sign_percs[2,],out_sig_sign_percs$m3_sig_sign_percs[2,],out_sig_sign_percs$m4_sig_sign_percs[2,],out_sig_sign_percs$m5_sig_sign_percs[2,],out_sig_sign_percs$m6_sig_sign_percs[2,])
-  if(length(num_inc) == 7){
+  if(dim(num_inc)[1] == 7){
+    png(paste(region_list[region_index],'_m_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
+    
     num_inc <- cbind(num_inc[,1],num_inc[,5])
     num_inc <- num_inc / total_unit_num
     rownames(num_inc) <- c('m0','m1','m2','m3','m4','m5','m6')
@@ -498,42 +517,44 @@ for(region_index in 1:length(region_list)){
   
     plot(plt)
     graphics.off()
+  }else{
+    
+    #motivation binary
+    png(paste(region_list[region_index],'_m_binary_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
+    
+    num_inc <- rbind(out_sig_sign_percs$m0_sig_sign_percs[2,],out_sig_sign_percs$mx_sig_sign_percs[2,],out_sig_sign_percs$m2x_sig_sign_percs[2,])
+    num_inc <- cbind(num_inc[,1],num_inc[,5])
+    num_inc <- num_inc / total_unit_num
+    rownames(num_inc) <- c('m0','mx','m2x')
+    colnames(num_inc) <- window_names
+    num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+    num_inc_melt$direction <- 'inc'
+      
+    num_dec <- rbind(out_sig_sign_percs$m0_sig_sign_percs[3,],out_sig_sign_percs$mx_sig_sign_percs[3,],out_sig_sign_percs$m2x_sig_sign_percs[3,])
+      
+    num_dec <- cbind(num_dec[,1],num_dec[,5])
+    num_dec <- num_dec / total_unit_num
+    rownames(num_dec) <- c('m0','mx','m2x')
+    colnames(num_dec) <- window_names
+    num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+    num_dec_melt$direction <- 'dec'
+      
+    both_num <- rbind(num_inc_melt,num_dec_melt)
+      
+    plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+    plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Motivation',y='Proportion Significant')
+    plt <- plt + theme(axis.text.x = element_text(size=rel(0.8)))
+      
+    plot(plt)
+    graphics.off()
   }
-  
-  #motivation binary
-  png(paste(region_list[region_index],'_m_binary_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
-  
-  num_inc <- rbind(out_sig_sign_percs$m0_sig_sign_percs[2,],out_sig_sign_percs$mx_sig_sign_percs[2,],out_sig_sign_percs$m2x_sig_sign_percs[2,])
-  num_inc <- cbind(num_inc[,1],num_inc[,5])
-  num_inc <- num_inc / total_unit_num
-  rownames(num_inc) <- c('m0','mx','m2x')
-  colnames(num_inc) <- window_names
-  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
-  num_inc_melt$direction <- 'inc'
-    
-  num_dec <- rbind(out_sig_sign_percs$m0_sig_sign_percs[3,],out_sig_sign_percs$mx_sig_sign_percs[3,],out_sig_sign_percs$m2x_sig_sign_percs[3,])
-    
-  num_dec <- cbind(num_dec[,1],num_dec[,5])
-  num_dec <- num_dec / total_unit_num
-  rownames(num_dec) <- c('m0','mx','m2x')
-  colnames(num_dec) <- window_names
-  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
-  num_dec_melt$direction <- 'dec'
-    
-  both_num <- rbind(num_inc_melt,num_dec_melt)
-    
-  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
-  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Motivation',y='Proportion Significant')
-  plt <- plt + theme(axis.text.x = element_text(size=rel(0.8)))
-    
-  plot(plt)
-  graphics.off()
     
   #value
-  png(paste(region_list[region_index],'_v_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
   
   num_inc <- rbind(out_sig_sign_percs$v_3_sig_sign_percs[2,],out_sig_sign_percs$v_2_sig_sign_percs[2,],out_sig_sign_percs$v_1_sig_sign_percs[2,],out_sig_sign_percs$v0_sig_sign_percs[2,],out_sig_sign_percs$v1_sig_sign_percs[2,],out_sig_sign_percs$v2_sig_sign_percs[2,],out_sig_sign_percs$v3_sig_sign_percs[2,])
-  if(length(num_inc) == 7){
+  if(dim(num_inc)[1] == 7){
+    png(paste(region_list[region_index],'_v_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
+    
     num_inc <- cbind(num_inc[,1],num_inc[,5])
     num_inc <- num_inc / total_unit_num
     rownames(num_inc) <- c('v_3','v_2','v_1','v0','v1','v2','v3')
@@ -558,37 +579,37 @@ for(region_index in 1:length(region_list)){
   
     plot(plt)
     graphics.off()
+  }else{
+  
+    #value binary
+    png(paste(region_list[region_index],'_v_binary_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
+    
+    num_inc <- rbind(out_sig_sign_percs$v_x_sig_sign_percs[2,],out_sig_sign_percs$v0_sig_sign_percs[2,],out_sig_sign_percs$vx_sig_sign_percs[2,])
+    num_inc <- cbind(num_inc[,1],num_inc[,5])
+    num_inc <- num_inc / total_unit_num
+    rownames(num_inc) <- c('v_x','v0','vx')
+    colnames(num_inc) <- window_names
+    num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+    num_inc_melt$direction <- 'inc'
+      
+    num_dec <- rbind(out_sig_sign_percs$v_x_sig_sign_percs[3,],out_sig_sign_percs$v0_sig_sign_percs[3,],out_sig_sign_percs$vx_sig_sign_percs[3,])
+      
+    num_dec <- cbind(num_dec[,1],num_dec[,5])
+    num_dec <- num_dec / total_unit_num
+    rownames(num_dec) <- c('v_x','v0','vx')
+    colnames(num_dec) <- window_names
+    num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+    num_dec_melt$direction <- 'dec'
+      
+    both_num <- rbind(num_inc_melt,num_dec_melt)
+      
+    plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+    plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Value',y='Proportion Significant')
+    plt <- plt + theme(axis.text.x = element_text(size=rel(0.8)))
+      
+    plot(plt)
+    graphics.off()
   }
-  
-  #value binary
-  png(paste(region_list[region_index],'_v_binary_sig_diffs_total.png',sep=""),width=8,height=6,units="in",res=500)
-  
-  num_inc <- rbind(out_sig_sign_percs$v_x_sig_sign_percs[2,],out_sig_sign_percs$v0_sig_sign_percs[2,],out_sig_sign_percs$vx_sig_sign_percs[2,])
-  num_inc <- cbind(num_inc[,1],num_inc[,5])
-  num_inc <- num_inc / total_unit_num
-  rownames(num_inc) <- c('v_x','v0','vx')
-  colnames(num_inc) <- window_names
-  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
-  num_inc_melt$direction <- 'inc'
-    
-  num_dec <- rbind(out_sig_sign_percs$v_x_sig_sign_percs[3,],out_sig_sign_percs$v0_sig_sign_percs[3,],out_sig_sign_percs$vx_sig_sign_percs[3,])
-    
-  num_dec <- cbind(num_dec[,1],num_dec[,5])
-  num_dec <- num_dec / total_unit_num
-  rownames(num_dec) <- c('v_x','v0','vx')
-  colnames(num_dec) <- window_names
-  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
-  num_dec_melt$direction <- 'dec'
-    
-  both_num <- rbind(num_inc_melt,num_dec_melt)
-    
-  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
-  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Value',y='Proportion Significant')
-  plt <- plt + theme(axis.text.x = element_text(size=rel(0.8)))
-    
-  plot(plt)
-  graphics.off()
-    
     
     
   #catch
@@ -648,7 +669,11 @@ for(region_name in region_list){
     for(window_name in time_windows){
       cat(window_name,'\n')
       name <- paste(region_name,'_ph_',ph_name,'_levels_',window_name,'_totals',sep="")
+      
+      tryCatch({
       temp <- get(name)
+      
+      
       if(length(temp) > 0){
         
         sig_unit_num <- length(temp)
@@ -719,6 +744,8 @@ for(region_name in region_list){
           
         }
       }
+      },error=function(e){},finally={})
+      
     }
     
     if(length(perc_list_windows) > 0){
@@ -731,8 +758,8 @@ for(region_name in region_list){
       }else{  
         write.xlsx(perc_list_windows_cbind,file=paste(region_name,'_ph_percs.xlsx',sep=""),sheetName=ph_name,append=T)
       }
-    }
-  }
+
+    }  }
 }
 
 save.image("summary.RData")
