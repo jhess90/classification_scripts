@@ -45,14 +45,28 @@ for(name in names(M1_p_val_list)){
   sig_info_res[[name]] <- which(M1_p_val_list[[name]][,5] < 0.05) 
   M1_sig_unit_list <- append(M1_sig_unit_list,temp_sig)
 }
-t1 <- c(M1_sm_sig_p_r_levels_ac[,1],M1_sm_sig_p_p_levels_ac[,1],M1_sm_sig_p_r_outcome_levels_ac[,1],M1_sm_sig_p_p_outcome_levels_ac[,1],M1_sm_sig_p_outcome_levels_ac[,1],M1_sm_sig_p_comb_levels_ac[,1],M1_sig_p_r_delivery_levels_ac[,1],M1_sig_p_p_delivery_levels_ac[,1])
-t2 <- c(M1_sm_sig_p_r_levels_br[,1],M1_sm_sig_p_p_levels_br[,1],M1_sm_sig_p_r_outcome_levels_br[,1],M1_sm_sig_p_p_outcome_levels_br[,1],M1_sm_sig_p_outcome_levels_br[,1],M1_sm_sig_p_comb_levels_br[,1],M1_sig_p_r_delivery_levels_br[,1],M1_sig_p_p_delivery_levels_br[,1])
-t3 <- c(M1_sm_sig_p_r_levels_ar[,1],M1_sm_sig_p_p_levels_ar[,1],M1_sm_sig_p_r_outcome_levels_ar[,1],M1_sm_sig_p_p_outcome_levels_ar[,1],M1_sm_sig_p_outcome_levels_ar[,1],M1_sm_sig_p_comb_levels_ar[,1],M1_sig_p_r_delivery_levels_ar[,1],M1_sig_p_p_delivery_levels_ar[,1])
+if(exists("M1_sm_sig_p_r_levels_ac")){
+  binary_bool <- FALSE
+  t1 <- c(M1_sm_sig_p_r_levels_ac[,1],M1_sm_sig_p_p_levels_ac[,1],M1_sm_sig_p_r_outcome_levels_ac[,1],M1_sm_sig_p_p_outcome_levels_ac[,1],M1_sm_sig_p_outcome_levels_ac[,1],M1_sm_sig_p_comb_levels_ac[,1],M1_sig_p_r_delivery_levels_ac[,1],M1_sig_p_p_delivery_levels_ac[,1])
+  t2 <- c(M1_sm_sig_p_r_levels_br[,1],M1_sm_sig_p_p_levels_br[,1],M1_sm_sig_p_r_outcome_levels_br[,1],M1_sm_sig_p_p_outcome_levels_br[,1],M1_sm_sig_p_outcome_levels_br[,1],M1_sm_sig_p_comb_levels_br[,1],M1_sig_p_r_delivery_levels_br[,1],M1_sig_p_p_delivery_levels_br[,1])
+  t3 <- c(M1_sm_sig_p_r_levels_ar[,1],M1_sm_sig_p_p_levels_ar[,1],M1_sm_sig_p_r_outcome_levels_ar[,1],M1_sm_sig_p_p_outcome_levels_ar[,1],M1_sm_sig_p_outcome_levels_ar[,1],M1_sm_sig_p_comb_levels_ar[,1],M1_sig_p_r_delivery_levels_ar[,1],M1_sig_p_p_delivery_levels_ar[,1])
 
-list1 <- list('r_levels'=M1_sm_sig_p_r_levels_ac[,1],'p_levels'=M1_sm_sig_p_p_levels_ac[,1],'r_outcome'=M1_sm_sig_p_r_outcome_levels_ac[,1],'p_outcome'=M1_sm_sig_p_p_outcome_levels_ac[,1],'outcome'=M1_sm_sig_p_outcome_levels_ac[,1],'comb'=M1_sm_sig_p_comb_levels_ac[,1],'r_delivery'=M1_sig_p_r_delivery_levels_ac[,1],'p_delivery'=M1_sig_p_p_delivery_levels_ac[,1])
-list2 <- list('r_levels'=M1_sm_sig_p_r_levels_br[,1],'p_levels'=M1_sm_sig_p_p_levels_br[,1],'r_outcome'=M1_sm_sig_p_r_outcome_levels_br[,1],'p_outcome'=M1_sm_sig_p_p_outcome_levels_br[,1],'outcome'=M1_sm_sig_p_outcome_levels_br[,1],'comb'=M1_sm_sig_p_comb_levels_br[,1],'r_delivery'=M1_sig_p_r_delivery_levels_br[,1],'p_delivery'=M1_sig_p_p_delivery_levels_br[,1])
-list3 <- list('r_levels'=M1_sm_sig_p_r_levels_ar[,1],'p_levels'=M1_sm_sig_p_p_levels_ar[,1],'r_outcome'=M1_sm_sig_p_r_outcome_levels_ar[,1],'p_outcome'=M1_sm_sig_p_p_outcome_levels_ar[,1],'outcome'=M1_sm_sig_p_outcome_levels_ar[,1],'comb'=M1_sm_sig_p_comb_levels_ar[,1],'r_delivery'=M1_sig_p_r_delivery_levels_ar[,1],'p_delivery'=M1_sig_p_p_delivery_levels_ar[,1])
-
+  list1 <- list('r_levels'=M1_sm_sig_p_r_levels_ac[,1],'p_levels'=M1_sm_sig_p_p_levels_ac[,1],'r_outcome'=M1_sm_sig_p_r_outcome_levels_ac[,1],'p_outcome'=M1_sm_sig_p_p_outcome_levels_ac[,1],'outcome'=M1_sm_sig_p_outcome_levels_ac[,1],'comb'=M1_sm_sig_p_comb_levels_ac[,1],'r_delivery'=M1_sig_p_r_delivery_levels_ac[,1],'p_delivery'=M1_sig_p_p_delivery_levels_ac[,1])
+  list2 <- list('r_levels'=M1_sm_sig_p_r_levels_br[,1],'p_levels'=M1_sm_sig_p_p_levels_br[,1],'r_outcome'=M1_sm_sig_p_r_outcome_levels_br[,1],'p_outcome'=M1_sm_sig_p_p_outcome_levels_br[,1],'outcome'=M1_sm_sig_p_outcome_levels_br[,1],'comb'=M1_sm_sig_p_comb_levels_br[,1],'r_delivery'=M1_sig_p_r_delivery_levels_br[,1],'p_delivery'=M1_sig_p_p_delivery_levels_br[,1])
+  list3 <- list('r_levels'=M1_sm_sig_p_r_levels_ar[,1],'p_levels'=M1_sm_sig_p_p_levels_ar[,1],'r_outcome'=M1_sm_sig_p_r_outcome_levels_ar[,1],'p_outcome'=M1_sm_sig_p_p_outcome_levels_ar[,1],'outcome'=M1_sm_sig_p_outcome_levels_ar[,1],'comb'=M1_sm_sig_p_comb_levels_ar[,1],'r_delivery'=M1_sig_p_r_delivery_levels_ar[,1],'p_delivery'=M1_sig_p_p_delivery_levels_ar[,1])
+}else{
+  binary_bool <- TRUE
+  t1 <- c(M1_sm_sig_p_r_outcome_levels_ac[,1],M1_sm_sig_p_p_outcome_levels_ac[,1],M1_sm_sig_p_outcome_levels_ac[,1],M1_sm_sig_p_comb_levels_ac[,1],M1_sig_p_r_delivery_levels_ac[,1],M1_sig_p_p_delivery_levels_ac[,1])
+  t2 <- c(M1_sm_sig_p_r_outcome_levels_br[,1],M1_sm_sig_p_p_outcome_levels_br[,1],M1_sm_sig_p_outcome_levels_br[,1],M1_sm_sig_p_comb_levels_br[,1],M1_sig_p_r_delivery_levels_br[,1],M1_sig_p_p_delivery_levels_br[,1])
+  t3 <- c(M1_sm_sig_p_r_outcome_levels_ar[,1],M1_sm_sig_p_p_outcome_levels_ar[,1],M1_sm_sig_p_outcome_levels_ar[,1],M1_sm_sig_p_comb_levels_ar[,1],M1_sig_p_r_delivery_levels_ar[,1],M1_sig_p_p_delivery_levels_ar[,1])
+  
+  list1 <- list('r_outcome'=M1_sm_sig_p_r_outcome_levels_ac[,1],'p_outcome'=M1_sm_sig_p_p_outcome_levels_ac[,1],'outcome'=M1_sm_sig_p_outcome_levels_ac[,1],'comb'=M1_sm_sig_p_comb_levels_ac[,1],'r_delivery'=M1_sig_p_r_delivery_levels_ac[,1],'p_delivery'=M1_sig_p_p_delivery_levels_ac[,1])
+  list2 <- list('r_outcome'=M1_sm_sig_p_r_outcome_levels_br[,1],'p_outcome'=M1_sm_sig_p_p_outcome_levels_br[,1],'outcome'=M1_sm_sig_p_outcome_levels_br[,1],'comb'=M1_sm_sig_p_comb_levels_br[,1],'r_delivery'=M1_sig_p_r_delivery_levels_br[,1],'p_delivery'=M1_sig_p_p_delivery_levels_br[,1])
+  list3 <- list('r_outcome'=M1_sm_sig_p_r_outcome_levels_ar[,1],'p_outcome'=M1_sm_sig_p_p_outcome_levels_ar[,1],'outcome'=M1_sm_sig_p_outcome_levels_ar[,1],'comb'=M1_sm_sig_p_comb_levels_ar[,1],'r_delivery'=M1_sig_p_r_delivery_levels_ar[,1],'p_delivery'=M1_sig_p_p_delivery_levels_ar[,1])
+  
+  
+}
+  
 M1_sig_unit_list <- c(M1_sig_unit_list,t1,t2,t3)
 M1_sig_unit_list <- sort(unique(M1_sig_unit_list))
 
@@ -73,14 +87,24 @@ for(name in names(S1_p_val_list)){
   sig_info_res[[name]] <- which(S1_p_val_list[[name]][,5] < 0.05) 
   S1_sig_unit_list <- append(S1_sig_unit_list,temp_sig)
 }
-t1 <- c(S1_sm_sig_p_r_levels_ac[,1],S1_sm_sig_p_p_levels_ac[,1],S1_sm_sig_p_r_outcome_levels_ac[,1],S1_sm_sig_p_p_outcome_levels_ac[,1],S1_sm_sig_p_outcome_levels_ac[,1],S1_sm_sig_p_comb_levels_ac[,1],S1_sig_p_r_delivery_levels_ac[,1],S1_sig_p_p_delivery_levels_ac[,1])
-t2 <- c(S1_sm_sig_p_r_levels_br[,1],S1_sm_sig_p_p_levels_br[,1],S1_sm_sig_p_r_outcome_levels_br[,1],S1_sm_sig_p_p_outcome_levels_br[,1],S1_sm_sig_p_outcome_levels_br[,1],S1_sm_sig_p_comb_levels_br[,1],S1_sig_p_r_delivery_levels_br[,1],S1_sig_p_p_delivery_levels_br[,1])
-t3 <- c(S1_sm_sig_p_r_levels_ar[,1],S1_sm_sig_p_p_levels_ar[,1],S1_sm_sig_p_r_outcome_levels_ar[,1],S1_sm_sig_p_p_outcome_levels_ar[,1],S1_sm_sig_p_outcome_levels_ar[,1],S1_sm_sig_p_comb_levels_ar[,1],S1_sig_p_r_delivery_levels_ar[,1],S1_sig_p_p_delivery_levels_ar[,1])
+if(!binary_bool){
+  t1 <- c(S1_sm_sig_p_r_levels_ac[,1],S1_sm_sig_p_p_levels_ac[,1],S1_sm_sig_p_r_outcome_levels_ac[,1],S1_sm_sig_p_p_outcome_levels_ac[,1],S1_sm_sig_p_outcome_levels_ac[,1],S1_sm_sig_p_comb_levels_ac[,1],S1_sig_p_r_delivery_levels_ac[,1],S1_sig_p_p_delivery_levels_ac[,1])
+  t2 <- c(S1_sm_sig_p_r_levels_br[,1],S1_sm_sig_p_p_levels_br[,1],S1_sm_sig_p_r_outcome_levels_br[,1],S1_sm_sig_p_p_outcome_levels_br[,1],S1_sm_sig_p_outcome_levels_br[,1],S1_sm_sig_p_comb_levels_br[,1],S1_sig_p_r_delivery_levels_br[,1],S1_sig_p_p_delivery_levels_br[,1])
+  t3 <- c(S1_sm_sig_p_r_levels_ar[,1],S1_sm_sig_p_p_levels_ar[,1],S1_sm_sig_p_r_outcome_levels_ar[,1],S1_sm_sig_p_p_outcome_levels_ar[,1],S1_sm_sig_p_outcome_levels_ar[,1],S1_sm_sig_p_comb_levels_ar[,1],S1_sig_p_r_delivery_levels_ar[,1],S1_sig_p_p_delivery_levels_ar[,1])
 
-list1 <- list('r_levels'=S1_sm_sig_p_r_levels_ac[,1],'p_levels'=S1_sm_sig_p_p_levels_ac[,1],'r_outcome'=S1_sm_sig_p_r_outcome_levels_ac[,1],'p_outcome'=S1_sm_sig_p_p_outcome_levels_ac[,1],'outcome'=S1_sm_sig_p_outcome_levels_ac[,1],'comb'=S1_sm_sig_p_comb_levels_ac[,1],'r_delivery'=S1_sig_p_r_delivery_levels_ac[,1],'p_delivery'=S1_sig_p_p_delivery_levels_ac[,1])
-list2 <- list('r_levels'=S1_sm_sig_p_r_levels_br[,1],'p_levels'=S1_sm_sig_p_p_levels_br[,1],'r_outcome'=S1_sm_sig_p_r_outcome_levels_br[,1],'p_outcome'=S1_sm_sig_p_p_outcome_levels_br[,1],'outcome'=S1_sm_sig_p_outcome_levels_br[,1],'comb'=S1_sm_sig_p_comb_levels_br[,1],'r_delivery'=S1_sig_p_r_delivery_levels_br[,1],'p_delivery'=S1_sig_p_p_delivery_levels_br[,1])
-list3 <- list('r_levels'=S1_sm_sig_p_r_levels_ar[,1],'p_levels'=S1_sm_sig_p_p_levels_ar[,1],'r_outcome'=S1_sm_sig_p_r_outcome_levels_ar[,1],'p_outcome'=S1_sm_sig_p_p_outcome_levels_ar[,1],'outcome'=S1_sm_sig_p_outcome_levels_ar[,1],'comb'=S1_sm_sig_p_comb_levels_ar[,1],'r_delivery'=S1_sig_p_r_delivery_levels_ar[,1],'p_delivery'=S1_sig_p_p_delivery_levels_ar[,1])
-
+  list1 <- list('r_levels'=S1_sm_sig_p_r_levels_ac[,1],'p_levels'=S1_sm_sig_p_p_levels_ac[,1],'r_outcome'=S1_sm_sig_p_r_outcome_levels_ac[,1],'p_outcome'=S1_sm_sig_p_p_outcome_levels_ac[,1],'outcome'=S1_sm_sig_p_outcome_levels_ac[,1],'comb'=S1_sm_sig_p_comb_levels_ac[,1],'r_delivery'=S1_sig_p_r_delivery_levels_ac[,1],'p_delivery'=S1_sig_p_p_delivery_levels_ac[,1])
+  list2 <- list('r_levels'=S1_sm_sig_p_r_levels_br[,1],'p_levels'=S1_sm_sig_p_p_levels_br[,1],'r_outcome'=S1_sm_sig_p_r_outcome_levels_br[,1],'p_outcome'=S1_sm_sig_p_p_outcome_levels_br[,1],'outcome'=S1_sm_sig_p_outcome_levels_br[,1],'comb'=S1_sm_sig_p_comb_levels_br[,1],'r_delivery'=S1_sig_p_r_delivery_levels_br[,1],'p_delivery'=S1_sig_p_p_delivery_levels_br[,1])
+  list3 <- list('r_levels'=S1_sm_sig_p_r_levels_ar[,1],'p_levels'=S1_sm_sig_p_p_levels_ar[,1],'r_outcome'=S1_sm_sig_p_r_outcome_levels_ar[,1],'p_outcome'=S1_sm_sig_p_p_outcome_levels_ar[,1],'outcome'=S1_sm_sig_p_outcome_levels_ar[,1],'comb'=S1_sm_sig_p_comb_levels_ar[,1],'r_delivery'=S1_sig_p_r_delivery_levels_ar[,1],'p_delivery'=S1_sig_p_p_delivery_levels_ar[,1])
+}else{
+  t1 <- c(S1_sm_sig_p_r_outcome_levels_ac[,1],S1_sm_sig_p_p_outcome_levels_ac[,1],S1_sm_sig_p_outcome_levels_ac[,1],S1_sm_sig_p_comb_levels_ac[,1],S1_sig_p_r_delivery_levels_ac[,1],S1_sig_p_p_delivery_levels_ac[,1])
+  t2 <- c(S1_sm_sig_p_r_outcome_levels_br[,1],S1_sm_sig_p_p_outcome_levels_br[,1],S1_sm_sig_p_outcome_levels_br[,1],S1_sm_sig_p_comb_levels_br[,1],S1_sig_p_r_delivery_levels_br[,1],S1_sig_p_p_delivery_levels_br[,1])
+  t3 <- c(S1_sm_sig_p_r_outcome_levels_ar[,1],S1_sm_sig_p_p_outcome_levels_ar[,1],S1_sm_sig_p_outcome_levels_ar[,1],S1_sm_sig_p_comb_levels_ar[,1],S1_sig_p_r_delivery_levels_ar[,1],S1_sig_p_p_delivery_levels_ar[,1])
+  
+  list1 <- list('r_outcome'=S1_sm_sig_p_r_outcome_levels_ac[,1],'p_outcome'=S1_sm_sig_p_p_outcome_levels_ac[,1],'outcome'=S1_sm_sig_p_outcome_levels_ac[,1],'comb'=S1_sm_sig_p_comb_levels_ac[,1],'r_delivery'=S1_sig_p_r_delivery_levels_ac[,1],'p_delivery'=S1_sig_p_p_delivery_levels_ac[,1])
+  list2 <- list('r_outcome'=S1_sm_sig_p_r_outcome_levels_br[,1],'p_outcome'=S1_sm_sig_p_p_outcome_levels_br[,1],'outcome'=S1_sm_sig_p_outcome_levels_br[,1],'comb'=S1_sm_sig_p_comb_levels_br[,1],'r_delivery'=S1_sig_p_r_delivery_levels_br[,1],'p_delivery'=S1_sig_p_p_delivery_levels_br[,1])
+  list3 <- list('r_outcome'=S1_sm_sig_p_r_outcome_levels_ar[,1],'p_outcome'=S1_sm_sig_p_p_outcome_levels_ar[,1],'outcome'=S1_sm_sig_p_outcome_levels_ar[,1],'comb'=S1_sm_sig_p_comb_levels_ar[,1],'r_delivery'=S1_sig_p_r_delivery_levels_ar[,1],'p_delivery'=S1_sig_p_p_delivery_levels_ar[,1])
+}
+  
 S1_sig_unit_list <- c(S1_sig_unit_list,t1,t2,t3)
 S1_sig_unit_list <- sort(unique(S1_sig_unit_list))
 
@@ -101,14 +125,26 @@ for(name in names(PmD_p_val_list)){
   sig_info_res[[name]] <- which(PmD_p_val_list[[name]][,5] < 0.05) 
   PmD_sig_unit_list <- append(PmD_sig_unit_list,temp_sig)
 }
-t1 <- c(PmD_sm_sig_p_r_levels_ac[,1],PmD_sm_sig_p_p_levels_ac[,1],PmD_sm_sig_p_r_outcome_levels_ac[,1],PmD_sm_sig_p_p_outcome_levels_ac[,1],PmD_sm_sig_p_outcome_levels_ac[,1],PmD_sm_sig_p_comb_levels_ac[,1],PmD_sig_p_r_delivery_levels_ac[,1],PmD_sig_p_p_delivery_levels_ac[,1])
-t2 <- c(PmD_sm_sig_p_r_levels_br[,1],PmD_sm_sig_p_p_levels_br[,1],PmD_sm_sig_p_r_outcome_levels_br[,1],PmD_sm_sig_p_p_outcome_levels_br[,1],PmD_sm_sig_p_outcome_levels_br[,1],PmD_sm_sig_p_comb_levels_br[,1],PmD_sig_p_r_delivery_levels_br[,1],PmD_sig_p_p_delivery_levels_br[,1])
-t3 <- c(PmD_sm_sig_p_r_levels_ar[,1],PmD_sm_sig_p_p_levels_ar[,1],PmD_sm_sig_p_r_outcome_levels_ar[,1],PmD_sm_sig_p_p_outcome_levels_ar[,1],PmD_sm_sig_p_outcome_levels_ar[,1],PmD_sm_sig_p_comb_levels_ar[,1],PmD_sig_p_r_delivery_levels_ar[,1],PmD_sig_p_p_delivery_levels_ar[,1])
+if(!binary_bool){
+  t1 <- c(PmD_sm_sig_p_r_levels_ac[,1],PmD_sm_sig_p_p_levels_ac[,1],PmD_sm_sig_p_r_outcome_levels_ac[,1],PmD_sm_sig_p_p_outcome_levels_ac[,1],PmD_sm_sig_p_outcome_levels_ac[,1],PmD_sm_sig_p_comb_levels_ac[,1],PmD_sig_p_r_delivery_levels_ac[,1],PmD_sig_p_p_delivery_levels_ac[,1])
+  t2 <- c(PmD_sm_sig_p_r_levels_br[,1],PmD_sm_sig_p_p_levels_br[,1],PmD_sm_sig_p_r_outcome_levels_br[,1],PmD_sm_sig_p_p_outcome_levels_br[,1],PmD_sm_sig_p_outcome_levels_br[,1],PmD_sm_sig_p_comb_levels_br[,1],PmD_sig_p_r_delivery_levels_br[,1],PmD_sig_p_p_delivery_levels_br[,1])
+  t3 <- c(PmD_sm_sig_p_r_levels_ar[,1],PmD_sm_sig_p_p_levels_ar[,1],PmD_sm_sig_p_r_outcome_levels_ar[,1],PmD_sm_sig_p_p_outcome_levels_ar[,1],PmD_sm_sig_p_outcome_levels_ar[,1],PmD_sm_sig_p_comb_levels_ar[,1],PmD_sig_p_r_delivery_levels_ar[,1],PmD_sig_p_p_delivery_levels_ar[,1])
 
-list1 <- list('r_levels'=PmD_sm_sig_p_r_levels_ac[,1],'p_levels'=PmD_sm_sig_p_p_levels_ac[,1],'r_outcome'=PmD_sm_sig_p_r_outcome_levels_ac[,1],'p_outcome'=PmD_sm_sig_p_p_outcome_levels_ac[,1],'outcome'=PmD_sm_sig_p_outcome_levels_ac[,1],'comb'=PmD_sm_sig_p_comb_levels_ac[,1],'r_delivery'=PmD_sig_p_r_delivery_levels_ac[,1],'p_delivery'=PmD_sig_p_p_delivery_levels_ac[,1])
-list2 <- list('r_levels'=PmD_sm_sig_p_r_levels_br[,1],'p_levels'=PmD_sm_sig_p_p_levels_br[,1],'r_outcome'=PmD_sm_sig_p_r_outcome_levels_br[,1],'p_outcome'=PmD_sm_sig_p_p_outcome_levels_br[,1],'outcome'=PmD_sm_sig_p_outcome_levels_br[,1],'comb'=PmD_sm_sig_p_comb_levels_br[,1],'r_delivery'=PmD_sig_p_r_delivery_levels_br[,1],'p_delivery'=PmD_sig_p_p_delivery_levels_br[,1])
-list3 <- list('r_levels'=PmD_sm_sig_p_r_levels_ar[,1],'p_levels'=PmD_sm_sig_p_p_levels_ar[,1],'r_outcome'=PmD_sm_sig_p_r_outcome_levels_ar[,1],'p_outcome'=PmD_sm_sig_p_p_outcome_levels_ar[,1],'outcome'=PmD_sm_sig_p_outcome_levels_ar[,1],'comb'=PmD_sm_sig_p_comb_levels_ar[,1],'r_delivery'=PmD_sig_p_r_delivery_levels_ar[,1],'p_delivery'=PmD_sig_p_p_delivery_levels_ar[,1])
-
+  list1 <- list('r_levels'=PmD_sm_sig_p_r_levels_ac[,1],'p_levels'=PmD_sm_sig_p_p_levels_ac[,1],'r_outcome'=PmD_sm_sig_p_r_outcome_levels_ac[,1],'p_outcome'=PmD_sm_sig_p_p_outcome_levels_ac[,1],'outcome'=PmD_sm_sig_p_outcome_levels_ac[,1],'comb'=PmD_sm_sig_p_comb_levels_ac[,1],'r_delivery'=PmD_sig_p_r_delivery_levels_ac[,1],'p_delivery'=PmD_sig_p_p_delivery_levels_ac[,1])
+  list2 <- list('r_levels'=PmD_sm_sig_p_r_levels_br[,1],'p_levels'=PmD_sm_sig_p_p_levels_br[,1],'r_outcome'=PmD_sm_sig_p_r_outcome_levels_br[,1],'p_outcome'=PmD_sm_sig_p_p_outcome_levels_br[,1],'outcome'=PmD_sm_sig_p_outcome_levels_br[,1],'comb'=PmD_sm_sig_p_comb_levels_br[,1],'r_delivery'=PmD_sig_p_r_delivery_levels_br[,1],'p_delivery'=PmD_sig_p_p_delivery_levels_br[,1])
+  list3 <- list('r_levels'=PmD_sm_sig_p_r_levels_ar[,1],'p_levels'=PmD_sm_sig_p_p_levels_ar[,1],'r_outcome'=PmD_sm_sig_p_r_outcome_levels_ar[,1],'p_outcome'=PmD_sm_sig_p_p_outcome_levels_ar[,1],'outcome'=PmD_sm_sig_p_outcome_levels_ar[,1],'comb'=PmD_sm_sig_p_comb_levels_ar[,1],'r_delivery'=PmD_sig_p_r_delivery_levels_ar[,1],'p_delivery'=PmD_sig_p_p_delivery_levels_ar[,1])
+}else{
+  t1 <- c(PmD_sm_sig_p_r_outcome_levels_ac[,1],PmD_sm_sig_p_p_outcome_levels_ac[,1],PmD_sm_sig_p_outcome_levels_ac[,1],PmD_sm_sig_p_comb_levels_ac[,1],PmD_sig_p_r_delivery_levels_ac[,1],PmD_sig_p_p_delivery_levels_ac[,1])
+  t2 <- c(PmD_sm_sig_p_r_outcome_levels_br[,1],PmD_sm_sig_p_p_outcome_levels_br[,1],PmD_sm_sig_p_outcome_levels_br[,1],PmD_sm_sig_p_comb_levels_br[,1],PmD_sig_p_r_delivery_levels_br[,1],PmD_sig_p_p_delivery_levels_br[,1])
+  t3 <- c(PmD_sm_sig_p_r_outcome_levels_ar[,1],PmD_sm_sig_p_p_outcome_levels_ar[,1],PmD_sm_sig_p_outcome_levels_ar[,1],PmD_sm_sig_p_comb_levels_ar[,1],PmD_sig_p_r_delivery_levels_ar[,1],PmD_sig_p_p_delivery_levels_ar[,1])
+  
+  list1 <- list('r_outcome'=PmD_sm_sig_p_r_outcome_levels_ac[,1],'p_outcome'=PmD_sm_sig_p_p_outcome_levels_ac[,1],'outcome'=PmD_sm_sig_p_outcome_levels_ac[,1],'comb'=PmD_sm_sig_p_comb_levels_ac[,1],'r_delivery'=PmD_sig_p_r_delivery_levels_ac[,1],'p_delivery'=PmD_sig_p_p_delivery_levels_ac[,1])
+  list2 <- list('r_outcome'=PmD_sm_sig_p_r_outcome_levels_br[,1],'p_outcome'=PmD_sm_sig_p_p_outcome_levels_br[,1],'outcome'=PmD_sm_sig_p_outcome_levels_br[,1],'comb'=PmD_sm_sig_p_comb_levels_br[,1],'r_delivery'=PmD_sig_p_r_delivery_levels_br[,1],'p_delivery'=PmD_sig_p_p_delivery_levels_br[,1])
+  list3 <- list('r_outcome'=PmD_sm_sig_p_r_outcome_levels_ar[,1],'p_outcome'=PmD_sm_sig_p_p_outcome_levels_ar[,1],'outcome'=PmD_sm_sig_p_outcome_levels_ar[,1],'comb'=PmD_sm_sig_p_comb_levels_ar[,1],'r_delivery'=PmD_sig_p_r_delivery_levels_ar[,1],'p_delivery'=PmD_sig_p_p_delivery_levels_ar[,1])
+  
+  
+}
+  
 PmD_sig_unit_list <- c(PmD_sig_unit_list,t1,t2,t3)
 PmD_sig_unit_list <- sort(unique(PmD_sig_unit_list))
 
@@ -198,12 +234,10 @@ for(region_index in 1:length(region_list)){
   
   if(region_index == 1){unit_list <- M1_sig_unit_list}else if (region_index == 2){unit_list <- S1_sig_unit_list}else{unit_list <- PmD_sig_unit_list}
   
-  #for (unit_num in 1:dim(all_cue_fr)[1]){
   for(unit_num in unit_list){
     cat(unit_num,'\n')
-    #for i in range(length units desired)
-    #unit = unit_list[i]
     
+    #can change this and rest to binary_bool now that it's set
     if (!((length(r1) == 0 | length(r2) == 0) | length(r3) == 0)){
       ## reward
       png(paste("sem_",region_list[region_index],"_r_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
