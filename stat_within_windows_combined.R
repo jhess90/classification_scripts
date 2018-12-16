@@ -1,0 +1,68 @@
+rm(list=ls())
+
+library(data.table)
+
+attach('summary.RData')
+
+M1_perc_diff_ac <- list()
+for(name in names(M1_diffs_length_list_ac_total)){
+  M1_perc_diff_ac[[name]] <- M1_diffs_length_list_ac_total[[name]] / M1_total_unit_num
+}
+M1_perc_diff_br <- list()
+for(name in names(M1_diffs_length_list_br_total)){
+  M1_perc_diff_br[[name]] <- M1_diffs_length_list_br_total[[name]] / M1_total_unit_num
+}
+M1_perc_diff_ar <- list()
+for(name in names(M1_diffs_length_list_ar_total)){
+  M1_perc_diff_ar[[name]] <- M1_diffs_length_list_ar_total[[name]] / M1_total_unit_num
+}  
+M1_diffs <- as.data.frame(rbind("M1_ac"=M1_perc_diff_ac,"M1_br" =M1_perc_diff_br,"M1_ar" =M1_perc_diff_ar))
+
+S1_perc_diff_ac <- list()
+for(name in names(S1_diffs_length_list_ac_total)){
+  S1_perc_diff_ac[[name]] <- S1_diffs_length_list_ac_total[[name]] / S1_total_unit_num
+}
+S1_perc_diff_br <- list()
+for(name in names(S1_diffs_length_list_br_total)){
+  S1_perc_diff_br[[name]] <- S1_diffs_length_list_br_total[[name]] / S1_total_unit_num
+}
+S1_perc_diff_ar <- list()
+for(name in names(S1_diffs_length_list_ar_total)){
+  S1_perc_diff_ar[[name]] <- S1_diffs_length_list_ar_total[[name]] / S1_total_unit_num
+}  
+S1_diffs <- as.data.frame(rbind("S1_ac"=S1_perc_diff_ac,"S1_br" =S1_perc_diff_br,"S1_ar" =S1_perc_diff_ar))
+
+
+PmD_perc_diff_ac <- list()
+for(name in names(PmD_diffs_length_list_ac_total)){
+  PmD_perc_diff_ac[[name]] <- PmD_diffs_length_list_ac_total[[name]] / PmD_total_unit_num
+}
+PmD_perc_diff_br <- list()
+for(name in names(PmD_diffs_length_list_br_total)){
+  PmD_perc_diff_br[[name]] <- PmD_diffs_length_list_br_total[[name]] / PmD_total_unit_num
+}
+PmD_perc_diff_ar <- list()
+for(name in names(PmD_diffs_length_list_ar_total)){
+  PmD_perc_diff_ar[[name]] <- PmD_diffs_length_list_ar_total[[name]] / PmD_total_unit_num
+}  
+PmD_diffs <- as.data.frame(rbind("PmD_ac"=PmD_perc_diff_ac,"PmD_br" =PmD_perc_diff_br,"PmD_ar" =PmD_perc_diff_ar))
+
+
+
+
+
+
+
+fwrite(M1_diffs,file='perc_diff_within_win.csv',append=T,row.names=T)
+fwrite(S1_diffs,file='perc_diff_within_win.csv',append=T,row.names=T)
+fwrite(PmD_diffs,file='perc_diff_within_win.csv',append=T,row.names=T)
+
+
+
+
+
+
+
+
+
+

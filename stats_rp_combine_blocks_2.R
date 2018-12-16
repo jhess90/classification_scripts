@@ -37,9 +37,10 @@ pval_adjusted_bool <- TRUE
 
 saveAsPng <- T
 region_list <- c('M1','S1','PmD')
+binary_bool <- FALSE
 
-#ph_list_names <- c('comb','comb_outcome','m','p_catch','p','p_outcome','r_catch','r','r_outcome','v')
-ph_list_names <- c('comb','comb_outcome','m','p','p_outcome','r','r_outcome','v')
+ph_list_names <- c('comb','comb_outcome','m','p_catch','p','p_outcome','r_catch','r','r_outcome','v')
+#ph_list_names <- c('comb','comb_outcome','m','p','p_outcome','r','r_outcome','v')
 time_windows <- c('ac','br','ar','rw')
 
 file_list <- Sys.glob("block*.RData")
@@ -61,15 +62,15 @@ for(block_name in file_list){
     M1_diffs_length_list_ac_total <- M1_diffs_length_list_ac
     M1_diffs_length_list_br_total <- M1_diffs_length_list_br
     M1_diffs_length_list_ar_total <- M1_diffs_length_list_ar
-    M1_diffs_length_list_rw_total <- M1_diffs_length_list_rw
+    #M1_diffs_length_list_rw_total <- M1_diffs_length_list_rw
     S1_diffs_length_list_ac_total <- S1_diffs_length_list_ac
     S1_diffs_length_list_br_total <- S1_diffs_length_list_br
     S1_diffs_length_list_ar_total <- S1_diffs_length_list_ar
-    S1_diffs_length_list_rw_total <- S1_diffs_length_list_rw
+    #S1_diffs_length_list_rw_total <- S1_diffs_length_list_rw
     PmD_diffs_length_list_ac_total <- PmD_diffs_length_list_ac
     PmD_diffs_length_list_br_total <- PmD_diffs_length_list_br
     PmD_diffs_length_list_ar_total <- PmD_diffs_length_list_ar
-    PmD_diffs_length_list_rw_total <- PmD_diffs_length_list_rw
+    #PmD_diffs_length_list_rw_total <- PmD_diffs_length_list_rw
     
     for(region_name in region_list){
       for(ph_name in ph_list_names){
@@ -112,15 +113,15 @@ for(block_name in file_list){
       M1_diffs_length_list_ac_total[[name]] <- M1_diffs_length_list_ac_total[[name]] + M1_diffs_length_list_ac[[name]]
       M1_diffs_length_list_br_total[[name]] <- M1_diffs_length_list_br_total[[name]] + M1_diffs_length_list_br[[name]]
       M1_diffs_length_list_ar_total[[name]] <- M1_diffs_length_list_ar_total[[name]] + M1_diffs_length_list_ar[[name]]
-      M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
+      #M1_diffs_length_list_rw_total[[name]] <- M1_diffs_length_list_rw_total[[name]] + M1_diffs_length_list_rw[[name]]
       S1_diffs_length_list_ac_total[[name]] <- S1_diffs_length_list_ac_total[[name]] + S1_diffs_length_list_ac[[name]]
       S1_diffs_length_list_br_total[[name]] <- S1_diffs_length_list_br_total[[name]] + S1_diffs_length_list_br[[name]]
       S1_diffs_length_list_ar_total[[name]] <- S1_diffs_length_list_ar_total[[name]] + S1_diffs_length_list_ar[[name]]
-      S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
+      #S1_diffs_length_list_rw_total[[name]] <- S1_diffs_length_list_rw_total[[name]] + S1_diffs_length_list_rw[[name]]
       PmD_diffs_length_list_ac_total[[name]] <- PmD_diffs_length_list_ac_total[[name]] + PmD_diffs_length_list_ac[[name]]
       PmD_diffs_length_list_br_total[[name]] <- PmD_diffs_length_list_br_total[[name]] + PmD_diffs_length_list_br[[name]]
       PmD_diffs_length_list_ar_total[[name]] <- PmD_diffs_length_list_ar_total[[name]] + PmD_diffs_length_list_ar[[name]]
-      PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
+      #PmD_diffs_length_list_rw_total[[name]] <- PmD_diffs_length_list_rw_total[[name]] + PmD_diffs_length_list_rw[[name]]
     }
 
     
