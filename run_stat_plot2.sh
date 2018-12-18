@@ -1,9 +1,9 @@
 #!/bin/sh
 
-#cd /home/jack/Dropbox/stat_analysis/rp_cue/0059/total/
-#Rscript /home/jack/workspace/classification_scripts/stats_rp_combine_blocks_2.R
-#cd /home/jack/Dropbox/stat_analysis/rp_cue/504/total/
-#Rscript /home/jack/workspace/classification_scripts/stats_rp_combine_blocks_2.R
+cd /home/jack/Dropbox/stat_analysis/rp_cue/0059/total/
+Rscript /home/jack/workspace/classification_scripts/stats_rp_combine_blocks_2.R
+cd /home/jack/Dropbox/stat_analysis/rp_cue/504/total/
+Rscript /home/jack/workspace/classification_scripts/stats_rp_combine_blocks_2.R
 
 cd /home/jack/Dropbox/stat_analysis/alt_cue/0059/total/
 Rscript /home/jack/workspace/classification_scripts/stats_rp_combine_blocks_2.R

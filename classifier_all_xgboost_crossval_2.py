@@ -47,6 +47,8 @@ res_window = [0.3,0.8]
 
 run_pop_bool = False
 
+binary_bool = True
+
 #########################
 # functions  ############
 #########################
@@ -476,7 +478,7 @@ for region_key,region_val in data_dict_all.iteritems():
             #succ/fail high even aft cue- b/ of more succ? unequal distrib? 
             #how many times run? What best test/train split?
 
-            if np.shape(np.unique(all_list[unit_num][1][0,:]))[0] > 2:
+            if np.shape(np.unique(all_list[unit_num][1][0,:]))[0] > 2 or not binary_bool:
 
                 r_level_out = run_xgboost(all_list[unit_num][0],all_list[unit_num][1][0,:])
                 p_level_out = run_xgboost(all_list[unit_num][0],all_list[unit_num][1][1,:])
