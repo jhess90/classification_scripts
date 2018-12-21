@@ -907,15 +907,15 @@ for(region_index in 1:length(region_list)){
     cat('p level differences: ',length(ph_p_levels),'units\n')
     
     #
-    assign(paste(region_list[region_index],'_sm_sig_p_r_bin_',window_name[i],sep=""),sm_sig_p_r_bin)
-    assign(paste(region_list[region_index],'_ph_r_bin_',window_name[i],sep=""),ph_r_bin)
-    if (length(sm_sig_p_r_bin[,1]) != length(ph_r_bin)){cat('ERROR in post hoc lengths\n')}
-    cat('r bin differences: ',length(ph_r_levels),'units\n')
+    assign(paste(region_list[region_index],'_sm_sig_p_r_bin_',window_name[i],sep=""),sig_p_r_bin)
+    #assign(paste(region_list[region_index],'_ph_r_bin_',window_name[i],sep=""),ph_r_bin)
+    #if (length(sm_sig_p_r_bin[,1]) != length(ph_r_bin)){cat('ERROR in post hoc lengths\n')}
+    cat('r bin differences: ',length(sig_p_r_bin),'units\n')
     
-    assign(paste(region_list[region_index],'_sm_sig_p_p_bin_',window_name[i],sep=""),sm_sig_p_p_bin)
-    assign(paste(region_list[region_index],'_ph_p_bin_',window_name[i],sep=""),ph_p_bin)
-    if (length(sm_sig_p_p_bin[,1]) != length(ph_p_bin)){cat('ERROR in post hoc lengths\n')}
-    cat('p bin differences: ',length(ph_p_bin),'units\n')
+    assign(paste(region_list[region_index],'_sm_sig_p_p_bin_',window_name[i],sep=""),sig_p_p_bin)
+    #assign(paste(region_list[region_index],'_ph_p_bin_',window_name[i],sep=""),ph_p_bin)
+    #if (length(sm_sig_p_p_bin[,1]) != length(ph_p_bin)){cat('ERROR in post hoc lengths\n')}
+    cat('p bin differences: ',length(sig_p_p_bin),'units\n')
     
     #
     
@@ -959,7 +959,7 @@ for(region_index in 1:length(region_list)){
     assign(paste(region_list[region_index],'_ph_m_levels_',window_name[i],sep=""),ph_m_levels)
     cat('m level differences: ',length(ph_m_levels),'units\n')
     
-    diffs_length_list <- list(r=length(ph_r_levels),p=length(ph_p_levels),r_outcome=length(ph_r_outcome_levels),p_outcome=length(ph_p_outcome_levels),outcome=length(sm_sig_p_outcome_levels[,1]),comb=length(ph_comb_levels),comb_outcome=length(ph_comb_outcome_levels),r_delivery=length(sig_p_r_delivery_levels[,1]),p_delivery=length(sig_p_p_delivery_levels[,1]),value=length(sm_sig_p_v_levels[,1]),motivation=length(sm_sig_p_m_levels[,1]),r_bin=length(ph_r_bin),p_bin=length(ph_p_bin))
+    diffs_length_list <- list(r=length(ph_r_levels),p=length(ph_p_levels),r_outcome=length(ph_r_outcome_levels),p_outcome=length(ph_p_outcome_levels),outcome=length(sm_sig_p_outcome_levels[,1]),comb=length(ph_comb_levels),comb_outcome=length(ph_comb_outcome_levels),r_delivery=length(sig_p_r_delivery_levels[,1]),p_delivery=length(sig_p_p_delivery_levels[,1]),value=length(sm_sig_p_v_levels[,1]),motivation=length(sm_sig_p_m_levels[,1]),r_bin=length(sig_p_r_bin),p_bin=length(sig_p_p_bin))
 
     assign(paste(region_list[region_index],'_diffs_length_list_',window_name[i],sep=""),diffs_length_list)
     
