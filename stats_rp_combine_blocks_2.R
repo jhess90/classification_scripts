@@ -48,6 +48,7 @@ file_list <- Sys.glob("block*.RData")
 ind = 1
 for(block_name in file_list){
   cat(block_name)
+  
 
   if(ind == 1){
     attach(block_name)
@@ -98,6 +99,7 @@ for(block_name in file_list){
     attach(block_name)
     M1_temp <- M1_sig_sign_percs
     M1_total_unit_num <- M1_total_unit_num + length(M1_p_val_list$r0_p_vals[,1])
+    cat(dim(M1_p_val_list$r0_p_vals),'\n')
     S1_temp <- S1_sig_sign_percs
     S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
     PmD_temp <- PmD_sig_sign_percs
