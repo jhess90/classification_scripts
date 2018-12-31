@@ -793,13 +793,13 @@ for(region_index in 1:length(region_list)){
       
       v_levels <- t(rbind.fill.matrix(t(v_x_means),t(v0_means),t(vx_means)))
       
-      tryCatch({sm_out <- as.numeric(Ski.Mack(v_levels))},error=function(e){sm_out <<- c(1.0,1.0)},finally={})
+      tryCatch({sm_out <- as.numeric(Ski.Mack(v_levels))},error=function(e){sm_out <- c(1.0,1.0)},finally={})
       
       if(sm_out[1] < 0.05){
         sm_sig_p_v_levels <- rbind(sm_sig_p_v_levels,c(unit_num,sm_out))
         
         v_levels.m <- melt(data.frame(v_x=v_levels[,1],v0=v_levels[,2],vx=v_levels[,3]),measure.vars=c('v_x','v0','vx'),variable.name='level')
-        trash <- capture.output(d_t <- dunn.test(v_levels.m$value,v_levels.m$level,method=p.adjust.methods))
+        tryCatch({trash <- capture.output(d_t <- dunn.test(v_levels.m$value,v_levels.m$level,method=p.adjust.methods))},error=function(e){d_t <- 'Error'},finally={})
         
         ph_v_levels[[sig_v_level_ct]] <- d_t
         sig_v_level_ct <- sig_v_level_ct + 1
@@ -819,7 +819,7 @@ for(region_index in 1:length(region_list)){
         sm_sig_p_m_levels <- rbind(sm_sig_p_m_levels,c(unit_num,sm_out))
         
         m_levels.m <- melt(data.frame(m0=m_levels[,1],mx=m_levels[,2],m2x=m_levels[,3]),measure.vars=c('m0','mx','m2x'),variable.name='level')
-        trash <- capture.output(d_t <- dunn.test(m_levels.m$value,m_levels.m$level,method=p.adjust.methods))
+        tryCatch({trash <- capture.output(d_t <- dunn.test(m_levels.m$value,m_levels.m$level,method=p.adjust.methods))},error=function(e){d_t <- 'Error'},finally={})
         
         ph_m_levels[[sig_m_level_ct]] <- d_t
         sig_m_level_ct <- sig_m_level_ct + 1
