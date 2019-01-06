@@ -18,6 +18,8 @@ region_list <- c('M1','S1','PmD')
 ##############################
 
 compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,type_name,trial_inds){
+  
+  #look at only trials for this particular index  
   cue_fr_M1 <- all_cue_fr_M1[,trial_inds,]
   cue_fr_S1 <- all_cue_fr_S1[,trial_inds,]
   cue_fr_PmD <- all_cue_fr_PmD[,trial_inds,]
@@ -26,7 +28,7 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
   res_fr_S1 <- all_res_fr_S1[,trial_inds,]
   res_fr_PmD <- all_res_fr_PmD[,trial_inds,]
   
-  
+  #average over all trials of this particular trial index for each unit
   cue_avgs_M1 <- c()
   res_avgs_M1 <- c()
   for(unit_num in 1:total_unit_num_M1){
@@ -48,22 +50,25 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
     res_avgs_PmD <- rbind(res_avgs_PmD,colMeans(res_fr_PmD[unit_num,,]))
   }
   
+  #combine into larger matrix with all regions: M1 units, then S1 units, then PMd units
   combined_cue_avgs <- rbind(cue_avgs_M1,cue_avgs_S1,cue_avgs_PmD)
   combined_res_avgs <- rbind(res_avgs_M1,res_avgs_S1,res_avgs_PmD)
   
+  #compute rate correlation coeffs and p values
   cue_corr <- round(cor(t(combined_cue_avgs)),2)
   res_corr <- round(cor(t(combined_res_avgs)),2)
   
   cue_pmat <- cor_pmat(t(combined_cue_avgs))
   res_pmat <- cor_pmat(t(combined_res_avgs))
   
+  #region label data frame
   label_df <- data.frame(
     x = c(total_unit_num_M1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2,5,5,5),
     y = c(-8,-8,-8,total_unit_num_M1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2),
     text = c('M1','S1','PmD','M1','S1','PmD')
   )
   
-  
+  #plot correlation matrix
   png(paste("corr_",type_name,".png",sep=""),width=8,height=6,units="in",res=500)
   
   cue_plt <- ggcorrplot(cue_corr,p.mat=cue_pmat,type="lower",insig="blank",outline.col='white')
@@ -84,11 +89,7 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
 }
 
 
-
 ##############################
-
-
-
 
 #uses simple_output_[region].mat, one from each region
 readin <- readMat('simple_output_M1.mat')
@@ -110,6 +111,7 @@ all_cue_fr_PmD <- readin$return.dict[,,1]$all.cue.fr
 all_res_fr_PmD <- readin$return.dict[,,1]$all.res.fr
 total_unit_num_PmD <- dim(all_cue_fr_PmD)[1]
 
+#get indices for different trial types
 r0 <- which(condensed[,4] == 0)
 rx <- which(condensed[,4] >= 1)
 
@@ -134,8 +136,7 @@ rx_p0 <- rx[which(rx %in% p0)]
 r0_px <- r0[which(r0 %in% px)]
 rx_px <- rx[which(rx %in% px)]
 
-#
-
+#compute correlations and plot figs
 compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'All',1:dim(all_cue_fr_M1)[2])
 
 compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0',r0)
