@@ -55,8 +55,8 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
   combined_res_avgs <- rbind(res_avgs_M1,res_avgs_S1,res_avgs_PmD)
   
   #compute rate correlation coeffs and p values
-  cue_corr <- round(cor(t(combined_cue_avgs)),2)
-  res_corr <- round(cor(t(combined_res_avgs)),2)
+  cue_corr <- cor(t(combined_cue_avgs))
+  res_corr <- cor(t(combined_res_avgs))
   
   cue_pmat <- cor_pmat(t(combined_cue_avgs))
   res_pmat <- cor_pmat(t(combined_res_avgs))
@@ -68,6 +68,59 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
     text = c('M1','S1','PmD','M1','S1','PmD')
   )
   
+  #calculate sum of correlations, put in data frame for plotting
+  cue_corr_sum <- cue_corr
+  res_corr_sum <- res_corr
+  
+  cue_corr_sum[cue_pmat >= 0.05] <- 0
+  res_corr_sum[res_pmat >= 0.05] <- 0
+  
+  cue_corr_sum[lower.tri(cue_corr_sum,diag=T)] <- 0 #removing half of matrix, including the diagonal, so can sum
+  res_corr_sum[lower.tri(res_corr_sum,diag=T)] <- 0
+  
+  abs_cue_corr_sum <- abs(cue_corr_sum)
+  abs_res_corr_sum <- abs(res_corr_sum)
+  
+  m1_m1_cue <- round(sum(cue_corr_sum[1:total_unit_num_M1,1:total_unit_num_M1],na.rm=T),2)
+  m1_s1_cue <- round(sum(cue_corr_sum[1:total_unit_num_M1,(1+total_unit_num_M1):(total_unit_num_M1 + total_unit_num_S1)],na.rm=T),2)
+  m1_pmd_cue <- round(sum(cue_corr_sum[1:total_unit_num_M1,(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD)],na.rm=T),2)
+  s1_s1_cue <- round(sum(cue_corr_sum[(1+total_unit_num_M1):(total_unit_num_M1+total_unit_num_S1),(1+total_unit_num_M1):(total_unit_num_M1+total_unit_num_S1)],na.rm=T),2)
+  s1_pmd_cue <- round(sum(cue_corr_sum[(1+total_unit_num_M1):(total_unit_num_M1+total_unit_num_S1),(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD)],na.rm=T),2)
+  pmd_pmd_cue <- round(sum(cue_corr_sum[(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD),(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD)],na.rm=T),2)
+  
+  abs_m1_m1_cue <- round(sum(abs_cue_corr_sum[1:total_unit_num_M1,1:total_unit_num_M1],na.rm=T),2)
+  abs_m1_s1_cue <- round(sum(abs_cue_corr_sum[1:total_unit_num_M1,(1+total_unit_num_M1):(total_unit_num_M1 + total_unit_num_S1)],na.rm=T),2)
+  abs_m1_pmd_cue <- round(sum(abs_cue_corr_sum[1:total_unit_num_M1,(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD)],na.rm=T),2)
+  abs_s1_s1_cue <- round(sum(abs_cue_corr_sum[(1+total_unit_num_M1):(total_unit_num_M1+total_unit_num_S1),(1+total_unit_num_M1):(total_unit_num_M1+total_unit_num_S1)],na.rm=T),2)
+  abs_s1_pmd_cue <- round(sum(abs_cue_corr_sum[(1+total_unit_num_M1):(total_unit_num_M1+total_unit_num_S1),(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD)],na.rm=T),2)
+  abs_pmd_pmd_cue <- round(sum(abs_cue_corr_sum[(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD),(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD)],na.rm=T),2)
+  
+  m1_m1_res <- round(sum(res_corr_sum[1:total_unit_num_M1,1:total_unit_num_M1],na.rm=T),2)
+  m1_s1_res <- round(sum(res_corr_sum[1:total_unit_num_M1,(1+total_unit_num_M1):(total_unit_num_M1 + total_unit_num_S1)],na.rm=T),2)
+  m1_pmd_res <- round(sum(res_corr_sum[1:total_unit_num_M1,(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD)],na.rm=T),2)
+  s1_s1_res <- round(sum(res_corr_sum[(1+total_unit_num_M1):(total_unit_num_M1+total_unit_num_S1),(1+total_unit_num_M1):(total_unit_num_M1+total_unit_num_S1)],na.rm=T),2)
+  s1_pmd_res <- round(sum(res_corr_sum[(1+total_unit_num_M1):(total_unit_num_M1+total_unit_num_S1),(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD)],na.rm=T),2)
+  pmd_pmd_res <- round(sum(res_corr_sum[(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD),(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD)],na.rm=T),2)
+  
+  abs_m1_m1_res <- round(sum(abs_res_corr_sum[1:total_unit_num_M1,1:total_unit_num_M1],na.rm=T),2)
+  abs_m1_s1_res <- round(sum(abs_res_corr_sum[1:total_unit_num_M1,(1+total_unit_num_M1):(total_unit_num_M1 + total_unit_num_S1)],na.rm=T),2)
+  abs_m1_pmd_res <- round(sum(abs_res_corr_sum[1:total_unit_num_M1,(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD)],na.rm=T),2)
+  abs_s1_s1_res <- round(sum(abs_res_corr_sum[(1+total_unit_num_M1):(total_unit_num_M1+total_unit_num_S1),(1+total_unit_num_M1):(total_unit_num_M1+total_unit_num_S1)],na.rm=T),2)
+  abs_s1_pmd_res <- round(sum(abs_res_corr_sum[(1+total_unit_num_M1):(total_unit_num_M1+total_unit_num_S1),(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD)],na.rm=T),2)
+  abs_pmd_pmd_res <- round(sum(abs_res_corr_sum[(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD),(1+total_unit_num_M1+total_unit_num_S1):(total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD)],na.rm=T),2)
+  
+  cue_sum_label_df <- data.frame(
+    x = c(total_unit_num_M1/2,total_unit_num_M1/2,total_unit_num_M1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2),
+    y = c(total_unit_num_M1/2+15,total_unit_num_M1+total_unit_num_S1/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15,total_unit_num_M1+total_unit_num_S1/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15),
+    text = c(paste(m1_m1_cue,abs_m1_m1_cue,sep="\n"),paste(m1_s1_cue,abs_m1_s1_cue,sep="\n"),paste(m1_pmd_cue,abs_m1_pmd_cue,sep="\n"),paste(s1_s1_cue,abs_s1_s1_cue,sep="\n"),paste(s1_pmd_cue,abs_s1_pmd_cue,sep="\n"),paste(pmd_pmd_cue,abs_m1_m1_cue,sep="\n"))
+  )
+  
+  res_sum_label_df <- data.frame(
+    x = c(total_unit_num_M1/2,total_unit_num_M1/2,total_unit_num_M1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2),
+    y = c(total_unit_num_M1/2+15,total_unit_num_M1+total_unit_num_S1/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15,total_unit_num_M1+total_unit_num_S1/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15),
+    text = c(paste(m1_m1_res,abs_m1_m1_res,sep="\n"),paste(m1_s1_res,abs_m1_s1_res,sep="\n"),paste(m1_pmd_res,abs_m1_pmd_res,sep="\n"),paste(s1_s1_res,abs_s1_s1_res,sep="\n"),paste(s1_pmd_res,abs_s1_pmd_res,sep="\n"),paste(pmd_pmd_res,abs_m1_m1_res,sep="\n"))
+  )
+  
   #plot correlation matrix
   png(paste("corr_",type_name,".png",sep=""),width=8,height=6,units="in",res=500)
   
@@ -76,12 +129,14 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
   cue_plt <- cue_plt + geom_hline(yintercept=total_unit_num_M1,color="grey") + geom_hline(yintercept=total_unit_num_M1+total_unit_num_S1,color="grey")
   cue_plt <- cue_plt + labs(title=paste(type_name,":\nCue",sep="")) + theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank(),legend.position="none",axis.text.y=element_blank(),plot.title=element_text(size=16))
   cue_plt <- cue_plt + geom_text(data=label_df,aes(x=x,y=y,label=text),inherit.aes=FALSE,size=5)
-  
+  cue_plt <- cue_plt + geom_text(data=cue_sum_label_df,aes(x=x,y=y,label=text),inherit.aes=FALSE,size=2)
+
   res_plt <- ggcorrplot(res_corr,p.mat=res_pmat,type="lower",insig="blank",outline.col='white')
   res_plt <- res_plt + geom_vline(xintercept=total_unit_num_M1,color="grey") + geom_vline(xintercept=total_unit_num_M1+total_unit_num_S1,color="grey")
   res_plt <- res_plt + geom_hline(yintercept=total_unit_num_M1,color="grey") + geom_hline(yintercept=total_unit_num_M1+total_unit_num_S1,color="grey")
   res_plt <- res_plt + labs(title="\nResult") + theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank(),legend.position="none",axis.text.y=element_blank(),plot.title=element_text(size=16))
   res_plt <- res_plt + geom_text(data=label_df,aes(x=x,y=y,label=text),inherit.aes=FALSE,size=5)
+  res_plt <- res_plt + geom_text(data=res_sum_label_df,aes(x=x,y=y,label=text),inherit.aes=FALSE,size=2)
   
   multiplot(cue_plt,res_plt,cols=2)
   graphics.off()
@@ -110,6 +165,17 @@ readin <- readMat('simple_output_PmD.mat')
 all_cue_fr_PmD <- readin$return.dict[,,1]$all.cue.fr
 all_res_fr_PmD <- readin$return.dict[,,1]$all.res.fr
 total_unit_num_PmD <- dim(all_cue_fr_PmD)[1]
+
+
+#TODO unhardcode. Right now just looking at after-cue and after-result windows (AC and AR), instead of BC + AC for cue, and BR + AR for result
+all_cue_fr_M1 <- all_cue_fr_M1[,,51:150]
+all_res_fr_M1 <- all_res_fr_M1[,,51:150]
+
+all_cue_fr_S1 <- all_cue_fr_S1[,,51:150]
+all_res_fr_S1 <- all_res_fr_S1[,,51:150]
+
+all_cue_fr_PmD <- all_cue_fr_PmD[,,51:150]
+all_res_fr_PmD <- all_res_fr_PmD[,,51:150]
 
 #get indices for different trial types
 r0 <- which(condensed[,4] == 0)
