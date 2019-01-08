@@ -111,13 +111,14 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
   
   cue_sum_label_df <- data.frame(
     x = c(total_unit_num_M1/2,total_unit_num_M1/2,total_unit_num_M1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2),
-    y = c(total_unit_num_M1/2+15,total_unit_num_M1+total_unit_num_S1/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15,total_unit_num_M1+total_unit_num_S1/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15),
+    #y = c(total_unit_num_M1/2+15,total_unit_num_M1+total_unit_num_S1/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15,total_unit_num_M1+total_unit_num_S1/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15),
+    y = c(total_unit_num_M1-10,total_unit_num_M1+total_unit_num_S1-10,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-10,total_unit_num_M1+total_unit_num_S1-10,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-10,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-10),
     text = c(paste(m1_m1_cue,abs_m1_m1_cue,sep="\n"),paste(m1_s1_cue,abs_m1_s1_cue,sep="\n"),paste(m1_pmd_cue,abs_m1_pmd_cue,sep="\n"),paste(s1_s1_cue,abs_s1_s1_cue,sep="\n"),paste(s1_pmd_cue,abs_s1_pmd_cue,sep="\n"),paste(pmd_pmd_cue,abs_m1_m1_cue,sep="\n"))
   )
   
   res_sum_label_df <- data.frame(
     x = c(total_unit_num_M1/2,total_unit_num_M1/2,total_unit_num_M1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2),
-    y = c(total_unit_num_M1/2+15,total_unit_num_M1+total_unit_num_S1/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15,total_unit_num_M1+total_unit_num_S1/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15),
+    y = c(total_unit_num_M1-10,total_unit_num_M1+total_unit_num_S1-10,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-10,total_unit_num_M1+total_unit_num_S1-10,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-10,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-10),
     text = c(paste(m1_m1_res,abs_m1_m1_res,sep="\n"),paste(m1_s1_res,abs_m1_s1_res,sep="\n"),paste(m1_pmd_res,abs_m1_pmd_res,sep="\n"),paste(s1_s1_res,abs_s1_s1_res,sep="\n"),paste(s1_pmd_res,abs_s1_pmd_res,sep="\n"),paste(pmd_pmd_res,abs_m1_m1_res,sep="\n"))
   )
   
