@@ -11,7 +11,6 @@ library(gridExtra)
 library(R.matlab)
 library(plyr)
 library(dunn.test)
-#library(PMCMRplus)
 
 tryCatch({
   source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
@@ -28,6 +27,8 @@ p.adjust.methods <- 'bh'
 
 ##### func
 
+#calculate wilcoxon signed rank to determine differences between firing rates of two windows of time
+#returns p value, and if it is a positive or negative change (ie increase or decrease in firing rate) from the first to the second window
 calc_wsr <- function(baseline,window){
   
   if(identical(baseline,window)){return(NA)}
@@ -56,21 +57,24 @@ for(region_index in 1:length(region_list)){
   bin_size <- readin$return.dict[,,1]$params[,,1]$bin.size[,]
   total_unit_num <- dim(all_cue_fr)[1]
 
-  old_time <- seq(from=-0.5,to=(1.0-bin_size/1000),by=bin_size/1000)
-
   ###########
+  #pull out trial numbers where different trial types occur
+
+  #reward levels (0-3), rx = any level of reward
   r0 <- which(condensed[,4] == 0)
   r1 <- which(condensed[,4] == 1)
   r2 <- which(condensed[,4] == 2)
   r3 <- which(condensed[,4] == 3)
   rx <- which(condensed[,4] >= 1)
   
+  #punishment levels (0-3_, px = any level of punishment
   p0 <- which(condensed[,5] == 0)
   p1 <- which(condensed[,5] == 1)
   p2 <- which(condensed[,5] == 2)
   p3 <- which(condensed[,5] == 3)
   px <- which(condensed[,5] >= 1)
   
+  #value levels (v_3 = -3 to v3 = 3). Value = r level - p level
   v_3 <- which(condensed[,7] == -3)
   v_2 <- which(condensed[,7] == -2)
   v_1 <- which(condensed[,7] == -1)
@@ -79,6 +83,7 @@ for(region_index in 1:length(region_list)){
   v2 <- which(condensed[,7] == 2)
   v3 <- which(condensed[,7] == 3)
   
+  #motivation levels, 0 - 6. Motivation = r level + p level
   m0 <- which(condensed[,8] == 0)
   m1 <- which(condensed[,8] == 1)
   m2 <- which(condensed[,8] == 2)
@@ -87,9 +92,11 @@ for(region_index in 1:length(region_list)){
   m5 <- which(condensed[,8] == 5)
   m6 <- which(condensed[,8] == 6)
   
+  #successful trials = res1, unsuccessful trials = res0 (res = result)
   res0 <- which(condensed[,6] == 0)
   res1 <- which(condensed[,6] == 1)
   
+  #combinations of the above. f = fail, s = succcess (succ)
   r0_fail <- res0[which(res0 %in% r0)]
   r1_fail <- res0[which(res0 %in% r1)]
   r2_fail <- res0[which(res0 %in% r2)]
@@ -142,7 +149,8 @@ for(region_index in 1:length(region_list)){
   out_perc_sig_list <- c()
   out_mean_diff_array <- c()
   out_sig_sign_percs <- c()
-  
+
+  #for each trial type combination in the list, determine if differences between time windows are significant for different combinations of time windows
   for (i in comb_list){
     comb_inds <- get(i)
     
@@ -520,6 +528,10 @@ for(region_index in 1:length(region_list)){
   #### Ski Mack ###
   #################
   
+  #second set of statistics looking at firing rate differences between trial types within each window of time
+  #for comparisons between two trial types, wilcoxon signed rank test was used
+  #for comparisons between more than two trial types, skillings mack test used with pairwise post hoc Dunn’s test with Benjamini-Hochberg False Discovery Rate correction.
+
   cat('Ski Mack\n')
   
   #iterate through time windows

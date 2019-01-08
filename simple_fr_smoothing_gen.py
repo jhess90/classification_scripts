@@ -30,8 +30,6 @@ zscore_bool = True
 gaussian_bool = False
 gauss_sigma = 30 #in ms
 
-plot_bool = True
-
 bfr_cue_time = 0.5
 aft_cue_time = 1.0
 bfr_result_time = 0.5
@@ -270,11 +268,3 @@ for key,value in data_dict.iteritems():
 
 
 				
-        #data_dict[key]['spike_data'] = spike_data
-        #data_dict[key]['binned_data'] = binned_data
-        #data_dict[key]['coutput'] = output
-		
-        #sio.savemat('simple_output_%s' %(key),{'corr_output':corr_data['corr_output']},format='5')
-
-		
-#np.save('corr_analysis.npy',data_dict)

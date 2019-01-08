@@ -123,7 +123,8 @@ strobe_logging_version = {...
     %'log_before_sending'...
     };
 
-% brain regions (this doesn't change every day)
+% brain regions (this doesn't change every day), but the initial
+% recording sessions had M1 and PMd switched, so be careful of that
 brain_regions = {'m1', 's1', 'pmd', 'pmv'};
 
 % map for brain region --> {recording system, channel subset}

@@ -1,7 +1,10 @@
-function extract_ts_val_test(filename)
+function mult_extract_as_single(filename)
 %pull out timestamps and reward/punishment values by trial
 %uses data from Extracted_NHPID_date_time.mat
-
+%also yields force data
+%trial_breakdown variable is a trial-by-trial matrix of trial data
+%and times that is the most relevant output of this, and used in
+%later analysis
 
 load (filename)
 
@@ -91,14 +94,6 @@ if trial_breakdown(2,5) > trial_breakdown(2,9) && trial_breakdown(2,7) > trial_b
 end
 
 
-%sanity check
-for i = 1:length(trial_breakdown)
-   for j = 1:8
-       if (trial_breakdown(i,j) > trial_breakdown(i,9)) && ~(j == 6) && ~(j == 8)
-           fprintf('error indexing trial %i of %i\n',i,length(trial_breakdown))
-       end
-   end
-end
 
 
 %trial breakdown columns:
@@ -124,9 +119,6 @@ if sum(strcmp(fieldnames(task_data), 'catch_trial_pub')) == 1
             end
         end
     end
-    if catch_indices(end,1) == 0
-       disp('potential error indexing catch_trials') 
-    end
 end
 
 
@@ -137,6 +129,9 @@ else
 end
 
 
+
+%below not really used, it was what I started with
+
 %%%%%%%%%%%%%%%%%%%%%%%%%
 all_r = trial_breakdown(trial_breakdown(:, 6) > 0, :);
 all_nr = trial_breakdown(trial_breakdown(:, 6) == 0, :);
@@ -145,9 +140,6 @@ all_p = trial_breakdown(trial_breakdown(:, 8) > 0, :);
 all_np = trial_breakdown(trial_breakdown(:, 8) == 0, :);
 
 %r_s = reward cue, success. r_f = reward cue, fail, nr = no reward, etc
-
-
-
 
 % %ALL: reward cue, success (rewarding)
 % r_s = trial_breakdown((trial_breakdown(:, 4) >= 1) & ~(trial_breakdown(:,7)==0) & (trial_breakdown(:, 8) == 0) & (trial_breakdown(:, 9) == 0), :);

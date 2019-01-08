@@ -1,5 +1,9 @@
 %batch extract_ts_val
 
+%runs mult_extract_as_single on however many blocks are specified
+%below
+
+
 file_list = {...
     %'Extracted_0059_2016-02-26-16-28-27.mat' ...
     %'Extracted_0059_2016-02-26-16-38-13.mat' ...
