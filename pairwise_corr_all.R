@@ -72,8 +72,8 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
   cue_corr_sum <- cue_corr
   res_corr_sum <- res_corr
   
-  cue_corr_sum[cue_pmat >= 0.05] <- 0
-  res_corr_sum[res_pmat >= 0.05] <- 0
+  #cue_corr_sum[cue_pmat >= 0.05] <- 0
+  #res_corr_sum[res_pmat >= 0.05] <- 0
   
   cue_corr_sum[lower.tri(cue_corr_sum,diag=T)] <- 0 #removing half of matrix, including the diagonal, so can sum
   res_corr_sum[lower.tri(res_corr_sum,diag=T)] <- 0
@@ -122,16 +122,16 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
   )
   
   #plot correlation matrix
-  png(paste("corr_spear_",type_name,".png",sep=""),width=8,height=6,units="in",res=500)
+  png(paste("corr_spear_all_",type_name,".png",sep=""),width=8,height=6,units="in",res=500)
   
-  cue_plt <- ggcorrplot(cue_corr,p.mat=cue_pmat,type="lower",insig="blank",outline.col='white')
+  cue_plt <- ggcorrplot(cue_corr,type="lower",outline.col='white')
   cue_plt <- cue_plt + geom_vline(xintercept=total_unit_num_M1,color="grey") + geom_vline(xintercept=total_unit_num_M1+total_unit_num_S1,color="grey")
   cue_plt <- cue_plt + geom_hline(yintercept=total_unit_num_M1,color="grey") + geom_hline(yintercept=total_unit_num_M1+total_unit_num_S1,color="grey")
   cue_plt <- cue_plt + labs(title=paste(type_name,":\nCue",sep="")) + theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank(),legend.position="none",axis.text.y=element_blank(),plot.title=element_text(size=16))
   cue_plt <- cue_plt + geom_text(data=label_df,aes(x=x,y=y,label=text),inherit.aes=FALSE,size=5)
   cue_plt <- cue_plt + geom_text(data=cue_sum_label_df,aes(x=x,y=y,label=text),inherit.aes=FALSE,size=2)
 
-  res_plt <- ggcorrplot(res_corr,p.mat=res_pmat,type="lower",insig="blank",outline.col='white')
+  res_plt <- ggcorrplot(res_corr,type="lower",outline.col='white')
   res_plt <- res_plt + geom_vline(xintercept=total_unit_num_M1,color="grey") + geom_vline(xintercept=total_unit_num_M1+total_unit_num_S1,color="grey")
   res_plt <- res_plt + geom_hline(yintercept=total_unit_num_M1,color="grey") + geom_hline(yintercept=total_unit_num_M1+total_unit_num_S1,color="grey")
   res_plt <- res_plt + labs(title="\nResult") + theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank(),legend.position="none",axis.text.y=element_blank(),plot.title=element_text(size=16))
@@ -247,6 +247,5 @@ compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_r
 compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0P0 Succ',r0_px_s)
 compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0P0 Succ',rx_p0_s)
 compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0P0 Succ',rx_px_s)
-
 
 
