@@ -54,12 +54,12 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
   combined_cue_avgs <- rbind(cue_avgs_M1,cue_avgs_S1,cue_avgs_PmD)
   combined_res_avgs <- rbind(res_avgs_M1,res_avgs_S1,res_avgs_PmD)
   
-  #compute rate correlation coeffs and p values
-  cue_corr <- cor(t(combined_cue_avgs))
-  res_corr <- cor(t(combined_res_avgs))
+#compute rate correlation coeffs and p values
+  cue_corr <- cor(t(combined_cue_avgs),method=c("spearman"))
+  res_corr <- cor(t(combined_res_avgs),method=c("spearman"))
   
-  cue_pmat <- cor_pmat(t(combined_cue_avgs))
-  res_pmat <- cor_pmat(t(combined_res_avgs))
+  cue_pmat <- cor_pmat(t(combined_cue_avgs),method=c("spearman"))
+  res_pmat <- cor_pmat(t(combined_res_avgs),method=c("spearman"))
   
   #region label data frame
   label_df <- data.frame(
@@ -112,18 +112,18 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
   cue_sum_label_df <- data.frame(
     x = c(total_unit_num_M1/2,total_unit_num_M1/2,total_unit_num_M1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2),
     #y = c(total_unit_num_M1/2+15,total_unit_num_M1+total_unit_num_S1/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15,total_unit_num_M1+total_unit_num_S1/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2+15),
-    y = c(total_unit_num_M1-10,total_unit_num_M1+total_unit_num_S1-10,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-10,total_unit_num_M1+total_unit_num_S1-10,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-10,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-10),
+    y = c(total_unit_num_M1-12,total_unit_num_M1+total_unit_num_S1-12,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-12,total_unit_num_M1+total_unit_num_S1-12,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-12,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-12),
     text = c(paste(m1_m1_cue,abs_m1_m1_cue,sep="\n"),paste(m1_s1_cue,abs_m1_s1_cue,sep="\n"),paste(m1_pmd_cue,abs_m1_pmd_cue,sep="\n"),paste(s1_s1_cue,abs_s1_s1_cue,sep="\n"),paste(s1_pmd_cue,abs_s1_pmd_cue,sep="\n"),paste(pmd_pmd_cue,abs_m1_m1_cue,sep="\n"))
   )
   
   res_sum_label_df <- data.frame(
     x = c(total_unit_num_M1/2,total_unit_num_M1/2,total_unit_num_M1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2),
-    y = c(total_unit_num_M1-10,total_unit_num_M1+total_unit_num_S1-10,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-10,total_unit_num_M1+total_unit_num_S1-10,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-10,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-10),
+    y = c(total_unit_num_M1-12,total_unit_num_M1+total_unit_num_S1-12,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-12,total_unit_num_M1+total_unit_num_S1-12,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-12,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD-12),
     text = c(paste(m1_m1_res,abs_m1_m1_res,sep="\n"),paste(m1_s1_res,abs_m1_s1_res,sep="\n"),paste(m1_pmd_res,abs_m1_pmd_res,sep="\n"),paste(s1_s1_res,abs_s1_s1_res,sep="\n"),paste(s1_pmd_res,abs_s1_pmd_res,sep="\n"),paste(pmd_pmd_res,abs_m1_m1_res,sep="\n"))
   )
   
   #plot correlation matrix
-  png(paste("corr_",type_name,".png",sep=""),width=8,height=6,units="in",res=500)
+  png(paste("corr_spear_",type_name,".png",sep=""),width=8,height=6,units="in",res=500)
   
   cue_plt <- ggcorrplot(cue_corr,p.mat=cue_pmat,type="lower",insig="blank",outline.col='white')
   cue_plt <- cue_plt + geom_vline(xintercept=total_unit_num_M1,color="grey") + geom_vline(xintercept=total_unit_num_M1+total_unit_num_S1,color="grey")
