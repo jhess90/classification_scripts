@@ -19,6 +19,8 @@ region_list <- c('M1','S1','PmD')
 
 compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,type_name,trial_inds){
   
+  if (length(trial_inds) == 0){return()}
+  
   #look at only trials for this particular index  
   cue_fr_M1 <- all_cue_fr_M1[,trial_inds,]
   cue_fr_S1 <- all_cue_fr_S1[,trial_inds,]
@@ -32,22 +34,22 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
   cue_avgs_M1 <- c()
   res_avgs_M1 <- c()
   for(unit_num in 1:total_unit_num_M1){
-    cue_avgs_M1 <- rbind(cue_avgs_M1,colMeans(cue_fr_M1[unit_num,,]))
-    res_avgs_M1 <- rbind(res_avgs_M1,colMeans(res_fr_M1[unit_num,,]))
+    if (length(trial_inds) > 1){cue_avgs_M1 <- rbind(cue_avgs_M1,colMeans(cue_fr_M1[unit_num,,]))}else if (length(trial_inds) == 1){cue_avgs_M1 <- rbind(cue_avgs_M1,cue_fr_M1[unit_num,])}
+    if (length(trial_inds) > 1){res_avgs_M1 <- rbind(res_avgs_M1,colMeans(res_fr_M1[unit_num,,]))}else if (length(trial_inds) == 1){res_avgs_M1 <- rbind(res_avgs_M1,res_fr_M1[unit_num,])}
   }
   
   cue_avgs_S1 <- c()
   res_avgs_S1 <- c()
   for(unit_num in 1:total_unit_num_S1){
-    cue_avgs_S1 <- rbind(cue_avgs_S1,colMeans(cue_fr_S1[unit_num,,]))
-    res_avgs_S1 <- rbind(res_avgs_S1,colMeans(res_fr_S1[unit_num,,]))
+    if (length(trial_inds) > 1){cue_avgs_S1 <- rbind(cue_avgs_S1,colMeans(cue_fr_S1[unit_num,,]))}else if (length(trial_inds) == 1){cue_avgs_S1 <- rbind(cue_avgs_S1,cue_fr_S1[unit_num,])}
+    if (length(trial_inds) > 1){res_avgs_S1 <- rbind(res_avgs_S1,colMeans(res_fr_S1[unit_num,,]))}else if (length(trial_inds) == 1){res_avgs_S1 <- rbind(res_avgs_S1,res_fr_S1[unit_num,])}
   }
   
   cue_avgs_PmD <- c()
   res_avgs_PmD <- c()
   for(unit_num in 1:total_unit_num_PmD){
-    cue_avgs_PmD <- rbind(cue_avgs_PmD,colMeans(cue_fr_PmD[unit_num,,]))
-    res_avgs_PmD <- rbind(res_avgs_PmD,colMeans(res_fr_PmD[unit_num,,]))
+    if (length(trial_inds) > 1){cue_avgs_PmD <- rbind(cue_avgs_PmD,colMeans(cue_fr_PmD[unit_num,,]))}else if (length(trial_inds) == 1){cue_avgs_PmD <- rbind(cue_avgs_PmD,cue_fr_PmD[unit_num,])}
+    if (length(trial_inds) > 1){res_avgs_PmD <- rbind(res_avgs_PmD,colMeans(res_fr_PmD[unit_num,,]))}else if (length(trial_inds) == 1){res_avgs_PmD <- rbind(res_avgs_PmD,res_fr_PmD[unit_num,])}
   }
   
   #combine into larger matrix with all regions: M1 units, then S1 units, then PMd units
@@ -141,6 +143,7 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
   multiplot(cue_plt,res_plt,cols=2)
   graphics.off()
   
+  return()
 }
 
 
