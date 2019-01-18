@@ -234,6 +234,10 @@ for(region_index in 1:length(region_list)){
   
   if(region_index == 1){unit_list <- M1_sig_unit_list}else if (region_index == 2){unit_list <- S1_sig_unit_list}else{unit_list <- PmD_sig_unit_list}
   
+  #set here if want to just plot certain units by number
+  #if(region_index == 1){unit_list <- c(27,37,3,54,23,38,7,8)}else if (region_index == 2){unit_list <- c(6,7,17,32,44,49,60)}else{unit_list <- c(6,7,17,32,44,49,60)}
+  
+  
   for(unit_num in unit_list){
     cat(unit_num,'\n')
     
@@ -252,7 +256,7 @@ for(region_index in 1:length(region_list)){
       
       plt_cue <- ggplot(r_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=r_level),size=1) + theme_classic()
       plt_cue <- plt_cue + scale_colour_manual(values=c("goldenrod","palegreen3","seagreen","darkgreen")) + labs(title=paste("Reward: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Reward Level") + geom_vline(xintercept=0)
-    
+          
       #
       plt_cue <- plt_cue + geom_ribbon(data=r_cue_avgs,aes(x=time,ymin=r_cue_avgs$r0-r_cue_sems$r0,ymax=r_cue_avgs$r0+r_cue_sems$r0),inherit.aes=FALSE,alpha=0.2,fill="goldenrod")
       plt_cue <- plt_cue + geom_ribbon(data=r_cue_avgs,aes(x=time,ymin=r_cue_avgs$r1-r_cue_sems$r1,ymax=r_cue_avgs$r1+r_cue_sems$r1),inherit.aes=FALSE,alpha=0.2,fill="palegreen3")
@@ -323,7 +327,8 @@ for(region_index in 1:length(region_list)){
     #
     plt_cue <- plt_cue + geom_ribbon(data=r_cue_avgs,aes(x=time,ymin=r_cue_avgs$r0-r_cue_sems$r0,ymax=r_cue_avgs$r0+r_cue_sems$r0),inherit.aes=FALSE,alpha=0.2,fill="goldenrod")
     plt_cue <- plt_cue + geom_ribbon(data=r_cue_avgs,aes(x=time,ymin=r_cue_avgs$rx-r_cue_sems$rx,ymax=r_cue_avgs$rx+r_cue_sems$rx),inherit.aes=FALSE,alpha=0.2,fill="darkgreen")
-
+    plt_cue <- plt_cue + theme(legend.position="none")
+    
     r_res_avgs.m <- melt(r_res_avgs,id.vars="time",variable="r_level")
     plt_res <- ggplot(r_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=r_level),size=1) + theme_classic()
     plt_res <- plt_res + scale_colour_manual(values=c("goldenrod","darkgreen")) + labs(title="Result",y="z-score", x="Time(s)",colour="Reward Level") + geom_vline(xintercept=0)
@@ -331,7 +336,8 @@ for(region_index in 1:length(region_list)){
     #
     plt_res <- plt_res + geom_ribbon(data=r_res_avgs,aes(x=time,ymin=r_res_avgs$r0-r_res_sems$r0,ymax=r_res_avgs$r0+r_res_sems$r0),inherit.aes=FALSE,alpha=0.2,fill="goldenrod")
     plt_res <- plt_res + geom_ribbon(data=r_res_avgs,aes(x=time,ymin=r_res_avgs$rx-r_res_sems$rx,ymax=r_res_avgs$rx+r_res_sems$rx),inherit.aes=FALSE,alpha=0.2,fill="darkgreen")
-
+    plt_res <- plt_res + theme(legend.position="none")
+    
     
     multiplot(plt_cue,plt_res)
     graphics.off()
@@ -353,7 +359,8 @@ for(region_index in 1:length(region_list)){
     #
     plt_cue <- plt_cue + geom_ribbon(data=p_cue_avgs,aes(x=time,ymin=p_cue_avgs$p0-p_cue_sems$p0,ymax=p_cue_avgs$p0+p_cue_sems$p0),inherit.aes=FALSE,alpha=0.2,fill="goldenrod")
     plt_cue <- plt_cue + geom_ribbon(data=p_cue_avgs,aes(x=time,ymin=p_cue_avgs$px-p_cue_sems$px,ymax=p_cue_avgs$px+p_cue_sems$px),inherit.aes=FALSE,alpha=0.2,fill="red2")
-
+    plt_cue <- plt_cue + theme(legend.position="none")
+    
     p_res_avgs.m <- melt(p_res_avgs,id.vars="time",variable="p_level")
     plt_res <- ggplot(p_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=p_level),size=1) + theme_classic()
     plt_res <- plt_res + scale_colour_manual(values=c("goldenrod","coral","firebrick1","red2")) + labs(title="Result",y="z-score", x="Time(s)",colour="Punishment Level") + geom_vline(xintercept=0)
@@ -361,6 +368,7 @@ for(region_index in 1:length(region_list)){
     #
     plt_res <- plt_res + geom_ribbon(data=p_res_avgs,aes(x=time,ymin=p_res_avgs$p0-p_res_sems$p0,ymax=p_res_avgs$p0+p_res_sems$p0),inherit.aes=FALSE,alpha=0.2,fill="goldenrod")
     plt_res <- plt_res + geom_ribbon(data=p_res_avgs,aes(x=time,ymin=p_res_avgs$px-p_res_sems$px,ymax=p_res_avgs$px+p_res_sems$px),inherit.aes=FALSE,alpha=0.2,fill="red2")
+    plt_res <- plt_res + theme(legend.position="none")
     
     multiplot(plt_cue,plt_res)
     graphics.off()
@@ -414,6 +422,7 @@ for(region_index in 1:length(region_list)){
     
     plt_cue <- plt_cue + geom_ribbon(data=res_cue_avgs,aes(x=time,ymin=res_cue_avgs$fail-res_cue_sems$fail,ymax=res_cue_avgs$fail+res_cue_sems$fail),inherit.aes=FALSE,alpha=0.2,fill="skyblue4")
     plt_cue <- plt_cue + geom_ribbon(data=res_cue_avgs,aes(x=time,ymin=res_cue_avgs$succ-res_cue_sems$succ,ymax=res_cue_avgs$succ+res_cue_sems$succ),inherit.aes=FALSE,alpha=0.2,fill="purple")
+    plt_cue <- plt_cue + theme(legend.position="none")
     
     res_res_avgs.m <- melt(res_res_avgs,id.vars="time",variable="res_level")
     plt_res <- ggplot(res_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=res_level),size=1) + theme_classic()
@@ -421,6 +430,7 @@ for(region_index in 1:length(region_list)){
     
     plt_res <- plt_res + geom_ribbon(data=res_res_avgs,aes(x=time,ymin=res_res_avgs$fail-res_res_sems$fail,ymax=res_res_avgs$fail+res_res_sems$fail),inherit.aes=FALSE,alpha=0.2,fill="skyblue4")
     plt_res <- plt_res + geom_ribbon(data=res_res_avgs,aes(x=time,ymin=res_res_avgs$succ-res_res_sems$succ,ymax=res_res_avgs$succ+res_res_sems$succ),inherit.aes=FALSE,alpha=0.2,fill="purple")
+    plt_res <- plt_res + theme(legend.position="none")
     
     multiplot(plt_cue,plt_res)
     graphics.off()
@@ -443,6 +453,7 @@ for(region_index in 1:length(region_list)){
     plt_cue <- plt_cue + geom_ribbon(data=comb_cue_avgs,aes(x=time,ymin=comb_cue_avgs$rx_p0-comb_cue_sems$rx_p0,ymax=comb_cue_avgs$rx_p0+comb_cue_sems$rx_p0),inherit.aes=FALSE,alpha=0.2,fill="forestgreen")
     plt_cue <- plt_cue + geom_ribbon(data=comb_cue_avgs,aes(x=time,ymin=comb_cue_avgs$r0_px-comb_cue_sems$r0_px,ymax=comb_cue_avgs$r0_px+comb_cue_sems$r0_px),inherit.aes=FALSE,alpha=0.2,fill="firebrick")
     plt_cue <- plt_cue + geom_ribbon(data=comb_cue_avgs,aes(x=time,ymin=comb_cue_avgs$rx_px-comb_cue_sems$rx_px,ymax=comb_cue_avgs$rx_px+comb_cue_sems$rx_px),inherit.aes=FALSE,alpha=0.2,fill="mediumblue")
+    plt_cue <- plt_cue + theme(legend.position="none")
     
     
     comb_res_avgs.m <- melt(comb_res_avgs,id.vars="time",variable="comb")
@@ -454,6 +465,7 @@ for(region_index in 1:length(region_list)){
     plt_res <- plt_res + geom_ribbon(data=comb_res_avgs,aes(x=time,ymin=comb_res_avgs$rx_p0-comb_res_sems$rx_p0,ymax=comb_res_avgs$rx_p0+comb_res_sems$rx_p0),inherit.aes=FALSE,alpha=0.2,fill="forestgreen")
     plt_res <- plt_res + geom_ribbon(data=comb_res_avgs,aes(x=time,ymin=comb_res_avgs$r0_px-comb_res_sems$r0_px,ymax=comb_res_avgs$r0_px+comb_res_sems$r0_px),inherit.aes=FALSE,alpha=0.2,fill="firebrick")
     plt_res <- plt_res + geom_ribbon(data=comb_res_avgs,aes(x=time,ymin=comb_res_avgs$rx_px-comb_res_sems$rx_px,ymax=comb_res_avgs$rx_px+comb_res_sems$rx_px),inherit.aes=FALSE,alpha=0.2,fill="mediumblue")
+    plt_res <- plt_res + theme(legend.position="none")
     
     multiplot(plt_cue,plt_res)
     graphics.off()
