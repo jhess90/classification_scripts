@@ -13,7 +13,7 @@ library(ggcorrplot)
 source("~/workspace/classification_scripts/multiplot.R")
 
 saveAsPng <- T
-region_list <- c('M1','S1','PmD')
+region_list <- c('M1','S1','PMd')
 
 ##############################
 
@@ -67,7 +67,7 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
   label_df <- data.frame(
     x = c(total_unit_num_M1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2,5,5,5),
     y = c(-8,-8,-8,total_unit_num_M1/2,total_unit_num_M1+total_unit_num_S1/2,total_unit_num_M1+total_unit_num_S1+total_unit_num_PmD/2),
-    text = c('M1','S1','PmD','M1','S1','PmD')
+    text = c('M1','S1','PMd','M1','S1','PMd')
   )
   
   #calculate sum of correlations, put in data frame for plotting
@@ -219,14 +219,14 @@ rx_px_s <- res1[which(res1 %in% rx_px)]
 #compute correlations and plot figs
 #compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'All',1:dim(all_cue_fr_M1)[2])
 
-#compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0',r0)
-#compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'RX',rx)
+compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0',r0)
+compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'RX',rx)
 
-#compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'P0',p0)
-#compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'PX',px)
+compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'P0',p0)
+compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'PX',px)
 
-#compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'Succ',res1)
-#compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'Fail',res0)
+compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'Succ',res1)
+compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'Fail',res0)
 
 #compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0 Succ',r0_s)
 #compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0 Fail',r0_f)
@@ -243,11 +243,11 @@ rx_px_s <- res1[which(res1 %in% rx_px)]
 #compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'RXP0',rx_p0)
 #compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'RXPX',rx_px)
 
-compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0P0 Fail',r0_p0_f)
-compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0PX Fail',r0_px_f)
-compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'RXP0 Fail',rx_p0_f)
-compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'RXPX Fail',rx_px_f)
-compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0P0 Succ',r0_p0_s)
-compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0PX Succ',r0_px_s)
-compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'RXP0 Succ',rx_p0_s)
-compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'RXPX Succ',rx_px_s)
+#compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0P0 Fail',r0_p0_f)
+#compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0PX Fail',r0_px_f)
+#compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'RXP0 Fail',rx_p0_f)
+#compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'RXPX Fail',rx_px_f)
+#compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0P0 Succ',r0_p0_s)
+#compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'R0PX Succ',r0_px_s)
+#compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'RXP0 Succ',rx_p0_s)
+#compute_plot_corr(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res_fr_M1,all_res_fr_S1,all_res_fr_PmD,total_unit_num_M1,total_unit_num_S1,total_unit_num_PmD,'RXPX Succ',rx_px_s)
