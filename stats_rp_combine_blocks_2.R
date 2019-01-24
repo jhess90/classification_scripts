@@ -257,7 +257,7 @@ for(region_index in 1:length(region_list)){
   
   plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
   plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Reward and Outcome',y='Proportion Significant')
-  plt <- plt + theme_classic() + theme(strip.text=element_text(size=16),plot.title=element_text(size=16),axis.title=element_text(size=16),axis.text=element_text(size=12))
+  plt <- plt + theme_classic() + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25) ,strip.text=element_text(size=16),plot.title=element_text(size=16),axis.title=element_text(size=16),axis.text=element_text(size=12))
   
   plot(plt)
   graphics.off()
@@ -285,7 +285,7 @@ for(region_index in 1:length(region_list)){
   
   plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
   plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Punishment and Outcome',y='Proportion Significant')
-  plt <- plt + theme_classic() + theme(strip.text=element_text(size=16),plot.title=element_text(size=16),axis.title=element_text(size=16),axis.text=element_text(size=12))
+  plt <- plt + theme_classic() + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25) ,strip.text=element_text(size=16),plot.title=element_text(size=16),axis.title=element_text(size=16),axis.text=element_text(size=12))
   
   plot(plt)
   graphics.off()
@@ -313,7 +313,7 @@ for(region_index in 1:length(region_list)){
   
   plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
   plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Reward and Outcome',y='Proportion Significant')
-  plt <- plt + theme_classic() + theme(strip.text=element_text(size=16),plot.title=element_text(size=16),axis.title=element_text(size=16),axis.text=element_text(size=12))
+  plt <- plt + theme_classic() + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25) ,strip.text=element_text(size=16),plot.title=element_text(size=16),axis.title=element_text(size=16),axis.text=element_text(size=12))
   
   plot(plt)
   graphics.off()
@@ -341,7 +341,7 @@ for(region_index in 1:length(region_list)){
   
   plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
   plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Punishment and Outcome',y='Proportion Significant')
-  plt <- plt + theme_classic() + theme(strip.text=element_text(size=16),plot.title=element_text(size=16),axis.title=element_text(size=16),axis.text=element_text(size=12))
+  plt <- plt + theme_classic() + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25) ,strip.text=element_text(size=16),plot.title=element_text(size=16),axis.title=element_text(size=16),axis.text=element_text(size=12))
   
   plot(plt)
   graphics.off()
@@ -370,7 +370,7 @@ for(region_index in 1:length(region_list)){
   
   plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
   plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Result',y='Proportion Significant')
-  plt <- plt + theme_classic() + theme(strip.text=element_text(size=16),plot.title=element_text(size=16),axis.title=element_text(size=16),axis.text=element_text(size=12))
+  plt <- plt + theme_classic() + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25) ,strip.text=element_text(size=16),plot.title=element_text(size=16),axis.title=element_text(size=16),axis.text=element_text(size=12))
   
   plot(plt)
   graphics.off()
@@ -399,7 +399,7 @@ for(region_index in 1:length(region_list)){
   plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
   plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Combination',y='Proportion Significant')
   plt <- plt + theme(axis.text.x = element_text(size=rel(0.8)))
-  plt <- plt + theme_classic() + theme(strip.text=element_text(size=16),plot.title=element_text(size=16),axis.title=element_text(size=16),axis.text=element_text(size=12))
+  plt <- plt + theme_classic() + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25) ,strip.text=element_text(size=16),plot.title=element_text(size=16),axis.title=element_text(size=16),axis.text=element_text(size=12))
   
   plot(plt)
   graphics.off()
@@ -428,7 +428,7 @@ for(region_index in 1:length(region_list)){
   plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
   plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Combination and Outcome',y='Proportion Significant')
   plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
-  plt <- plt + theme_classic() + theme(strip.text=element_text(size=16),plot.title=element_text(size=16),axis.title=element_text(size=16),axis.text=element_text(size=12))
+  plt <- plt + theme_classic() + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25) ,strip.text=element_text(size=16),plot.title=element_text(size=16),axis.title=element_text(size=16),axis.text=element_text(size=12))
   
   plot(plt)
   graphics.off()
