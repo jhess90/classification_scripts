@@ -23,7 +23,6 @@ nhp_id <- 'nhp'
 
 sem <- function(x){sd(x)/sqrt(length(x))}
 
-
 ######
 
 file_list <- Sys.glob("block*.RData")
