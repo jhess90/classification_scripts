@@ -195,3 +195,48 @@ plt <- plt + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25),
 
 plot(plt)
 graphics.off()
+
+#######
+diff_labels <-  c("P0/PX")
+
+#
+png(paste('M1_win_wind_sig4_perc.png',sep=""),width=8,height=6,units="in",res=500)
+
+diffs.df <- data.frame(window_labels=window_labels,P=c(M1_diffs$p_bin$M1_ac,M1_diffs$p_bin$M1_br,M1_diffs$p_bin$M1_ar),position=c(1,2,3))
+diffs.m <-melt(diffs.df,id.vars=c('window_labels','position'))
+
+plt <- ggplot(diffs.m,aes(variable,value)) + geom_bar(aes(fill=window_labels,group=position),stat='identity',position=position_dodge(),show.legend=F)
+plt <- plt + theme_classic() + labs(title=paste('M1\nTotal Units:',M1_total_unit_num),y='Percent Significant',x='',fill='Time Window') + theme(axis.text.x = element_text(size = rel(1.6), angle = 00)) + theme(axis.text.y = element_text(size = rel(1.6), angle = 00)) + theme(axis.title.y = element_text(size = rel(1.6), angle = 90))
+plt <- plt + scale_fill_manual(values=c("darkslategray2","darkslategray","darkslategray4")) + scale_x_discrete(labels=c("P0/PX"))
+plt <- plt + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25),plot.title=element_text(size=16),axis.title=element_text(size=12),axis.text=element_text(size=12))
+
+plot(plt)
+graphics.off()
+
+#
+png(paste('S1_win_wind_sig4_perc.png',sep=""),width=8,height=6,units="in",res=500)
+
+diffs.df <- data.frame(window_labels=window_labels,P=c(S1_diffs$p_bin$S1_ac,S1_diffs$p_bin$S1_br,S1_diffs$p_bin$S1_ar),position=c(1,2,3))
+diffs.m <-melt(diffs.df,id.vars=c('window_labels','position'))
+
+plt <- ggplot(diffs.m,aes(variable,value)) + geom_bar(aes(fill=window_labels,group=position),stat='identity',position=position_dodge(),show.legend=F)
+plt <- plt + theme_classic() + labs(title=paste('S1\nTotal Units:',S1_total_unit_num),y='Percent Significant',x='',fill='Time Window') + theme(axis.text.x = element_text(size = rel(1.6), angle = 00)) + theme(axis.text.y = element_text(size = rel(1.6), angle = 00)) + theme(axis.title.y = element_text(size = rel(1.6), angle = 90))
+plt <- plt + scale_fill_manual(values=c("darkslategray2","darkslategray","darkslategray4")) + scale_x_discrete(labels=c("P0/PX"))
+plt <- plt + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25),plot.title=element_text(size=16),axis.title=element_text(size=12),axis.text=element_text(size=12))
+
+plot(plt)
+graphics.off()
+
+
+png(paste('PmD_win_wind_sig4_perc.png',sep=""),width=8,height=6,units="in",res=500)
+
+diffs.df <- data.frame(window_labels=window_labels,P=c(PmD_diffs$p_bin$PmD_ac,PmD_diffs$p_bin$PmD_br,PmD_diffs$p_bin$PmD_ar),position=c(1,2,3))
+diffs.m <-melt(diffs.df,id.vars=c('window_labels','position'))
+
+plt <- ggplot(diffs.m,aes(variable,value)) + geom_bar(aes(fill=window_labels,group=position),stat='identity',position=position_dodge(),show.legend=F)
+plt <- plt + theme_classic() + labs(title=paste('PmD\nTotal Units:',PmD_total_unit_num),y='Percent Significant',x='',fill='Time Window') + theme(axis.text.x = element_text(size = rel(1.6), angle = 00)) + theme(axis.text.y = element_text(size = rel(1.6), angle = 00)) + theme(axis.title.y = element_text(size = rel(1.6), angle = 90))
+plt <- plt + scale_fill_manual(values=c("darkslategray2","darkslategray","darkslategray4")) + scale_x_discrete(labels=c("P0/PX"))
+plt <- plt + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25),plot.title=element_text(size=16),axis.title=element_text(size=12),axis.text=element_text(size=12))
+
+plot(plt)
+graphics.off()
