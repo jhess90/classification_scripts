@@ -109,7 +109,7 @@ rx_px <- rx[which(rx %in% px)]
 png(paste("time_", nhp_id,"_reward.png",sep=""),width=8,height=6,units="in",res=500)
 
 ravgs <- data.frame(r_values=c(0,1,2,3),reach_time = c(mean(condensed[r0,9]),mean(condensed[r1,9]),mean(condensed[r2,9]),mean(condensed[r3,9])),intertrial = c(mean(condensed[r0,10]),mean(condensed[r1,10]),mean(condensed[r2,10]),mean(condensed[r3,10])))
-rstds <- data.frame(r_values=c(0,1,2,3),reach_time = c(sd(condensed[r0,9]),sd(condensed[r1,9]),sd(condensed[r2,9]),sd(condensed[r3,9])),intertrial = c(sd(condensed[r0,10]),sd(condensed[r1,10]),sd(condensed[r2,10]),sd(condensed[r3,10])))
+rstds <- data.frame(r_values=c(0,1,2,3),reach_time = c(sem(condensed[r0,9]),sem(condensed[r1,9]),sem(condensed[r2,9]),sem(condensed[r3,9])),intertrial = c(sem(condensed[r0,10]),sem(condensed[r1,10]),sem(condensed[r2,10]),sem(condensed[r3,10])))
 
 avg_melt <- melt(ravgs,id="r_values",variable.name='type',value.name='avg')
 std_melt <- melt(rstds,id="r_values",variable.name='type',value.name='std')
@@ -127,7 +127,7 @@ graphics.off()
 png(paste("time_", nhp_id,"_punishment.png",sep=""),width=8,height=6,units="in",res=500)
 
 pavgs <- data.frame(p_values=c(0,1,2,3),reach_time = c(mean(condensed[p0,9]),mean(condensed[p1,9]),mean(condensed[p2,9]),mean(condensed[p3,9])),intertrial = c(mean(condensed[p0,10]),mean(condensed[p1,10]),mean(condensed[p2,10]),mean(condensed[p3,10])))
-pstds <- data.frame(p_values=c(0,1,2,3),reach_time = c(sd(condensed[p0,9]),sd(condensed[p1,9]),sd(condensed[p2,9]),sd(condensed[p3,9])),intertrial = c(sd(condensed[p0,10]),sd(condensed[p1,10]),sd(condensed[p2,10]),sd(condensed[p3,10])))
+pstds <- data.frame(p_values=c(0,1,2,3),reach_time = c(sem(condensed[p0,9]),sem(condensed[p1,9]),sem(condensed[p2,9]),sem(condensed[p3,9])),intertrial = c(sem(condensed[p0,10]),sem(condensed[p1,10]),sem(condensed[p2,10]),sem(condensed[p3,10])))
 
 avg_melt <- melt(pavgs,id="p_values",variable.name='type',value.name='avg')
 std_melt <- melt(pstds,id="p_values",variable.name='type',value.name='std')
