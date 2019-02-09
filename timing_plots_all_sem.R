@@ -21,7 +21,7 @@ saveAsPng <- T
 
 nhp_id <- 'nhp'
 
-binary_bool <- T
+binary_bool <- F
 
 ######
 
