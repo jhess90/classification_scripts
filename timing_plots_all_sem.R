@@ -21,9 +21,36 @@ saveAsPng <- T
 
 nhp_id <- 'nhp'
 
-sem <- function(x){sd(x)/sqrt(length(x))}
+binary_bool <- T
 
 ######
+
+sem <- function(x){sd(x)/sqrt(length(x))}
+
+calc_wsr <- function(baseline,window){
+  
+  if(identical(baseline,window)){return(NA)}
+  
+  #Not paired
+  suppressWarnings(wsr <- wilcox.test(baseline,window,paired=F))
+  p_val <- wsr$p.v
+  
+  #if (mean(baseline) > mean(window)){change = -1}else if(mean(baseline) < mean(window)){change = 1}else{change=0}
+  
+  #output <- c(p_val,change)
+  
+  #if (p_val < 0.05){p_cat = 1}else if(p_val < 0.01){p_cat = 2}else if(p_val < 0.001){p_cat = 3}else if (p_val < 0.0001){p_cat = 4}else if(p_val < 0.00001){p_cat = 5}else{p_cat = 0}
+  
+  if(p_val < 1e-20){p_cat=5}else if(p_val < 1e-10){p_cat = 4}else if(p_val < 0.001){p_cat = 3}else if(p_val < 0.01){p_cat = 2}else if(p_val < 0.05){p_cat = 1}else{p_cat = 0}
+  
+  output <- c(p_val,p_cat)
+  
+  return(output)
+}
+
+############
+
+
 
 file_list <- Sys.glob("block*.RData")
 
@@ -105,42 +132,43 @@ rx_p0 <- rx[which(rx %in% p0)]
 r0_px <- r0[which(r0 %in% px)]
 rx_px <- rx[which(rx %in% px)]
 
+if(!binary_bool){
 #reward
-png(paste("time_", nhp_id,"_reward.png",sep=""),width=8,height=6,units="in",res=500)
-
-ravgs <- data.frame(r_values=c(0,1,2,3),reach_time = c(mean(condensed[r0,9]),mean(condensed[r1,9]),mean(condensed[r2,9]),mean(condensed[r3,9])),intertrial = c(mean(condensed[r0,10]),mean(condensed[r1,10]),mean(condensed[r2,10]),mean(condensed[r3,10])))
-rstds <- data.frame(r_values=c(0,1,2,3),reach_time = c(sem(condensed[r0,9]),sem(condensed[r1,9]),sem(condensed[r2,9]),sem(condensed[r3,9])),intertrial = c(sem(condensed[r0,10]),sem(condensed[r1,10]),sem(condensed[r2,10]),sem(condensed[r3,10])))
-
-avg_melt <- melt(ravgs,id="r_values",variable.name='type',value.name='avg')
-std_melt <- melt(rstds,id="r_values",variable.name='type',value.name='std')
-
-test <- merge(std_melt,avg_melt,row.names='r_values')
-test[is.na(test)] <- 0
-
-plt <- ggplot(data=test,aes(x=r_values,y=avg,ymax=avg+std,ymin=avg-std,fill=type)) + geom_bar(position="dodge",stat="identity") + geom_errorbar(position=position_dodge(width=0.9),color="gray32",width=0.25)
-plt <- plt + scale_fill_manual(values=c("royalblue","seagreen")) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Reward",fill="") + theme(legend.position="none")
-
-plot(plt)
-graphics.off()
-
-#punishment
-png(paste("time_", nhp_id,"_punishment.png",sep=""),width=8,height=6,units="in",res=500)
-
-pavgs <- data.frame(p_values=c(0,1,2,3),reach_time = c(mean(condensed[p0,9]),mean(condensed[p1,9]),mean(condensed[p2,9]),mean(condensed[p3,9])),intertrial = c(mean(condensed[p0,10]),mean(condensed[p1,10]),mean(condensed[p2,10]),mean(condensed[p3,10])))
-pstds <- data.frame(p_values=c(0,1,2,3),reach_time = c(sem(condensed[p0,9]),sem(condensed[p1,9]),sem(condensed[p2,9]),sem(condensed[p3,9])),intertrial = c(sem(condensed[p0,10]),sem(condensed[p1,10]),sem(condensed[p2,10]),sem(condensed[p3,10])))
-
-avg_melt <- melt(pavgs,id="p_values",variable.name='type',value.name='avg')
-std_melt <- melt(pstds,id="p_values",variable.name='type',value.name='std')
-
-test <- merge(std_melt,avg_melt,row.names='p_values')
-test[is.na(test)] <- 0
-
-plt <- ggplot(data=test,aes(x=p_values,y=avg,ymax=avg+std,ymin=avg-std,fill=type)) + geom_bar(position="dodge",stat="identity") + geom_errorbar(position=position_dodge(width=0.9),color="gray32",width=0.25)
-plt <- plt + scale_fill_manual(values=c("royalblue","seagreen")) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Punishment",fill="") + theme(legend.position="none")
-
-plot(plt)
-graphics.off()
-
+  png(paste("time_", nhp_id,"_reward.png",sep=""),width=8,height=6,units="in",res=500)
+  
+  ravgs <- data.frame(r_values=c(0,1,2,3),reach_time = c(mean(condensed[r0,9]),mean(condensed[r1,9]),mean(condensed[r2,9]),mean(condensed[r3,9])),intertrial = c(mean(condensed[r0,10]),mean(condensed[r1,10]),mean(condensed[r2,10]),mean(condensed[r3,10])))
+  rstds <- data.frame(r_values=c(0,1,2,3),reach_time = c(sem(condensed[r0,9]),sem(condensed[r1,9]),sem(condensed[r2,9]),sem(condensed[r3,9])),intertrial = c(sem(condensed[r0,10]),sem(condensed[r1,10]),sem(condensed[r2,10]),sem(condensed[r3,10])))
+  
+  avg_melt <- melt(ravgs,id="r_values",variable.name='type',value.name='avg')
+  std_melt <- melt(rstds,id="r_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='r_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(data=test,aes(x=r_values,y=avg,ymax=avg+std,ymin=avg-std,fill=type)) + geom_bar(position="dodge",stat="identity") + geom_errorbar(position=position_dodge(width=0.9),color="gray32",width=0.25)
+  plt <- plt + scale_fill_manual(values=c("royalblue","seagreen")) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Reward",fill="") + theme(legend.position="none")
+  
+  plot(plt)
+  graphics.off()
+  
+  #punishment
+  png(paste("time_", nhp_id,"_punishment.png",sep=""),width=8,height=6,units="in",res=500)
+  
+  pavgs <- data.frame(p_values=c(0,1,2,3),reach_time = c(mean(condensed[p0,9]),mean(condensed[p1,9]),mean(condensed[p2,9]),mean(condensed[p3,9])),intertrial = c(mean(condensed[p0,10]),mean(condensed[p1,10]),mean(condensed[p2,10]),mean(condensed[p3,10])))
+  pstds <- data.frame(p_values=c(0,1,2,3),reach_time = c(sem(condensed[p0,9]),sem(condensed[p1,9]),sem(condensed[p2,9]),sem(condensed[p3,9])),intertrial = c(sem(condensed[p0,10]),sem(condensed[p1,10]),sem(condensed[p2,10]),sem(condensed[p3,10])))
+  
+  avg_melt <- melt(pavgs,id="p_values",variable.name='type',value.name='avg')
+  std_melt <- melt(pstds,id="p_values",variable.name='type',value.name='std')
+  
+  test <- merge(std_melt,avg_melt,row.names='p_values')
+  test[is.na(test)] <- 0
+  
+  plt <- ggplot(data=test,aes(x=p_values,y=avg,ymax=avg+std,ymin=avg-std,fill=type)) + geom_bar(position="dodge",stat="identity") + geom_errorbar(position=position_dodge(width=0.9),color="gray32",width=0.25)
+  plt <- plt + scale_fill_manual(values=c("royalblue","seagreen")) + theme_classic() + labs(title="Average Times",y="Time (s)",x="Punishment",fill="") + theme(legend.position="none")
+  
+  plot(plt)
+  graphics.off()
+}
 
 #reward
 png(paste("time_", nhp_id,"_reward_binary.png",sep=""),width=8,height=6,units="in",res=500)
@@ -311,8 +339,57 @@ plot(plt)
 graphics.off()
 
 
+#R0-RX
+r0_rx <- calc_wsr(condensed[r0,9],condensed[rx,9])
 
+#P0-PX
+p0_px <- calc_wsr(condensed[p0,9],condensed[px,9])
 
+if(!binary_bool){
+  #R0-R1, R0-R2, R0-R3, R1-R2, R1-R3, R2-R3
+  r0_r1 <- calc_wsr(condensed[r0,9],condensed[r1,9])
+  r0_r2 <- calc_wsr(condensed[r0,9],condensed[r2,9])
+  r0_r3 <- calc_wsr(condensed[r0,9],condensed[r3,9])
+  r1_r2 <- calc_wsr(condensed[r1,9],condensed[r2,9])
+  r1_r3 <- calc_wsr(condensed[r1,9],condensed[r3,9])
+  r2_r3 <- calc_wsr(condensed[r2,9],condensed[r3,9])
+  
+  #P0-P1, P0-P2, P0-P3, P1-P2, P1-P3, P2-P3
+  p0_p1 <- calc_wsr(condensed[p0,9],condensed[p1,9])
+  p0_p2 <- calc_wsr(condensed[p0,9],condensed[p2,9])
+  p0_p3 <- calc_wsr(condensed[p0,9],condensed[p3,9])
+  p1_p2 <- calc_wsr(condensed[p1,9],condensed[p2,9])
+  p1_p3 <- calc_wsr(condensed[p1,9],condensed[p3,9])
+  p2_p3 <- calc_wsr(condensed[p2,9],condensed[p3,9])
+}
+#Succ-Fail
+succ_fail <- calc_wsr(condensed[res0,9],condensed[res1,9])
+
+#R0P0-R0PX, R0P0-RXP0, R0P0-RXPX, R0PX-RXP0, R0PX-RXPX, RXP0-RXPX
+r0p0_r0px <- calc_wsr(condensed[r0_p0,9],condensed[r0_px,9])
+r0p0_rxp0 <- calc_wsr(condensed[r0_p0,9],condensed[rx_p0,9])
+r0p0_rxpx <- calc_wsr(condensed[r0_p0,9],condensed[rx_px,9])
+r0px_rxp0 <- calc_wsr(condensed[r0_px,9],condensed[rx_p0,9])
+r0px_rxpx <- calc_wsr(condensed[r0_px,9],condensed[rx_px,9])
+rxp0_rxpx <- calc_wsr(condensed[rx_p0,9],condensed[rx_px,9])
+
+if(!binary_bool){
+  all_diffs <- list(r0_rx,p0_px,r0_r1,r0_r2,r0_r3,r1_r2,r1_r3,r2_r3,p0_p1,p0_p2,p0_p3,p1_p2,p1_p3,p2_p3,succ_fail,r0p0_r0px,r0p0_rxp0,r0p0_rxpx,r0px_rxp0,r0px_rxpx,rxp0_rxpx)
+  all_diff_names <- c('r0_rx','p0_px','r0_r1','r0_r2','r0_r3','r1_r2','r1_r3','r2_r3','p0_p1','p0_p2','p0_p3','p1_p2','p1_p3','p2_p3','succ_fail','r0p0_r0px','r0p0_rxp0','r0p0_rxpx','r0px_rxp0','r0px_rxpx','rxp0_rxpx')
+}else{
+  all_diffs <- list(r0_rx,p0_px,succ_fail,r0p0_r0px,r0p0_rxp0,r0p0_rxpx,r0px_rxp0,r0px_rxpx,rxp0_rxpx)
+  all_diff_names <- c('r0_rx','p0_px','succ_fail','r0p0_r0px','r0p0_rxp0','r0p0_rxpx','r0px_rxp0','r0px_rxpx','rxp0_rxpx')
+  
+}
+
+#output sig diffs. For now just print out, copy into text file
+for(i in 1:length(all_diffs)){
+  if (all_diffs[[i]][1] < 0.05){
+    cat(all_diff_names[i],all_diffs[[i]],'\n')
+  }
+  
+  
+}
 
 
 
