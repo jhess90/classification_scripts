@@ -557,12 +557,16 @@ for(region_index in 1:length(region_list)){
     sig_p_level_ct <- 1
     
     sig_p_r_bin <- c()
-    ph_r_bin <- c()
     sig_r_bin_ct <- 1
     
     sig_p_p_bin <- c()
-    ph_p_bin <- c()
     sig_p_bin_ct <- 1
+    
+    sig_p_r_s_bin <- c()
+    sig_r_s_bin_ct <- 1
+    
+    sig_p_p_f_bin <- c()
+    sig_p_f_bin_ct <- 1
 
     sm_sig_p_r_outcome_levels <- c()
     ph_r_outcome_levels <- c()
@@ -662,11 +666,26 @@ for(region_index in 1:length(region_list)){
       suppressWarnings(wsr <- wilcox.test(r_bin[,1],r_bin[,2],paired=T))
       p_val <- wsr$p.v
       if(p_val < 0.05 & is.finite(p_val)){
-        cat(unit_num,'\n')
+        #cat(unit_num,'\n')
         if (mean(r_bin[,1],na.rm=T) > mean(r_bin[,2],na.rm=T)){r_bin_change = -1}else if(mean(r_bin[,1],na.rm=T) < mean(r_bin[,2],na.rm=T)){r_bin_change = 1}else{change=0}
         sig_p_r_bin <- rbind(sig_p_r_bin,c(unit_num,p_val,r_bin_change))
       }
       
+      #############
+      #reward succ binary
+      
+      r0_s_means <- rowMeans(all_total_fr[unit_num,r0_s,windows[i,1]:windows[i,2]])
+      rx_s_means <- rowMeans(all_total_fr[unit_num,rx_s,windows[i,1]:windows[i,2]])
+      
+      r_s_bin <- t(rbind.fill.matrix(t(r0_s_means),t(rx_s_means)))
+      
+      suppressWarnings(wsr <- wilcox.test(r_s_bin[,1],r_s_bin[,2],paired=T))
+      p_val <- wsr$p.v
+      if(p_val < 0.05 & is.finite(p_val)){
+        if (mean(r_s_bin[,1],na.rm=T) > mean(r_s_bin[,2],na.rm=T)){r_s_bin_change = -1}else if(mean(r_s_bin[,1],na.rm=T) < mean(r_s_bin[,2],na.rm=T)){r_s_bin_change = 1}else{change=0}
+        sig_p_r_s_bin <- rbind(sig_p_r_s_bin,c(unit_num,p_val,r_s_bin_change))
+      }
+
       #############
       #punishment binary
       p0_means <- rowMeans(all_total_fr[unit_num,p0,windows[i,1]:windows[i,2]])
@@ -680,6 +699,21 @@ for(region_index in 1:length(region_list)){
         if (mean(p_bin[,1],na.rm=T) > mean(p_bin[,2],na.rm=T)){p_bin_change = -1}else if(mean(p_bin[,1],na.rm=T) < mean(p_bin[,2],na.rm=T)){p_bin_change = 1}else{change=0}
         sig_p_p_bin <- rbind(sig_p_p_bin,c(unit_num,p_val,p_bin_change))
       }
+      
+      #############
+      #punishment fail binary
+      p0_f_means <- rowMeans(all_total_fr[unit_num,p0_f,windows[i,1]:windows[i,2]])
+      px_f_means <- rowMeans(all_total_fr[unit_num,px_f,windows[i,1]:windows[i,2]])
+      
+      p_f_bin <- t(rbind.fill.matrix(t(p0_f_means),t(px_f_means)))
+      
+      suppressWarnings(wsr <- wilcox.test(p_f_bin[,1],p_f_bin[,2],paired=T))
+      p_val <- wsr$p.v
+      if(p_val < 0.05 & is.finite(p_val)){
+        if (mean(p_f_bin[,1],na.rm=T) > mean(p_f_bin[,2],na.rm=T)){p_f_bin_change = -1}else if(mean(p_f_bin[,1],na.rm=T) < mean(p_f_bin[,2],na.rm=T)){p_f_bin_change = 1}else{change=0}
+        sig_p_p_f_bin <- rbind(sig_p_p_f_bin,c(unit_num,p_val,p_f_bin_change))
+      }
+      
       
       #############
       #reward outcome
@@ -930,8 +964,18 @@ for(region_index in 1:length(region_list)){
     #if (length(sm_sig_p_p_bin[,1]) != length(ph_p_bin)){cat('ERROR in post hoc lengths\n')}
     cat('p bin differences: ',dim(sig_p_p_bin)[1],'units\n')
     
-    #
+    ####
+    assign(paste(region_list[region_index],'_sm_sig_p_r_s_bin_',window_name[i],sep=""),sig_p_r_s_bin)
+    #assign(paste(region_list[region_index],'_ph_r_bin_',window_name[i],sep=""),ph_r_bin)
+    #if (length(sm_sig_p_r_bin[,1]) != length(ph_r_bin)){cat('ERROR in post hoc lengths\n')}
+    cat('r s bin differences: ',dim(sig_p_r_s_bin)[1],'units\n')
     
+    assign(paste(region_list[region_index],'_sm_sig_p_p_f_bin_',window_name[i],sep=""),sig_p_p_f_bin)
+    #assign(paste(region_list[region_index],'_ph_p_bin_',window_name[i],sep=""),ph_p_bin)
+    #if (length(sm_sig_p_p_bin[,1]) != length(ph_p_bin)){cat('ERROR in post hoc lengths\n')}
+    cat('p f bin differences: ',dim(sig_p_p_f_bin)[1],'units\n')
+    
+    #
     assign(paste(region_list[region_index],'_sm_sig_p_r_outcome_levels_',window_name[i],sep=""),sm_sig_p_r_outcome_levels)
     assign(paste(region_list[region_index],'_ph_r_outcome_levels_',window_name[i],sep=""),ph_r_outcome_levels)
     if (length(sm_sig_p_r_outcome_levels[,1]) != length(ph_r_outcome_levels)){cat('ERROR in post hoc lengths\n')}
@@ -972,7 +1016,7 @@ for(region_index in 1:length(region_list)){
     assign(paste(region_list[region_index],'_ph_m_levels_',window_name[i],sep=""),ph_m_levels)
     cat('m level differences: ',length(ph_m_levels),'units\n')
     
-    diffs_length_list <- list(r=length(ph_r_levels),p=length(ph_p_levels),r_outcome=length(ph_r_outcome_levels),p_outcome=length(ph_p_outcome_levels),outcome=length(sm_sig_p_outcome_levels[,1]),comb=length(ph_comb_levels),comb_outcome=length(ph_comb_outcome_levels),r_delivery=length(sig_p_r_delivery_levels[,1]),p_delivery=length(sig_p_p_delivery_levels[,1]),value=length(sm_sig_p_v_levels[,1]),motivation=length(sm_sig_p_m_levels[,1]),r_bin=length(sig_p_r_bin[,1]),p_bin=length(sig_p_p_bin[,1]))
+    diffs_length_list <- list(r=length(ph_r_levels),p=length(ph_p_levels),r_outcome=length(ph_r_outcome_levels),p_outcome=length(ph_p_outcome_levels),outcome=length(sm_sig_p_outcome_levels[,1]),comb=length(ph_comb_levels),comb_outcome=length(ph_comb_outcome_levels),r_delivery=length(sig_p_r_delivery_levels[,1]),p_delivery=length(sig_p_p_delivery_levels[,1]),value=length(sm_sig_p_v_levels[,1]),motivation=length(sm_sig_p_m_levels[,1]),r_bin=length(sig_p_r_bin[,1]),p_bin=length(sig_p_p_bin[,1]),r_s_bin=length(sig_p_r_s_bin[,1]),p_f_bin=length(sig_p_p_f_bin[,1]))
 
     assign(paste(region_list[region_index],'_diffs_length_list_',window_name[i],sep=""),diffs_length_list)
     
