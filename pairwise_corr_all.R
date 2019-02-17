@@ -143,6 +143,26 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
   multiplot(cue_plt,res_plt,cols=2)
   graphics.off()
   
+  #plot correlation matrix
+  png(paste("corr_spear_all_no_txt_",type_name,".png",sep=""),width=8,height=6,units="in",res=500)
+  
+  cue_plt <- ggcorrplot(cue_corr,type="lower",outline.col='white')
+  cue_plt <- cue_plt + geom_vline(xintercept=total_unit_num_M1,color="grey") + geom_vline(xintercept=total_unit_num_M1+total_unit_num_S1,color="grey")
+  cue_plt <- cue_plt + geom_hline(yintercept=total_unit_num_M1,color="grey") + geom_hline(yintercept=total_unit_num_M1+total_unit_num_S1,color="grey")
+  cue_plt <- cue_plt + labs(title=paste(type_name,":\nCue",sep="")) + theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank(),legend.position="none",axis.text.y=element_blank(),plot.title=element_text(size=16))
+  cue_plt <- cue_plt + geom_text(data=label_df,aes(x=x,y=y,label=text),inherit.aes=FALSE,size=5)
+  #cue_plt <- cue_plt + geom_text(data=cue_sum_label_df,aes(x=x,y=y,label=text),inherit.aes=FALSE,size=2)
+  
+  res_plt <- ggcorrplot(res_corr,type="lower",outline.col='white')
+  res_plt <- res_plt + geom_vline(xintercept=total_unit_num_M1,color="grey") + geom_vline(xintercept=total_unit_num_M1+total_unit_num_S1,color="grey")
+  res_plt <- res_plt + geom_hline(yintercept=total_unit_num_M1,color="grey") + geom_hline(yintercept=total_unit_num_M1+total_unit_num_S1,color="grey")
+  res_plt <- res_plt + labs(title="\nResult") + theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank(),legend.position="none",axis.text.y=element_blank(),plot.title=element_text(size=16))
+  res_plt <- res_plt + geom_text(data=label_df,aes(x=x,y=y,label=text),inherit.aes=FALSE,size=5)
+  #res_plt <- res_plt + geom_text(data=res_sum_label_df,aes(x=x,y=y,label=text),inherit.aes=FALSE,size=2)
+  
+  multiplot(cue_plt,res_plt,cols=2)
+  graphics.off()
+  
   return()
   
 }
