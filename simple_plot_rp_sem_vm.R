@@ -237,9 +237,9 @@ for(region_index in 1:length(region_list)){
   
   #set here if want to just plot certain units by number
   #0059
-  if(region_index == 1){unit_list <- c(45,26)}else if (region_index == 2){unit_list <- c(62,69)}else{unit_list <- c(78,36)}
+  #if(region_index == 1){unit_list <- c(45,26)}else if (region_index == 2){unit_list <- c(62,69)}else{unit_list <- c(78,36)}
   #504
-  #if(region_index == 1){unit_list <- c(65,47)}else if (region_index == 2){unit_list <- c(27,44)}else{unit_list <- c(7,51)}
+  if(region_index == 1){unit_list <- c(65,47)}else if (region_index == 2){unit_list <- c(27,44)}else{unit_list <- c(7,51)}
   
   
   for(unit_num in unit_list){
@@ -393,7 +393,7 @@ for(region_index in 1:length(region_list)){
     plt_res <- plt_res +labs(title="Result",y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0) + scale_color_manual(values=c("salmon4","salmon3","lightsalmon","khaki","aquamarine2","aquamarine4","darkgreen"))    #scale_color_brewer(palette="GnBu") +
     plt_res <- plt_res + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
     
-    multiplot(plt_cue,plt_res)
+    ggarrange(plt_cue,plt_res,ncol=1)
     graphics.off()
     
     # motivation
