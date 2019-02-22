@@ -1,11 +1,7 @@
 library(openxlsx)
 library(ggplot2)
 library(reshape2)
-#source("~/dropbox/mult_rp_files/r_test/multiplot.R")
-#source("~/Dropbox/mult_rp_files/r_test/multiplot.R")
 source("~/workspace/classification_scripts/multiplot.R")
-#source("~/documents/lab/workspace/Classification_scripts/multiplot.R")
-#source("~/workspace/classification_scripts/multiplot.R")
 library(zoo)
 library(gplots)
 library(RColorBrewer)
@@ -14,6 +10,7 @@ library(gridGraphics)
 library(grid)
 library(gridExtra)
 library(R.matlab)
+library(egg)
 
 saveAsPng <- T
 
@@ -235,7 +232,8 @@ for(region_index in 1:length(region_list)){
   #if(region_index == 1){unit_list <- M1_sig_unit_list}else if (region_index == 2){unit_list <- S1_sig_unit_list}else{unit_list <- PmD_sig_unit_list}
   
   #set here if want to just plot certain units by number (M1, S1, PMd)
-  #if(region_index == 1){unit_list <- c(7,14,50,49,8,60)}else if (region_index == 2){unit_list <- c(35,73,49,38,7)}else{unit_list <- c(107,62,80)} #Soph cued block 3
+  #if(region_index == 1){unit_list <- c(7,14,50,49,8,60,65)}else if (region_index == 2){unit_list <- c(35,73,49,38,7)}else{unit_list <- c(107,62,80)} #Soph cued block 3
+  #if(region_index == 1){unit_list <- c(7,14,50,49,8)}else if (region_index == 2){unit_list <- c(35,73,49,38,7)}else{unit_list <- c(62,80)} #Soph cued block 3
   #if(region_index == 1){unit_list <- c(8,65,68,47,76)}else if (region_index == 2){unit_list <- c(19,25,13,21,5)}else{unit_list <- c(44,17,49,7,15,20)} #PG cued block 3 
   #if(region_index == 1){unit_list <- c(17,67,68,69)}else if (region_index == 2){unit_list <- c(89,66,42,81,31)}else{unit_list <- c(49,93,91,5,79,93)} #soph uncued block 1
   if(region_index == 1){unit_list <- c(35,25,20,114)}else if (region_index == 2){unit_list <- c(78)}else{unit_list <- c(72,68,65,75,52,6,67,28)} #PG uncued block 1
@@ -278,7 +276,7 @@ for(region_index in 1:length(region_list)){
       plt_res <- plt_res + geom_ribbon(data=r_res_avgs,aes(x=time,ymin=r_res_avgs$r3-r_res_sems$r3,ymax=r_res_avgs$r3+r_res_sems$r3),inherit.aes=FALSE,alpha=0.2,fill="darkgreen")
       
       
-      multiplot(plt_cue,plt_res)
+      ggarrange(plt_cue,plt_res,ncol=1)
       graphics.off()
       
       ## punishment
@@ -313,7 +311,7 @@ for(region_index in 1:length(region_list)){
       plt_res <- plt_res + geom_ribbon(data=p_res_avgs,aes(x=time,ymin=p_res_avgs$p2-p_res_sems$p2,ymax=p_res_avgs$p2+p_res_sems$p2),inherit.aes=FALSE,alpha=0.2,fill="firebrick1")
       plt_res <- plt_res + geom_ribbon(data=p_res_avgs,aes(x=time,ymin=p_res_avgs$p3-p_res_sems$p3,ymax=p_res_avgs$p3+p_res_sems$p3),inherit.aes=FALSE,alpha=0.2,fill="red2")
       
-      multiplot(plt_cue,plt_res)
+      ggarrange(plt_cue,plt_res,ncol=1)
       graphics.off()
     }
     ############
@@ -345,7 +343,7 @@ for(region_index in 1:length(region_list)){
     plt_res <- plt_res + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
     
     
-    multiplot(plt_cue,plt_res)
+    ggarrange(plt_cue,plt_res,ncol=1)
     graphics.off()
     
     ## punishment
@@ -376,7 +374,7 @@ for(region_index in 1:length(region_list)){
     plt_res <- plt_res + geom_ribbon(data=p_res_avgs,aes(x=time,ymin=p_res_avgs$px-p_res_sems$px,ymax=p_res_avgs$px+p_res_sems$px),inherit.aes=FALSE,alpha=0.2,fill="red2")
     plt_res <- plt_res + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
     
-    multiplot(plt_cue,plt_res)
+    ggarrange(plt_cue,plt_res,ncol=1)
     graphics.off()
     
     ## value
@@ -438,7 +436,7 @@ for(region_index in 1:length(region_list)){
     plt_res <- plt_res + geom_ribbon(data=res_res_avgs,aes(x=time,ymin=res_res_avgs$succ-res_res_sems$succ,ymax=res_res_avgs$succ+res_res_sems$succ),inherit.aes=FALSE,alpha=0.2,fill="purple")
     plt_res <- plt_res + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
     
-    multiplot(plt_cue,plt_res)
+    ggarrange(plt_cue,plt_res,ncol=1)
     graphics.off()
     
     
@@ -473,7 +471,7 @@ for(region_index in 1:length(region_list)){
     plt_res <- plt_res + geom_ribbon(data=comb_res_avgs,aes(x=time,ymin=comb_res_avgs$rx_px-comb_res_sems$rx_px,ymax=comb_res_avgs$rx_px+comb_res_sems$rx_px),inherit.aes=FALSE,alpha=0.2,fill="mediumblue")
     plt_res <- plt_res + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
     
-    multiplot(plt_cue,plt_res)
+    ggarrange(plt_cue,plt_res,ncol=1)
     graphics.off()
     
     
@@ -567,7 +565,7 @@ for(region_index in 1:length(region_list)){
     plt_res <- plt_res + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
     
     
-    multiplot(plt_cue,plt_res)
+    ggarrange(plt_cue,plt_res,ncol=1)
     graphics.off()
     
     ## punishment sf
@@ -620,7 +618,7 @@ for(region_index in 1:length(region_list)){
     plt_res <- plt_res + geom_ribbon(data=p_sf_res_avgs,aes(x=time,ymin=p_sf_res_avgs$px_f-p_sf_res_sems$px_f,ymax=p_sf_res_avgs$px_f+p_sf_res_sems$px_f),inherit.aes=FALSE,alpha=0.2,fill="lightpink2")
     plt_res <- plt_res + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
     
-    multiplot(plt_cue,plt_res)
+    ggarrange(plt_cue,plt_res,ncol=1)
     graphics.off()
     
   
