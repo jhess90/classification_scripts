@@ -233,7 +233,7 @@ for(region_index in 1:length(region_list)){
   
   #set here if want to just plot certain units by number (M1, S1, PMd)
   #if(region_index == 1){unit_list <- c(7,14,50,49,8,60,65)}else if (region_index == 2){unit_list <- c(35,73,49,38,7)}else{unit_list <- c(107,62,80)} #Soph cued block 3
-  #if(region_index == 1){unit_list <- c(7,14,50,49,8)}else if (region_index == 2){unit_list <- c(35,73,49,38,7)}else{unit_list <- c(62,80)} #Soph cued block 3
+  #if(region_index == 1){unit_list <- c(7,14,50,49,8)}else if (region_index == 2){unit_list <- c(35,73,49,38,7)}else{unit_list <- c(62,80)} #Soph cued block 1
   #if(region_index == 1){unit_list <- c(8,65,68,47,76)}else if (region_index == 2){unit_list <- c(19,25,13,21,5)}else{unit_list <- c(44,17,49,7,15,20)} #PG cued block 3 
   #if(region_index == 1){unit_list <- c(17,67,68,69)}else if (region_index == 2){unit_list <- c(89,66,42,81,31)}else{unit_list <- c(49,93,91,5,79,93)} #soph uncued block 1
   if(region_index == 1){unit_list <- c(35,25,20,114)}else if (region_index == 2){unit_list <- c(78)}else{unit_list <- c(72,68,65,75,52,6,67,28)} #PG uncued block 1
