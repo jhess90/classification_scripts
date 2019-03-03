@@ -237,391 +237,116 @@ for(region_index in 1:length(region_list)){
   
   #set here if want to just plot certain units by number
   #0059
-  #if(region_index == 1){unit_list <- c(45,26)}else if (region_index == 2){unit_list <- c(62,69)}else{unit_list <- c(78,36)}
+  if(region_index == 1){unit_list <- c(26,45)}else if (region_index == 2){unit_list <- c(62,69)}else{unit_list <- c(78,36)}
   #504
-  if(region_index == 1){unit_list <- c(65,47)}else if (region_index == 2){unit_list <- c(27,44)}else{unit_list <- c(7,51)}
+  #if(region_index == 1){unit_list <- c(65,47)}else if (region_index == 2){unit_list <- c(27,44)}else{unit_list <- c(7,51)}
   
   
   for(unit_num in unit_list){
     cat(unit_num,'\n')
     
-    # #can change this and rest to binary_bool now that it's set
-    # if (!((length(r1) == 0 | length(r2) == 0) | length(r3) == 0)){
-    #   ## reward
-    #   png(paste("sem_",region_list[region_index],"_r_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
-    #   
-    #   r_cue_avgs <- data.frame(time=time,r0=rollmean(colMeans(all_cue_fr[unit_num,r0,]),5),r1=rollmean(colMeans(all_cue_fr[unit_num,r1,]),5),r2=rollmean(colMeans(all_cue_fr[unit_num,r2,]),5),r3=rollmean(colMeans(all_cue_fr[unit_num,r3,]),5))
-    #   r_res_avgs <- data.frame(time=time,r0=rollmean(colMeans(all_res_fr[unit_num,r0,]),5),r1=rollmean(colMeans(all_res_fr[unit_num,r1,]),5),r2=rollmean(colMeans(all_res_fr[unit_num,r2,]),5),r3=rollmean(colMeans(all_res_fr[unit_num,r3,]),5))
-    #   
-    #   r_cue_sems <-  data.frame(time=time,r0=rollmean(sapply(data.frame(all_cue_fr[unit_num,r0,]),function(x)sd(x)/sqrt(length(x))),5),r1=rollmean(sapply(data.frame(all_cue_fr[unit_num,r1,]),function(x)sd(x)/sqrt(length(x))),5),r2=rollmean(sapply(data.frame(all_cue_fr[unit_num,r2,]),function(x)sd(x)/sqrt(length(x))),5),r3=rollmean(sapply(data.frame(all_cue_fr[unit_num,r3,]),function(x)sd(x)/sqrt(length(x))),5))
-    #   r_res_sems <-  data.frame(time=time,r0=rollmean(sapply(data.frame(all_res_fr[unit_num,r0,]),function(x)sd(x)/sqrt(length(x))),5),r1=rollmean(sapply(data.frame(all_res_fr[unit_num,r1,]),function(x)sd(x)/sqrt(length(x))),5),r2=rollmean(sapply(data.frame(all_res_fr[unit_num,r2,]),function(x)sd(x)/sqrt(length(x))),5),r3=rollmean(sapply(data.frame(all_res_fr[unit_num,r3,]),function(x)sd(x)/sqrt(length(x))),5))
-    #   
-    #   r_cue_avgs.m <- melt(r_cue_avgs,id.vars="time",variable="r_level")
-    #   
-    #   plt_cue <- ggplot(r_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=r_level),size=1) + theme_classic()
-    #   plt_cue <- plt_cue + scale_colour_manual(values=c("goldenrod","palegreen3","seagreen","darkgreen")) + labs(title=paste("Reward: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Reward Level") + geom_vline(xintercept=0)
-    #       
-    #   #
-    #   plt_cue <- plt_cue + geom_ribbon(data=r_cue_avgs,aes(x=time,ymin=r_cue_avgs$r0-r_cue_sems$r0,ymax=r_cue_avgs$r0+r_cue_sems$r0),inherit.aes=FALSE,alpha=0.2,fill="goldenrod")
-    #   plt_cue <- plt_cue + geom_ribbon(data=r_cue_avgs,aes(x=time,ymin=r_cue_avgs$r1-r_cue_sems$r1,ymax=r_cue_avgs$r1+r_cue_sems$r1),inherit.aes=FALSE,alpha=0.2,fill="palegreen3")
-    #   plt_cue <- plt_cue + geom_ribbon(data=r_cue_avgs,aes(x=time,ymin=r_cue_avgs$r2-r_cue_sems$r2,ymax=r_cue_avgs$r2+r_cue_sems$r2),inherit.aes=FALSE,alpha=0.2,fill="seagreen")
-    #   plt_cue <- plt_cue + geom_ribbon(data=r_cue_avgs,aes(x=time,ymin=r_cue_avgs$r3-r_cue_sems$r3,ymax=r_cue_avgs$r3+r_cue_sems$r3),inherit.aes=FALSE,alpha=0.2,fill="darkgreen")
-    #   
-    #   r_res_avgs.m <- melt(r_res_avgs,id.vars="time",variable="r_level")
-    #   plt_res <- ggplot(r_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=r_level),size=1) + theme_classic()
-    #   plt_res <- plt_res + scale_colour_manual(values=c("goldenrod","palegreen3","seagreen","darkgreen")) + labs(title="Result",y="z-score", x="Time(s)",colour="Reward Level") + geom_vline(xintercept=0)
-    #   
-    #   #
-    #   plt_res <- plt_res + geom_ribbon(data=r_res_avgs,aes(x=time,ymin=r_res_avgs$r0-r_res_sems$r0,ymax=r_res_avgs$r0+r_res_sems$r0),inherit.aes=FALSE,alpha=0.2,fill="goldenrod")
-    #   plt_res <- plt_res + geom_ribbon(data=r_res_avgs,aes(x=time,ymin=r_res_avgs$r1-r_res_sems$r1,ymax=r_res_avgs$r1+r_res_sems$r1),inherit.aes=FALSE,alpha=0.2,fill="palegreen3")
-    #   plt_res <- plt_res + geom_ribbon(data=r_res_avgs,aes(x=time,ymin=r_res_avgs$r2-r_res_sems$r2,ymax=r_res_avgs$r2+r_res_sems$r2),inherit.aes=FALSE,alpha=0.2,fill="seagreen")
-    #   plt_res <- plt_res + geom_ribbon(data=r_res_avgs,aes(x=time,ymin=r_res_avgs$r3-r_res_sems$r3,ymax=r_res_avgs$r3+r_res_sems$r3),inherit.aes=FALSE,alpha=0.2,fill="darkgreen")
-    #   
-    #   
-    #   multiplot(plt_cue,plt_res)
-    #   graphics.off()
-    #   
-    #   ## punishment
-    #   png(paste("sem_",region_list[region_index],"_p_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
-    #   
-    #   p_cue_avgs <- data.frame(time=time,p0=rollmean(colMeans(all_cue_fr[unit_num,p0,]),5),p1=rollmean(colMeans(all_cue_fr[unit_num,p1,]),5),p2=rollmean(colMeans(all_cue_fr[unit_num,p2,]),5),p3=rollmean(colMeans(all_cue_fr[unit_num,p3,]),5))
-    #   p_res_avgs <- data.frame(time=time,p0=rollmean(colMeans(all_res_fr[unit_num,p0,]),5),p1=rollmean(colMeans(all_res_fr[unit_num,p1,]),5),p2=rollmean(colMeans(all_res_fr[unit_num,p2,]),5),p3=rollmean(colMeans(all_res_fr[unit_num,p3,]),5))
-    #   
-    #   #
-    #   p_cue_sems <-  data.frame(time=time,p0=rollmean(sapply(data.frame(all_cue_fr[unit_num,p0,]),function(x)sd(x)/sqrt(length(x))),5),p1=rollmean(sapply(data.frame(all_cue_fr[unit_num,p1,]),function(x)sd(x)/sqrt(length(x))),5),p2=rollmean(sapply(data.frame(all_cue_fr[unit_num,p2,]),function(x)sd(x)/sqrt(length(x))),5),p3=rollmean(sapply(data.frame(all_cue_fr[unit_num,p3,]),function(x)sd(x)/sqrt(length(x))),5))
-    #   p_res_sems <-  data.frame(time=time,p0=rollmean(sapply(data.frame(all_res_fr[unit_num,p0,]),function(x)sd(x)/sqrt(length(x))),5),p1=rollmean(sapply(data.frame(all_res_fr[unit_num,p1,]),function(x)sd(x)/sqrt(length(x))),5),p2=rollmean(sapply(data.frame(all_res_fr[unit_num,p2,]),function(x)sd(x)/sqrt(length(x))),5),p3=rollmean(sapply(data.frame(all_res_fr[unit_num,p3,]),function(x)sd(x)/sqrt(length(x))),5))
-    #   
-    #   p_cue_avgs.m <- melt(p_cue_avgs,id.vars="time",variable="p_level")
-    #   plt_cue <- ggplot(p_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=p_level),size=1) + theme_classic()
-    #   plt_cue <- plt_cue + scale_colour_manual(values=c("goldenrod","coral","firebrick1","red2")) + labs(title=paste("Punishment: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Punishment Level") + geom_vline(xintercept=0)
-    #   
-    #   #
-    #   plt_cue <- plt_cue + geom_ribbon(data=p_cue_avgs,aes(x=time,ymin=p_cue_avgs$p0-p_cue_sems$p0,ymax=p_cue_avgs$p0+p_cue_sems$p0),inherit.aes=FALSE,alpha=0.2,fill="goldenrod")
-    #   plt_cue <- plt_cue + geom_ribbon(data=p_cue_avgs,aes(x=time,ymin=p_cue_avgs$p1-p_cue_sems$p1,ymax=p_cue_avgs$p1+p_cue_sems$p1),inherit.aes=FALSE,alpha=0.2,fill="coral")
-    #   plt_cue <- plt_cue + geom_ribbon(data=p_cue_avgs,aes(x=time,ymin=p_cue_avgs$p2-p_cue_sems$p2,ymax=p_cue_avgs$p2+p_cue_sems$p2),inherit.aes=FALSE,alpha=0.2,fill="firebrick1")
-    #   plt_cue <- plt_cue + geom_ribbon(data=p_cue_avgs,aes(x=time,ymin=p_cue_avgs$p3-p_cue_sems$p3,ymax=p_cue_avgs$p3+p_cue_sems$p3),inherit.aes=FALSE,alpha=0.2,fill="red2")
-    #   
-    #   p_res_avgs.m <- melt(p_res_avgs,id.vars="time",variable="p_level")
-    #   plt_res <- ggplot(p_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=p_level),size=1) + theme_classic()
-    #   plt_res <- plt_res + scale_colour_manual(values=c("goldenrod","coral","firebrick1","red2")) + labs(title="Result",y="z-score", x="Time(s)",colour="Punishment Level") + geom_vline(xintercept=0)
-    #   
-    #   #
-    #   plt_res <- plt_res + geom_ribbon(data=p_res_avgs,aes(x=time,ymin=p_res_avgs$p0-p_res_sems$p0,ymax=p_res_avgs$p0+p_res_sems$p0),inherit.aes=FALSE,alpha=0.2,fill="goldenrod")
-    #   plt_res <- plt_res + geom_ribbon(data=p_res_avgs,aes(x=time,ymin=p_res_avgs$p1-p_res_sems$p1,ymax=p_res_avgs$p1+p_res_sems$p1),inherit.aes=FALSE,alpha=0.2,fill="coral")
-    #   plt_res <- plt_res + geom_ribbon(data=p_res_avgs,aes(x=time,ymin=p_res_avgs$p2-p_res_sems$p2,ymax=p_res_avgs$p2+p_res_sems$p2),inherit.aes=FALSE,alpha=0.2,fill="firebrick1")
-    #   plt_res <- plt_res + geom_ribbon(data=p_res_avgs,aes(x=time,ymin=p_res_avgs$p3-p_res_sems$p3,ymax=p_res_avgs$p3+p_res_sems$p3),inherit.aes=FALSE,alpha=0.2,fill="red2")
-    #   
-    #   multiplot(plt_cue,plt_res)
-    #   graphics.off()
-    # }
-    # ############
-    # png(paste("sem_",region_list[region_index],"_r_bin_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
-    # 
-    # r_cue_avgs <- data.frame(time=time,r0=rollmean(colMeans(all_cue_fr[unit_num,r0,]),5),rx=rollmean(colMeans(all_cue_fr[unit_num,rx,]),5))
-    # r_res_avgs <- data.frame(time=time,r0=rollmean(colMeans(all_res_fr[unit_num,r0,]),5),rx=rollmean(colMeans(all_res_fr[unit_num,rx,]),5))
-    # 
-    # r_cue_sems <-  data.frame(time=time,r0=rollmean(sapply(data.frame(all_cue_fr[unit_num,r0,]),function(x)sd(x)/sqrt(length(x))),5),rx=rollmean(sapply(data.frame(all_cue_fr[unit_num,rx,]),function(x)sd(x)/sqrt(length(x))),5))
-    # r_res_sems <-  data.frame(time=time,r0=rollmean(sapply(data.frame(all_res_fr[unit_num,r0,]),function(x)sd(x)/sqrt(length(x))),5),rx=rollmean(sapply(data.frame(all_res_fr[unit_num,rx,]),function(x)sd(x)/sqrt(length(x))),5))
-    # 
-    # r_cue_avgs.m <- melt(r_cue_avgs,id.vars="time",variable="r_level")
-    # 
-    # plt_cue <- ggplot(r_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=r_level),size=1) + theme_classic()
-    # plt_cue <- plt_cue + scale_colour_manual(values=c("goldenrod","darkgreen")) + labs(title=paste("Reward: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Reward Level") + geom_vline(xintercept=0)
-    # 
-    # #
-    # plt_cue <- plt_cue + geom_ribbon(data=r_cue_avgs,aes(x=time,ymin=r_cue_avgs$r0-r_cue_sems$r0,ymax=r_cue_avgs$r0+r_cue_sems$r0),inherit.aes=FALSE,alpha=0.2,fill="goldenrod")
-    # plt_cue <- plt_cue + geom_ribbon(data=r_cue_avgs,aes(x=time,ymin=r_cue_avgs$rx-r_cue_sems$rx,ymax=r_cue_avgs$rx+r_cue_sems$rx),inherit.aes=FALSE,alpha=0.2,fill="darkgreen")
-    # plt_cue <- plt_cue + theme(legend.position="none")
-    # 
-    # r_res_avgs.m <- melt(r_res_avgs,id.vars="time",variable="r_level")
-    # plt_res <- ggplot(r_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=r_level),size=1) + theme_classic()
-    # plt_res <- plt_res + scale_colour_manual(values=c("goldenrod","darkgreen")) + labs(title="Result",y="z-score", x="Time(s)",colour="Reward Level") + geom_vline(xintercept=0)
-    # 
-    # #
-    # plt_res <- plt_res + geom_ribbon(data=r_res_avgs,aes(x=time,ymin=r_res_avgs$r0-r_res_sems$r0,ymax=r_res_avgs$r0+r_res_sems$r0),inherit.aes=FALSE,alpha=0.2,fill="goldenrod")
-    # plt_res <- plt_res + geom_ribbon(data=r_res_avgs,aes(x=time,ymin=r_res_avgs$rx-r_res_sems$rx,ymax=r_res_avgs$rx+r_res_sems$rx),inherit.aes=FALSE,alpha=0.2,fill="darkgreen")
-    # plt_res <- plt_res + theme(legend.position="none")
-    # 
-    # 
-    # multiplot(plt_cue,plt_res)
-    # graphics.off()
-    # 
-    # ## punishment
-    # png(paste("sem_",region_list[region_index],"_p_bin_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
-    # 
-    # p_cue_avgs <- data.frame(time=time,p0=rollmean(colMeans(all_cue_fr[unit_num,p0,]),5),px=rollmean(colMeans(all_cue_fr[unit_num,px,]),5))
-    # p_res_avgs <- data.frame(time=time,p0=rollmean(colMeans(all_res_fr[unit_num,p0,]),5),px=rollmean(colMeans(all_res_fr[unit_num,px,]),5))
-    # 
-    # #
-    # p_cue_sems <-  data.frame(time=time,p0=rollmean(sapply(data.frame(all_cue_fr[unit_num,p0,]),function(x)sd(x)/sqrt(length(x))),5),px=rollmean(sapply(data.frame(all_cue_fr[unit_num,px,]),function(x)sd(x)/sqrt(length(x))),5))
-    # p_res_sems <-  data.frame(time=time,p0=rollmean(sapply(data.frame(all_res_fr[unit_num,p0,]),function(x)sd(x)/sqrt(length(x))),5),px=rollmean(sapply(data.frame(all_res_fr[unit_num,px,]),function(x)sd(x)/sqrt(length(x))),5))
-    # 
-    # p_cue_avgs.m <- melt(p_cue_avgs,id.vars="time",variable="p_level")
-    # plt_cue <- ggplot(p_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=p_level),size=1) + theme_classic()
-    # plt_cue <- plt_cue + scale_colour_manual(values=c("goldenrod","red2")) + labs(title=paste("Punishment: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Punishment Level") + geom_vline(xintercept=0)
-    # 
-    # #
-    # plt_cue <- plt_cue + geom_ribbon(data=p_cue_avgs,aes(x=time,ymin=p_cue_avgs$p0-p_cue_sems$p0,ymax=p_cue_avgs$p0+p_cue_sems$p0),inherit.aes=FALSE,alpha=0.2,fill="goldenrod")
-    # plt_cue <- plt_cue + geom_ribbon(data=p_cue_avgs,aes(x=time,ymin=p_cue_avgs$px-p_cue_sems$px,ymax=p_cue_avgs$px+p_cue_sems$px),inherit.aes=FALSE,alpha=0.2,fill="red2")
-    # plt_cue <- plt_cue + theme(legend.position="none")
-    # 
-    # p_res_avgs.m <- melt(p_res_avgs,id.vars="time",variable="p_level")
-    # plt_res <- ggplot(p_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=p_level),size=1) + theme_classic()
-    # plt_res <- plt_res + scale_colour_manual(values=c("goldenrod","coral","firebrick1","red2")) + labs(title="Result",y="z-score", x="Time(s)",colour="Punishment Level") + geom_vline(xintercept=0)
-    # 
-    # #
-    # plt_res <- plt_res + geom_ribbon(data=p_res_avgs,aes(x=time,ymin=p_res_avgs$p0-p_res_sems$p0,ymax=p_res_avgs$p0+p_res_sems$p0),inherit.aes=FALSE,alpha=0.2,fill="goldenrod")
-    # plt_res <- plt_res + geom_ribbon(data=p_res_avgs,aes(x=time,ymin=p_res_avgs$px-p_res_sems$px,ymax=p_res_avgs$px+p_res_sems$px),inherit.aes=FALSE,alpha=0.2,fill="red2")
-    # plt_res <- plt_res + theme(legend.position="none")
-    # 
-    # multiplot(plt_cue,plt_res)
-    # graphics.off()
-    
-    # value
-    png(paste("sem_",region_list[region_index],"_v_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
+    #value  (initial colortest3: value = scale_color_brewer YlOrRd)
+    png(paste("colortest3_sem_",region_list[region_index],"_v_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
     
     v_cue_avgs <- data.frame(time=time,v_3=rollmean(colMeans(all_cue_fr[unit_num,v_3,]),5),v_2=rollmean(colMeans(all_cue_fr[unit_num,v_2,]),5),v_1=rollmean(colMeans(all_cue_fr[unit_num,v_1,]),5),v0=rollmean(colMeans(all_cue_fr[unit_num,v0,]),5),v1=rollmean(colMeans(all_cue_fr[unit_num,v1,]),5),v2=rollmean(colMeans(all_cue_fr[unit_num,v2,]),5),v3=rollmean(colMeans(all_cue_fr[unit_num,v3,]),5))
     v_res_avgs <- data.frame(time=time,v_3=rollmean(colMeans(all_res_fr[unit_num,v_3,]),5),v_2=rollmean(colMeans(all_res_fr[unit_num,v_2,]),5),v_1=rollmean(colMeans(all_res_fr[unit_num,v_1,]),5),v0=rollmean(colMeans(all_res_fr[unit_num,v0,]),5),v1=rollmean(colMeans(all_res_fr[unit_num,v1,]),5),v2=rollmean(colMeans(all_res_fr[unit_num,v2,]),5),v3=rollmean(colMeans(all_res_fr[unit_num,v3,]),5))
     
     v_cue_avgs.m <- melt(v_cue_avgs,id.vars="time",variable="v_level")
     plt_cue <- ggplot(v_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=v_level),size=1) + theme_classic()
+    plt_cue <- plt_cue +labs(title="Cue",y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0) + scale_color_brewer(palette="YlOrRd")
+    #plt_cue <- plt_cue + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
+    plt_cue <- plt_cue + theme(axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
+    
+    v_res_avgs.m <- melt(v_res_avgs,id.vars="time",variable="v_level")
+    plt_res <- ggplot(v_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=v_level),size=1) + theme_classic()
+    plt_res <- plt_res +labs(title="Result",y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0) + scale_color_brewer(palette="YlOrRd")
+    plt_res <- plt_res + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
+    
+    ggarrange(plt_cue,plt_res,ncol=1)
+    graphics.off()
+    
+
+    #value  
+    png(paste("colortest4_sem_",region_list[region_index],"_v_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
+
+    v_cue_avgs <- data.frame(time=time,v_3=rollmean(colMeans(all_cue_fr[unit_num,v_3,]),5),v_2=rollmean(colMeans(all_cue_fr[unit_num,v_2,]),5),v_1=rollmean(colMeans(all_cue_fr[unit_num,v_1,]),5),v0=rollmean(colMeans(all_cue_fr[unit_num,v0,]),5),v1=rollmean(colMeans(all_cue_fr[unit_num,v1,]),5),v2=rollmean(colMeans(all_cue_fr[unit_num,v2,]),5),v3=rollmean(colMeans(all_cue_fr[unit_num,v3,]),5))
+    v_res_avgs <- data.frame(time=time,v_3=rollmean(colMeans(all_res_fr[unit_num,v_3,]),5),v_2=rollmean(colMeans(all_res_fr[unit_num,v_2,]),5),v_1=rollmean(colMeans(all_res_fr[unit_num,v_1,]),5),v0=rollmean(colMeans(all_res_fr[unit_num,v0,]),5),v1=rollmean(colMeans(all_res_fr[unit_num,v1,]),5),v2=rollmean(colMeans(all_res_fr[unit_num,v2,]),5),v3=rollmean(colMeans(all_res_fr[unit_num,v3,]),5))
+
+    v_cue_avgs.m <- melt(v_cue_avgs,id.vars="time",variable="v_level")
+    plt_cue <- ggplot(v_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=v_level),size=1) + theme_classic()
     plt_cue <- plt_cue +labs(title="Cue",y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0) + scale_color_manual(values=c("salmon4","salmon3","lightsalmon","khaki","aquamarine2","aquamarine4","darkgreen"))    #
-    plt_cue <- plt_cue + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
+    #plt_cue <- plt_cue + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
+    plt_cue <- plt_cue + theme(axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
     
     v_res_avgs.m <- melt(v_res_avgs,id.vars="time",variable="v_level")
     plt_res <- ggplot(v_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=v_level),size=1) + theme_classic()
     plt_res <- plt_res +labs(title="Result",y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0) + scale_color_manual(values=c("salmon4","salmon3","lightsalmon","khaki","aquamarine2","aquamarine4","darkgreen"))    #scale_color_brewer(palette="GnBu") +
     plt_res <- plt_res + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
-    
+
     ggarrange(plt_cue,plt_res,ncol=1)
     graphics.off()
-    
+
     # motivation
-    png(paste("sem_",region_list[region_index],"_m_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
-    
+    png(paste("colortest4_sem_",region_list[region_index],"_m_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
+
     m_cue_avgs <- data.frame(time=time,m0=rollmean(colMeans(all_cue_fr[unit_num,m0,]),5),m1=rollmean(colMeans(all_cue_fr[unit_num,m1,]),5),m2=rollmean(colMeans(all_cue_fr[unit_num,m2,]),5),m3=rollmean(colMeans(all_cue_fr[unit_num,m3,]),5),m4=rollmean(colMeans(all_cue_fr[unit_num,m4,]),5),m5=rollmean(colMeans(all_cue_fr[unit_num,m5,]),5),m6=rollmean(colMeans(all_cue_fr[unit_num,m6,]),5))
     m_res_avgs <- data.frame(time=time,m0=rollmean(colMeans(all_res_fr[unit_num,m0,]),5),m1=rollmean(colMeans(all_res_fr[unit_num,m1,]),5),m2=rollmean(colMeans(all_res_fr[unit_num,m2,]),5),m3=rollmean(colMeans(all_res_fr[unit_num,m3,]),5),m4=rollmean(colMeans(all_res_fr[unit_num,m4,]),5),m5=rollmean(colMeans(all_res_fr[unit_num,m5,]),5),m6=rollmean(colMeans(all_res_fr[unit_num,m6,]),5))
-    
+
     m_cue_avgs.m <- melt(m_cue_avgs,id.vars="time",variable="m_level")
-    plt_cue <- ggplot(m_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=m_level),size=1) + theme_classic()
+    plt_cue <- ggplot(m_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=m_level),size=2) + theme_classic()
     plt_cue <- plt_cue + labs(title="Cue") + geom_vline(xintercept=0) + scale_color_manual(values=c("thistle2","thistle3","slategray2","slategray3","slateblue1","slateblue3","slateblue4"))    #scale_color_brewer(palette="GnBu") +
     plt_cue <- plt_cue + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
-    
+
     m_res_avgs.m <- melt(m_res_avgs,id.vars="time",variable="m_level")
-    plt_res <- ggplot(m_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=m_level),size=1) + theme_classic()
+    plt_res <- ggplot(m_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=m_level),size=2) + theme_classic()
     plt_res <- plt_res + labs(title="Result") + geom_vline(xintercept=0) + scale_color_manual(values=c("thistle2","thistle3","slategray2","slategray3","slateblue1","slateblue3","slateblue4"))    #scale_color_brewer(palette="GnBu") +
-    plt_res <- plt_res + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
+    #plt_res <- plt_res + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
+    plt_res <- plt_res + theme(axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
     
     ggarrange(plt_cue,plt_res,ncol=1)
     graphics.off()
+
+    ###############
+    # value
+    # png(paste("colortest2_nl_sem_",region_list[region_index],"_v_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
+    # 
+    # v_cue_avgs <- data.frame(time=time,v_3=rollmean(colMeans(all_cue_fr[unit_num,v_3,]),5),v_2=rollmean(colMeans(all_cue_fr[unit_num,v_2,]),5),v_1=rollmean(colMeans(all_cue_fr[unit_num,v_1,]),5),v0=rollmean(colMeans(all_cue_fr[unit_num,v0,]),5),v1=rollmean(colMeans(all_cue_fr[unit_num,v1,]),5),v2=rollmean(colMeans(all_cue_fr[unit_num,v2,]),5),v3=rollmean(colMeans(all_cue_fr[unit_num,v3,]),5))
+    # v_res_avgs <- data.frame(time=time,v_3=rollmean(colMeans(all_res_fr[unit_num,v_3,]),5),v_2=rollmean(colMeans(all_res_fr[unit_num,v_2,]),5),v_1=rollmean(colMeans(all_res_fr[unit_num,v_1,]),5),v0=rollmean(colMeans(all_res_fr[unit_num,v0,]),5),v1=rollmean(colMeans(all_res_fr[unit_num,v1,]),5),v2=rollmean(colMeans(all_res_fr[unit_num,v2,]),5),v3=rollmean(colMeans(all_res_fr[unit_num,v3,]),5))
+    # 
+    # v_cue_avgs.m <- melt(v_cue_avgs,id.vars="time",variable="v_level")
+    # plt_cue <- ggplot(v_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=v_level),size=1) + theme_classic()
+    # plt_cue <- plt_cue +labs(title="Cue",y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0) + scale_color_manual(values=c(rgb(153,51,255,maxColorValue = 255),rgb(51,51,255,maxColorValue = 255),rgb(51,255,51,maxColorValue = 255),rgb(160,160,160,maxColorValue = 255),rgb(255,255,51,maxColorValue = 255),rgb(255,153,51,maxColorValue = 255),rgb(255,51,51,maxColorValue = 255)))    
+    # plt_cue <- plt_cue + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
+    # 
+    # v_res_avgs.m <- melt(v_res_avgs,id.vars="time",variable="v_level")
+    # plt_res <- ggplot(v_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=v_level),size=1) + theme_classic()
+    # plt_res <- plt_res +labs(title="Result",y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0) + scale_color_manual(values=c(rgb(153,51,255,maxColorValue = 255),rgb(51,51,255,maxColorValue = 255),rgb(51,255,51,maxColorValue = 255),rgb(160,160,160,maxColorValue = 255),rgb(255,255,51,maxColorValue = 255),rgb(255,153,51,maxColorValue = 255),rgb(255,51,51,maxColorValue = 255)))    
+    # plt_res <- plt_res + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
+    # 
+    # ggarrange(plt_cue,plt_res,ncol=1)
+    # graphics.off()
+    # 
+    # # motivation
+    # png(paste("colortest2_nl_sem_",region_list[region_index],"_m_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
+    # 
+    # m_cue_avgs <- data.frame(time=time,m0=rollmean(colMeans(all_cue_fr[unit_num,m0,]),5),m1=rollmean(colMeans(all_cue_fr[unit_num,m1,]),5),m2=rollmean(colMeans(all_cue_fr[unit_num,m2,]),5),m3=rollmean(colMeans(all_cue_fr[unit_num,m3,]),5),m4=rollmean(colMeans(all_cue_fr[unit_num,m4,]),5),m5=rollmean(colMeans(all_cue_fr[unit_num,m5,]),5),m6=rollmean(colMeans(all_cue_fr[unit_num,m6,]),5))
+    # m_res_avgs <- data.frame(time=time,m0=rollmean(colMeans(all_res_fr[unit_num,m0,]),5),m1=rollmean(colMeans(all_res_fr[unit_num,m1,]),5),m2=rollmean(colMeans(all_res_fr[unit_num,m2,]),5),m3=rollmean(colMeans(all_res_fr[unit_num,m3,]),5),m4=rollmean(colMeans(all_res_fr[unit_num,m4,]),5),m5=rollmean(colMeans(all_res_fr[unit_num,m5,]),5),m6=rollmean(colMeans(all_res_fr[unit_num,m6,]),5))
+    # 
+    # m_cue_avgs.m <- melt(m_cue_avgs,id.vars="time",variable="m_level")
+    # plt_cue <- ggplot(m_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=m_level),size=1) + theme_classic()
+    # #plt_cue <- plt_cue + labs(title="Cue") + geom_vline(xintercept=0) + scale_color_manual(values=c(rgb(0,0,1),rgb(0,0.5,0),rgb(1,0,0),rgb(0,0.75,0.75),rgb(0.75,0,0.75),rgb(0.75,0.75,0),rgb(0.25,0.25,0.25)))    #matlab (old default colors)
+    # plt_cue <- plt_cue + labs(title="Cue") + geom_vline(xintercept=0) + scale_color_manual(values=c(rgb(160,160,160,maxColorValue = 255),rgb(51,255,255,maxColorValue = 255),rgb(51,153,255,maxColorValue = 255),rgb(51,51,255,maxColorValue = 255),rgb(153,51,255,maxColorValue = 255),rgb(255,51,255,maxColorValue = 255),rgb(255,51,153,maxColorValue = 255)))    
+    # plt_cue <- plt_cue + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
+    # 
+    # m_res_avgs.m <- melt(m_res_avgs,id.vars="time",variable="m_level")
+    # plt_res <- ggplot(m_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=m_level),size=1) + theme_classic()
+    # #plt_res <- plt_res + labs(title="Result") + geom_vline(xintercept=0) + scale_color_manual(values=c(rgb(0,0.447,0.741),rgb(0.85,0.325,0.098),rgb(0.929,0.694,0.125),rgb(0.494,0.184,0.556),rgb(0.466,0.674,0.188),rgb(0.301,0.745,0.933),rgb(0.635,0.078,0.184)))    #new default colors
+    # plt_res <- plt_res + labs(title="Result") + geom_vline(xintercept=0) + scale_color_manual(values=c(rgb(160,160,160,maxColorValue = 255),rgb(51,255,255,maxColorValue = 255),rgb(51,153,255,maxColorValue = 255),rgb(51,51,255,maxColorValue = 255),rgb(153,51,255,maxColorValue = 255),rgb(255,51,255,maxColorValue = 255),rgb(255,51,153,maxColorValue = 255)))    
+    # plt_res <- plt_res + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
+    # 
+    # ggarrange(plt_cue,plt_res,ncol=1)
+    # graphics.off()
     
-    # ## result
-    # png(paste("sem_",region_list[region_index],"_res_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
-    # 
-    # res_cue_avgs <- data.frame(time=time,fail=rollmean(colMeans(all_cue_fr[unit_num,res0,]),5),succ=rollmean(colMeans(all_cue_fr[unit_num,res1,]),5))
-    # res_res_avgs <- data.frame(time=time,fail=rollmean(colMeans(all_res_fr[unit_num,res0,]),5),succ=rollmean(colMeans(all_res_fr[unit_num,res1,]),5))
-    # 
-    # res_cue_sems <-  data.frame(time=time,fail=rollmean(sapply(data.frame(all_cue_fr[unit_num,res0,]),function(x)sd(x)/sqrt(length(x))),5),succ=rollmean(sapply(data.frame(all_cue_fr[unit_num,res1,]),function(x)sd(x)/sqrt(length(x))),5))
-    # res_res_sems <-  data.frame(time=time,fail=rollmean(sapply(data.frame(all_res_fr[unit_num,res0,]),function(x)sd(x)/sqrt(length(x))),5),succ=rollmean(sapply(data.frame(all_res_fr[unit_num,res1,]),function(x)sd(x)/sqrt(length(x))),5))
-    # 
-    # res_cue_avgs.m <- melt(res_cue_avgs,id.vars="time",variable="res_level")
-    # plt_cue <- ggplot(res_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=res_level),size=1) + theme_classic()
-    # plt_cue <- plt_cue + scale_colour_manual(values=c("skyblue4","purple")) + labs(title=paste("Result: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Result") + geom_vline(xintercept=0)
-    # 
-    # plt_cue <- plt_cue + geom_ribbon(data=res_cue_avgs,aes(x=time,ymin=res_cue_avgs$fail-res_cue_sems$fail,ymax=res_cue_avgs$fail+res_cue_sems$fail),inherit.aes=FALSE,alpha=0.2,fill="skyblue4")
-    # plt_cue <- plt_cue + geom_ribbon(data=res_cue_avgs,aes(x=time,ymin=res_cue_avgs$succ-res_cue_sems$succ,ymax=res_cue_avgs$succ+res_cue_sems$succ),inherit.aes=FALSE,alpha=0.2,fill="purple")
-    # plt_cue <- plt_cue + theme(legend.position="none")
-    # 
-    # res_res_avgs.m <- melt(res_res_avgs,id.vars="time",variable="res_level")
-    # plt_res <- ggplot(res_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=res_level),size=1) + theme_classic()
-    # plt_res <- plt_res + scale_colour_manual(values=c("skyblue4","purple")) + labs(title="Result",y="z-score", x="Time(s)",colour="Result") + geom_vline(xintercept=0)
-    # 
-    # plt_res <- plt_res + geom_ribbon(data=res_res_avgs,aes(x=time,ymin=res_res_avgs$fail-res_res_sems$fail,ymax=res_res_avgs$fail+res_res_sems$fail),inherit.aes=FALSE,alpha=0.2,fill="skyblue4")
-    # plt_res <- plt_res + geom_ribbon(data=res_res_avgs,aes(x=time,ymin=res_res_avgs$succ-res_res_sems$succ,ymax=res_res_avgs$succ+res_res_sems$succ),inherit.aes=FALSE,alpha=0.2,fill="purple")
-    # plt_res <- plt_res + theme(legend.position="none")
-    # 
-    # multiplot(plt_cue,plt_res)
-    # graphics.off()
-    # 
-    # 
-    # ## comb
-    # png(paste("sem_",region_list[region_index],"_comb_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
-    # 
-    # comb_cue_avgs <- data.frame(time=time,r0_p0=rollmean(colMeans(all_cue_fr[unit_num,r0_p0,]),5),rx_p0=rollmean(colMeans(all_cue_fr[unit_num,rx_p0,]),5),r0_px=rollmean(colMeans(all_cue_fr[unit_num,r0_px,]),5),rx_px=rollmean(colMeans(all_cue_fr[unit_num,rx_px,]),5))
-    # comb_res_avgs <- data.frame(time=time,r0_p0=rollmean(colMeans(all_res_fr[unit_num,r0_p0,]),5),rx_p0=rollmean(colMeans(all_res_fr[unit_num,rx_p0,]),5),r0_px=rollmean(colMeans(all_res_fr[unit_num,r0_px,]),5),rx_px=rollmean(colMeans(all_res_fr[unit_num,rx_px,]),5))
-    # comb_cue_sems <-  data.frame(time=time,r0_p0=rollmean(sapply(data.frame(all_cue_fr[unit_num,r0_p0,]),function(x)sd(x)/sqrt(length(x))),5),rx_p0=rollmean(sapply(data.frame(all_cue_fr[unit_num,rx_p0,]),function(x)sd(x)/sqrt(length(x))),5),r0_px=rollmean(sapply(data.frame(all_cue_fr[unit_num,r0_px,]),function(x)sd(x)/sqrt(length(x))),5),rx_px=rollmean(sapply(data.frame(all_cue_fr[unit_num,rx_px,]),function(x)sd(x)/sqrt(length(x))),5))
-    # comb_res_sems <-  data.frame(time=time,r0_p0=rollmean(sapply(data.frame(all_res_fr[unit_num,r0_p0,]),function(x)sd(x)/sqrt(length(x))),5),rx_p0=rollmean(sapply(data.frame(all_res_fr[unit_num,rx_p0,]),function(x)sd(x)/sqrt(length(x))),5),r0_px=rollmean(sapply(data.frame(all_res_fr[unit_num,r0_px,]),function(x)sd(x)/sqrt(length(x))),5),rx_px=rollmean(sapply(data.frame(all_res_fr[unit_num,rx_px,]),function(x)sd(x)/sqrt(length(x))),5))
-    # 
-    # comb_cue_avgs.m <- melt(comb_cue_avgs,id.vars="time",variable="comb")
-    # plt_cue <- ggplot(comb_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=comb),size=1) + theme_classic()
-    # plt_cue <- plt_cue + scale_colour_manual(values=c("black","forestgreen","firebrick","mediumblue")) + labs(title=paste("Combination: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Combination") + geom_vline(xintercept=0)
-    # 
-    # #
-    # plt_cue <- plt_cue + geom_ribbon(data=comb_cue_avgs,aes(x=time,ymin=comb_cue_avgs$r0_p0-comb_cue_sems$r0_p0,ymax=comb_cue_avgs$r0_p0+comb_cue_sems$r0_p0),inherit.aes=FALSE,alpha=0.2,fill="black")
-    # plt_cue <- plt_cue + geom_ribbon(data=comb_cue_avgs,aes(x=time,ymin=comb_cue_avgs$rx_p0-comb_cue_sems$rx_p0,ymax=comb_cue_avgs$rx_p0+comb_cue_sems$rx_p0),inherit.aes=FALSE,alpha=0.2,fill="forestgreen")
-    # plt_cue <- plt_cue + geom_ribbon(data=comb_cue_avgs,aes(x=time,ymin=comb_cue_avgs$r0_px-comb_cue_sems$r0_px,ymax=comb_cue_avgs$r0_px+comb_cue_sems$r0_px),inherit.aes=FALSE,alpha=0.2,fill="firebrick")
-    # plt_cue <- plt_cue + geom_ribbon(data=comb_cue_avgs,aes(x=time,ymin=comb_cue_avgs$rx_px-comb_cue_sems$rx_px,ymax=comb_cue_avgs$rx_px+comb_cue_sems$rx_px),inherit.aes=FALSE,alpha=0.2,fill="mediumblue")
-    # plt_cue <- plt_cue + theme(legend.position="none")
-    # 
-    # 
-    # comb_res_avgs.m <- melt(comb_res_avgs,id.vars="time",variable="comb")
-    # plt_res <- ggplot(comb_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=comb),size=1) + theme_classic()
-    # plt_res <- plt_res + scale_colour_manual(values=c("black","forestgreen","firebrick","mediumblue")) + labs(title="Result",y="z-score", x="Time(s)",colour="Combination") + geom_vline(xintercept=0)
-    # 
-    # #
-    # plt_res <- plt_res + geom_ribbon(data=comb_res_avgs,aes(x=time,ymin=comb_res_avgs$r0_p0-comb_res_sems$r0_p0,ymax=comb_res_avgs$r0_p0+comb_res_sems$r0_p0),inherit.aes=FALSE,alpha=0.2,fill="black")
-    # plt_res <- plt_res + geom_ribbon(data=comb_res_avgs,aes(x=time,ymin=comb_res_avgs$rx_p0-comb_res_sems$rx_p0,ymax=comb_res_avgs$rx_p0+comb_res_sems$rx_p0),inherit.aes=FALSE,alpha=0.2,fill="forestgreen")
-    # plt_res <- plt_res + geom_ribbon(data=comb_res_avgs,aes(x=time,ymin=comb_res_avgs$r0_px-comb_res_sems$r0_px,ymax=comb_res_avgs$r0_px+comb_res_sems$r0_px),inherit.aes=FALSE,alpha=0.2,fill="firebrick")
-    # plt_res <- plt_res + geom_ribbon(data=comb_res_avgs,aes(x=time,ymin=comb_res_avgs$rx_px-comb_res_sems$rx_px,ymax=comb_res_avgs$rx_px+comb_res_sems$rx_px),inherit.aes=FALSE,alpha=0.2,fill="mediumblue")
-    # plt_res <- plt_res + theme(legend.position="none")
-    # 
-    # multiplot(plt_cue,plt_res)
-    # graphics.off()
-    # 
-    # 
-    # ## comb res
-    # #png(paste(region_list[region_index],"_comb_res_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
-    # 
-    # #if (length(r0_p0_f) == 1){r0_p0_f_fr <- rollmean(all_cue_fr[unit_num,r0_p0_f,],5)}else if(length(r0_p0_f) == 0){r0_p0_f_fr <- rep(0,146)}else{r0_p0_f_fr <- rollmean(colMeans(all_cue_fr[unit_num,r0_p0_f,]),5)}
-    # #if (length(r0_px_f) == 1){r0_px_f_fr <- rollmean(all_cue_fr[unit_num,r0_px_f,],5)}else if(length(r0_px_f) == 0){r0_px_f_fr <- rep(0,146)}else{r0_px_f_fr <- rollmean(colMeans(all_cue_fr[unit_num,r0_px_f,]),5)}
-    # #if (length(rx_p0_f) == 1){rx_p0_f_fr <- rollmean(all_cue_fr[unit_num,rx_p0_f,],5)}else if(length(rx_p0_f) == 0){rx_p0_f_fr <- rep(0,146)}else{rx_p0_f_fr <- rollmean(colMeans(all_cue_fr[unit_num,rx_p0_f,]),5)}
-    # #if (length(rx_px_f) == 1){rx_px_f_fr <- rollmean(all_cue_fr[unit_num,rx_px_f,],5)}else if(length(rx_px_f) == 0){rx_px_f_fr <- rep(0,146)}else{rx_px_f_fr <- rollmean(colMeans(all_cue_fr[unit_num,rx_px_f,]),5)}
-    # 
-    # #if (length(r0_p0_s) == 1){r0_p0_s_fr <- rollmean(all_cue_fr[unit_num,r0_p0_s,],5)}else if(length(r0_p0_s) == 0){r0_p0_s_fr <- rep(0,146)}else{r0_p0_s_fr <- rollmean(colMeans(all_cue_fr[unit_num,r0_p0_s,]),5)}
-    # #if (length(r0_px_s) == 1){r0_px_s_fr <- rollmean(all_cue_fr[unit_num,r0_px_s,],5)}else if(length(r0_px_s) == 0){r0_px_s_fr <- rep(0,146)}else{r0_px_s_fr <- rollmean(colMeans(all_cue_fr[unit_num,r0_px_s,]),5)}
-    # #if (length(rx_p0_s) == 1){rx_p0_s_fr <- rollmean(all_cue_fr[unit_num,rx_p0_s,],5)}else if(length(rx_p0_s) == 0){rx_p0_s_fr <- rep(0,146)}else{rx_p0_s_fr <- rollmean(colMeans(all_cue_fr[unit_num,rx_p0_s,]),5)}
-    # #if (length(rx_px_s) == 1){rx_px_s_fr <- rollmean(all_cue_fr[unit_num,rx_px_s,],5)}else if(length(rx_px_s) == 0){rx_px_s_fr <- rep(0,146)}else{rx_px_s_fr <- rollmean(colMeans(all_cue_fr[unit_num,rx_px_s,]),5)}
-    # 
-    # #comb_cue_avgs <- data.frame(time=time,r0_p0_s=r0_p0_s_fr,rx_p0_s=rx_p0_s_fr,r0_px_s=r0_px_s_fr,rx_px_s=rx_px_s_fr,r0_p0_f=r0_p0_f_fr,rx_p0_f=rx_p0_f_fr,r0_px_f=r0_px_f_fr,rx_px_f=rx_px_f_fr)
-    # 
-    # #if (length(r0_px_f) == 1){r0_px_f_fr <- rollmean(all_res_fr[unit_num,r0_px_f,],5)}else if(length(r0_px_f) == 0){r0_px_f_fr <- rep(0,146)}else{r0_px_f_fr <- rollmean(colMeans(all_res_fr[unit_num,r0_px_f,]),5)}
-    # #if (length(rx_p0_f) == 1){rx_p0_f_fr <- rollmean(all_res_fr[unit_num,rx_p0_f,],5)}else if(length(rx_p0_f) == 0){rx_p0_f_fr <- rep(0,146)}else{rx_p0_f_fr <- rollmean(colMeans(all_res_fr[unit_num,rx_p0_f,]),5)}
-    # #if (length(rx_px_f) == 1){rx_px_f_fr <- rollmean(all_res_fr[unit_num,rx_px_f,],5)}else if(length(rx_px_f) == 0){rx_px_f_fr <- rep(0,146)}else{rx_px_f_fr <- rollmean(colMeans(all_res_fr[unit_num,rx_px_f,]),5)}
-    # 
-    # #if (length(r0_p0_s) == 1){r0_p0_s_fr <- rollmean(all_res_fr[unit_num,r0_p0_s,],5)}else if(length(r0_p0_s) == 0){r0_p0_s_fr <- rep(0,146)}else{r0_p0_s_fr <- rollmean(colMeans(all_res_fr[unit_num,r0_p0_s,]),5)}
-    # #if (length(r0_px_s) == 1){r0_px_s_fr <- rollmean(all_res_fr[unit_num,r0_px_s,],5)}else if(length(r0_px_s) == 0){r0_px_s_fr <- rep(0,146)}else{r0_px_s_fr <- rollmean(colMeans(all_res_fr[unit_num,r0_px_s,]),5)}
-    # #if (length(rx_p0_s) == 1){rx_p0_s_fr <- rollmean(all_res_fr[unit_num,rx_p0_s,],5)}else if(length(rx_p0_s) == 0){rx_p0_s_fr <- rep(0,146)}else{rx_p0_s_fr <- rollmean(colMeans(all_res_fr[unit_num,rx_p0_s,]),5)}
-    # #if (length(rx_px_s) == 1){rx_px_s_fr <- rollmean(all_res_fr[unit_num,rx_px_s,],5)}else if(length(rx_px_s) == 0){rx_px_s_fr <- rep(0,146)}else{rx_px_s_fr <- rollmean(colMeans(all_res_fr[unit_num,rx_px_s,]),5)}
-    # 
-    # #comb_res_avgs <- data.frame(time=time,r0_p0_s=r0_p0_s_fr,rx_p0_s=rx_p0_s_fr,r0_px_s=r0_px_s_fr,rx_px_s=rx_px_s_fr,r0_p0_f=r0_p0_f_fr,rx_p0_f=rx_p0_f_fr,r0_px_f=r0_px_f_fr,rx_px_f=rx_px_f_fr)
-    # 
-    # #comb_cue_avgs.m <- melt(comb_cue_avgs,id.vars="time",variable="comb")
-    # #plt_cue <- ggplot(comb_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=comb),size=0.5) + theme_classic()
-    # #plt_cue <- plt_cue + scale_colour_manual(values=c("black","forestgreen","firebrick","mediumblue","gray69","darkseagreen2","lightpink2","darkslategray1")) + labs(title=paste("Combination: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Combination") #+ geom_vline(xintercept=0) +  scale_linetype_manual(values=c("solid","solid","solid","solid","dashed","dashed","dashed","dashed"))
-    # 
-    # 
-    # #comb_res_avgs.m <- melt(comb_res_avgs,id.vars="time",variable="comb")
-    # #plt_res <- ggplot(comb_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=comb),size=0.5) + theme_classic()
-    # #plt_res <- plt_res + scale_colour_manual(values=c("black","forestgreen","firebrick","mediumblue","gray69","darkseagreen2","lightpink2","darkslategray1")) + labs(title="Result",y="z-score", x="Time(s)",colour="Combination") + geom_vline(xintercept=0)
-    # 
-    # #multiplot(plt_cue,plt_res)
-    # #graphics.off()
-    # 
-    # ## reward sf
-    # png(paste("sem_",region_list[region_index],"_r_sf_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
-    # 
-    # if (length(r0_s) == 1){r0_s_fr_cue <- rollmean(all_cue_fr[unit_num,r0_s,],5)}else if(length(r0_s) == 0){r0_s_fr_cue <- rep(0,146)}else{r0_s_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,r0_s,]),5)}
-    # if (length(r0_f) == 1){r0_f_fr_cue <- rollmean(all_cue_fr[unit_num,r0_f,],5)}else if(length(r0_f) == 0){r0_f_fr_cue <- rep(0,146)}else{r0_f_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,r0_f,]),5)}
-    # if (length(rx_s) == 1){rx_s_fr_cue <- rollmean(all_cue_fr[unit_num,rx_s,],5)}else if(length(rx_s) == 0){rx_s_fr_cue <- rep(0,146)}else{rx_s_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,rx_s,]),5)}
-    # if (length(rx_f) == 1){rx_f_fr_cue <- rollmean(all_cue_fr[unit_num,rx_f,],5)}else if(length(rx_f) == 0){rx_f_fr_cue <- rep(0,146)}else{rx_f_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,rx_f,]),5)}
-    # 
-    # if (length(r0_s) == 1){r0_s_fr_res <- rollmean(all_res_fr[unit_num,r0_s,],5)}else if(length(r0_s) == 0){r0_s_fr_res <- rep(0,146)}else{r0_s_fr_res <- rollmean(colMeans(all_res_fr[unit_num,r0_s,]),5)}
-    # if (length(r0_f) == 1){r0_f_fr_res <- rollmean(all_res_fr[unit_num,r0_f,],5)}else if(length(r0_f) == 0){r0_f_fr_res <- rep(0,146)}else{r0_f_fr_res <- rollmean(colMeans(all_res_fr[unit_num,r0_f,]),5)}
-    # if (length(rx_s) == 1){rx_s_fr_res <- rollmean(all_res_fr[unit_num,rx_s,],5)}else if(length(rx_s) == 0){rx_s_fr_res <- rep(0,146)}else{rx_s_fr_res <- rollmean(colMeans(all_res_fr[unit_num,rx_s,]),5)}
-    # if (length(rx_f) == 1){rx_f_fr_res <- rollmean(all_res_fr[unit_num,rx_f,],5)}else if(length(rx_f) == 0){rx_f_fr_res <- rep(0,146)}else{rx_f_fr_res <- rollmean(colMeans(all_res_fr[unit_num,rx_f,]),5)}
-    # 
-    # r_sf_cue_avgs <- data.frame(time=time,r0_s_cue=r0_s_fr_cue,r0_f_cue=r0_f_fr_cue,rx_s_cue=rx_s_fr_cue,rx_f_cue=rx_f_fr_cue)
-    # r_sf_res_avgs <- data.frame(time=time,r0_s_res=r0_s_fr_res,r0_f_res=r0_f_fr_res,rx_s_res=rx_s_fr_res,rx_f_res=rx_f_fr_res)
-    # 
-    # if (length(r0_s) <= 1){r0_s_fr_cue <- rep(0,146)}else{r0_s_fr_cue <- rollmean(sapply(data.frame(all_cue_fr[unit_num,r0_s,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # if (length(r0_f) <= 1){r0_f_fr_cue <- rep(0,146)}else{r0_f_fr_cue <- rollmean(sapply(data.frame(all_cue_fr[unit_num,r0_f,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # if (length(rx_s) <= 1){rx_s_fr_cue <- rep(0,146)}else{rx_s_fr_cue <- rollmean(sapply(data.frame(all_cue_fr[unit_num,rx_s,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # if (length(rx_f) <= 1){rx_f_fr_cue <- rep(0,146)}else{rx_f_fr_cue <- rollmean(sapply(data.frame(all_cue_fr[unit_num,rx_f,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # 
-    # if (length(r0_s) <= 1){r0_s_fr_res <- rep(0,146)}else{r0_s_fr_res <- rollmean(sapply(data.frame(all_cue_fr[unit_num,r0_s,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # if (length(r0_f) <= 1){r0_f_fr_res <- rep(0,146)}else{r0_f_fr_res <- rollmean(sapply(data.frame(all_cue_fr[unit_num,r0_f,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # if (length(rx_s) <= 1){rx_s_fr_res <- rep(0,146)}else{rx_s_fr_res <- rollmean(sapply(data.frame(all_cue_fr[unit_num,rx_s,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # if (length(rx_f) <= 1){rx_f_fr_res <- rep(0,146)}else{rx_f_fr_res <- rollmean(sapply(data.frame(all_cue_fr[unit_num,rx_f,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # 
-    # r_sf_cue_sems <- data.frame(time=time,r0_s_cue=r0_s_fr_cue,r0_f_cue=r0_f_fr_cue,rx_s_cue=rx_s_fr_cue,rx_f_cue=rx_f_fr_cue)
-    # r_sf_res_sems <- data.frame(time=time,r0_s_res=r0_s_fr_res,r0_f_res=r0_f_fr_res,rx_s_res=rx_s_fr_res,rx_f_res=rx_f_fr_res)
-    # 
-    # 
-    # r_sf_cue_avgs.m <- melt(r_sf_cue_avgs,id.vars="time",variable="comb")
-    # plt_cue <- ggplot(r_sf_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=comb),size=1) + theme_classic()
-    # plt_cue <- plt_cue + scale_colour_manual(values=c("black","gray69","forestgreen","darkseagreen2")) + labs(title=paste("Reward combination: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Combination") + geom_vline(xintercept=0)
-    # 
-    # plt_cue <- plt_cue + geom_ribbon(data=r_sf_cue_avgs,aes(x=time,ymin=r_sf_cue_avgs$r0_s-r_sf_cue_sems$r0_s,ymax=r_sf_cue_avgs$r0_s+r_sf_cue_sems$r0_s),inherit.aes=FALSE,alpha=0.2,fill="black")
-    # plt_cue <- plt_cue + geom_ribbon(data=r_sf_cue_avgs,aes(x=time,ymin=r_sf_cue_avgs$r0_f-r_sf_cue_sems$r0_f,ymax=r_sf_cue_avgs$r0_f+r_sf_cue_sems$r0_f),inherit.aes=FALSE,alpha=0.2,fill="gray69")
-    # plt_cue <- plt_cue + geom_ribbon(data=r_sf_cue_avgs,aes(x=time,ymin=r_sf_cue_avgs$rx_s-r_sf_cue_sems$rx_s,ymax=r_sf_cue_avgs$rx_s+r_sf_cue_sems$rx_s),inherit.aes=FALSE,alpha=0.2,fill="forestgreen")
-    # plt_cue <- plt_cue + geom_ribbon(data=r_sf_cue_avgs,aes(x=time,ymin=r_sf_cue_avgs$rx_f-r_sf_cue_sems$rx_f,ymax=r_sf_cue_avgs$rx_f+r_sf_cue_sems$rx_f),inherit.aes=FALSE,alpha=0.2,fill="darkseagreen2")
-    # 
-    # 
-    # r_sf_res_avgs.m <- melt(r_sf_res_avgs,id.vars="time",variable="comb")
-    # plt_res <- ggplot(r_sf_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=comb),size=1) + theme_classic()
-    # plt_res <- plt_res + scale_colour_manual(values=c("black","gray69","forestgreen","darkseagreen2")) + labs(title="Result",y="z-score", x="Time(s)",colour="Combination") + geom_vline(xintercept=0)
-    # 
-    # plt_res <- plt_res + geom_ribbon(data=r_sf_res_avgs,aes(x=time,ymin=r_sf_res_avgs$r0_s-r_sf_res_sems$r0_s,ymax=r_sf_res_avgs$r0_s+r_sf_res_sems$r0_s),inherit.aes=FALSE,alpha=0.2,fill="black")
-    # plt_res <- plt_res + geom_ribbon(data=r_sf_res_avgs,aes(x=time,ymin=r_sf_res_avgs$r0_f-r_sf_res_sems$r0_f,ymax=r_sf_res_avgs$r0_f+r_sf_res_sems$r0_f),inherit.aes=FALSE,alpha=0.2,fill="gray69")
-    # plt_res <- plt_res + geom_ribbon(data=r_sf_res_avgs,aes(x=time,ymin=r_sf_res_avgs$rx_s-r_sf_res_sems$rx_s,ymax=r_sf_res_avgs$rx_s+r_sf_res_sems$rx_s),inherit.aes=FALSE,alpha=0.2,fill="forestgreen")
-    # plt_res <- plt_res + geom_ribbon(data=r_sf_res_avgs,aes(x=time,ymin=r_sf_res_avgs$rx_f-r_sf_res_sems$rx_f,ymax=r_sf_res_avgs$rx_f+r_sf_res_sems$rx_f),inherit.aes=FALSE,alpha=0.2,fill="darkseagreen2")
-    # 
-    # 
-    # multiplot(plt_cue,plt_res)
-    # graphics.off()
-    # 
-    # ## punishment sf
-    # png(paste("sem_",region_list[region_index],"_p_sf_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
-    # 
-    # if (length(p0_s) == 1){p0_s_fr_cue <- rollmean(all_cue_fr[unit_num,p0_s,],5)}else if(length(p0_s) == 0){p0_s_fr_cue <- rep(0,146)}else{p0_s_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,p0_s,]),5)}
-    # if (length(p0_f) == 1){p0_f_fr_cue <- rollmean(all_cue_fr[unit_num,p0_f,],5)}else if(length(p0_f) == 0){p0_f_fr_cue <- rep(0,146)}else{p0_f_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,p0_f,]),5)}
-    # if (length(px_s) == 1){px_s_fr_cue <- rollmean(all_cue_fr[unit_num,px_s,],5)}else if(length(px_s) == 0){px_s_fr_cue <- rep(0,146)}else{px_s_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,px_s,]),5)}
-    # if (length(px_f) == 1){px_f_fr_cue <- rollmean(all_cue_fr[unit_num,px_f,],5)}else if(length(px_f) == 0){px_f_fr_cue <- rep(0,146)}else{px_f_fr_cue <- rollmean(colMeans(all_cue_fr[unit_num,px_f,]),5)}
-    # 
-    # if (length(p0_s) == 1){p0_s_fr_res <- rollmean(all_res_fr[unit_num,p0_s,],5)}else if(length(p0_s) == 0){p0_s_fr_res <- rep(0,146)}else{p0_s_fr_res <- rollmean(colMeans(all_res_fr[unit_num,p0_s,]),5)}
-    # if (length(p0_f) == 1){p0_f_fr_res <- rollmean(all_res_fr[unit_num,p0_f,],5)}else if(length(p0_f) == 0){p0_f_fr_res <- rep(0,146)}else{p0_f_fr_res <- rollmean(colMeans(all_res_fr[unit_num,p0_f,]),5)}
-    # if (length(px_s) == 1){px_s_fr_res <- rollmean(all_res_fr[unit_num,px_s,],5)}else if(length(px_s) == 0){px_s_fr_res <- rep(0,146)}else{px_s_fr_res <- rollmean(colMeans(all_res_fr[unit_num,px_s,]),5)}
-    # if (length(px_f) == 1){px_f_fr_res <- rollmean(all_res_fr[unit_num,px_f,],5)}else if(length(px_f) == 0){px_f_fr_res <- rep(0,146)}else{px_f_fr_res <- rollmean(colMeans(all_res_fr[unit_num,px_f,]),5)}
-    # 
-    # 
-    # p_sf_cue_avgs <- data.frame(time=time,p0_s_cue=p0_s_fr_cue,p0_f_cue=p0_f_fr_cue,px_s_cue=px_s_fr_cue,px_f_cue=px_f_fr_cue)
-    # p_sf_res_avgs <- data.frame(time=time,p0_s_res=p0_s_fr_res,p0_f_res=p0_f_fr_res,px_s_res=px_s_fr_res,px_f_res=px_f_fr_res)
-    # 
-    # if (length(p0_s) <= 1){p0_s_fr_cue <- rep(0,146)}else{p0_s_fr_cue <- rollmean(sapply(data.frame(all_cue_fr[unit_num,p0_s,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # if (length(p0_f) <= 1){p0_f_fr_cue <- rep(0,146)}else{p0_f_fr_cue <- rollmean(sapply(data.frame(all_cue_fr[unit_num,p0_f,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # if (length(px_s) <= 1){px_s_fr_cue <- rep(0,146)}else{px_s_fr_cue <- rollmean(sapply(data.frame(all_cue_fr[unit_num,px_s,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # if (length(px_f) <= 1){px_f_fr_cue <- rep(0,146)}else{px_f_fr_cue <- rollmean(sapply(data.frame(all_cue_fr[unit_num,px_f,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # 
-    # if (length(p0_s) <= 1){p0_s_fr_res <- rep(0,146)}else{p0_s_fr_res <- rollmean(sapply(data.frame(all_cue_fr[unit_num,p0_s,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # if (length(p0_f) <= 1){p0_f_fr_res <- rep(0,146)}else{p0_f_fr_res <- rollmean(sapply(data.frame(all_cue_fr[unit_num,p0_f,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # if (length(px_s) <= 1){px_s_fr_res <- rep(0,146)}else{px_s_fr_res <- rollmean(sapply(data.frame(all_cue_fr[unit_num,px_s,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # if (length(px_f) <= 1){px_f_fr_res <- rep(0,146)}else{px_f_fr_res <- rollmean(sapply(data.frame(all_cue_fr[unit_num,px_f,]),function(x)sd(x)/sqrt(length(x))),5)}
-    # 
-    # p_sf_cue_sems <- data.frame(time=time,p0_s_cue=p0_s_fr_cue,p0_f_cue=p0_f_fr_cue,px_s_cue=px_s_fr_cue,px_f_cue=px_f_fr_cue)
-    # p_sf_res_sems <- data.frame(time=time,p0_s_res=p0_s_fr_res,p0_f_res=p0_f_fr_res,px_s_res=px_s_fr_res,px_f_res=px_f_fr_res)
-    # 
-    # p_sf_cue_avgs.m <- melt(p_sf_cue_avgs,id.vars="time",variable="comb")
-    # plt_cue <- ggplot(p_sf_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=comb),size=1) + theme_classic()
-    # plt_cue <- plt_cue + scale_colour_manual(values=c("black","gray69","firebrick","lightpink2")) + labs(title=paste("Punishment combination: Unit",unit_num,"\nCue"),y="z-score", x="Time(s)",colour="Combination") + geom_vline(xintercept=0)
-    # 
-    # plt_cue <- plt_cue + geom_ribbon(data=p_sf_cue_avgs,aes(x=time,ymin=p_sf_cue_avgs$p0_s-p_sf_cue_sems$p0_s,ymax=p_sf_cue_avgs$p0_s+p_sf_cue_sems$p0_s),inherit.aes=FALSE,alpha=0.2,fill="black")
-    # plt_cue <- plt_cue + geom_ribbon(data=p_sf_cue_avgs,aes(x=time,ymin=p_sf_cue_avgs$p0_f-p_sf_cue_sems$p0_f,ymax=p_sf_cue_avgs$p0_f+p_sf_cue_sems$p0_f),inherit.aes=FALSE,alpha=0.2,fill="gray69")
-    # plt_cue <- plt_cue + geom_ribbon(data=p_sf_cue_avgs,aes(x=time,ymin=p_sf_cue_avgs$px_s-p_sf_cue_sems$px_s,ymax=p_sf_cue_avgs$px_s+p_sf_cue_sems$px_s),inherit.aes=FALSE,alpha=0.2,fill="firebrick")
-    # plt_cue <- plt_cue + geom_ribbon(data=p_sf_cue_avgs,aes(x=time,ymin=p_sf_cue_avgs$px_f-p_sf_cue_sems$px_f,ymax=p_sf_cue_avgs$px_f+p_sf_cue_sems$px_f),inherit.aes=FALSE,alpha=0.2,fill="lightpink2")
-    # 
-    # p_sf_res_avgs.m <- melt(p_sf_res_avgs,id.vars="time",variable="comb")
-    # plt_res <- ggplot(p_sf_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=comb),size=1) + theme_classic()
-    # plt_res <- plt_res + scale_colour_manual(values=c("black","gray69","firebrick","lightpink2")) + labs(title="Result",y="z-score", x="Time(s)",colour="Combination") + geom_vline(xintercept=0)
-    # 
-    # plt_res <- plt_res + geom_ribbon(data=p_sf_res_avgs,aes(x=time,ymin=p_sf_res_avgs$p0_s-p_sf_res_sems$p0_s,ymax=p_sf_res_avgs$p0_s+p_sf_res_sems$p0_s),inherit.aes=FALSE,alpha=0.2,fill="black")
-    # plt_res <- plt_res + geom_ribbon(data=p_sf_res_avgs,aes(x=time,ymin=p_sf_res_avgs$p0_f-p_sf_res_sems$p0_f,ymax=p_sf_res_avgs$p0_f+p_sf_res_sems$p0_f),inherit.aes=FALSE,alpha=0.2,fill="gray69")
-    # plt_res <- plt_res + geom_ribbon(data=p_sf_res_avgs,aes(x=time,ymin=p_sf_res_avgs$px_s-p_sf_res_sems$px_s,ymax=p_sf_res_avgs$px_s+p_sf_res_sems$px_s),inherit.aes=FALSE,alpha=0.2,fill="firebrick")
-    # plt_res <- plt_res + geom_ribbon(data=p_sf_res_avgs,aes(x=time,ymin=p_sf_res_avgs$px_f-p_sf_res_sems$px_f,ymax=p_sf_res_avgs$px_f+p_sf_res_sems$px_f),inherit.aes=FALSE,alpha=0.2,fill="lightpink2")
-    # 
-    # multiplot(plt_cue,plt_res)
-    # graphics.off()
-    # 
-    # 
   }
 }
 
