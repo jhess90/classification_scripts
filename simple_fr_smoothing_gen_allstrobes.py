@@ -138,7 +138,6 @@ condensed = np.zeros((np.shape(trial_breakdown)[0],14))
 
 #0: disp_rp, 1: succ scene 2: failure scene, 3: rnum, 4: pnum, 5:succ/fail, 6: value, 7: motiv, 8: disp_rp bin
 
-
 condensed[:,0] = trial_breakdown[:,1]
 condensed[:,1] = trial_breakdown[:,2]
 condensed[:,2] = trial_breakdown[:,3]
@@ -279,4 +278,31 @@ for key,value in data_dict.iteritems():
 
 
 
-				
+#cue to reach
+cue_reach = condensed[:,11] - condensed[:,0]
+
+#num failed before reach
+
+#cue to grasp
+cue_grasp = condensed[:,12] - condensed[:,0]
+
+#cue to transport
+cue_transport = condensed[:,13] - condensed[:,0]
+
+#cue to fail times
+cue_fail = condensed[:,2] - condensed[:,0]
+cue_fail = cue_fail[condensed[:,5] != 1]
+
+#result to next cue
+temp = np.zeros(np.shape(condensed[:,0]))
+temp[0:-2] = condensed[1:-1,0]
+res_time = condensed[:,1] + condensed[:,2]
+
+result_next_cue = temp - res_time
+
+#result_next_cue = result_next_cue[condensed[:,5] != 1]
+
+
+save_dict = {'cue_reach':cue_reach,'cue_grasp':cue_grasp,'cue_transport':cue_transport,'cue_fail':cue_fail,'result_next_cue':result_next_cue,'condensed':condensed}
+
+np.save("times.npy",save_dict)
