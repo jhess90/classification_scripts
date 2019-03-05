@@ -123,8 +123,30 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
     text = c(paste(m1_m1_res,abs_m1_m1_res,sep="\n"),paste(m1_s1_res,abs_m1_s1_res,sep="\n"),paste(m1_pmd_res,abs_m1_pmd_res,sep="\n"),paste(s1_s1_res,abs_s1_s1_res,sep="\n"),paste(s1_pmd_res,abs_s1_pmd_res,sep="\n"),paste(pmd_pmd_res,abs_pmd_pmd_res,sep="\n"))
   )
   
-  write.table(cue_sum_label_df,paste('raw_all_',type_name,'_cue.txt',sep=""),sep="\t",row.names=FALSE)
-  write.table(res_sum_label_df,paste('raw_all_',type_name,'_res.txt',sep=""),sep="\t",row.names=FALSE)
+  #num same-region pairs = x(x-1)/2
+  m1_m1_num <- total_unit_num_M1*(total_unit_num_M1 - 1)/2
+  s1_s1_num <- total_unit_num_S1*(total_unit_num_S1 - 1)/2
+  pmd_pmd_num <- total_unit_num_PmD*(total_unit_num_PmD - 1)/2
+  
+  #cue, abs cue, res, abs res
+  m1_m1_avgs <- c(m1_m1_cue,abs_m1_m1_cue,m1_m1_res,abs_m1_m1_res)/m1_m1_num
+  s1_s1_avgs <- c(s1_s1_cue,abs_s1_s1_cue,s1_s1_res,abs_s1_s1_res)/s1_s1_num
+  pmd_pmd_avgs <- c(pmd_pmd_cue,abs_pmd_pmd_cue,pmd_pmd_res,abs_pmd_pmd_res)/pmd_pmd_num
+  m1_s1_avgs <- c(m1_s1_cue,abs_m1_s1_cue,m1_s1_res,abs_m1_s1_res)/(total_unit_num_M1*total_unit_num_S1)
+  m1_pmd_avgs <- c(m1_pmd_cue,abs_m1_pmd_cue,m1_pmd_res,abs_m1_pmd_res)/(total_unit_num_M1*total_unit_num_PmD)
+  s1_pmd_avgs <- c(s1_pmd_cue,abs_s1_pmd_cue,s1_pmd_res,abs_s1_pmd_res)/(total_unit_num_S1*total_unit_num_PmD)
+  
+  m1_m1_sums <- c(m1_m1_cue,abs_m1_m1_cue,m1_m1_res,abs_m1_m1_res)
+  s1_s1_sums <- c(s1_s1_cue,abs_s1_s1_cue,s1_s1_res,abs_s1_s1_res)
+  pmd_pmd_sums <- c(pmd_pmd_cue,abs_pmd_pmd_cue,pmd_pmd_res,abs_pmd_pmd_res)
+  m1_s1_sums <- c(m1_s1_cue,abs_m1_s1_cue,m1_s1_res,abs_m1_s1_res)
+  m1_pmd_sums <- c(m1_pmd_cue,abs_m1_pmd_cue,m1_pmd_res,abs_m1_pmd_res)
+  s1_pmd_sums <- c(s1_pmd_cue,abs_s1_pmd_cue,s1_pmd_res,abs_s1_pmd_res)
+  
+  output <- data.frame(m1_m1_avgs,m1_s1_avgs,m1_pmd_avgs,s1_s1_avgs,s1_pmd_avgs,pmd_pmd_avgs,m1_m1_sums,m1_s1_sums,m1_pmd_sums,s1_s1_sums,s1_pmd_sums,pmd_pmd_sums)
+  rownames(output) <- c('cue','abs cue','res','abs res')
+  
+  write.table(output,paste('avg_sum_rate_',type_name,'.txt',sep=""),sep=',')
   
   #plot correlation matrix
   png(paste("raw_corr_spear_all_",type_name,".png",sep=""),width=8,height=6,units="in",res=500)

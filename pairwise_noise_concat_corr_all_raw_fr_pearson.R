@@ -124,11 +124,11 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
   combined_res_avgs <- rbind(demeaned_res_avgs_M1,demeaned_res_avgs_S1,demeaned_res_avgs_PmD)
   
   #compute rate correlation coeffs and p values. Spearman non-parametric
-  cue_corr <- cor(t(combined_cue_avgs),method=c("spearman"))
-  res_corr <- cor(t(combined_res_avgs),method=c("spearman"))
+  cue_corr <- cor(t(combined_cue_avgs),method=c("pearson"))
+  res_corr <- cor(t(combined_res_avgs),method=c("pearson"))
   
-  cue_pmat <- cor_pmat(t(combined_cue_avgs),method=c("spearman"))
-  res_pmat <- cor_pmat(t(combined_res_avgs),method=c("spearman"))
+  #cue_pmat <- cor_pmat(t(combined_cue_avgs),method=c("pearson"))
+  #res_pmat <- cor_pmat(t(combined_res_avgs),method=c("pearson"))
   
   #region label data frame
   label_df <- data.frame(
@@ -190,8 +190,8 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
     text = c(paste(m1_m1_res,abs_m1_m1_res,sep="\n"),paste(m1_s1_res,abs_m1_s1_res,sep="\n"),paste(m1_pmd_res,abs_m1_pmd_res,sep="\n"),paste(s1_s1_res,abs_s1_s1_res,sep="\n"),paste(s1_pmd_res,abs_s1_pmd_res,sep="\n"),paste(pmd_pmd_res,abs_pmd_pmd_res,sep="\n"))
   )
   
-  #write.table(cue_sum_label_df,paste('raw_noise_concat_',type_name,'_cue.txt',sep=""),sep="\t",row.names=FALSE)
-  #write.table(res_sum_label_df,paste('raw_noise_concat_',type_name,'_res.txt',sep=""),sep="\t",row.names=FALSE)
+  #write.table(cue_sum_label_df,paste('raw_noise_concat_pearson_',type_name,'_cue.txt',sep=""),sep="\t",row.names=FALSE)
+  #write.table(res_sum_label_df,paste('raw_noise_concat_pearson_',type_name,'_res.txt',sep=""),sep="\t",row.names=FALSE)
   
   #num same-region pairs = x(x-1)/2
   m1_m1_num <- total_unit_num_M1*(total_unit_num_M1 - 1)/2
@@ -216,10 +216,10 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
   output <- data.frame(m1_m1_avgs,m1_s1_avgs,m1_pmd_avgs,s1_s1_avgs,s1_pmd_avgs,pmd_pmd_avgs,m1_m1_sums,m1_s1_sums,m1_pmd_sums,s1_s1_sums,s1_pmd_sums,pmd_pmd_sums)
   rownames(output) <- c('cue','abs cue','res','abs res')
   
-  write.table(output,paste('avg_sum_noise_concat_',type_name,'.txt',sep=""),sep=',')
+  write.table(output,paste('avg_sum_noise_concat_pearson_',type_name,'.txt',sep=""),sep=',')
   
   #plot correlation matrix
-  png(paste("raw_noise_concat_corr_spear_all_",type_name,".png",sep=""),width=8,height=6,units="in",res=500)
+  png(paste("raw_noise_concat_corr_pearson_all_",type_name,".png",sep=""),width=8,height=6,units="in",res=500)
   
   cue_plt <- ggcorrplot(cue_corr,type="lower",outline.col='white')
   cue_plt <- cue_plt + geom_vline(xintercept=total_unit_num_M1,color="grey") + geom_vline(xintercept=total_unit_num_M1+total_unit_num_S1,color="grey")
@@ -239,7 +239,7 @@ compute_plot_corr <- function(all_cue_fr_M1,all_cue_fr_S1,all_cue_fr_PmD,all_res
   graphics.off()
   
   #plot correlation matrix
-  png(paste("raw_noise_concat_corr_spear_all_no_txt_",type_name,".png",sep=""),width=8,height=6,units="in",res=500)
+  png(paste("raw_noise_concat_corr_pearson_all_no_txt_",type_name,".png",sep=""),width=8,height=6,units="in",res=500)
   
   cue_plt <- ggcorrplot(cue_corr,type="lower",outline.col='white')
   cue_plt <- cue_plt + geom_vline(xintercept=total_unit_num_M1,color="grey") + geom_vline(xintercept=total_unit_num_M1+total_unit_num_S1,color="grey")
