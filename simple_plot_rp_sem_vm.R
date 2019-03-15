@@ -245,6 +245,10 @@ for(region_index in 1:length(region_list)){
   for(unit_num in unit_list){
     cat(unit_num,'\n')
     
+    ###To do: want motivation to be the bright colored one, size 1.5 maybe (not 2). 
+    #Value: YlOrRd but shift it all a step darker. In order like this, not divergeing. Same size.
+    
+    
     #value  (initial colortest3: value = scale_color_brewer YlOrRd)
     png(paste("colortest3_sem_",region_list[region_index],"_v_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
     
