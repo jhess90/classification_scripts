@@ -44,11 +44,13 @@ ph_list_names <- c('comb','comb_outcome','m','p_catch','p','p_outcome','r_catch'
 time_windows <- c('ac','br','ar','rw')
 
 file_list <- Sys.glob("block*.RData")
+individ_block_totals <- c()
 
 ind = 1
 for(block_name in file_list){
   cat(block_name)
   
+  #
 
   if(ind == 1){
     attach(block_name)
@@ -59,6 +61,9 @@ for(block_name in file_list){
     S1_total_unit_num <- length(S1_p_val_list$r0_p_vals[,1])
     PmD_sig_sign_percs_total <- PmD_sig_sign_percs
     PmD_total_unit_num <- length(PmD_p_val_list$r0_p_vals[,1])
+    
+    #
+    individ_block_totals <- c(M1_total_unit_num,S1_total_unit_num,PmD_total_unit_num)
     
     M1_diffs_length_list_ac_total <- M1_diffs_length_list_ac
     M1_diffs_length_list_br_total <- M1_diffs_length_list_br
@@ -103,6 +108,10 @@ for(block_name in file_list){
     S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
     PmD_temp <- PmD_sig_sign_percs
     PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
+    
+    #
+    individ_block_totals <- rbind(individ_block_totals,c(length(M1_p_val_list$r0_p_vals[,1]),length(S1_p_val_list$r0_p_vals[,1]),length(PmD_p_val_list$r0_p_vals[,1])))
+    
     
     #NOTE just using raw number of units, not percs. So perc sections of these arrays can be ignored
     for(name in names(M1_sig_sign_percs_total)){
@@ -151,7 +160,8 @@ for(block_name in file_list){
   ind <- ind + 1
 }
 
-
+#M1, S1, PMd num of units in each block. Final row = total for pseudopop
+individ_block_totals <- rbind(individ_block_totals,c(M1_total_unit_num,S1_total_unit_num,PmD_total_unit_num))
   
 #######################
 ###plot ###############
@@ -163,7 +173,7 @@ for(region_index in 1:length(region_list)){
   out_sig_sign_percs <- get(paste(region_list[region_index],'_sig_sign_percs_total',sep=""))
 
   cat('plotting',region_list[region_index],'\n')
-  window_names <- c('Cue','Result')
+  window_names <- c('Cue','Feedback')
   
   #reward
   png(paste(region_list[region_index],'_r_sig_diffs_total_perc.png',sep=""),width=8,height=6,units="in",res=500)
@@ -411,7 +421,7 @@ for(region_index in 1:length(region_list)){
   graphics.off()
   
   #comb outcome succ
-  png(paste(region_list[region_index],'_comb_outcome_succ_newplots_sig_diffs_total_perc.png',sep=""),width=8,height=6,units="in",res=500)
+  png(paste(region_list[region_index],'_comb_outcome_succ_newplots_sig_diffs_total_perc_4.png',sep=""),width=8,height=6,units="in",res=500)
   
   num_inc <- rbind(out_sig_sign_percs$r0_p0_s_sig_sign_percs[2,],out_sig_sign_percs$rx_p0_s_sig_sign_percs[2,],out_sig_sign_percs$r0_px_s_sig_sign_percs[2,],out_sig_sign_percs$rx_px_s_sig_sign_percs[2,])
   num_inc <- cbind(num_inc[,1],num_inc[,5])
@@ -435,7 +445,7 @@ for(region_index in 1:length(region_list)){
   plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
   plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Combination and Outcome',y='Percent Significant')
   plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
-  plt <- plt + theme_classic() + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25) ,strip.text=element_text(size=rel(2)),plot.title=element_text(size=rel(2)),axis.title=element_blank(),axis.text=element_text(size=rel(2)),axis.text.x=element_text(angle=45,hjust=1))
+  plt <- plt + theme_classic() + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25) ,strip.text=element_text(size=rel(3)),plot.title=element_text(size=rel(3)),axis.title=element_blank(),axis.text.y=element_text(size=rel(4)),axis.text.x=element_text(angle=45,hjust=1))
   
   plot(plt)
   graphics.off()
