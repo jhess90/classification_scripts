@@ -237,9 +237,9 @@ for(region_index in 1:length(region_list)){
   
   #set here if want to just plot certain units by number
   #0059
-  if(region_index == 1){unit_list <- c(26,45)}else if (region_index == 2){unit_list <- c(62,69)}else{unit_list <- c(78,36)}
+  #if(region_index == 1){unit_list <- c(26,45)}else if (region_index == 2){unit_list <- c(62,69)}else{unit_list <- c(78,36)}
   #504
-  #if(region_index == 1){unit_list <- c(65,47)}else if (region_index == 2){unit_list <- c(27,44)}else{unit_list <- c(7,51)}
+  if(region_index == 1){unit_list <- c(65,47)}else if (region_index == 2){unit_list <- c(27,44)}else{unit_list <- c(7,51)}
   
   
   for(unit_num in unit_list){
@@ -309,18 +309,18 @@ for(region_index in 1:length(region_list)){
 
     ##############
     #value
-    png(paste("paper_nl_sem_1_",region_list[region_index],"_v_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
+    png(paste("paper_nl_sem_1.5_",region_list[region_index],"_v_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
 
     v_cue_avgs <- data.frame(time=time,v_3=rollmean(colMeans(all_cue_fr[unit_num,v_3,]),5),v_2=rollmean(colMeans(all_cue_fr[unit_num,v_2,]),5),v_1=rollmean(colMeans(all_cue_fr[unit_num,v_1,]),5),v0=rollmean(colMeans(all_cue_fr[unit_num,v0,]),5),v1=rollmean(colMeans(all_cue_fr[unit_num,v1,]),5),v2=rollmean(colMeans(all_cue_fr[unit_num,v2,]),5),v3=rollmean(colMeans(all_cue_fr[unit_num,v3,]),5))
     v_res_avgs <- data.frame(time=time,v_3=rollmean(colMeans(all_res_fr[unit_num,v_3,]),5),v_2=rollmean(colMeans(all_res_fr[unit_num,v_2,]),5),v_1=rollmean(colMeans(all_res_fr[unit_num,v_1,]),5),v0=rollmean(colMeans(all_res_fr[unit_num,v0,]),5),v1=rollmean(colMeans(all_res_fr[unit_num,v1,]),5),v2=rollmean(colMeans(all_res_fr[unit_num,v2,]),5),v3=rollmean(colMeans(all_res_fr[unit_num,v3,]),5))
 
     v_cue_avgs.m <- melt(v_cue_avgs,id.vars="time",variable="v_level")
-    plt_cue <- ggplot(v_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=v_level),size=1) + theme_classic()
+    plt_cue <- ggplot(v_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=v_level),size=1.5) + theme_classic()
     plt_cue <- plt_cue +labs(title="Cue",y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0) + scale_color_manual(values=c(rgb(254,227,145,maxColorValue = 255),rgb(254,196,79,maxColorValue = 255),rgb(254,153,41,maxColorValue = 255),rgb(236,112,20,maxColorValue = 255),rgb(204,76,2,maxColorValue = 255),rgb(153,52,4,maxColorValue = 255),rgb(102,37,6,maxColorValue = 255)))
     plt_cue <- plt_cue + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
 
     v_res_avgs.m <- melt(v_res_avgs,id.vars="time",variable="v_level")
-    plt_res <- ggplot(v_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=v_level),size=1) + theme_classic()
+    plt_res <- ggplot(v_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=v_level),size=1.5) + theme_classic()
     plt_res <- plt_res +labs(title="Result",y="z-score", x="Time(s)",colour="Value Level") + geom_vline(xintercept=0) + scale_color_manual(values=c(rgb(254,227,145,maxColorValue = 255),rgb(254,196,79,maxColorValue = 255),rgb(254,153,41,maxColorValue = 255),rgb(236,112,20,maxColorValue = 255),rgb(204,76,2,maxColorValue = 255),rgb(153,52,4,maxColorValue = 255),rgb(102,37,6,maxColorValue = 255)))
     plt_res <- plt_res + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
 
@@ -328,19 +328,19 @@ for(region_index in 1:length(region_list)){
     graphics.off()
 
     # motivation (final)
-    png(paste("paper_nl_sem_1_",region_list[region_index],"_m_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
+    png(paste("paper_nl_sem_1.5_",region_list[region_index],"_m_unit_",unit_num,".png",sep=""),width=8,height=6,units="in",res=500)
 
     m_cue_avgs <- data.frame(time=time,m0=rollmean(colMeans(all_cue_fr[unit_num,m0,]),5),m1=rollmean(colMeans(all_cue_fr[unit_num,m1,]),5),m2=rollmean(colMeans(all_cue_fr[unit_num,m2,]),5),m3=rollmean(colMeans(all_cue_fr[unit_num,m3,]),5),m4=rollmean(colMeans(all_cue_fr[unit_num,m4,]),5),m5=rollmean(colMeans(all_cue_fr[unit_num,m5,]),5),m6=rollmean(colMeans(all_cue_fr[unit_num,m6,]),5))
     m_res_avgs <- data.frame(time=time,m0=rollmean(colMeans(all_res_fr[unit_num,m0,]),5),m1=rollmean(colMeans(all_res_fr[unit_num,m1,]),5),m2=rollmean(colMeans(all_res_fr[unit_num,m2,]),5),m3=rollmean(colMeans(all_res_fr[unit_num,m3,]),5),m4=rollmean(colMeans(all_res_fr[unit_num,m4,]),5),m5=rollmean(colMeans(all_res_fr[unit_num,m5,]),5),m6=rollmean(colMeans(all_res_fr[unit_num,m6,]),5))
 
     m_cue_avgs.m <- melt(m_cue_avgs,id.vars="time",variable="m_level")
-    plt_cue <- ggplot(m_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=m_level),size=1) + theme_classic()
+    plt_cue <- ggplot(m_cue_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=m_level),size=1.5) + theme_classic()
     #plt_cue <- plt_cue + labs(title="Cue") + geom_vline(xintercept=0) + scale_color_manual(values=c(rgb(0,0,1),rgb(0,0.5,0),rgb(1,0,0),rgb(0,0.75,0.75),rgb(0.75,0,0.75),rgb(0.75,0.75,0),rgb(0.25,0.25,0.25)))    #matlab (old default colors)
     plt_cue <- plt_cue + labs(title="Cue") + geom_vline(xintercept=0) + scale_color_manual(values=c(rgb(160,160,160,maxColorValue = 255),rgb(51,255,255,maxColorValue = 255),rgb(51,153,255,maxColorValue = 255),rgb(51,51,255,maxColorValue = 255),rgb(153,51,255,maxColorValue = 255),rgb(255,51,255,maxColorValue = 255),rgb(255,51,153,maxColorValue = 255)))
     plt_cue <- plt_cue + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))
 
     m_res_avgs.m <- melt(m_res_avgs,id.vars="time",variable="m_level")
-    plt_res <- ggplot(m_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=m_level),size=1) + theme_classic()
+    plt_res <- ggplot(m_res_avgs.m,aes(x=time,y=value)) + geom_line(aes(colour=m_level),size=1.5) + theme_classic()
     #plt_res <- plt_res + labs(title="Result") + geom_vline(xintercept=0) + scale_color_manual(values=c(rgb(0,0.447,0.741),rgb(0.85,0.325,0.098),rgb(0.929,0.694,0.125),rgb(0.494,0.184,0.556),rgb(0.466,0.674,0.188),rgb(0.301,0.745,0.933),rgb(0.635,0.078,0.184)))    #new default colors
     plt_res <- plt_res + labs(title="Result") + geom_vline(xintercept=0) + scale_color_manual(values=c(rgb(160,160,160,maxColorValue = 255),rgb(51,255,255,maxColorValue = 255),rgb(51,153,255,maxColorValue = 255),rgb(51,51,255,maxColorValue = 255),rgb(153,51,255,maxColorValue = 255),rgb(255,51,255,maxColorValue = 255),rgb(255,51,153,maxColorValue = 255)))
     plt_res <- plt_res + theme(legend.position="none",axis.title=element_blank(),axis.text.y=element_text(size=rel(1.5)),axis.text.x=element_blank(),plot.title=element_text(size=rel(2)))

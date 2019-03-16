@@ -482,7 +482,7 @@ diffs.m <-melt(diffs.df,id.vars=c('window_labels','position'))
 
 plt <- ggplot(diffs.m,aes(variable,value)) + geom_bar(aes(fill=window_labels,group=position),stat='identity',position=position_dodge(),show.legend=F)
 plt <- plt + theme_classic() + labs(title=paste('M1\nTotal Units:',M1_total_unit_num),y='Percent Significant',x='',fill='Time Window') + theme(axis.text.x = element_text(size = rel(1.6), angle = 00)) + theme(axis.text.y = element_text(size = rel(1.6), angle = 00)) + theme(axis.title.y = element_text(size = rel(1.6), angle = 90))
-plt <- plt + scale_fill_manual(values=c("darkslategray2","darkslategray")) + scale_x_discrete(labels=c("R0/RX","R0 S/RX S","P0/PX","P0 F/PX F","Outcome"))
+plt <- plt + scale_fill_manual(values=c("darkslategray2","darkslategray")) + scale_x_discrete(labels=c("R0/RX","R0 S/RX S","P0/PX","P0 F/PX F","Result"))
 plt <- plt + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25),plot.title=element_text(size=rel(2)),axis.title=element_blank(),axis.text=element_text(size=12))
 
 plot(plt)
@@ -496,7 +496,7 @@ diffs.m <-melt(diffs.df,id.vars=c('window_labels','position'))
 
 plt <- ggplot(diffs.m,aes(variable,value)) + geom_bar(aes(fill=window_labels,group=position),stat='identity',position=position_dodge(),show.legend=F)
 plt <- plt + theme_classic() + labs(title=paste('S1\nTotal Units:',S1_total_unit_num),y='Percent Significant',x='',fill='Time Window') + theme(axis.text.x = element_text(size = rel(1.6), angle = 00)) + theme(axis.text.y = element_text(size = rel(1.6), angle = 00)) + theme(axis.title.y = element_text(size = rel(1.6), angle = 90))
-plt <- plt + scale_fill_manual(values=c("darkslategray2","darkslategray")) + scale_x_discrete(labels=c("R0/RX","R0 S/RX S","P0/PX","P0 F/PX F","Outcome"))
+plt <- plt + scale_fill_manual(values=c("darkslategray2","darkslategray")) + scale_x_discrete(labels=c("R0/RX","R0 S/RX S","P0/PX","P0 F/PX F","Result"))
 plt <- plt + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25),plot.title=element_text(size=rel(2)),axis.title=element_blank(),axis.text=element_text(size=12))
 
 plot(plt)
@@ -510,8 +510,56 @@ diffs.m <-melt(diffs.df,id.vars=c('window_labels','position'))
 
 plt <- ggplot(diffs.m,aes(variable,value)) + geom_bar(aes(fill=window_labels,group=position),stat='identity',position=position_dodge(),show.legend=F)
 plt <- plt + theme_classic() + labs(title=paste('PMd\nTotal Units:',PmD_total_unit_num),y='Percent Significant',x='',fill='Time Window') + theme(axis.text.x = element_text(size = rel(1.6), angle = 00)) + theme(axis.text.y = element_text(size = rel(1.6), angle = 00)) + theme(axis.title.y = element_text(size = rel(1.6), angle = 90))
-plt <- plt + scale_fill_manual(values=c("darkslategray2","darkslategray")) + scale_x_discrete(labels=c("R0/RX","R0 S/RX S","P0/PX","P0 F/PX F","Outcome"))
+plt <- plt + scale_fill_manual(values=c("darkslategray2","darkslategray")) + scale_x_discrete(labels=c("R0/RX","R0 S/RX S","P0/PX","P0 F/PX F","Result"))
 plt <- plt + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25),plot.title=element_text(size=rel(2)),axis.title=element_blank(),axis.text=element_text(size=12))
 
 plot(plt)
 graphics.off()
+
+###########
+window_labels <- c("Cue","Feedback")
+diff_labels <-  c("R0/RX","P0/PX","Outcome")
+
+#
+png(paste('M1_win_wind_sig11_perc.png',sep=""),width=8,height=6,units="in",res=500)
+
+diffs.df <- data.frame(window_labels=window_labels,R=c(M1_diffs$r_bin$M1_ac,M1_diffs$r_bin$M1_ar),P=c(M1_diffs$p_bin$M1_ac,M1_diffs$p_bin$M1_ar),Result=c(M1_diffs$outcome$M1_ac,M1_diffs$outcome$M1_ar),position=c(1,2))
+diffs.m <-melt(diffs.df,id.vars=c('window_labels','position'))
+
+plt <- ggplot(diffs.m,aes(variable,value)) + geom_bar(aes(fill=window_labels,group=position),stat='identity',position=position_dodge(),show.legend=F)
+plt <- plt + theme_classic() + labs(title=paste('M1\nTotal Units:',M1_total_unit_num),y='Percent Significant',x='',fill='Time Window') + theme(axis.text.x = element_text(size = rel(1.6), angle = 00)) + theme(axis.text.y = element_text(size = rel(1.6), angle = 00)) + theme(axis.title.y = element_text(size = rel(1.6), angle = 90))
+plt <- plt + scale_fill_manual(values=c("darkslategray2","darkslategray","darkslategray4")) + scale_x_discrete(labels=c("R0/RX","P0/PX","Result"))
+plt <- plt + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25),plot.title=element_text(size=rel(2)),axis.title=element_blank(),axis.text=element_text(size=12))
+
+plot(plt)
+graphics.off()
+
+#
+png(paste('S1_win_wind_sig11_perc.png',sep=""),width=8,height=6,units="in",res=500)
+
+diffs.df <- data.frame(window_labels=window_labels,R=c(S1_diffs$r_bin$S1_ac,S1_diffs$r_bin$S1_ar),P=c(S1_diffs$p_bin$S1_ac,S1_diffs$p_bin$S1_ar),Result=c(S1_diffs$outcome$S1_ac,S1_diffs$outcome$S1_ar),position=c(1,2))
+diffs.m <-melt(diffs.df,id.vars=c('window_labels','position'))
+
+plt <- ggplot(diffs.m,aes(variable,value)) + geom_bar(aes(fill=window_labels,group=position),stat='identity',position=position_dodge(),show.legend=F)
+plt <- plt + theme_classic() + labs(title=paste('S1\nTotal Units:',S1_total_unit_num),y='Percent Significant',x='',fill='Time Window') + theme(axis.text.x = element_text(size = rel(1.6), angle = 00)) + theme(axis.text.y = element_text(size = rel(1.6), angle = 00)) + theme(axis.title.y = element_text(size = rel(1.6), angle = 90))
+plt <- plt + scale_fill_manual(values=c("darkslategray2","darkslategray","darkslategray4")) + scale_x_discrete(labels=c("R0/RX","P0/PX","Result"))
+plt <- plt + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25),plot.title=element_text(size=rel(2)),axis.title=element_blank(),axis.text=element_text(size=12))
+
+plot(plt)
+graphics.off()
+
+#
+png(paste('PmD_win_wind_sig11_perc.png',sep=""),width=8,height=6,units="in",res=500)
+
+diffs.df <- data.frame(window_labels=window_labels,R=c(PmD_diffs$r_bin$PmD_ac,PmD_diffs$r_bin$PmD_ar),P=c(PmD_diffs$p_bin$PmD_ac,PmD_diffs$p_bin$PmD_ar),Result=c(PmD_diffs$outcome$PmD_ac,PmD_diffs$outcome$PmD_ar),position=c(1,2))
+diffs.m <-melt(diffs.df,id.vars=c('window_labels','position'))
+
+plt <- ggplot(diffs.m,aes(variable,value)) + geom_bar(aes(fill=window_labels,group=position),stat='identity',position=position_dodge(),show.legend=F)
+plt <- plt + theme_classic() + labs(title=paste('PMd\nTotal Units:',M1_total_unit_num),y='Percent Significant',x='',fill='Time Window') + theme(axis.text.x = element_text(size = rel(1.6), angle = 00)) + theme(axis.text.y = element_text(size = rel(1.6), angle = 00)) + theme(axis.title.y = element_text(size = rel(1.6), angle = 90))
+plt <- plt + scale_fill_manual(values=c("darkslategray2","darkslategray","darkslategray4")) + scale_x_discrete(labels=c("R0/RX","P0/PX","Result"))
+plt <- plt + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25),plot.title=element_text(size=rel(2)),axis.title=element_blank(),axis.text=element_text(size=12))
+
+plot(plt)
+graphics.off()
+
+

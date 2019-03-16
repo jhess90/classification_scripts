@@ -420,21 +420,51 @@ for(region_index in 1:length(region_list)){
   plot(plt)
   graphics.off()
   
+  # #comb outcome succ
+  # png(paste(region_list[region_index],'_comb_outcome_succ_newplots_sig_diffs_total_perc_4.png',sep=""),width=8,height=6,units="in",res=500)
+  # 
+  # num_inc <- rbind(out_sig_sign_percs$r0_p0_s_sig_sign_percs[2,],out_sig_sign_percs$rx_p0_s_sig_sign_percs[2,],out_sig_sign_percs$r0_px_s_sig_sign_percs[2,],out_sig_sign_percs$rx_px_s_sig_sign_percs[2,])
+  # num_inc <- cbind(num_inc[,1],num_inc[,5])
+  # num_inc <- num_inc / total_unit_num
+  # rownames(num_inc) <- c('R0P0','RXP0','R0PX','RXPX')
+  # colnames(num_inc) <- window_names
+  # num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  # num_inc_melt$direction <- 'inc'
+  # 
+  # num_dec <- rbind(out_sig_sign_percs$r0_p0_s_sig_sign_percs[3,],out_sig_sign_percs$rx_p0_s_sig_sign_percs[3,],out_sig_sign_percs$r0_px_s_sig_sign_percs[3,],out_sig_sign_percs$rx_px_s_sig_sign_percs[3,])
+  # num_dec <- cbind(num_dec[,1],num_dec[,5])
+  # num_dec <- num_dec / total_unit_num
+  # rownames(num_dec) <- c('R0P0','RXP0','R0PX','RXPX')
+  # colnames(num_dec) <- window_names
+  # num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  # num_dec_melt$direction <- 'dec'
+  # 
+  # both_num <- rbind(num_inc_melt,num_dec_melt)
+  # both_num$value <- both_num$value * 100 #convert from proportion of population to percentage
+  # 
+  # plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  # plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Combination and Outcome',y='Percent Significant')
+  # plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
+  # plt <- plt + theme_classic() + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25) ,strip.text=element_text(size=rel(3)),plot.title=element_text(size=rel(3)),axis.title=element_blank(),axis.text.y=element_text(size=rel(4)),axis.text.x=element_text(angle=45,hjust=1))
+  # 
+  # plot(plt)
+  # graphics.off()
+  
   #comb outcome succ
   png(paste(region_list[region_index],'_comb_outcome_succ_newplots_sig_diffs_total_perc_4.png',sep=""),width=8,height=6,units="in",res=500)
   
-  num_inc <- rbind(out_sig_sign_percs$r0_p0_s_sig_sign_percs[2,],out_sig_sign_percs$rx_p0_s_sig_sign_percs[2,],out_sig_sign_percs$r0_px_s_sig_sign_percs[2,],out_sig_sign_percs$rx_px_s_sig_sign_percs[2,])
+  num_inc <- rbind(out_sig_sign_percs$r0_p0_s_sig_sign_percs[2,],out_sig_sign_percs$r0_px_s_sig_sign_percs[2,],out_sig_sign_percs$rx_p0_s_sig_sign_percs[2,],out_sig_sign_percs$rx_px_s_sig_sign_percs[2,])
   num_inc <- cbind(num_inc[,1],num_inc[,5])
   num_inc <- num_inc / total_unit_num
-  rownames(num_inc) <- c('R0P0','RXP0','R0PX','RXPX')
+  rownames(num_inc) <- c('R0P0','R0PX','RXP0','RXPX')
   colnames(num_inc) <- window_names
   num_inc_melt <- melt(num_inc,varnames=c('level','window'))
   num_inc_melt$direction <- 'inc'
   
-  num_dec <- rbind(out_sig_sign_percs$r0_p0_s_sig_sign_percs[3,],out_sig_sign_percs$rx_p0_s_sig_sign_percs[3,],out_sig_sign_percs$r0_px_s_sig_sign_percs[3,],out_sig_sign_percs$rx_px_s_sig_sign_percs[3,])
+  num_dec <- rbind(out_sig_sign_percs$r0_p0_s_sig_sign_percs[3,],out_sig_sign_percs$r0_px_s_sig_sign_percs[3,],out_sig_sign_percs$rx_p0_s_sig_sign_percs[3,],out_sig_sign_percs$rx_px_s_sig_sign_percs[3,])
   num_dec <- cbind(num_dec[,1],num_dec[,5])
   num_dec <- num_dec / total_unit_num
-  rownames(num_dec) <- c('R0P0','RXP0','R0PX','RXPX')
+  rownames(num_dec) <- c('R0P0','R0PX','RXP0','RXPX')
   colnames(num_dec) <- window_names
   num_dec_melt <- melt(num_dec,varnames=c('level','window'))
   num_dec_melt$direction <- 'dec'
@@ -445,7 +475,37 @@ for(region_index in 1:length(region_list)){
   plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
   plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Combination and Outcome',y='Percent Significant')
   plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
-  plt <- plt + theme_classic() + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25) ,strip.text=element_text(size=rel(3)),plot.title=element_text(size=rel(3)),axis.title=element_blank(),axis.text.y=element_text(size=rel(4)),axis.text.x=element_text(angle=45,hjust=1))
+  plt <- plt + theme_classic() + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25) ,strip.text=element_text(size=rel(3)),plot.title=element_text(size=rel(3)),axis.title=element_blank(),axis.text.y=element_text(size=rel(4)),axis.text.x=element_text(size=rel(4),angle=45,hjust=1))
+  
+  plot(plt)
+  graphics.off()
+  
+  #comb outcome succ
+  png(paste(region_list[region_index],'_comb_outcome_succ_newplots_sig_diffs_total_perc_3.png',sep=""),width=8,height=6,units="in",res=500)
+  
+  num_inc <- rbind(out_sig_sign_percs$r0_p0_s_sig_sign_percs[2,],out_sig_sign_percs$r0_px_s_sig_sign_percs[2,],out_sig_sign_percs$rx_p0_s_sig_sign_percs[2,],out_sig_sign_percs$rx_px_s_sig_sign_percs[2,])
+  num_inc <- cbind(num_inc[,1],num_inc[,5])
+  num_inc <- num_inc / total_unit_num
+  rownames(num_inc) <- c('R0P0','R0PX','RXP0','RXPX')
+  colnames(num_inc) <- window_names
+  num_inc_melt <- melt(num_inc,varnames=c('level','window'))
+  num_inc_melt$direction <- 'inc'
+  
+  num_dec <- rbind(out_sig_sign_percs$r0_p0_s_sig_sign_percs[3,],out_sig_sign_percs$r0_px_s_sig_sign_percs[3,],out_sig_sign_percs$rx_p0_s_sig_sign_percs[3,],out_sig_sign_percs$rx_px_s_sig_sign_percs[3,])
+  num_dec <- cbind(num_dec[,1],num_dec[,5])
+  num_dec <- num_dec / total_unit_num
+  rownames(num_dec) <- c('R0P0','R0PX','RXP0','RXPX')
+  colnames(num_dec) <- window_names
+  num_dec_melt <- melt(num_dec,varnames=c('level','window'))
+  num_dec_melt$direction <- 'dec'
+  
+  both_num <- rbind(num_inc_melt,num_dec_melt)
+  both_num$value <- both_num$value * 100 #convert from proportion of population to percentage
+  
+  plt <- ggplot() + geom_bar(data=both_num,aes(y=value,x=level,fill=direction),stat="identity",position="stack",show.legend=F) + facet_grid(~window)
+  plt <- plt + theme_bw() + scale_fill_manual(values=c("lightcoral","royalblue")) + labs(title=paste("Region: ",region_list[region_index],'\nTotal units: ',total_unit_num,sep=""),x='Combination and Outcome',y='Percent Significant')
+  plt <- plt + theme(axis.text.x = element_text(angle=45,hjust=1))
+  plt <- plt + theme_classic() + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25) ,strip.text=element_text(size=rel(2)),plot.title=element_text(size=rel(2)),axis.title=element_blank(),axis.text.y=element_text(size=rel(3)),axis.text.x=element_text(size=rel(3),angle=45,hjust=1))
   
   plot(plt)
   graphics.off()
