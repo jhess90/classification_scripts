@@ -10,8 +10,6 @@ library(abind)
 library(gridGraphics)
 library(grid)
 library(gridExtra)
-
-
 library(data.table)
 
 attach('summary.RData')

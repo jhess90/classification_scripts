@@ -60,6 +60,61 @@ for(block_name in file_list){
     PmD_sig_sign_percs_total <- PmD_sig_sign_percs
     PmD_total_unit_num <- length(PmD_p_val_list$r0_p_vals[,1])
     
+    #################
+    M1_win_r_ac <- M1_sm_sig_p_r_bin_ac
+    M1_win_r_br <- M1_sm_sig_p_r_bin_br
+    M1_win_r_ar <- M1_sm_sig_p_r_bin_ar
+    M1_win_p_ac <- M1_sm_sig_p_p_bin_ac
+    M1_win_p_br <- M1_sm_sig_p_p_bin_br
+    M1_win_p_ar <- M1_sm_sig_p_p_bin_ar
+    M1_win_r_s_ac <- M1_sm_sig_p_r_s_bin_ac
+    M1_win_r_s_br <- M1_sm_sig_p_r_s_bin_br
+    M1_win_r_s_ar <- M1_sm_sig_p_r_s_bin_ar
+    M1_win_p_f_ac <- M1_sm_sig_p_p_f_bin_ac
+    M1_win_p_f_br <- M1_sm_sig_p_p_f_bin_br
+    M1_win_p_f_ar <- M1_sm_sig_p_p_f_bin_ar
+    M1_win_res_ac <- M1_sm_sig_p_outcome_levels_ac
+    M1_win_res_br <- M1_sm_sig_p_outcome_levels_br
+    M1_win_res_ar <- M1_sm_sig_p_outcome_levels_ar
+    ###third column = change.       
+    # +1 = RX > R0, -1 = R0 > RX
+    # +1 = RX succ > R0 succ, -1 = R0 succ > RX succ
+    # +1 = PX > P0, -1 = P0 > PX
+    # +1 = PX fail > P- fail, -1 = P0 fail > PX fail
+    # +1 = succ > fail, -1 = fail > succ
+    
+    S1_win_r_ac <- S1_sm_sig_p_r_bin_ac
+    S1_win_r_br <- S1_sm_sig_p_r_bin_br
+    S1_win_r_ar <- S1_sm_sig_p_r_bin_ar
+    S1_win_p_ac <- S1_sm_sig_p_p_bin_ac
+    S1_win_p_br <- S1_sm_sig_p_p_bin_br
+    S1_win_p_ar <- S1_sm_sig_p_p_bin_ar
+    S1_win_r_s_ac <- S1_sm_sig_p_r_s_bin_ac
+    S1_win_r_s_br <- S1_sm_sig_p_r_s_bin_br
+    S1_win_r_s_ar <- S1_sm_sig_p_r_s_bin_ar
+    S1_win_p_f_ac <- S1_sm_sig_p_p_f_bin_ac
+    S1_win_p_f_br <- S1_sm_sig_p_p_f_bin_br
+    S1_win_p_f_ar <- S1_sm_sig_p_p_f_bin_ar
+    S1_win_res_ac <- S1_sm_sig_p_outcome_levels_ac
+    S1_win_res_br <- S1_sm_sig_p_outcome_levels_br
+    S1_win_res_ar <- S1_sm_sig_p_outcome_levels_ar
+
+    PmD_win_r_ac <- PmD_sm_sig_p_r_bin_ac
+    PmD_win_r_br <- PmD_sm_sig_p_r_bin_br
+    PmD_win_r_ar <- PmD_sm_sig_p_r_bin_ar
+    PmD_win_p_ac <- PmD_sm_sig_p_p_bin_ac
+    PmD_win_p_br <- PmD_sm_sig_p_p_bin_br
+    PmD_win_p_ar <- PmD_sm_sig_p_p_bin_ar
+    PmD_win_r_s_ac <- PmD_sm_sig_p_r_s_bin_ac
+    PmD_win_r_s_br <- PmD_sm_sig_p_r_s_bin_br
+    PmD_win_r_s_ar <- PmD_sm_sig_p_r_s_bin_ar
+    PmD_win_p_f_ac <- PmD_sm_sig_p_p_f_bin_ac
+    PmD_win_p_f_br <- PmD_sm_sig_p_p_f_bin_br
+    PmD_win_p_f_ar <- PmD_sm_sig_p_p_f_bin_ar
+    PmD_win_res_ac <- PmD_sm_sig_p_outcome_levels_ac
+    PmD_win_res_br <- PmD_sm_sig_p_outcome_levels_br
+    PmD_win_res_ar <- PmD_sm_sig_p_outcome_levels_ar
+    
     M1_diffs_length_list_ac_total <- M1_diffs_length_list_ac
     M1_diffs_length_list_br_total <- M1_diffs_length_list_br
     M1_diffs_length_list_ar_total <- M1_diffs_length_list_ar
@@ -103,6 +158,63 @@ for(block_name in file_list){
     S1_total_unit_num <- S1_total_unit_num + length(S1_p_val_list$r0_p_vals[,1])
     PmD_temp <- PmD_sig_sign_percs
     PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
+    
+    M1_sig_sign_percs_total <- M1_sig_sign_percs
+    M1_total_unit_num <- length(M1_p_val_list$r0_p_vals[,1])
+    S1_sig_sign_percs_total <- S1_sig_sign_percs
+    S1_total_unit_num <- length(S1_p_val_list$r0_p_vals[,1])
+    PmD_sig_sign_percs_total <- PmD_sig_sign_percs
+    PmD_total_unit_num <- length(PmD_p_val_list$r0_p_vals[,1])
+    
+    #################
+    M1_win_r_ac <- rbind(M1_win_win_r_ac,M1_sm_sig_p_r_bin_ac)
+    M1_win_r_br <- rbind(M1_win_win_r_br,M1_sm_sig_p_r_bin_br)
+    M1_win_r_ar <- rbind(M1_win_win_r_ar,M1_sm_sig_p_r_bin_ar)
+    M1_win_p_ac <- rbind(M1_win_win_p_ac,M1_sm_sig_p_p_bin_ac)
+    M1_win_p_br <- rbind(M1_win_win_p_br,M1_sm_sig_p_p_bin_br)
+    M1_win_p_ar <- rbind(M1_win_win_p_ar,M1_sm_sig_p_p_bin_ar)
+    M1_win_r_s_ac <- rbind(M1_win_win_r_s_ac,M1_sm_sig_p_r_s_bin_ac)
+    M1_win_r_s_br <- rbind(M1_win_win_r_s_br,M1_sm_sig_p_r_s_bin_br)
+    M1_win_r_s_ar <- rbind(M1_win_win_r_s_ar,M1_sm_sig_p_r_s_bin_ar)
+    M1_win_p_f_ac <- rbind(M1_win_win_p_f_ac,M1_sm_sig_p_p_f_bin_ac)
+    M1_win_p_f_br <- rbind(M1_win_win_p_f_br,M1_sm_sig_p_p_f_bin_br)
+    M1_win_p_f_ar <- rbind(M1_win_win_p_f_ar,M1_sm_sig_p_p_f_bin_ar)
+    M1_win_res_ac <- rbind(M1_win_win_res_ac,M1_sm_sig_p_outcome_levels_ac)
+    M1_win_res_br <- rbind(M1_win_win_res_br,M1_sm_sig_p_outcome_levels_br)
+    M1_win_res_ar <- rbind(M1_win_win_res_ar,M1_sm_sig_p_outcome_levels_ar)
+    
+    S1_win_r_ac <- rbind(S1_win_win_r_ac,S1_sm_sig_p_r_bin_ac)
+    S1_win_r_br <- rbind(S1_win_win_r_br,S1_sm_sig_p_r_bin_br)
+    S1_win_r_ar <- rbind(S1_win_win_r_ar,S1_sm_sig_p_r_bin_ar)
+    S1_win_p_ac <- rbind(S1_win_win_p_ac,S1_sm_sig_p_p_bin_ac)
+    S1_win_p_br <- rbind(S1_win_win_p_br,S1_sm_sig_p_p_bin_br)
+    S1_win_p_ar <- rbind(S1_win_win_p_ar,S1_sm_sig_p_p_bin_ar)
+    S1_win_r_s_ac <- rbind(S1_win_win_r_s_ac,S1_sm_sig_p_r_s_bin_ac)
+    S1_win_r_s_br <- rbind(S1_win_win_r_s_br,S1_sm_sig_p_r_s_bin_br)
+    S1_win_r_s_ar <- rbind(S1_win_win_r_s_ar,S1_sm_sig_p_r_s_bin_ar)
+    S1_win_p_f_ac <- rbind(S1_win_win_p_f_ac,S1_sm_sig_p_p_f_bin_ac)
+    S1_win_p_f_br <- rbind(S1_win_win_p_f_br,S1_sm_sig_p_p_f_bin_br)
+    S1_win_p_f_ar <- rbind(S1_win_win_p_f_ar,S1_sm_sig_p_p_f_bin_ar)
+    S1_win_res_ac <- rbind(S1_win_win_res_ac,S1_sm_sig_p_outcome_levels_ac)
+    S1_win_res_br <- rbind(S1_win_win_res_br,S1_sm_sig_p_outcome_levels_br)
+    S1_win_res_ar <- rbind(S1_win_win_res_ar,S1_sm_sig_p_outcome_levels_ar)
+    
+    PmD_win_r_ac <- rbind(PmD_win_win_r_ac,PmD_sm_sig_p_r_bin_ac)
+    PmD_win_r_br <- rbind(PmD_win_win_r_br,PmD_sm_sig_p_r_bin_br)
+    PmD_win_r_ar <- rbind(PmD_win_win_r_ar,PmD_sm_sig_p_r_bin_ar)
+    PmD_win_p_ac <- rbind(PmD_win_win_p_ac,PmD_sm_sig_p_p_bin_ac)
+    PmD_win_p_br <- rbind(PmD_win_win_p_br,PmD_sm_sig_p_p_bin_br)
+    PmD_win_p_ar <- rbind(PmD_win_win_p_ar,PmD_sm_sig_p_p_bin_ar)
+    PmD_win_r_s_ac <- rbind(PmD_win_win_r_s_ac,PmD_sm_sig_p_r_s_bin_ac)
+    PmD_win_r_s_br <- rbind(PmD_win_win_r_s_br,PmD_sm_sig_p_r_s_bin_br)
+    PmD_win_r_s_ar <- rbind(PmD_win_win_r_s_ar,PmD_sm_sig_p_r_s_bin_ar)
+    PmD_win_p_f_ac <- rbind(PmD_win_win_p_f_ac,PmD_sm_sig_p_p_f_bin_ac)
+    PmD_win_p_f_br <- rbind(PmD_win_win_p_f_br,PmD_sm_sig_p_p_f_bin_br)
+    PmD_win_p_f_ar <- rbind(PmD_win_win_p_f_ar,PmD_sm_sig_p_p_f_bin_ar)
+    PmD_win_res_ac <- rbind(PmD_win_win_res_ac,PmD_sm_sig_p_outcome_levels_ac)
+    PmD_win_res_br <- rbind(PmD_win_win_res_br,PmD_sm_sig_p_outcome_levels_br)
+    PmD_win_res_ar <- rbind(PmD_win_win_res_ar,PmD_sm_sig_p_outcome_levels_ar)
+    
     
     #NOTE just using raw number of units, not percs. So perc sections of these arrays can be ignored
     for(name in names(M1_sig_sign_percs_total)){

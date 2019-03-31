@@ -60,7 +60,7 @@ for(region_index in 1:length(region_list)){
   ###########
   #pull out trial numbers where different trial types occur
 
-  #reward levels (0-3), rx = any level of reward
+  #reward levels (0-3), rx = any level of rewardf
   r0 <- which(condensed[,4] == 0)
   r1 <- which(condensed[,4] == 1)
   r2 <- which(condensed[,4] == 2)
@@ -670,6 +670,7 @@ for(region_index in 1:length(region_list)){
         if (mean(r_bin[,1],na.rm=T) > mean(r_bin[,2],na.rm=T)){r_bin_change = -1}else if(mean(r_bin[,1],na.rm=T) < mean(r_bin[,2],na.rm=T)){r_bin_change = 1}else{change=0}
         sig_p_r_bin <- rbind(sig_p_r_bin,c(unit_num,p_val,r_bin_change))
       }
+      #change: +1 = R0 < RX, -1 = R0 > RX
       
       #############
       #reward succ binary
@@ -685,6 +686,8 @@ for(region_index in 1:length(region_list)){
         if (mean(r_s_bin[,1],na.rm=T) > mean(r_s_bin[,2],na.rm=T)){r_s_bin_change = -1}else if(mean(r_s_bin[,1],na.rm=T) < mean(r_s_bin[,2],na.rm=T)){r_s_bin_change = 1}else{change=0}
         sig_p_r_s_bin <- rbind(sig_p_r_s_bin,c(unit_num,p_val,r_s_bin_change))
       }
+      #change: +1 = R0 succ < RX succ, -1 = R0 succ > RX succ
+      
 
       #############
       #punishment binary
@@ -699,6 +702,8 @@ for(region_index in 1:length(region_list)){
         if (mean(p_bin[,1],na.rm=T) > mean(p_bin[,2],na.rm=T)){p_bin_change = -1}else if(mean(p_bin[,1],na.rm=T) < mean(p_bin[,2],na.rm=T)){p_bin_change = 1}else{change=0}
         sig_p_p_bin <- rbind(sig_p_p_bin,c(unit_num,p_val,p_bin_change))
       }
+      #change: +1 = P0 < PX, -1 = P0 > PX
+      
       
       #############
       #punishment fail binary
@@ -713,6 +718,7 @@ for(region_index in 1:length(region_list)){
         if (mean(p_f_bin[,1],na.rm=T) > mean(p_f_bin[,2],na.rm=T)){p_f_bin_change = -1}else if(mean(p_f_bin[,1],na.rm=T) < mean(p_f_bin[,2],na.rm=T)){p_f_bin_change = 1}else{change=0}
         sig_p_p_f_bin <- rbind(sig_p_p_f_bin,c(unit_num,p_val,p_f_bin_change))
       }
+      #change: +1 = P0 fail < PX fail, -1 = P0 fail > PX fail
       
       
       #############
@@ -769,8 +775,12 @@ for(region_index in 1:length(region_list)){
       p_val <- wsr$p.v
       #cat(p_val,'\n')
       if(p_val < 0.05 & is.finite(p_val)){
-        sm_sig_p_outcome_levels <- rbind(sm_sig_p_outcome_levels,c(unit_num,p_val))
+        if (mean(res_levels[,1],na.rm=T) > mean(res_levels[,2],na.rm=T)){res_levels_change = -1}else if(mean(res_levels[,1],na.rm=T) < mean(res_levels[,2],na.rm=T)){res_levels_change = 1}else{change=0}
+        sm_sig_p_outcome_levels <- rbind(sm_sig_p_outcome_levels,c(unit_num,p_val,res_levels_change))
       }
+      #change: +1 = fail < succ, -1 = fail > succ
+      
+      
     
       #############
       #combination 
