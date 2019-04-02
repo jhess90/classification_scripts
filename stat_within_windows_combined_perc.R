@@ -64,7 +64,113 @@ fwrite(S1_diffs,file='perc_diff_within_win.csv',append=T,row.names=T)
 fwrite(PmD_diffs,file='perc_diff_within_win.csv',append=T,row.names=T)
 
 
+#########
+
+M1_win_r <- data.frame(pos=c(sum(M1_win_r_ac[,3]==1),sum(M1_win_r_br[,3]==1),sum(M1_win_r_ar[,3]==1)),neg=c(sum(M1_win_r_ac[,3]==-1),sum(M1_win_r_br[,3]==-1),sum(M1_win_r_ar[,3]==-1))) / M1_total_unit_num
+row.names(M1_win_r) <- c('AC','BF','AF')
+M1_win_p <- data.frame(pos=c(sum(M1_win_p_ac[,3]==1),sum(M1_win_p_br[,3]==1),sum(M1_win_p_ar[,3]==1)),neg=c(sum(M1_win_p_ac[,3]==-1),sum(M1_win_p_br[,3]==-1),sum(M1_win_p_ar[,3]==-1))) / M1_total_unit_num
+row.names(M1_win_p) <- c('AC','BF','AF')
+M1_win_r_s <- data.frame(pos=c(sum(M1_win_r_s_ac[,3]==1),sum(M1_win_r_s_br[,3]==1),sum(M1_win_r_s_ar[,3]==1)),neg=c(sum(M1_win_r_s_ac[,3]==-1),sum(M1_win_r_s_br[,3]==-1),sum(M1_win_r_s_ar[,3]==-1))) / M1_total_unit_num
+row.names(M1_win_r_s) <- c('AC','BF','AF')
+M1_win_p_f <- data.frame(pos=c(sum(M1_win_p_f_ac[,3]==1),sum(M1_win_p_f_br[,3]==1),sum(M1_win_p_f_ar[,3]==1)),neg=c(sum(M1_win_p_f_ac[,3]==-1),sum(M1_win_p_f_br[,3]==-1),sum(M1_win_p_f_ar[,3]==-1))) / M1_total_unit_num
+row.names(M1_win_p_f) <- c('AC','BF','AF')
+M1_win_res <- data.frame(pos=c(sum(M1_win_res_ac[,3]==1),sum(M1_win_res_br[,3]==1),sum(M1_win_res_ar[,3]==1)),neg=c(sum(M1_win_res_ac[,3]==-1),sum(M1_win_res_br[,3]==-1),sum(M1_win_res_ar[,3]==-1))) / M1_total_unit_num
+row.names(M1_win_res) <- c('AC','BF','AF')
+
+S1_win_r <- data.frame(pos=c(sum(S1_win_r_ac[,3]==1),sum(S1_win_r_br[,3]==1),sum(S1_win_r_ar[,3]==1)),neg=c(sum(S1_win_r_ac[,3]==-1),sum(S1_win_r_br[,3]==-1),sum(S1_win_r_ar[,3]==-1))) / S1_total_unit_num
+row.names(S1_win_r) <- c('AC','BF','AF')
+S1_win_p <- data.frame(pos=c(sum(S1_win_p_ac[,3]==1),sum(S1_win_p_br[,3]==1),sum(S1_win_p_ar[,3]==1)),neg=c(sum(S1_win_p_ac[,3]==-1),sum(S1_win_p_br[,3]==-1),sum(S1_win_p_ar[,3]==-1)))/ S1_total_unit_num
+row.names(S1_win_p) <- c('AC','BF','AF')
+S1_win_r_s <- data.frame(pos=c(sum(S1_win_r_s_ac[,3]==1),sum(S1_win_r_s_br[,3]==1),sum(S1_win_r_s_ar[,3]==1)),neg=c(sum(S1_win_r_s_ac[,3]==-1),sum(S1_win_r_s_br[,3]==-1),sum(S1_win_r_s_ar[,3]==-1)))/ S1_total_unit_num
+row.names(S1_win_r_s) <- c('AC','BF','AF')
+S1_win_p_f <- data.frame(pos=c(sum(S1_win_p_f_ac[,3]==1),sum(S1_win_p_f_br[,3]==1),sum(S1_win_p_f_ar[,3]==1)),neg=c(sum(S1_win_p_f_ac[,3]==-1),sum(S1_win_p_f_br[,3]==-1),sum(S1_win_p_f_ar[,3]==-1)))/ S1_total_unit_num
+row.names(S1_win_p_f) <- c('AC','BF','AF')
+S1_win_res <- data.frame(pos=c(sum(S1_win_res_ac[,3]==1),sum(S1_win_res_br[,3]==1),sum(S1_win_res_ar[,3]==1)),neg=c(sum(S1_win_res_ac[,3]==-1),sum(S1_win_res_br[,3]==-1),sum(S1_win_res_ar[,3]==-1)))/ S1_total_unit_num
+row.names(S1_win_res) <- c('AC','BF','AF')
+
+PmD_win_r <- data.frame(pos=c(sum(PmD_win_r_ac[,3]==1),sum(PmD_win_r_br[,3]==1),sum(PmD_win_r_ar[,3]==1)),neg=c(sum(PmD_win_r_ac[,3]==-1),sum(PmD_win_r_br[,3]==-1),sum(PmD_win_r_ar[,3]==-1))) / PmD_total_unit_num
+row.names(PmD_win_r) <- c('AC','BF','AF')
+PmD_win_p <- data.frame(pos=c(sum(PmD_win_p_ac[,3]==1),sum(PmD_win_p_br[,3]==1),sum(PmD_win_p_ar[,3]==1)),neg=c(sum(PmD_win_p_ac[,3]==-1),sum(PmD_win_p_br[,3]==-1),sum(PmD_win_p_ar[,3]==-1))) / PmD_total_unit_num
+row.names(PmD_win_p) <- c('AC','BF','AF')
+PmD_win_r_s <- data.frame(pos=c(sum(PmD_win_r_s_ac[,3]==1),sum(PmD_win_r_s_br[,3]==1),sum(PmD_win_r_s_ar[,3]==1)),neg=c(sum(PmD_win_r_s_ac[,3]==-1),sum(PmD_win_r_s_br[,3]==-1),sum(PmD_win_r_s_ar[,3]==-1))) / PmD_total_unit_num
+row.names(PmD_win_r_s) <- c('AC','BF','AF')
+PmD_win_p_f <- data.frame(pos=c(sum(PmD_win_p_f_ac[,3]==1),sum(PmD_win_p_f_br[,3]==1),sum(PmD_win_p_f_ar[,3]==1)),neg=c(sum(PmD_win_p_f_ac[,3]==-1),sum(PmD_win_p_f_br[,3]==-1),sum(PmD_win_p_f_ar[,3]==-1))) / PmD_total_unit_num
+row.names(PmD_win_p_f) <- c('AC','BF','AF')
+PmD_win_res <- data.frame(pos=c(sum(PmD_win_res_ac[,3]==1),sum(PmD_win_res_br[,3]==1),sum(PmD_win_res_ar[,3]==1)),neg=c(sum(PmD_win_res_ac[,3]==-1),sum(PmD_win_res_br[,3]==-1),sum(PmD_win_res_ar[,3]==-1))) / PmD_total_unit_num
+row.names(PmD_win_res) <- c('AC','BF','AF')
+
+
+##use later: Colors
+#purples: 118,42,131    153,112,171   194,165,207
+#greens:  166,219,160   90,174,97     27,120,55
+
+########
+
 window_labels <-  c("AC","BF","AF")
+
+png(paste('M1_win_posneg.png',sep=""),width=8,height=6,units="in",res=500)
+
+diffs_pos.df <- data.frame(window_labels=c(window_labels),R=M1_win_r$pos,R_S=M1_win_r_s$pos,P=M1_win_p$pos,P_F=M1_win_p_f$pos,Result=M1_win_res$pos,position=c(1,2,3))
+diffs_neg.df <- data.frame(window_labels=c(window_labels),R=M1_win_r$neg*-1,R_S=M1_win_r_s$neg*-1,P=M1_win_p$neg*-1,P_F=M1_win_p_f$neg*-1,Result=M1_win_res$neg*-1,position=c(1,2,3))
+
+diffs_pos.m <-melt(diffs_pos.df,id.vars=c('window_labels','position'))
+diffs_neg.m <-melt(diffs_neg.df,id.vars=c('window_labels','position'))
+
+plt <- ggplot(diffs_pos.m,aes(variable,value)) + geom_bar(data=diffs_pos.m,aes(fill=window_labels,group=position),stat="identity",position=position_dodge()) 
+plt <- plt + geom_bar(data=diffs_neg.m,aes(fill=window_labels,group=position),stat="identity",position=position_dodge())
+plt <- plt + scale_fill_manual(values=c(rgb(27,158,119,maxColorValue = 255),rgb(217,95,2,maxColorValue = 255),rgb(117,112,179,maxColorValue = 255)))
+
+plt <- plt + theme_classic() + labs(title=paste('M1\nTotal Units:',M1_total_unit_num),y='Percent Significant',x='',fill='Time Window') + theme(axis.text.x = element_text(size = rel(1.6), angle = 00)) + theme(axis.text.y = element_text(size = rel(1.6), angle = 00)) + theme(axis.title.y = element_text(size = rel(1.6), angle = 90))
+plt <- plt + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25),plot.title=element_text(size=rel(2)),axis.title=element_blank(),axis.text=element_text(size=12),legend.position="none")
+plt <- plt + geom_hline(yintercept=0,size=0.25)
+plt <- plt + scale_x_discrete(labels=c("R0/RX","R0 S/RX S","P0/PX","P0 F/PX F","Result"))
+
+plot(plt)
+graphics.off()
+
+#
+png(paste('S1_win_posneg.png',sep=""),width=8,height=6,units="in",res=500)
+
+diffs_pos.df <- data.frame(window_labels=c(window_labels),R=S1_win_r$pos,R_S=S1_win_r_s$pos,P=S1_win_p$pos,P_F=S1_win_p_f$pos,Result=S1_win_res$pos,position=c(1,2,3))
+diffs_neg.df <- data.frame(window_labels=c(window_labels),R=S1_win_r$neg*-1,R_S=S1_win_r_s$neg*-1,P=S1_win_p$neg*-1,P_F=S1_win_p_f$neg*-1,Result=S1_win_res$neg*-1,position=c(1,2,3))
+
+diffs_pos.m <-melt(diffs_pos.df,id.vars=c('window_labels','position'))
+diffs_neg.m <-melt(diffs_neg.df,id.vars=c('window_labels','position'))
+
+plt <- ggplot(diffs_pos.m,aes(variable,value)) + geom_bar(data=diffs_pos.m,aes(fill=window_labels,group=position),stat="identity",position=position_dodge()) 
+plt <- plt + geom_bar(data=diffs_neg.m,aes(fill=window_labels,group=position),stat="identity",position=position_dodge())
+plt <- plt + scale_fill_manual(values=c(rgb(27,158,119,maxColorValue = 255),rgb(217,95,2,maxColorValue = 255),rgb(117,112,179,maxColorValue = 255)))
+
+plt <- plt + theme_classic() + labs(title=paste('S1\nTotal Units:',S1_total_unit_num),y='Percent Significant',x='',fill='Time Window') + theme(axis.text.x = element_text(size = rel(1.6), angle = 00)) + theme(axis.text.y = element_text(size = rel(1.6), angle = 00)) + theme(axis.title.y = element_text(size = rel(1.6), angle = 90))
+plt <- plt + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25),plot.title=element_text(size=rel(2)),axis.title=element_blank(),axis.text=element_text(size=12),legend.position="none")
+plt <- plt + geom_hline(yintercept=0,size=0.25)
+plt <- plt + scale_x_discrete(labels=c("R0/RX","R0 S/RX S","P0/PX","P0 F/PX F","Result"))
+
+plot(plt)
+graphics.off()
+
+#
+png(paste('PmD_win_posneg.png',sep=""),width=8,height=6,units="in",res=500)
+
+diffs_pos.df <- data.frame(window_labels=c(window_labels),R=PmD_win_r$pos,R_S=PmD_win_r_s$pos,P=PmD_win_p$pos,P_F=PmD_win_p_f$pos,Result=PmD_win_res$pos,position=c(1,2,3))
+diffs_neg.df <- data.frame(window_labels=c(window_labels),R=PmD_win_r$neg*-1,R_S=PmD_win_r_s$neg*-1,P=PmD_win_p$neg*-1,P_F=PmD_win_p_f$neg*-1,Result=PmD_win_res$neg*-1,position=c(1,2,3))
+
+diffs_pos.m <-melt(diffs_pos.df,id.vars=c('window_labels','position'))
+diffs_neg.m <-melt(diffs_neg.df,id.vars=c('window_labels','position'))
+
+plt <- ggplot(diffs_pos.m,aes(variable,value)) + geom_bar(data=diffs_pos.m,aes(fill=window_labels,group=position),stat="identity",position=position_dodge()) 
+plt <- plt + geom_bar(data=diffs_neg.m,aes(fill=window_labels,group=position),stat="identity",position=position_dodge())
+plt <- plt + scale_fill_manual(values=c(rgb(27,158,119,maxColorValue = 255),rgb(217,95,2,maxColorValue = 255),rgb(117,112,179,maxColorValue = 255)))
+
+plt <- plt + theme_classic() + labs(title=paste('PmD\nTotal Units:',PmD_total_unit_num),y='Percent Significant',x='',fill='Time Window') + theme(axis.text.x = element_text(size = rel(1.6), angle = 00)) + theme(axis.text.y = element_text(size = rel(1.6), angle = 00)) + theme(axis.title.y = element_text(size = rel(1.6), angle = 90))
+plt <- plt + theme(panel.grid.major.y=element_line(color='lightgrey',size=0.25),plot.title=element_text(size=rel(2)),axis.title=element_blank(),axis.text=element_text(size=12),legend.position="none")
+plt <- plt + geom_hline(yintercept=0,size=0.25)
+plt <- plt + scale_x_discrete(labels=c("R0/RX","R0 S/RX S","P0/PX","P0 F/PX F","Result"))
+
+plot(plt)
+graphics.off()
+
+
 
 #diff_labels <-  c("Result","Comb","R0/RX","P0/PX")
 

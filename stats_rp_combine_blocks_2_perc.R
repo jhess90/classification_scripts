@@ -159,12 +159,12 @@ for(block_name in file_list){
     PmD_temp <- PmD_sig_sign_percs
     PmD_total_unit_num <- PmD_total_unit_num + length(PmD_p_val_list$r0_p_vals[,1])
     
-    M1_sig_sign_percs_total <- M1_sig_sign_percs
-    M1_total_unit_num <- length(M1_p_val_list$r0_p_vals[,1])
-    S1_sig_sign_percs_total <- S1_sig_sign_percs
-    S1_total_unit_num <- length(S1_p_val_list$r0_p_vals[,1])
-    PmD_sig_sign_percs_total <- PmD_sig_sign_percs
-    PmD_total_unit_num <- length(PmD_p_val_list$r0_p_vals[,1])
+    #M1_sig_sign_percs_total <- M1_sig_sign_percs
+    #M1_total_unit_num <- length(M1_p_val_list$r0_p_vals[,1])
+    #S1_sig_sign_percs_total <- S1_sig_sign_percs
+    #S1_total_unit_num <- length(S1_p_val_list$r0_p_vals[,1])
+    #PmD_sig_sign_percs_total <- PmD_sig_sign_percs
+    #PmD_total_unit_num <- length(PmD_p_val_list$r0_p_vals[,1])
     
     #################
     M1_win_r_ac <- rbind(M1_win_r_ac,M1_sm_sig_p_r_bin_ac)
